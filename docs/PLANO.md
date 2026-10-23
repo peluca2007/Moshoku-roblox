@@ -248,8 +248,8 @@ Pedido do Pedro, com a análise de game design do Claude. Onde conflitar, substi
 
 1. **Taverna (hub):** ao entrar no jogo, o jogador chega a uma taverna cheia de gente, com servidores públicos. Ali já existe um **personagem pronto** para começar sem passar pela criação. A customização é opcional e fica na taverna: aparência e troca do modelo pronto.
 2. **Play cria a sala:** quem aperta Play cria uma sala. Os amigos entram por convite ou código. O servidor da partida é a sala.
-3. **Sala em primeira pessoa:** é a sala social que já existe (fichas, dados, livros, pegar o amigo; ver [SALA](SALA.md)). Quem criou a sala é o **mestre-anfitrião**: configura e dá o start. "Mestre" aqui quer dizer líder da sala, não um narrador humano; ADM continua sendo uma permissão separada.
-4. **Modo História:** é o único modo por enquanto e é cooperativo. Ao dar start, o grupo vai para o mundo com a câmera estilo Project Zomboid (`client/CameraMundo`).
+3. **Sala em primeira pessoa:** é a sala social que já existe (fichas, dados, livros, pegar o amigo; ver [SALA](SALA.md)). Quem criou a sala é o **mestre-anfitrião**: configura, escolhe o modo e dá o start. "Mestre" aqui quer dizer líder da sala, não um narrador humano; ADM continua sendo uma permissão separada.
+4. **Modos da sala:** o mestre escolhe entre **Modo História** (principal, cooperativo), **Desafios 1/2/3** e **PvP**. Desafios e PvP são os modos que já existem na sala e continuam ali, na arena da mesa. Ao dar start no Modo História, o grupo vai para o mundo com a câmera estilo Project Zomboid (`client/CameraMundo`).
 5. **Combate em arena fixa por região:** a patrulha encosta, vem a transição estilo Pokémon e o grupo luta numa **arena pronta da região onde estava**. Cada arena tem cenário próprio e NPCs de fundo assistindo ou reagindo:
    - cidade: arena da cidade, com moradores em volta;
    - fora da cidade: arena do campo;
@@ -265,18 +265,28 @@ Pedido do Pedro, com a análise de game design do Claude. Onde conflitar, substi
 - Decisão: **um só motor**, o da sala, rodando em arenas de grade plana com cenário por região. O J2 deixa de ser o combate do mundo. As peças úteis que só existem nele (patrulha visível, cone, surpresa, fuga pela borda, IA de criaturas) são aproveitadas na entrada e na arena. Depois disso o código do J2 sai do `src`, e o git guarda o histórico.
 - Com isso, ficam suspensos até a migração: a MAX2 (animações no J2) e o defeito "Perfil inicial incompleto ou incompatível", que é do J2.
 
-**Grupo (proposta do Claude, a confirmar com o Pedro)**
+**Grupo**
 
-- Até **4 jogadores** por sala no Modo História. Por turnos, cada jogador a mais aumenta a espera.
-- Solo é permitido, porque quem entra sem amigo e não consegue jogar vai embora, mas o jogo puxa para o grupo:
+- Até **4 jogadores** por sala no Modo História (Pedro). Um **ADM pode aumentar esse limite por comando**, sem teto fixo de regra, até a lotação do servidor do Roblox. Por turnos, cada jogador a mais aumenta a espera.
+- Proposta do Claude, a confirmar: solo é permitido, porque quem entra sem amigo e não consegue jogar vai embora, mas o jogo puxa para o grupo:
   - a luta inclui todos que estão por perto;
   - quem cai só é levantado por um aliado;
   - eventos e recompensas melhoram com mais gente;
   - o grupo não pode se separar além de um raio.
 
-**Treinadores**
+**Treinadores espalhados pelo mundo (RNG)**
 
-Na primeira cidade ficam o Ladino e a Mestra da Água (P2). O Pedro quer RNG, mas com só dois treinadores não há o que sortear. Proposta: um **conjunto de treinadores** do qual cada run sorteia quais aparecem na cidade (§12 previa 3–4 por vila). Ladino e Água são os dois primeiros; o sorteio passa a valer a partir de 4 treinadores prontos.
+- Cada run sorteia **quais treinadores existem e onde estão**. Nem todos ficam na cidade: alguns aparecem em outras regiões, mais adiante na run.
+- Treinadores fortes aparecem mais tarde e mais longe. Exemplo: o **Deus da Espada** só pode surgir em regiões avançadas.
+- Proposta de regra: cada treinador tem as regiões onde pode aparecer e um peso de chance. Treinador mais forte tem chance menor e só aparece em região mais avançada, como a oferta ponderada de §12.
+- A primeira cidade tem hoje o Ladino e a Mestra da Água (P2). Eles são os dois primeiros do conjunto; o sorteio só faz sentido com mais treinadores prontos.
+
+**Duração e save**
+
+- Uma run é **zerar o jogo**, com média entre **3 e 5 horas** (Pedro). Isso substitui o "1–2 h" de §12.
+- Por isso o **save no meio da run é obrigatório**. O grupo para e continua outro dia do ponto onde estava.
+- Hoje `server/RunServico` salva a run a cada 15 s e ao sair, e retoma pelo UserId. Falta confirmar como a run retomada encontra o grupo de novo na sala (quem precisa estar presente; o que acontece com quem faltar), já que o servidor da partida é a sala.
+- O conteúdo precisa encher 3–5 h: mais regiões, eventos e chefes do que a primeira fatia atual. A duração do dia (8 min) e o prazo da run precisam ser recalibrados para isso.
 
 **Ordem de trabalho proposta**
 
@@ -284,10 +294,11 @@ Na primeira cidade ficam o Ladino e a Mestra da Água (P2). O Pedro quer RNG, ma
 2. Arenas da floresta, do campo e das ruínas.
 3. Taverna como lugar de entrada, Play → sala, start do Modo História. A separação em places do Roblox (hub com servidores públicos e partida em servidor reservado via `TeleportService`) exige jogo publicado, então é testada no fim.
 4. Personagem pronto na taverna e customização opcional.
-5. Mais treinadores e o sorteio.
-6. Retirar o J2 e o que ficou sem uso.
+5. Save e retomada da run com o grupo na sala.
+6. Mais treinadores e o sorteio por região.
+7. Retirar o J2 e o que ficou sem uso.
 
-**Em aberto:** confirmar grupo/solo; quais NPCs de fundo e o que fazem em cada arena; se Treino, Desafios e PvP continuam acessíveis na sala ou ficam guardados.
+**Em aberto:** confirmar solo; quais NPCs de fundo e o que fazem em cada arena; como retomar a run quando nem todo o grupo voltar; se o Treino continua na sala.
 
 ## Histórico da discussão
 

@@ -1,0 +1,52 @@
+Fontes sincronizadas
+Game Started
+952 specs aprovados
+G2 preparado: 18 verificações
+rolagem real
+simulacao encerrada
+treino real
+turno conferido
+t1 ordem=1 x=97 visivel=true
+t2 ordem=2 x=231 visivel=true
+t3 ordem=3 x=365 visivel=true
+t4 ordem=4 x=499 visivel=true
+FINAL 0
+OK snapshot inicial aparece sem novo evento
+OK 32 participantes acessiveis
+OK ator atual primeiro
+OK proximo explicito
+OK volta da iniciativa preservada
+OK fila limitada a janela
+OK conteudo longo tem canvas navegavel
+OK rolagem alcanca outros participantes
+OK atualizar recurso preserva navegacao
+OK novo turno volta ao ator atual
+OK ator anterior perde agora
+OK ator oculto nao gera ficha
+OK proximo visivel nao finge ser ator atual
+OK fila compacta cabe em 375 px
+OK cartas compactas
+OK instrucao de rolagem visivel
+OK contador real do snapshot preservado
+OK urgencia final preservada
+OK arrasto real navega a fila
+OK fora do combate esconde fila
+OK fora do combate limpa participantes
+OK treino real tem HUD ativo
+OK ator real primeiro
+OK clique real passa turno
+OK fila acompanha turno real
+OK rodada real permanece visivel
+OK sem letreiro duplicado no turno
+Console: [Testes] 952 ok, 0 falha(s)
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 952 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

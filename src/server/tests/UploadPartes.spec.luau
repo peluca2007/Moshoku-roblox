@@ -1,0 +1,83 @@
+local UploadPartes = require(game:GetService("ReplicatedStorage").Shared.UploadPartes)
+
+local function novo(limites)
+	return UploadPartes.new(limites)
+end
+
+return {
+	["fluxo completo junta as partes na ordem"] = function(t)
+		local m = novo()
+		local id = m:iniciar("p1", 6, 2, 0, { geracao = 3 })
+		t.ok(id ~= nil)
+		t.eq(m:parte("p1", id, 1, "abc", 1), 2)
+		t.eq(m:parte("p1", id, 2, "def", 1), 3)
+		local texto, erro, contexto = m:concluir("p1", id, 2)
+		t.eq(texto, "abcdef", erro)
+		t.eq(contexto.geracao, 3)
+		t.eq(m.reservado, 0, "memória liberada")
+	end,
+	["parte repetida idêntica confirma; diferente ou fora de ordem é erro sem mudar o buffer"] = function(t)
+		local m = novo()
+		local id = m:iniciar("p1", 6, 2, 0)
+		m:parte("p1", id, 1, "abc", 0)
+		t.eq(m:parte("p1", id, 1, "abc", 0), 2, "repetição idêntica")
+		local _, erro = m:parte("p1", id, 1, "xyz", 0)
+		t.ok(erro and string.find(erro, "diferente", 1, true) ~= nil)
+		_, erro = m:parte("p1", id, 3, "zz", 0)
+		t.ok(erro ~= nil, "fora de ordem")
+		m:parte("p1", id, 2, "def", 0)
+		t.eq((m:concluir("p1", id, 0)), "abcdef")
+	end,
+	["outro jogador não usa o upload alheio"] = function(t)
+		local m = novo()
+		local id = m:iniciar("p1", 3, 1, 0)
+		local _, erro = m:parte("p2", id, 1, "abc", 0)
+		t.ok(erro ~= nil)
+		t.eq((m:concluir("p2", id, 0)), nil)
+	end,
+	["prazo absoluto de 60 s não renova com partes"] = function(t)
+		local m = novo()
+		local id = m:iniciar("p1", 6, 2, 0)
+		t.eq(m:parte("p1", id, 1, "abc", 59), 2)
+		local _, erro = m:parte("p1", id, 2, "def", 61)
+		t.ok(erro ~= nil, "vencida")
+		t.eq(m.reservado, 0)
+	end,
+	["limites de tamanho, partes, por jogador e memória"] = function(t)
+		local m = novo()
+		t.eq((m:iniciar("p1", 65537, 17, 0)), nil, "acima de 64 KiB")
+		t.eq((m:iniciar("p1", 10000, 1, 0)), nil, "parte acima de 4 KiB")
+		t.eq((m:iniciar("p1", 10, 11, 0)), nil, "mais partes que bytes")
+		t.ok(m:iniciar("p1", 10, 1, 0) ~= nil)
+		t.ok(m:iniciar("p1", 10, 1, 0) ~= nil)
+		t.eq((m:iniciar("p1", 10, 1, 0)), nil, "terceira do mesmo jogador")
+		local pequeno = novo({ parteMax = 4096, partesMax = 32, totalMax = 65536, porDono = 5, porServidor = 16, memoriaMax = 100, prazo = 60 })
+		t.ok(pequeno:iniciar("a", 60, 1, 0) ~= nil)
+		t.eq((pequeno:iniciar("b", 60, 1, 0)), nil, "memória global")
+	end,
+	["incompleta não conclui e libera"] = function(t)
+		local m = novo()
+		local id = m:iniciar("p1", 6, 2, 0)
+		m:parte("p1", id, 1, "abc", 0)
+		local texto, erro = m:concluir("p1", id, 0)
+		t.eq(texto, nil)
+		t.ok(erro ~= nil)
+		t.eq(m.reservado, 0)
+	end,
+	["dividir respeita fronteira UTF-8 e reconstrói o texto"] = function(t)
+		local texto = string.rep("Irmão Ossório ", 700)
+		local partes = UploadPartes.dividir(texto, 4096)
+		t.ok(#partes > 1)
+		for _, parte in partes do
+			t.ok(#parte <= 4096 and utf8.len(parte) ~= nil)
+		end
+		t.eq(table.concat(partes), texto)
+	end,
+	["saída do jogador libera as transferências dele"] = function(t)
+		local m = novo()
+		m:iniciar("p1", 10, 1, 0)
+		m:iniciar("p2", 10, 1, 0)
+		m:liberarDono("p1")
+		t.eq(m.reservado, 10)
+	end,
+}

@@ -1,0 +1,25 @@
+Fonte sincronizada
+Game Started
+1064 specs / 0 falhas
+Sala pronta
+Braços: parcial, R6 e apresentação remota
+Olhar baixo
+Ficha
+Leitura livre
+[{"lt":1,"pos":"250, 3.7999496459960938, -12","n":"HumanoidRootPart"},{"lt":1,"pos":"251.57965087890625, 3.719280481338501, -11.729920387268066","n":"LeftLowerArm"},{"lt":1,"pos":"248.44017028808594, 3.672358512878418, -11.812251091003418","n":"RightLowerArm"},{"lt":1,"pos":"251.5381622314453, 4.248678684234619, -12.013772964477539","n":"LeftUpperArm"},{"lt":1,"pos":"248.46603393554688, 4.235434532165527, -12.040306091308594","n":"RightUpperArm"},{"lt":0,"pos":"250, 4.007021427154541, -12.06985855102539","n":"UpperTorso"},{"lt":1,"pos":"251.5966796875, 3.252655506134033, -11.267342567443848","n":"LeftHand"},{"lt":0,"pos":"250.60731506347656, 2.424553394317627, -10.998885154724121","n":"LeftLowerLeg"},{"lt":0,"pos":"250.54702758789062, 2.773088216781616, -11.561298370361328","n":"LeftUpperLeg"},{"lt":0,"pos":"250, 2.9599204063415527, -12","n":"LowerTorso"},{"lt":1,"pos":"248.451171875, 3.138425827026367, -11.429102897644043","n":"RightHand"},{"lt":0,"pos":"249.4220733642578, 2.4243569374084473, -10.996228218078613","n":"RightLowerLeg"},{"lt":0,"pos":"249.46585083007812, 2.773021936416626, -11.560086250305176","n":"RightUpperLeg"},{"lt":1,"pos":"249.970947265625, 4.813705921173096, -12.21090030670166","n":"Handle"},{"lt":0,"pos":"250.6337890625, 1.7898879051208496, -10.751880645751953","n":"LeftFoot"},{"lt":1,"pos":"250, 5.429932594299316, -12.136817932128906","n":"Head"},{"lt":1,"pos":"250, 6.137237071990967, -12.233841896057129","n":"Handle"},{"lt":0,"pos":"249.981689453125, 2.6715245246887207, -11.596397399902344","n":"Handle"},{"lt":0,"pos":"249.40284729003906, 1.78969144821167, -10.748554229736328","n":"RightFoot"}]
+Marcadores
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g14_verificar.py", line 71, in <module>
+    marker_button('Folhear');marker_button('Folhear');marker_button('Folhear');marker_button('Assumir');key('P')
+    ~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g14_verificar.py", line 35, in marker_button
+    call('user_mouse_input',datamodel_type='Client',actions=[dict(action='mouseButtonClick',mouse_button='left',x=round(pos[0]),y=round(pos[1]))]);time.sleep(.55)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g14_verificar.py", line 13, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'VirtualInput::SendMousePosition: position (307.0, 167.0) hits CoreGUI.'}

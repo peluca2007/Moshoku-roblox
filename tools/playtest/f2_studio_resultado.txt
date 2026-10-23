@@ -1,0 +1,131 @@
+Estado inicial: - Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Game Started
+Specs: 943 specs aprovados
+iniciado
+EM ANDAMENTO 3
+EM ANDAMENTO 3
+EM ANDAMENTO 8
+EM ANDAMENTO 8
+EM ANDAMENTO 13
+EM ANDAMENTO 13
+EM ANDAMENTO 18
+EM ANDAMENTO 18
+EM ANDAMENTO 18
+EM ANDAMENTO 23
+EM ANDAMENTO 26
+EM ANDAMENTO 28
+EM ANDAMENTO 31
+EM ANDAMENTO 33
+EM ANDAMENTO 38
+EM ANDAMENTO 38
+EM ANDAMENTO 43
+EM ANDAMENTO 43
+EM ANDAMENTO 48
+EM ANDAMENTO 50
+EM ANDAMENTO 53
+EM ANDAMENTO 56
+EM ANDAMENTO 58
+EM ANDAMENTO 60
+EM ANDAMENTO 63
+EM ANDAMENTO 66
+EM ANDAMENTO 68
+EM ANDAMENTO 73
+EM ANDAMENTO 73
+EM ANDAMENTO 78
+EM ANDAMENTO 78
+EM ANDAMENTO 83
+FINAL 0
+OK    mago-de-fogo: escolha registrada
+OK    mago-de-fogo: personagem certo na mesa
+OK    mago-de-fogo: cartas na barra
+OK    mago-de-fogo: 13 cartas usadas sem erro interno
+OK    mago-de-fogo: saiu do treino e liberou a arena
+OK    maga-da-agua: escolha registrada
+OK    maga-da-agua: personagem certo na mesa
+OK    maga-da-agua: cartas na barra
+OK    maga-da-agua: 15 cartas usadas sem erro interno
+OK    maga-da-agua: saiu do treino e liberou a arena
+OK    mago-do-vento: escolha registrada
+OK    mago-do-vento: personagem certo na mesa
+OK    mago-do-vento: cartas na barra
+OK    mago-do-vento: 14 cartas usadas sem erro interno
+OK    mago-do-vento: saiu do treino e liberou a arena
+OK    mago-da-terra: escolha registrada
+OK    mago-da-terra: personagem certo na mesa
+OK    mago-da-terra: cartas na barra
+OK    mago-da-terra: 15 cartas usadas sem erro interno
+OK    mago-da-terra: saiu do treino e liberou a arena
+OK    curandeira: escolha registrada
+OK    curandeira: personagem certo na mesa
+OK    curandeira: cartas na barra
+OK    curandeira: 11 cartas usadas sem erro interno
+OK    curandeira: saiu do treino e liberou a arena
+OK    alquimista: escolha registrada
+OK    alquimista: personagem certo na mesa
+OK    alquimista: cartas na barra
+OK    alquimista: 12 cartas usadas sem erro interno
+OK    alquimista: saiu do treino e liberou a arena
+OK    teorico: escolha registrada
+OK    teorico: personagem certo na mesa
+OK    teorico: cartas na barra
+OK    teorico: 11 cartas usadas sem erro interno
+OK    teorico: saiu do treino e liberou a arena
+OK    invocador: escolha registrada
+OK    invocador: personagem certo na mesa
+OK    invocador: cartas na barra
+OK    invocador: 8 cartas usadas sem erro interno
+OK    invocador: saiu do treino e liberou a arena
+OK    espadachim: escolha registrada
+OK    espadachim: personagem certo na mesa
+OK    espadachim: cartas na barra
+OK    espadachim: 12 cartas usadas sem erro interno
+OK    espadachim: saiu do treino e liberou a arena
+OK    duelista-da-agua: escolha registrada
+OK    duelista-da-agua: personagem certo na mesa
+OK    duelista-da-agua: cartas na barra
+OK    duelista-da-agua: 11 cartas usadas sem erro interno
+OK    duelista-da-agua: saiu do treino e liberou a arena
+OK    guerreiro-do-norte: escolha registrada
+OK    guerreiro-do-norte: personagem certo na mesa
+OK    guerreiro-do-norte: cartas na barra
+OK    guerreiro-do-norte: 12 cartas usadas sem erro interno
+OK    guerreiro-do-norte: saiu do treino e liberou a arena
+OK    brutamontes: escolha registrada
+OK    brutamontes: personagem certo na mesa
+OK    brutamontes: cartas na barra
+OK    brutamontes: 13 cartas usadas sem erro interno
+OK    brutamontes: saiu do treino e liberou a arena
+OK    escudeiro: escolha registrada
+OK    escudeiro: personagem certo na mesa
+OK    escudeiro: cartas na barra
+OK    escudeiro: 12 cartas usadas sem erro interno
+OK    escudeiro: saiu do treino e liberou a arena
+OK    arqueira: escolha registrada
+OK    arqueira: personagem certo na mesa
+OK    arqueira: cartas na barra
+OK    arqueira: 10 cartas usadas sem erro interno
+OK    arqueira: saiu do treino e liberou a arena
+OK    ladina: escolha registrada
+OK    ladina: personagem certo na mesa
+OK    ladina: cartas na barra
+OK    ladina: 9 cartas usadas sem erro interno
+OK    ladina: saiu do treino e liberou a arena
+OK    bardo: escolha registrada
+OK    bardo: personagem certo na mesa
+OK    bardo: cartas na barra
+OK    bardo: 13 cartas usadas sem erro interno
+OK    bardo: saiu do treino e liberou a arena
+OK    tatico: escolha registrada
+OK    tatico: personagem certo na mesa
+OK    tatico: cartas na barra
+OK    tatico: 9 cartas usadas sem erro interno
+OK    tatico: saiu do treino e liberou a arena
+A9 personagens: 0 falha(s)
+Console: [Testes] 943 ok, 0 falha(s)
+[Testes] 943 ok, 0 falha(s)
+Game Stopped
+Estado final: - Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

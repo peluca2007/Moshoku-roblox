@@ -1,0 +1,3 @@
+J2 — Brasa autônoma (14/10/2026)
+
+Studio `Moshoku-Prototipo.rbxlx`: serviço, módulo de habilidade, UI e specs sincronizados em Edit. Play/TestRunner: **1219 ok, 0 falhas**. Fixture descartável no cliente mostrou “Brasa → Goblin · 30/30 PV” quando o snapshot autorizava Brasa; menu restaurado e fixture removida. Play encerrado; Studio retornou a Edit. Place não salvo. Sem clique real na habilidade, multiplayer real ou avaliação visual humana.

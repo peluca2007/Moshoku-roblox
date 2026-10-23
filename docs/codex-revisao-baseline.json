@@ -1,0 +1,66 @@
+[
+  {
+    "path": "src\\client.client.luau",
+    "sha256": "E543B56BFC3CB1D51764E7C695009CD0483FFB82784EB5AD75BE10B4533E7153"
+  },
+  {
+    "path": "src\\server.server.luau",
+    "sha256": "6C77ABF4E8F6A01F23587477EC9E43F80F57A1F337AFF387608B1887A39F5195"
+  },
+  {
+    "path": "src\\client\\BattleController.luau",
+    "sha256": "937FFF1CA325F9925BFCB81BF1C5D370892A54D3D8B34930917B2C89F2ABBE88"
+  },
+  {
+    "path": "src\\client\\BoardView.luau",
+    "sha256": "69C48855552F5D3103FEA240384F9C164D8040B83881518C0B0A815F9B9EAF76"
+  },
+  {
+    "path": "src\\client\\CameraController.luau",
+    "sha256": "6BBF569E0A903CE33BF7BD3EDAAD3B95BE12FBFB3A6355A566ECBAB0DCC0BAB0"
+  },
+  {
+    "path": "src\\client\\MesaState.luau",
+    "sha256": "9BE1A928375FBF917AC612944525E5E5B2A1E88AEEA55CB218AC36BE430B39DC"
+  },
+  {
+    "path": "src\\server\\CombatRules.luau",
+    "sha256": "9479B39024CC153900CE5C21C1F1AD519EDB5E1114EA23B945C73CCFA3259DEF"
+  },
+  {
+    "path": "src\\server\\CombatService.luau",
+    "sha256": "829E7E49DCBEAFCE8DDEB1DDE00AF1176E6F9CDD87B0431C84FD5B78BFBFE61D"
+  },
+  {
+    "path": "src\\server\\MesaRoles.luau",
+    "sha256": "2DDA01C5E4B9D93657147614610CC54C66A90D1321876D827DB7AFC02F5BC3B3"
+  },
+  {
+    "path": "src\\server\\MesaService.luau",
+    "sha256": "EA64AEC2CD52090D1B3C2606A3752605CAE12CB2FB5F073BFAFF77D83A9FDDA2"
+  },
+  {
+    "path": "src\\server\\MesaWorld.luau",
+    "sha256": "68C7E26EAB4BDE576987BE072CB58CAC1A1C987CA81CCD9BEE893D6DBF95CDDD"
+  },
+  {
+    "path": "src\\server\\TestRunner.luau",
+    "sha256": "CB9F8BAC851DB63354E939768EEBEE0BDCEAEBE99388CD1F9D83ADDDB29A196E"
+  },
+  {
+    "path": "src\\server\\WorldBuilder.luau",
+    "sha256": "10B87BA8CDE38632031A666D60CF9D81D8187544E2F7422FBD38B7DCD4605B38"
+  },
+  {
+    "path": "src\\server\\tests\\MesaProtocol.spec.luau",
+    "sha256": "13FE784BA34AE0C1391D00749AA607C71E0A6933A3D2D9386877CE685ED6E0EE"
+  },
+  {
+    "path": "src\\shared\\Grid.luau",
+    "sha256": "BDEAF88CC46694BB044019E1566F73678E526F5FAE90D7C777E784B89874BA97"
+  },
+  {
+    "path": "src\\shared\\MesaProtocol.luau",
+    "sha256": "0B866F188832D4345B7C8C7969AB339B3C9DC3533045130EDA10BEF22ED4F207"
+  }
+]

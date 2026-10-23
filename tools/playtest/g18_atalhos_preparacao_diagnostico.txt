@@ -1,0 +1,95 @@
+Fonte sincronizada
+Game Started
+Chat fechado apenas nesta sessao de teste: true
+Sala pronta
+pronto confirmado
+pronto cancelado
+Preparacao
+Foco producao
+Leitura livre
+CLICK Modo_duelo 499 422
+PvP bloqueado
+CLICK Modo_luta 499 361
+CLICK Aba_sala 692 95
+CLICK ArrumarSala 499 318
+Arrumado
+CLICK BrotosTodos 499 257
+CLICK GuardarPapel 504 476
+Rodada
+Brotos
+Admin
+CLICK Aba_sessao 303 120
+CLICK LancarDados 499 180
+{"maxY":12.699527740478516,"escuro":true,"frames":147,"fora":0}
+Erros 
+arvore fora da partida
+monitor de M
+camera livre em partida
+digitacao de bancada
+{"trocas":[],"texto":"","foco":"TextBox","entrada":[]}
+Entrada
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+[Admin] 2287856135 brotos
+AssistantCommand:1: attempt to index nil with 'combat'
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+AssistantCommand:1: attempt to index nil with 'combat'
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+AssistantCommand:1: attempt to index nil with 'combat'
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+FINAL 2
+OK sala mestre
+OK primeira pessoa
+OK cabeca oculta
+OK corpo visivel
+OK bandeja e caderno
+OK escudo moldura
+OK prontidao confirmada no servidor
+OK prompt oferece cancelar confirmado
+OK selo mostra pronto confirmado
+OK cancelar prontidao autoritativa
+OK prompt volta a confirmar
+OK modos explicitos
+OK inicio habilitado
+OK foco de bancada em opcao visivel
+OK foco preservado apos snapshot real
+OK foco real dentro da rolagem
+OK preparacao sem obstrucao
+OK pvp solo bloqueado
+OK arrumar recolhe
+OK Brotos aberto
+OK rodada real concluida
+OK mestre nao muda
+OK placar recreativo
+OK ADM brotos real
+OK transicao permanece na mesa
+OK subida moderada
+OK fade antes da arena
+OK fade revela arena
+OK partida real iniciou
+OK maos liberadas
+OK sem recusas no fluxo normal
+OK T nao abre arvore em partida
+OK M ainda sai do tabuleiro em partida
+FALHA M ainda volta ao tabuleiro em partida
+FALHA digitar M nao aciona camera
+OK Q cancela sem menu Roblox
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_regressao.py", line 105, in <module>
+    assert lua('return shared.G14.falhas').strip()=='0'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

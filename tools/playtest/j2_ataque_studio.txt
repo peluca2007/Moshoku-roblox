@@ -1,0 +1,8 @@
+J2 ataque básico autônomo — 13/10/2026
+
+Fontes sincronizadas em Edit para o place Moshoku-Prototipo.rbxlx: EncontroAutonomoCombate, EncontroAutonomoElenco, EncontroTurnos, EncontroAutonomoService, specs de combate/turnos/serviço e EncontroAutonomoState/View.
+Studio Play/TestRunner: **1.195 ok, 0 falhas**. Uma execução anterior marcou 1.194/1: replay do golpe final era recusado quando a fila ficava com um único jogador; corrigido para reconhecer replay exato antes da validação de fase/tamanho da fila, e repetido com 1.195/0.
+
+Fixture temporária só durante Play: 1 jogador local + 1 criatura a 1 casa, alvo CA 0/PV 1. O estado chegou à interface, o painel foi exibido e `InicioJogo.Enabled=false`; a opção `Atacar Goblin de teste · 1/1 PV` foi criada. O clique pela automação de mouse foi tentado por alvo e por coordenada, mas não produziu `GuiButton.Activated`; portanto, interação visual end-to-end permanece sem confirmação. A transação serviço→ataque→PV/derrota/vitória/replay passou no TestRunner com RNG determinístico.
+
+Play encerrado; Studio voltou a Edit. A fixture foi removida com o encerramento e o place não foi salvo. Sem cliente adicional/servidor publicado. A ação não foi visualmente confirmada por clique real.

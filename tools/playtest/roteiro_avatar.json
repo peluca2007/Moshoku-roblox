@@ -1,0 +1,16 @@
+[
+ {"tool":"start_stop_play","args":{"is_start":false}},
+ {"sleep":2},
+ {"tool":"start_stop_play","args":{"is_start":true}},
+ {"sleep":9},
+ {"tool":"execute_luau","args":{"datamodel_type":"Client","code_file":"tools/playtest/avatar_parte1.luau"},"timeout":60},
+ {"tool":"execute_luau","args":{"datamodel_type":"Server","code_file":"tools/playtest/avatar_onde.luau"}},
+ {"tool":"user_keyboard_input","args":{"datamodel_type":"Client","actions":[{"action":"keyPress","key_code":"M"},{"action":"wait","wait_time_ms":900}]}},
+ {"tool":"execute_luau","args":{"datamodel_type":"Client","code_file":"tools/playtest/avatar_mover.luau"}},
+ {"tool":"screen_capture","args":{"capture_id":"Avatar_Andando"}},
+ {"sleep":1.5},
+ {"tool":"execute_luau","args":{"datamodel_type":"Server","code_file":"tools/playtest/avatar_onde.luau"}},
+ {"tool":"screen_capture","args":{"capture_id":"Avatar_Chegou"}},
+ {"tool":"get_console_output","args":{},"max":2500},
+ {"tool":"start_stop_play","args":{"is_start":false}}
+]

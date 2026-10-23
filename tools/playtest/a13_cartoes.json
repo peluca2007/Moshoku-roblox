@@ -1,0 +1,8 @@
+[
+ {"sleep":2},
+ {"tool":"execute_luau","args":{"datamodel_type":"Server","code":"local r=game.ServerScriptService.Server; local p,f=require(r.TestRunner).run(r.tests); assert(f==0); return p..' specs aprovados'"}},
+ {"tool":"user_mouse_input","args":{"datamodel_type":"Client","actions":[{"action":"mouseButtonClick","mouse_button":"left","instance_path":"LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Inicio.Escolher"}]}},
+ {"sleep":1},
+ {"tool":"execute_luau","args":{"datamodel_type":"Client","code_file":"tools/playtest/a13_cartoes.luau"}},
+ {"tool":"screen_capture","args":{"capture_id":"A13_atributos"}}
+]

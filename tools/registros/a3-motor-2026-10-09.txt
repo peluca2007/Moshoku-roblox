@@ -1,0 +1,59 @@
+## start_stop_play {"is_start": true}
+Game Started
+## execute_luau {"datamodel_type": "Server", "code": "local root = game:GetService('ServerScriptService'):WaitForChild('Server'); local 
+A3: 168 ok, 0 falhas
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a3_fogo_e2e.luau"}
+OK    Ignis criado com PV/PM do site
+OK    Ignis tem as 6 magias do Principiante (truque + 5 compras)
+OK    Lobo do bestiário com PV do Apêndice G (patamar 1, padrão: 64)
+OK    criatura marcada
+OK    fora de combate: recusa
+OK    vez do Ignis
+OK    Brasa resolvida no registro
+OK    recibo do efeito chegou
+OK    1 Ação gasta
+OK    Brasa não gasta PM
+OK    Brasa só uma vez por turno
+OK    Bola de Fogo: fora de alcance? goblin a 9 casas está dentro de 12
+OK    Bola de Fogo gasta 1 PM e 2 Ações
+OK    sem Ações: recusa
+OK    Em Chamas cobra no início do turno de quem queima (se a Bola acertou)
+OK    rodada 2: vez do Ignis
+OK    Ações zeradas na vez nova
+OK    Toque Escaldante: precisa estar colado
+OK    Toque Escaldante colado ao lobo
+OK    Toque gasta 2 PM
+OK    Clarão: teste de Vigor no raio
+OK    rodada 3: vez do Ignis
+OK    Muro de Chamas erguido
+OK    muro no snapshot com 6 casas
+OK    Muro gasta 3 PM (12 - 1 - 2 - 1 - 3)
+OK    atravessar o muro queima
+OK    muro bloqueia a visão
+OK    Fagulha: 1 Ação, registro
+OK    apagar o fogo: teste de Agilidade no registro
+OK    saldo final de PM corresponde às seis magias
+OK    fim do combate apaga os muros
+PM final do Ignis: 4/12 esperado
+RESUMO: 0 falha(s); 7 recibos de efeito
+Últimos registros:
+  » Lobo Cinzento: teste d20 9 +2 = 11 contra CD 11: resiste
+  » Ignis, Aprendiz de Fogo usa Clarão
+  » Rodada 2: vez de Lobo Cinzento.
+  » Rodada 2: vez de Goblin Batedor.
+  » Rodada 3: vez de Ignis, Aprendiz de Fogo.
+  » Ignis, Aprendiz de Fogo usa Muro de Chamas • 6 casa(s) até a rodada 13
+  » Goblin Batedor atravessa Muro de Chamas: 13 de dano ígneo (PV 32 → 19), fica Em Chamas.
+  » Goblin Batedor moveu 6 casa(s) (9,0 m).
+  » Ignis, Aprendiz de Fogo moveu 3 casa(s) (4,5 m).
+  » Lobo Cinzento moveu 3 casa(s) (4,5 m).
+  » Sem linha de visão até o alvo.
+  » Ignis, Aprendiz de Fogo usa Fagulha • efeito narrativo (o mestre descreve)
+  » Aguarde a vez dessa ficha.
+  » Combate encerrado.
+  » A mesa foi limpa.
+## get_console_output {}
+[Testes] 168 ok, 0 falha(s)
+[Testes] 168 ok, 0 falha(s)
+## start_stop_play {"is_start": false}
+Game Stopped

@@ -1,0 +1,30 @@
+Fonte sincronizada
+Game Started
+1063 specs / 0 falhas
+Sala pronta
+bandeja
+Dados na mao
+Impulso nativo, dono servidor; velocidade 0.000042669475078582764, -0.0009198784828186035, -0.0003136247396469116
+Fisica: pico 23.223844528198242, deslocamento 1.4081873893737793
+Pousou
+Brotos confirmado
+Prompt nativo (ButtonB fisico nao emulado pelo MCP)
+Prompt
+Gestos de dados/jogador verificados em bancada
+Arrumado
+Alvo real carregado por avatar de bancada
+Alvo
+Salto real soltou pelo remoto
+Solto
+Game Stopped
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 69, in <module>
+    print(lua('return table.concat(shared.G15.linhas,"\n").."\nG15: "..shared.G15.falhas.." falhas\nErros: "..table.concat(shared.G15.erros," | ")'),flush=True)
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 17, in lua
+    def lua(code,dm='Client'):return call('execute_luau',datamodel_type=dm,code=code)
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 15, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: Failed to parse command code'}

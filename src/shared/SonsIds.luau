@@ -1,0 +1,22 @@
+-- Gerado por python tools/sons/preparar.py; efeitos selecionados pelo catálogo do site.
+return {
+	["agua"] = "rbxassetid://103436371462795",
+	["aparar"] = "rbxassetid://97386344301275",
+	["brilho"] = "rbxassetid://117974689608419",
+	["cura-1"] = "rbxassetid://75954149001115",
+	["cura-2"] = "rbxassetid://73324541149522",
+	["espada-combo"] = "rbxassetid://97732414173082",
+	["espada-corte"] = "rbxassetid://103695653863803",
+	["espada-metal"] = "rbxassetid://133019894363951",
+	["flecha-impacto-1"] = "rbxassetid://129700547306010",
+	["flecha-impacto-2"] = "rbxassetid://120428283997985",
+	["fogo"] = "rbxassetid://137399367521835",
+	["fogo-impacto"] = "rbxassetid://80973572132812",
+	["gelo"] = "rbxassetid://126582366704269",
+	["lanca"] = "rbxassetid://90057993077385",
+	["moedas"] = "rbxassetid://126704616317774",
+	["soco"] = "rbxassetid://84453480355784",
+	["terra"] = "rbxassetid://131552822090123",
+	["vento"] = "rbxassetid://87273513111120",
+	["vento-impacto"] = "rbxassetid://86654506723670",
+}

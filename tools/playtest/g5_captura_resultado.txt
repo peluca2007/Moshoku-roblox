@@ -1,0 +1,9 @@
+Game Started
+Braseiro real preparado, apenas camera e HUD ajustados para captura
+camera aproximada
+Console: [Testes] 970 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

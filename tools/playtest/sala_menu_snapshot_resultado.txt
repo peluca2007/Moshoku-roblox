@@ -1,0 +1,17 @@
+BUG-MENU-SNAPSHOT — 13/10/2026
+
+Correção aplicada em src/client/SalaView.luau e revisão auxiliar somente leitura aprovada.
+Suíte obrigatória: 259 fontes compiladas/0 erros; specs puros, catálogo, simulações do painel e estado do cliente aprovados.
+RESULTADO: tudo ok (fora do Studio).
+Place Moshoku-Prototipo.rbxlx regenerado por tools/build-place.ps1 e XML válido.
+
+O wrapper Python/MCP de menu_sair.py não respondeu durante inicialização. O fluxo equivalente foi rodado diretamente no Studio MCP `Moshoku-Prototipo.rbxlx`, após confirmar Edit:
+OK — treino começou e menu fechou (clique real).
+OK — MENU continua aberto após 3s de snapshots (clique real).
+OK — opção Sair da partida visível.
+OK — depois de sair, a opção some.
+Resultado: 4/4 verificações de cliente aprovadas.
+Output do Studio: [Testes] 1107 ok, 0 falha(s); aviso conhecido de inicialização Infinite yield em ReplicatedStorage:WaitForChild("Mesa").
+Play próprio encerrado, fixture MoshokuTesteMestre removida, Edit confirmado. A janela MoshokuRPGMesa também permaneceu em Edit. Place gerado não salvo após a sessão de teste.
+
+Proteção do roteiro: seleciona pelo nome, lista instâncias sem Play e exige modo Edit. --help e py_compile passaram.

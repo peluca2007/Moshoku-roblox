@@ -1,0 +1,14 @@
+Failed to find real location of C:\Program Files\Python314\python.exe
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g14_verificar.py", line 34, in <module>
+    studios=json.loads(c.call('list_roblox_studios',{})['text'])['studios']
+            ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\json\__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Program Files\Python314\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

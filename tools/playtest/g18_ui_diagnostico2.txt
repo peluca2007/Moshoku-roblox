@@ -1,0 +1,17 @@
+Game Started
+retrato
+bancada G18 criada
+374, 666 canvas=312, 440 papel=0.7864192724227905, 1.1191351413726807, 0.007561724167317152
+Lugar1
+sentado
+CLICK Modo_luta [182.9859161376953, 416.804931640625, 0, 334, 52, 440, 474.804931640625]
+CLICK Nivel_1 [182.9859161376953, 416.804931640625, 0, 334, 52, 440, 474.804931640625]
+opcoes atuais
+CLICK Modo_duelo [182.9859161376953, 356.0315856933594, 0, 274, 52, 440, 414.0315856933594]
+{"envios":[],"input":"Enum.UserInputType.Touch","scroll":"0, 159","clicados":["Modo_luta","Nivel_1"],"antes":0}
+{"sobre":["Players.Reset45206551.PlayerGui.TouchGui.TouchControlFrame","Players.Reset45206551.PlayerGui.G18Consulta.Pagina.Modo_duelo","Players.Reset45206551.PlayerGui.G18Consulta.Pagina","Players.Reset45206551.PlayerGui.G18Consulta.MolduraPapel","Players.Reset45206551.PlayerGui.SalaPapelInterface.Pagina.TextLabel","Players.Reset45206551.PlayerGui.SalaPapelInterface.Pagina","Players.Reset45206551.PlayerGui.SalaPapelInterface.MolduraPapel"],"touch":true}
+controles suspensos apenas nesta bancada
+CLICK Modo_duelo [182.9859161376953, 356.0315856933594, 0, 274, 52, 440, 414.0315856933594]
+{"clicados":["Modo_luta","Nivel_1","Modo_duelo"],"envios":[{"cmd":"salaConfigurar","d":{"modo":"duelo","nivel":1,"monstros":false}}]}
+Game Stopped
+default

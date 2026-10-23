@@ -1,0 +1,14 @@
+iPhone7
+Game Started
+retrato
+Enum.UserInputType.Touch touch=true key=false
+[]
+painel cabe 374, 666 18, 278 172, 160 acaoativa=true
+toque arremessa
+[imagem salva em C:\Users\pedro\AppData\Local\Temp\studio-captura-1791733878017.jpg]
+paisagem
+ficha cabe e rola 666, 374
+1081 specs / 0 falhas
+camera=250, 5.54275322, -11.8446712, -1, 0, 0, 0, 0.98934257, 0.145606741, 0, 0.145606741, -0.98934257 sujeito=Humanoid sala=SalaRPG
+Game Stopped
+default

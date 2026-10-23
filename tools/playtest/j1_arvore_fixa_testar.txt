@@ -1,0 +1,8 @@
+Preservação da progressão J1 — 14/10/2026
+
+Suíte: powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1
+Resultado: 296 arquivos Luau compilados, 0 erros; RESULTADO: tudo ok (fora do Studio).
+
+Spec de sessão: compra habilidade do rank aberto; recalcula nome e construção na mesma árvore e confirma que a habilidade continua; troca para outra árvore válida e confirma recusa, preservação da árvore e compra originais.
+
+Studio Edit sincronizado com `PersonagemSessao.spec` e `CriacaoPersonagemView`; Play/TestRunner: 1.241 specs, 0 falhas. Cliente iniciou sem erro de TextBox. Play encerrado; Studio em Edit; place não salvo. Não houve clique real na UI.

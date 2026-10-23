@@ -1,0 +1,4 @@
+J2 — mapa tático e prévia de movimento por destino.
+Studio Play/TestRunner: 1.234 ok, 0 falhas.
+Fixture de cliente: grade 20×20 criada, casa liberada por criatura derrotada ficou ativa para toque/clique, e mapa ocultou-se fora da fase ativa. A intenção chama `state.mover` com coordenada; o serviço segue revalidando turno, versão, Ação, ocupação e alcance.
+A interação real do botão Activated pela ferramenta de mouse do MCP não foi confirmada. Play encerrado, Studio em Edit; place não salvo.

@@ -1,0 +1,710 @@
+{
+ "AbetoSombrio1": {
+  "asset": "140181905734954",
+  "modelo": "abeto",
+  "semente": "1",
+  "sha256": "f9d2eb9fd70a651d5d459c20e3a583f3375fe83411ac5c62bdc15d59b18c9083"
+ },
+ "AbetoSombrio2": {
+  "asset": "75411239055743",
+  "modelo": "abeto",
+  "semente": "2",
+  "sha256": "706988acc36c423bde5dba2f0bbd7d8abb6335b6e526e6abc5d8818645d5bd67"
+ },
+ "AbetoSombrio3": {
+  "asset": "87662304447641",
+  "modelo": "abeto",
+  "semente": "3",
+  "sha256": "d106c496681002ad1cba6920c6ca1acd509046122a4841d095c7979dc35f0a59"
+ },
+ "Altar": {
+  "asset": "98506387136132",
+  "modelo": "altar",
+  "semente": "1",
+  "sha256": "62139e93b90fd2ed5a551bc9ce1a6560d99022259288d4a16c766db02a505179"
+ },
+ "AranhaFloresta": {
+  "asset": "101417364662209",
+  "modelo": "aranha",
+  "semente": "1",
+  "sha256": "4354222373d532455f93d2adf5ea6d2ebca64e9df8146175157d74a990a294fb"
+ },
+ "Arbusto1": {
+  "asset": "79729547095864",
+  "modelo": "arbusto",
+  "semente": "1",
+  "sha256": "2e4f74d153df06849a5ba062e7894afc888772af50e2d860bb1a36f6ebec0360"
+ },
+ "Arbusto2": {
+  "asset": "134772416390561",
+  "modelo": "arbusto",
+  "semente": "2",
+  "sha256": "4bfd8f14774372e2a07782b1d8a0b893a792cd6c815cbbc69d0189421d1f0443"
+ },
+ "ArbustoFlor1": {
+  "asset": "71285196378738",
+  "modelo": "arbusto",
+  "semente": "3",
+  "sha256": "0b10a1e86a9bc8180930794c0c1c2beddcfeb51ae998bf9977ad2d92d7fbf677"
+ },
+ "Arco": {
+  "asset": "94617987705231",
+  "modelo": "arco",
+  "semente": "1",
+  "sha256": "cbec79bad96935457d26fc2df8dd0deb3b8a3411d72a378e25d50a66fa095da7"
+ },
+ "ArvoreMorta1": {
+  "asset": "123420330251463",
+  "modelo": "arvoremorta",
+  "semente": "1",
+  "sha256": "d0be4f3538fbfca2b4cec1475f1661b230f5a17ad503a7b0436c3ac1623fbc04"
+ },
+ "ArvoreMorta2": {
+  "asset": "103657530226267",
+  "modelo": "arvoremorta",
+  "semente": "2",
+  "sha256": "5becafc58cb89f71939fd297662bf4da4a4f2d2dc6e08cf3fc6584962678fc0a"
+ },
+ "ArvoreMorta3": {
+  "asset": "75089122085948",
+  "modelo": "arvoremorta",
+  "semente": "3",
+  "sha256": "8014d8021070f5dcf61944532270db0c87f16bb3e1131929f9802a2e7b2f63ed"
+ },
+ "AsasCelestial": {
+  "asset": "71599075674079",
+  "modelo": "asascelestial",
+  "semente": "1",
+  "sha256": "417aae6f5b0623fe0ec6e90cbb11b85cf4ffce28b096f7e707b14946c56e5055"
+ },
+ "Banco": {
+  "asset": "97022837118316",
+  "modelo": "banco",
+  "semente": "1",
+  "sha256": "e3f8c443ec169ef200e236a85c596e30bd2d1f10760bbd9a20ddb14b0f0d91bf"
+ },
+ "Bandeirolas1": {
+  "asset": "90944870764131",
+  "modelo": "bandeirolas",
+  "semente": "1",
+  "sha256": "0db396ebe40322320a6edf32e59c4099336f676037e1840544dd440fdd722e80"
+ },
+ "Bandeirolas2": {
+  "asset": "124550190109108",
+  "modelo": "bandeirolas",
+  "semente": "2",
+  "sha256": "aff55a23400640cc66ad44c68607723b185ca024f48f70089d85d92dbc5a8b0d"
+ },
+ "Bandeirolas3": {
+  "asset": "84044956884254",
+  "modelo": "bandeirolas",
+  "semente": "3",
+  "sha256": "c7417ac616a3968b11df835a1930420571909251e5b26d35a9a708b6ddabe767"
+ },
+ "BandidoEspada": {
+  "asset": "116874211505824",
+  "modelo": "bandido",
+  "semente": "1",
+  "sha256": "333d6f68c72b4ed30fc6dd7e4c061d5521fdf3842cbead1a5fa6b3fd9d5fe355"
+ },
+ "BandidoPorrete": {
+  "asset": "121609113162863",
+  "modelo": "bandido",
+  "semente": "1",
+  "sha256": "0491d66aaa9cb20c6e6c1b230e2f8cc9882f78201af214c53177a091227be6ba"
+ },
+ "Barba1": {
+  "asset": "129677285232439",
+  "modelo": "barbacurta",
+  "semente": "1",
+  "sha256": "d52f2480e786cb1ea0b32db4754b28ed107e4ea77d889f6a4c79c85e669b111e"
+ },
+ "BarbaLonga1": {
+  "asset": "111752327127564",
+  "modelo": "barbatrancada",
+  "semente": "1",
+  "sha256": "cac80ec1ca76b5885c76edb0cacd05526767c71098812bead10d263a3381f2db"
+ },
+ "Barraca": {
+  "asset": "132222614804936",
+  "modelo": "barraca",
+  "semente": "1",
+  "sha256": "6d66580024ad91d0e555b1496129eb3b4408405806de193f424a5e3054642ded"
+ },
+ "CabeloCurto1": {
+  "asset": "123121495222480",
+  "modelo": "cabelocurto",
+  "semente": "1",
+  "sha256": "73fcdcea67fb74ec3569d481376d1d981739c3a72e3ef9e8049b93af2c26d96d"
+ },
+ "CabeloLongo1": {
+  "asset": "138692928099685",
+  "modelo": "cabelolongo",
+  "semente": "1",
+  "sha256": "74000a2d0153e8b9a085271bb8c45577b7cebb429fb9e28f18c19d4e70e72a8d"
+ },
+ "CabeloTrancado1": {
+  "asset": "110992475990035",
+  "modelo": "cabelotrancado",
+  "semente": "1",
+  "sha256": "1d04635e18604970929eaa1ec2f816fc626732a6189e3a5063ae5e27b05fa626"
+ },
+ "Caixotes": {
+  "asset": "132468201544077",
+  "modelo": "caixotes",
+  "semente": "1",
+  "sha256": "983ab232e84dcf7b2d132f044d8ad7975e6ba88bf6477b300bce889011c7289f"
+ },
+ "Canteiro": {
+  "asset": "78444891745758",
+  "modelo": "canteiro",
+  "semente": "1",
+  "sha256": "eedf5cd3adaa24a4ad3a1566af998eabeed9b44671cc151e7177717ebf64a2fe"
+ },
+ "Carroca": {
+  "asset": "92585240211011",
+  "modelo": "carroca",
+  "semente": "1",
+  "sha256": "934f82d9cb627a4f2ac6f71579811a3689d9055543b40faaedf7467b7728616f"
+ },
+ "CarvalhoAntigo1": {
+  "asset": "90836511177889",
+  "modelo": "carvalhoantigo",
+  "semente": "1",
+  "sha256": "86cccdce67e9ef927dd947d4ce446d8fabc328859464485cec0bbfa72666c252"
+ },
+ "CarvalhoAntigo2": {
+  "asset": "108683745390892",
+  "modelo": "carvalhoantigo",
+  "semente": "2",
+  "sha256": "ee899db169ed8bb1320dc0303ecedfbf645afd8096e8715f0c0cca64c32e4b9c"
+ },
+ "CarvalhoB1": {
+  "asset": "88916034054816",
+  "modelo": "arvore",
+  "semente": "1",
+  "sha256": "4ec99fc6599064d03d9b01e601ed315b720ddfbe16e8c1ca327dc36eb1349a89"
+ },
+ "CarvalhoB2": {
+  "asset": "134125080115254",
+  "modelo": "arvore",
+  "semente": "2",
+  "sha256": "f8c28b5f7dbf79e233fd0ddb6e7d7026cdcc031963ffedb7e5c7be5649692821"
+ },
+ "CarvalhoB3": {
+  "asset": "80482068018638",
+  "modelo": "arvore",
+  "semente": "3",
+  "sha256": "623b338f86b1ed93cad0d2334f8beb82e9152288dfebe3a1184d2b51b01563b6"
+ },
+ "CarvalhoB4": {
+  "asset": "81152873607256",
+  "modelo": "arvore",
+  "semente": "4",
+  "sha256": "8de0f0af9cdbc1d42f8c949cbd7bc4e5cf3630675591333a510f043996c334dc"
+ },
+ "Casa1": {
+  "asset": "92275866066116",
+  "modelo": "casa",
+  "semente": "1",
+  "sha256": "6dd504ec7357ed2ca75f293e3aa8a2954ddb5caceb5ba202a48b060f8f6f76ab"
+ },
+ "Casa2": {
+  "asset": "126681092890593",
+  "modelo": "casa",
+  "semente": "2",
+  "sha256": "2b8e12dd33920765d7fe0e8b9bc0bcb87272ff7d2f45d74e94cf84c7b7f5ea99"
+ },
+ "Casa3": {
+  "asset": "90754624762894",
+  "modelo": "casa",
+  "semente": "3",
+  "sha256": "ce141d24dd23f4a5ae8ecd0e5ef9206d53901d2d8c26d9307dfcb19d4c4ebc79"
+ },
+ "CasaPalha1": {
+  "asset": "86727226630508",
+  "modelo": "casapalha",
+  "semente": "1",
+  "sha256": "7af933b07ac9810445e6613cd381c163fa4d2738787fbd6b983dec2cab1c100a"
+ },
+ "CasaSacada1": {
+  "asset": "70611038197231",
+  "modelo": "casasacada",
+  "semente": "1",
+  "sha256": "512552b70ff97dc0c158a1b079d9b5a0d67b9e964ea79270be7865bdf568b128"
+ },
+ "CaudaSuperd": {
+  "asset": "120380298821901",
+  "modelo": "caudasuperd",
+  "semente": "1",
+  "sha256": "47de572df2a9bf9341928a5919bfbb179b4fa51debd6105709852b6a1e5d1ac8"
+ },
+ "CercaRipas": {
+  "asset": "130611385250036",
+  "modelo": "cerca",
+  "semente": "1",
+  "sha256": "c5e2df675e069ec0d93d1f23a2b625ded7873891b12f062ca9f8132d44605b5a"
+ },
+ "CercaTrilhos": {
+  "asset": "78251676420614",
+  "modelo": "cerca",
+  "semente": "1",
+  "sha256": "52bc2e911183e26e13b3dacf894ebfea06277b5c1e25ac174e0a8ed46f140da8"
+ },
+ "Chafariz": {
+  "asset": "84160475128737",
+  "modelo": "chafariz",
+  "semente": "1",
+  "sha256": "5deb98a4c945df9da5e47244f9d0a7e2d38f5716636607231d55a673138981f1"
+ },
+ "ChifresOgro": {
+  "asset": "106479997050862",
+  "modelo": "chifresogro",
+  "semente": "1",
+  "sha256": "a695666c5819cd61dbf8b957b79e5951ba95404c0c7f38e9881ea668bfe02db4"
+ },
+ "Cogumelos1": {
+  "asset": "93844015435805",
+  "modelo": "cogumelos",
+  "semente": "1",
+  "sha256": "ada8b31f37b226213b1cae8aa77116e5af27ebd081d2b0d925598b9858d42bd9"
+ },
+ "CogumelosLuz1": {
+  "asset": "116444538293486",
+  "modelo": "cogumelos",
+  "semente": "2",
+  "sha256": "d62fcd82c35b41abbcf9f759700b3d68a69dca6511341d5423168af4c4bb919d"
+ },
+ "Coluna1": {
+  "asset": "73245904259077",
+  "modelo": "coluna",
+  "semente": "1",
+  "sha256": "ba237ea7ba9b05de2c66e424370c0341cc9ba89082597318e0783b095d3b36d4"
+ },
+ "Coluna2": {
+  "asset": "136275343239861",
+  "modelo": "coluna",
+  "semente": "2",
+  "sha256": "00c325c385fb8dd4512fab148ed27edc0618b7c2f350da3fe9a1c4ef4039ebb6"
+ },
+ "ColunaHera1": {
+  "asset": "101488393301734",
+  "modelo": "colunahera",
+  "semente": "1",
+  "sha256": "b711141ed6d1390095d0f9ed1bef500b60e347deb0e117d90989eec890a42696"
+ },
+ "ColunaHera2": {
+  "asset": "95197140343392",
+  "modelo": "colunahera",
+  "semente": "2",
+  "sha256": "967fdd1ebcd6b9dee976adda39176c722ea4d7daeeca1b5cc195677991e78eb6"
+ },
+ "ColunaQuebrada1": {
+  "asset": "102981653600788",
+  "modelo": "colunaquebrada",
+  "semente": "1",
+  "sha256": "5db8dfbd1b5ada906a3658919c7dffe1a4cfbea9251be0373ca63076ac41697e"
+ },
+ "ColunaQuebrada2": {
+  "asset": "133089855971377",
+  "modelo": "colunaquebrada",
+  "semente": "2",
+  "sha256": "41b2393fbfd78928dba0822c12bf019f72facc38c4b47add352b777b5ea22ea6"
+ },
+ "Dojo": {
+  "asset": "93809802226269",
+  "modelo": "dojo",
+  "semente": "1",
+  "sha256": "0e9330d3249a5e350f886a209658a82723d22e95633e572a5df687f021a99377"
+ },
+ "EscadaQuebrada": {
+  "asset": "96769207993749",
+  "modelo": "escada",
+  "semente": "1",
+  "sha256": "3537502b46db42df968184b76b25995879e515d8df613e7dc4d49ca873c2bb95"
+ },
+ "EspelhoVila": {
+  "asset": "98981712442900",
+  "modelo": "espelhovila",
+  "semente": "1",
+  "sha256": "f8bde573414d4c8360a37aa0a0daebcc29090635174db5e95137f1adec4a95a9"
+ },
+ "Estandarte1": {
+  "asset": "87427595815559",
+  "modelo": "estandarte",
+  "semente": "1",
+  "sha256": "8e77061b3799d14b93dac7a8d532b512941800c173036adc7b7e40de09e56752"
+ },
+ "Estandarte2": {
+  "asset": "95051315335447",
+  "modelo": "estandarte",
+  "semente": "2",
+  "sha256": "04ea14ffdd796220c5b1657cd70b3879854b46f68b5fa8686418e3cb6be6770e"
+ },
+ "Estandarte3": {
+  "asset": "83587525093994",
+  "modelo": "estandarte",
+  "semente": "3",
+  "sha256": "ca20a62d85dbba20efcfc771b33f9af057d908e8d02716a44ccf5b007b1ab21d"
+ },
+ "Fardo1": {
+  "asset": "72351853832363",
+  "modelo": "fardo",
+  "semente": "1",
+  "sha256": "cb8dc61379f91f032dabf0263cea7d24ae458f2b604d635ac4c1d84bcbad29b1"
+ },
+ "Flores1": {
+  "asset": "135379253038442",
+  "modelo": "flores",
+  "semente": "1",
+  "sha256": "c01421defbfebf405bc0489ef4e95598cebdd37c57f7f212bad0cf17721235de"
+ },
+ "Flores2": {
+  "asset": "72280277681020",
+  "modelo": "flores",
+  "semente": "2",
+  "sha256": "89cdd5f4bb6de4746cf545ed5d56ee766eb35647762b07cc357d9ee83a184d2f"
+ },
+ "Flores3": {
+  "asset": "111058950081917",
+  "modelo": "flores",
+  "semente": "3",
+  "sha256": "6dbd8fde56ea12191605629dcbe9c466133f11112b81c48c1278ce3b8976b1cf"
+ },
+ "Forja": {
+  "asset": "128253191669347",
+  "modelo": "forja",
+  "semente": "1",
+  "sha256": "8c1cfdc9787cef2f07e502cc358bf887f2b705994a362ffafaaa5631f66e8a3a"
+ },
+ "GoblinArco": {
+  "asset": "120851445518116",
+  "modelo": "goblin",
+  "semente": "1",
+  "sha256": "39a2dd395f3a2302926bed891cf713191b7a9eeb9921757cd1da50c01a2d2092"
+ },
+ "GoblinFaca": {
+  "asset": "79776407844457",
+  "modelo": "goblin",
+  "semente": "1",
+  "sha256": "049abc8510c043277ab51b0402163b0513bc7c3daad32002ba7778de5b7034ac"
+ },
+ "GolemPedraMenor": {
+  "asset": "135974045085542",
+  "modelo": "golem",
+  "semente": "1",
+  "sha256": "7217953cf15549d3b51b5c2f5439f31bb1b6a27b6c5d79018a46e8554e5551dd"
+ },
+ "Jardineira": {
+  "asset": "108925798351800",
+  "modelo": "jardineira",
+  "semente": "1",
+  "sha256": "cff8e09d5095dad68badb23003a012b238f7bcd0ab9d1c66b2b750b1ce1230a5"
+ },
+ "Juncos1": {
+  "asset": "85512019284373",
+  "modelo": "juncos",
+  "semente": "1",
+  "sha256": "764a03a7bbf6f87555a7d5c745d1a86ae2c75229fa3642d8e950a028c67a7561"
+ },
+ "LadinoCapa": {
+  "asset": "107367036675217",
+  "modelo": "ladinocapa",
+  "semente": "1",
+  "sha256": "973988a10c4cde0d951ce94e15c46693193af6041cffa220b5f2c53b27afe492"
+ },
+ "LadinoCapuz": {
+  "asset": "129500378422916",
+  "modelo": "ladinocapuz",
+  "semente": "1",
+  "sha256": "2d5ef8ecb7a9b9fd30cd8e02715171c6ad4b4bc695b99e380475043e1d912c69"
+ },
+ "LadinoCinto": {
+  "asset": "89968416257969",
+  "modelo": "ladinocinto",
+  "semente": "1",
+  "sha256": "289e444a99b258f7fdd7fb96127afea1dcf1a11fefc5ceeeb77114a83654e9c7"
+ },
+ "LadinoMascara": {
+  "asset": "88597387075335",
+  "modelo": "ladinomascara",
+  "semente": "1",
+  "sha256": "ad833c113edcf827b2d3973461f4576f530a03bf48ef4a507d23abc50bcccf1f"
+ },
+ "Lampiao": {
+  "asset": "135517464012482",
+  "modelo": "lampiao",
+  "semente": "1",
+  "sha256": "dd647199221235f6bd05a8dc4a943ef502017bcca3f90a39d38be09934e3767b"
+ },
+ "Lapide1": {
+  "asset": "114488695103022",
+  "modelo": "lapide",
+  "semente": "1",
+  "sha256": "e2001842779ef63a3f8718b4e7adcb1aba621c6a7deb6fea758626cce83b5d26"
+ },
+ "Lapide2": {
+  "asset": "118937165976509",
+  "modelo": "lapide",
+  "semente": "2",
+  "sha256": "a881e6503008ac018f3d6e6e1c532bbce88755ec17f4227a1c39c6bb90aa15e1"
+ },
+ "Lenha": {
+  "asset": "93076073443513",
+  "modelo": "lenha",
+  "semente": "1",
+  "sha256": "f91c633384b1c45dc26682b99ce1160858153324d70705463bacaa79ea11c549"
+ },
+ "LoboCinzento": {
+  "asset": "73182686669053",
+  "modelo": "lobo",
+  "semente": "1",
+  "sha256": "21ca36aadc0fa348bfc88b0176a5649c4054f38f5024dfa5819e157d96a15667"
+ },
+ "MercadoLiso": {
+  "asset": "78239011834021",
+  "modelo": "mercado",
+  "semente": "2",
+  "sha256": "184cedb347ce8844675f2a511c77f0972ed05acea638be1043f46d23b78d0073"
+ },
+ "MercadoListrado": {
+  "asset": "106346415974030",
+  "modelo": "mercado",
+  "semente": "1",
+  "sha256": "a4ae9063096367bd6c883a995353761df34db02f8142d1ee7972c3707d810922"
+ },
+ "MestraCajado": {
+  "asset": "87802103221502",
+  "modelo": "mestracajado",
+  "semente": "1",
+  "sha256": "756a3562be2a85a82103765e1258403fcf4bd5acdfd7461d9a9a9bad1fb4e73c"
+ },
+ "MestraManto": {
+  "asset": "76337188826231",
+  "modelo": "mestramanto",
+  "semente": "1",
+  "sha256": "1bb5b691977469a281635b18c7b937eede72cb6af601745d414bbf6f05cece84"
+ },
+ "MestraObi": {
+  "asset": "103687267196857",
+  "modelo": "mestraobi",
+  "semente": "1",
+  "sha256": "cfdbe2425a5c8569b2501928dd6bd3014b9bc8074709b0d8c70958e8a2a95d78"
+ },
+ "MestraTiara": {
+  "asset": "121622342570155",
+  "modelo": "mestratiara",
+  "semente": "1",
+  "sha256": "e43654f20ac7a8255d55ab2e7076a9f71c7d63d422aee0644929879d71b3f1f6"
+ },
+ "Muro1": {
+  "asset": "123916496864929",
+  "modelo": "muro",
+  "semente": "1",
+  "sha256": "460f7a1a38f30d6914c364f40ad2dbb17a10358e9e6f87600856425fff361fed"
+ },
+ "Muro2": {
+  "asset": "109160217450773",
+  "modelo": "muro",
+  "semente": "2",
+  "sha256": "2cea01bf24b74e7eac09e15688f2db223219f83106b9a7dcb60cf32cec23fd4e"
+ },
+ "OrelhasBestiais": {
+  "asset": "116008924751000",
+  "modelo": "orelhasferafelina",
+  "semente": "1",
+  "sha256": "c560d8d35e4861d031ff3fb44a0f39d4e963c78fd477cd3ad0eb50bcb5a8b07e"
+ },
+ "OrelhasElficas": {
+  "asset": "102437848323356",
+  "modelo": "orelhaselfo",
+  "semente": "1",
+  "sha256": "6ffaff205e5228b1c03a61d4ce3b84e71755b5b3277ac1cf00e4dbe7f5afbcf8"
+ },
+ "Palicada": {
+  "asset": "94800365329188",
+  "modelo": "palicada",
+  "semente": "1",
+  "sha256": "cf422577be4c0f2176aeb53126cdda937800a430e75118f99414be4e1e27b29d"
+ },
+ "Placa1": {
+  "asset": "118852782455700",
+  "modelo": "placa",
+  "semente": "1",
+  "sha256": "025bfb02bc3ea1c9cb514b1e7a60d0fd903be21b817bf229a2f8aebf894affe4"
+ },
+ "PocoV2": {
+  "asset": "89857438653448",
+  "modelo": "poco",
+  "semente": "1",
+  "sha256": "5e3e24282731d1deb7886c8d4aa3b0dd1b857a77fabec97eb980b1bea7e222f8"
+ },
+ "Ponte": {
+  "asset": "70794329977577",
+  "modelo": "ponte",
+  "semente": "1",
+  "sha256": "12976fee7cb2aa563956bc83f4b0f8f5ea771b17210ba1e5ccec05c7f523435a"
+ },
+ "Portao": {
+  "asset": "111162001142050",
+  "modelo": "portao",
+  "semente": "1",
+  "sha256": "263fb7331454829b4f346e58f69d8087ecd19f6439078e205dd08de381327cce"
+ },
+ "RatoGigante": {
+  "asset": "139324489825229",
+  "modelo": "rato",
+  "semente": "1",
+  "sha256": "4e2ca5ef0fa905ea9ba9cfb8d6331ff277cca6494a2d6b7dc8d0a2ba1f2997e4"
+ },
+ "Rocha1": {
+  "asset": "85856028174025",
+  "modelo": "rocha",
+  "semente": "1",
+  "sha256": "d8f12c3381942715e0922315e19632fe96a087a7f030565b100d455c80e5d85d"
+ },
+ "Rocha2": {
+  "asset": "90633074654765",
+  "modelo": "rocha",
+  "semente": "2",
+  "sha256": "17d7ffac6a049859568f2d755d21f906e6bb0dcbad0d9f5bb57cb6701a7ad987"
+ },
+ "Rocha3": {
+  "asset": "84029123063941",
+  "modelo": "rocha",
+  "semente": "3",
+  "sha256": "5bb37bf7cb17a743d9fac6bffe0ba6c1c04d780699a4573698dda49023417a6b"
+ },
+ "Rochedo1": {
+  "asset": "70716108959990",
+  "modelo": "rochedo",
+  "semente": "1",
+  "sha256": "d851c551458cd67190561b83a476bbb31097a96aa92f50580b85ebd056b2c843"
+ },
+ "Rochedo2": {
+  "asset": "106902344127495",
+  "modelo": "rochedo",
+  "semente": "2",
+  "sha256": "61379392fcc943782ebedcfd902c742ffc4cd522095586e034e7657a00eceb6f"
+ },
+ "RoupaBotas1": {
+  "asset": "86954915416950",
+  "modelo": "botasbasicas",
+  "semente": "1",
+  "sha256": "2bac86cfc0ea3948e1ab6ff72c9fc478dbb433c4f24f04cea36027a8e1729a4a"
+ },
+ "RoupaCapuz1": {
+  "asset": "71400160394371",
+  "modelo": "capuzbasico",
+  "semente": "1",
+  "sha256": "7c44ac5ce3243e99970afdc2f9b931a7eb9bef5c726001179b0299fe6eb2698d"
+ },
+ "RoupaCinto1": {
+  "asset": "125652348489825",
+  "modelo": "cintobasico",
+  "semente": "1",
+  "sha256": "1dbc5f2c04e95e4ecd5507135db12df58526d82e15d27a0c2d2d07d2c979c9f5"
+ },
+ "RoupaTunica1": {
+  "asset": "137656785012740",
+  "modelo": "tunicabasica",
+  "semente": "1",
+  "sha256": "cc15e441b2a4c19a38d7e7b2655549efbc068625e9c1b7c4b8773eb712c06df1"
+ },
+ "Samambaia1": {
+  "asset": "84259187448663",
+  "modelo": "samambaia",
+  "semente": "1",
+  "sha256": "b20c2b57e048278ab8ed5a2ad81b43866373274feb59d00c1775b62504a1a0c2"
+ },
+ "Samambaia2": {
+  "asset": "101571550064076",
+  "modelo": "samambaia",
+  "semente": "2",
+  "sha256": "4c2bafd9ab42170d2e2493e044d9b68e64aa7a8704a2d2bee3f20a1b7fc7c80f"
+ },
+ "Taverna": {
+  "asset": "124929588632974",
+  "modelo": "taverna",
+  "semente": "1",
+  "sha256": "39656e8785e2d33a7aafbbf0b2abba1fbc8a723c894ea8fca809161ec8c0dc33"
+ },
+ "Tenda1": {
+  "asset": "91069257535606",
+  "modelo": "tenda",
+  "semente": "1",
+  "sha256": "055d2df30e2db9aa1a1e29dda75e6d4fdb3afff1f8cda242cbd38fd674147ae5"
+ },
+ "Tenda2": {
+  "asset": "109890463632873",
+  "modelo": "tenda",
+  "semente": "2",
+  "sha256": "b4dea509391293fc5f55c7167e7d13f7786f2833c8fa06efeea56a17891c0064"
+ },
+ "Tenda3": {
+  "asset": "93633962928917",
+  "modelo": "tenda",
+  "semente": "3",
+  "sha256": "b5c40eb99151843220319b2427d1def40c37800cc8b26011eccbe0780ba31071"
+ },
+ "Toco1": {
+  "asset": "94292206806384",
+  "modelo": "tocos",
+  "semente": "1",
+  "sha256": "36edab5a0e5c0ad704342aa0a131242c54ff1313fed6adc6d85166503b992989"
+ },
+ "Tora1": {
+  "asset": "115262029721161",
+  "modelo": "tora",
+  "semente": "1",
+  "sha256": "c51c5d10c38014154c1150f1c01eab82956d64e028c25e428854af89fa7c26a9"
+ },
+ "Tora2": {
+  "asset": "125757373192374",
+  "modelo": "tora",
+  "semente": "2",
+  "sha256": "4f115a67cf8edfdeb004d57da7a0cf2b5fa0402380b12d80a886eba23fafa72e"
+ },
+ "ToraMusgo1": {
+  "asset": "90768981681067",
+  "modelo": "toramusgo",
+  "semente": "1",
+  "sha256": "df0fda6c354047fa1024fab61150d6d0423edebfcb3a029869bf464eaaea76f6"
+ },
+ "TreantAnciao": {
+  "asset": "110681308021495",
+  "modelo": "treant",
+  "semente": "1",
+  "sha256": "152babd95beb7bc37009cdce047fc99a91cf8b92fcd5b99cb2c8d527b81890a1"
+ },
+ "Tripe1": {
+  "asset": "106778895361908",
+  "modelo": "tripe",
+  "semente": "1",
+  "sha256": "22c929afbe5929ad15e2be235c1d99d927fad4a6d5abfc90e31952ebb44f3e7f"
+ },
+ "TufoGrama1": {
+  "asset": "104301700433885",
+  "modelo": "tufo",
+  "semente": "1",
+  "sha256": "8c0313e9627290b7ed6084d3fedac31e1ef64bd24cf4fd1d566545add3e2d214"
+ },
+ "TufoGrama2": {
+  "asset": "83932067884159",
+  "modelo": "tufo",
+  "semente": "2",
+  "sha256": "6fa942fc3e60e8876f2d91717f1d07186add18de58f61e338f810774f06cafc7"
+ },
+ "UrsoPresasVermelhas": {
+  "asset": "114013182938258",
+  "modelo": "urso",
+  "semente": "1",
+  "sha256": "e7046695346b2d85a35ecdc7cd716306310086d2aea4a8ab09a88a4d4dcf934e"
+ },
+ "Varal": {
+  "asset": "94398145531634",
+  "modelo": "varal",
+  "semente": "1",
+  "sha256": "6971c6fa80579f1063bb98e90ede658967650013c82e1d5d1c1cdd9b244b0bc1"
+ }
+}

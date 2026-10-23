@@ -1,0 +1,17 @@
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_interacao.py", line 28, in <module>
+    assert 'Mode: Edit' in call('get_studio_state'),'Play alheio preservado'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Play alheio preservado

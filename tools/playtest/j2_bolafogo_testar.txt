@@ -1,0 +1,18 @@
+J2 — habilidades, Cura, Poção Menor, Defender e Em Chamas
+Data: 14/10/2026
+Comando: powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1
+Resultado: compilação de 293 fontes, 0 erros; specs puros, catálogo, painel e estado do cliente aprovados.
+RESULTADO: tudo ok (fora do Studio)
+Observação do ambiente: houve avisos repetidos de localização de Python 3.14, sem impedir os verificadores nem alterar o resultado.
+
+Cobertura principal desta fatia: custo multi-Ação, IDs longos, replay sem desconto duplicado, posse pela ficha, gasto de PM, PV/PM atuais, bônus do Toque com metade dos PV, condição aplicada no acerto, dano de Em Chamas no começo da vez, Defender e mitigação, Cura comprada em si ou aliado adjacente, Ferida Fresca após o marco do curador, recuperação de aliado em 0 PV e consumo de uma Poção Menor presente no inventário.
+
+
+Continuação 14/10 — consumo persistente durante a sessão J1:
+RESULTADO local: 293 fontes/0 erros; RESULTADO: tudo ok (fora do Studio).
+PersonagemSessao.spec: remoção canônica, notificação privada, recusa de item ausente/outro ID e prevenção de segunda remoção. EncontroAutonomoService.spec: callback uma vez mesmo no replay; recusa do inventário preserva 3 Ações, PV do alvo e a cópia local da poção.
+
+
+Continuação 14/10 — descanso terminal RB-25:
+Suíte local repetida após o código e spec: 293 fontes compiladas/0 erros; RESULTADO: tudo ok (fora do Studio).
+Cobertura: vitória e derrota restauram PV/PM/PT/PP, limpam condições/Defender e marcam o estado terminal para a UI; criatura derrotada mantém PV 0. Fonte de adaptação: FIDELIDADE §7E. Não cobre descanso de exploração nem persistência.

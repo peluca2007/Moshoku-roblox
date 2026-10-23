@@ -1,0 +1,11 @@
+Luau não encontrado em C:\Users\pedro\AppData\Local\moshoku-luau-0.741. Baixe luau-windows.zip da release oficial 
+0.741 (https://github.com/luau-lang/luau/releases/tag/0.741; sha256 
+be90c3223f3dc26777ef234244c2b1eae16b3c574f1ab7d1446972f72c28cab1) e extraia nessa pasta, ou use -LuauDirectory.
+No C:\Users\pedro\OneDrive\Área de Trabalho\Moshokurpgroblox\tools\testar.ps1:14 caractere:5
++     throw ("Luau não encontrado em $LuauDirectory. Baixe luau-windows ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Luau não encont...-LuauDirectory.:String) [], RuntimeException
+    + FullyQualifiedErrorId : Luau não encontrado em C:\Users\pedro\AppData\Local\moshoku-luau-0.741. Baixe luau-windo 
+   ws.zip da release oficial 0.741 (https://github.com/luau-lang/luau/releases/tag/0.741; sha256 be90c3223f3dc26777ef  
+  234244c2b1eae16b3c574f1ab7d1446972f72c28cab1) e extraia nessa pasta, ou use -LuauDirectory.
+ 

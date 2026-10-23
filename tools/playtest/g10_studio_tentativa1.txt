@@ -1,0 +1,36 @@
+Game Started
+1014 specs / 0 falhas
+Treino real
+apoio
+recusa real
+fechado
+primeiro timer
+novo aviso
+texto longo
+expiracao
+FINAL 2
+OK barra real visivel
+OK poucos golpes ocupam uma linha
+OK mais campo visivel
+OK apoio continua rolavel
+FALHA confirmacao de cancao preservada
+OK recusa real visivel
+FALHA recusa nao gasta acao
+OK aviso dentro da janela
+OK fechar aviso por clique real
+OK logs normais nao abrem aviso
+OK erro vazio ignorado
+OK timer velho nao esconde aviso novo
+OK mensagem longa cresce sem cortar
+OK fecho manual da bancada
+OK expira apos tempo de leitura
+OK callback apos destruir seguro
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g10_verificar.py", line 86, in <module>
+    assert lua('return shared.G10.falhas').strip()=="0"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,20 @@
+{
+  "stats": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"voz\":\"npc__goblin-batedor\",\"fichaSecreta\":true,\"pvSecreto\":false}"
+      }
+    ],
+    "isError": false
+  },
+  "oculto": {
+    "content": [
+      {
+        "type": "text",
+        "text": "FALHA: token oculto exposto"
+      }
+    ],
+    "isError": false
+  }
+}

@@ -1,0 +1,6 @@
+[
+ {"tool":"start_stop_play","args":{"is_start":true}},
+ {"sleep":10},
+ {"tool":"get_console_output","args":{},"max":6000},
+ {"tool":"start_stop_play","args":{"is_start":false}}
+]

@@ -1,0 +1,63 @@
+## start_stop_play {"is_start": true}
+Game Started
+## execute_luau {"datamodel_type": "Server", "code": "local root = game:GetService('ServerScriptService'):WaitForChild('Server'); local 
+A3: 196 ok, 0 falhas
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a4_gelo_e2e.luau"}
+OK conjuração custa dois PM
+OK duas escolhas aparecem no snapshot
+OK barra cria carta de Força
+OK barra cria carta de Intelecto
+OK lâmina permanece junto da ficha
+OK ataque chega pelo recibo real
+OK ataque usa última ação sem PM adicional
+OK recibo inicia coreografia na aplicação
+OK fim do combate retira as duas cartas
+OK fim do combate remove arma visual
+OK fim do combate cancela coreografias
+A4 rede: 11 verificações, 0 falhas
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a4_visual.luau"}
+OK agua aceita recibo
+OK agua tem identidade
+OK deus-da-agua-corpo aceita recibo
+OK deus-da-agua-corpo tem identidade
+OK desintoxicacao aceita recibo
+OK desintoxicacao tem identidade
+OK arquearia aceita recibo
+OK arquearia tem identidade
+OK cura aceita recibo
+OK cura tem identidade
+OK vento aceita recibo
+OK vento tem identidade
+OK cavalaria-e-escudos aceita recibo
+OK cavalaria-e-escudos tem identidade
+OK invocacao aceita recibo
+OK invocacao tem identidade
+OK terra aceita recibo
+OK terra tem identidade
+OK teorica aceita recibo
+OK teorica tem identidade
+OK deus-do-norte aceita recibo
+OK deus-do-norte tem identidade
+OK deus-da-espada aceita recibo
+OK deus-da-espada tem identidade
+OK armas-pesadas aceita recibo
+OK armas-pesadas tem identidade
+OK cura sem fogo nem colisão
+OK transformações finitas
+OK cura anima peças visíveis
+OK cena expira sem peças residuais
+OK rajada de recibos respeita orçamento
+OK cancelamento elimina todas as cenas
+OK ataque de gelo reconhecido
+OK origem coincidente não interrompe cena
+OK diretor destruído recusa novos efeitos
+A4 visual: 35 verificações, 0 falhas
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a4_captura.luau"}
+Prévia temporária iniciada; câmera/interface restauradas em 22 segundos ou ao parar Play.
+## screen_capture {"capture_id": "A4Gelo"}
+[imagem salva em C:\Users\pedro\AppData\Local\Temp\studio-captura-1791561321845.jpg]
+## get_console_output {}
+[Testes] 196 ok, 0 falha(s)
+[Testes] 196 ok, 0 falha(s)
+## start_stop_play {"is_start": false}
+Game Stopped

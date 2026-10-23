@@ -1,0 +1,5 @@
+Failed to find real location of C:\Program Files\Python314\python.exe
+47 originais preservados;47 WAV validos;56 vinculos;9 aliases: OK
+Reexecucao preserva campo preenchido no CSV de fixture isolada: OK
+Duplicata recusada antes de sobrescrever: OK
+Fixture removida; pacote real sem IDs de teste; nenhum upload ou Studio.

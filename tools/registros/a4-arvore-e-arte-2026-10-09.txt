@@ -1,0 +1,139 @@
+## start_stop_play {"is_start": true}
+Game Started
+## execute_luau {"datamodel_type": "Server", "code": "local root = game:GetService('ServerScriptService'):WaitForChild('Server'); local 
+A3: 193 ok, 0 falhas
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a3_fogo_e2e.luau"}
+OK    Ignis criado com PV/PM do site
+OK    Ignis tem as 6 magias do Principiante (truque + 5 compras)
+OK    Lobo do bestiário com PV do Apêndice G (patamar 1, padrão: 64)
+OK    criatura marcada
+OK    fora de combate: recusa
+OK    vez do Ignis
+OK    Brasa resolvida no registro
+OK    recibo do efeito chegou
+OK    1 Ação gasta
+OK    Brasa não gasta PM
+OK    Brasa só uma vez por turno
+OK    Bola de Fogo: fora de alcance? goblin a 9 casas está dentro de 12
+OK    Bola de Fogo gasta 1 PM e 2 Ações
+OK    sem Ações: recusa
+OK    Em Chamas cobra no início do turno de quem queima (se a Bola acertou)
+OK    rodada 2: vez do Ignis
+OK    Ações zeradas na vez nova
+OK    Toque Escaldante: precisa estar colado
+OK    Toque Escaldante colado ao lobo
+OK    Toque gasta 2 PM
+OK    Clarão: teste de Vigor no raio
+OK    rodada 3: vez do Ignis
+OK    Muro de Chamas erguido
+OK    muro no snapshot com 6 casas
+OK    Muro gasta 3 PM (12 - 1 - 2 - 1 - 3)
+OK    atravessar o muro queima
+OK    muro bloqueia a visão
+OK    Fagulha: 1 Ação, registro
+OK    apagar o fogo: teste de Agilidade no registro
+OK    saldo final de PM corresponde às seis magias
+OK    fim do combate apaga os muros
+PM final do Ignis: 4/12 esperado
+RESUMO: 0 falha(s); 8 recibos de efeito
+Últimos registros:
+  » Rodada 2: vez de Lobo Cinzento.
+  » Lembrete — Lobo Cinzento: Cego (Desvantagem em ataques; termina: Até o fim do próximo turno)
+  » Lobo Cinzento não está mais Cego.
+  » Rodada 2: vez de Goblin Batedor.
+  » Rodada 3: vez de Ignis, Aprendiz de Fogo.
+  » Ignis, Aprendiz de Fogo usa Muro de Chamas • 6 casa(s) até a rodada 13
+  » Goblin Batedor atravessa Muro de Chamas: 14 de dano ígneo (PV 32 → 18), fica Em Chamas.
+  » Goblin Batedor moveu 6 casa(s) (9,0 m).
+  » Ignis, Aprendiz de Fogo moveu 3 casa(s) (4,5 m).
+  » Lobo Cinzento moveu 3 casa(s) (4,5 m).
+  » Sem linha de visão até o alvo.
+  » Ignis, Aprendiz de Fogo usa Fagulha • efeito narrativo (o mestre descreve)
+  » Aguarde a vez dessa ficha.
+  » Combate encerrado.
+  » A mesa foi limpa.
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a3_arvores_e2e.luau"}
+OK    mesa de treino criada
+OK    cartas de agua chegam ao cliente
+OK    cartas de vento chegam ao cliente
+OK    cartas de terra chegam ao cliente
+OK    cartas de cura chegam ao cliente
+OK    cartas de desintoxicacao chegam ao cliente
+OK    cartas de teorica chegam ao cliente
+OK    cartas de invocacao chegam ao cliente
+OK    cartas de deus-da-espada chegam ao cliente
+OK    cartas de deus-da-agua-corpo chegam ao cliente
+OK    cartas de deus-do-norte chegam ao cliente
+OK    cartas de armas-pesadas chegam ao cliente
+OK    cartas de cavalaria-e-escudos chegam ao cliente
+OK    cartas de arquearia chegam ao cliente
+OK    barra com rolagem para várias árvores
+OK    Estancar aparece como controle manual
+OK    mira acumula dois alvos sem enviar
+OK    lista confirmada gera recibo de dois alvos
+OK    mira limpa após confirmar
+OK    dois pactos disponíveis para escolher
+OK    controle de escolha de pacto aparece
+OK    Chamado gera recibo
+OK    Pacto nasce com ações próprias
+OK    turno do invocado vem após conjurador
+OK    Pacto resolve mordida no alvo
+OK    segunda ação do Pacto recusada
+OK    encerrar combate remove invocado
+OK    Névoa tem estilo próprio no snapshot
+OK    Névoa renderiza sem partículas de fogo
+RESUMO: 0 falha(s)
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a4_gelo_e2e.luau"}
+OK conjuração custa dois PM
+OK duas escolhas aparecem no snapshot
+FALHA barra cria carta de Força
+FALHA barra cria carta de Intelecto
+OK ataque chega pelo recibo real
+OK ataque usa última ação sem PM adicional
+OK recibo inicia coreografia na aplicação
+OK fim do combate retira as duas cartas
+OK fim do combate cancela coreografias
+A4 rede: 9 verificações, 2 falhas
+Combate encerrado.
+## execute_luau {"datamodel_type": "Client", "code_file": "tools/playtest/a4_visual.luau"}
+OK agua aceita recibo
+OK agua tem identidade
+OK deus-da-agua-corpo aceita recibo
+OK deus-da-agua-corpo tem identidade
+OK desintoxicacao aceita recibo
+OK desintoxicacao tem identidade
+OK arquearia aceita recibo
+OK arquearia tem identidade
+OK cura aceita recibo
+OK cura tem identidade
+OK vento aceita recibo
+OK vento tem identidade
+OK cavalaria-e-escudos aceita recibo
+OK cavalaria-e-escudos tem identidade
+OK invocacao aceita recibo
+OK invocacao tem identidade
+OK terra aceita recibo
+OK terra tem identidade
+OK teorica aceita recibo
+OK teorica tem identidade
+OK deus-do-norte aceita recibo
+OK deus-do-norte tem identidade
+OK deus-da-espada aceita recibo
+OK deus-da-espada tem identidade
+OK armas-pesadas aceita recibo
+OK armas-pesadas tem identidade
+OK cura sem fogo nem colisão
+OK transformações finitas
+OK cura anima peças visíveis
+OK cena expira sem peças residuais
+OK rajada de recibos respeita orçamento
+OK cancelamento elimina todas as cenas
+OK ataque de gelo reconhecido
+OK origem coincidente não interrompe cena
+OK diretor destruído recusa novos efeitos
+A4 visual: 35 verificações, 0 falhas
+## get_console_output {}
+[Testes] 193 ok, 0 falha(s)
+[Testes] 193 ok, 0 falha(s)
+## start_stop_play {"is_start": false}
+Game Stopped

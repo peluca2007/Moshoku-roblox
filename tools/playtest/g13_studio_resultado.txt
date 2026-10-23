@@ -1,0 +1,45 @@
+Game Started
+1041 specs / 0 falhas
+Sala iniciada
+Papel
+CLICK VirarPagina [525.4277954101562, 251.406494140625]
+Pagina
+CLICK FichaSeguinte [525.4279174804688, 324.310302734375]
+CLICK FichaAnterior [525.4279174804688, 272.0722961425781]
+CLICK AssumirFicha [525.4277954101562, 402.95263671875]
+Escolha
+CLICK GuardarPapel [525.4277954101562, 516.6109619140625]
+CLICK Modo [525.4302368164062, 95.84519958496094]
+Modo confirmado
+CLICK Modo [525.4302368164062, 95.84519958496094]
+Modo confirmado
+CLICK Modo [525.4302368164062, 95.84519958496094]
+Modo confirmado
+Modo
+CLICK LancarDados [525.4328002929688, 258.29669189453125]
+FINAL 0
+OK primeiro mestre
+OK seis vagas incluindo mestre
+OK dez cadeiras
+OK primeira pessoa
+OK avatar sentado
+OK menu antigo fechado
+OK papel fisico aberto
+OK pagina atributos
+OK ficha confirmada servidor
+OK modo duelo confirmado
+OK modo treino confirmado
+OK modo luta confirmado
+OK modos pelo caderno
+OK partida real iniciou
+OK camera tabuleiro
+OK sala oculta no jogo
+OK personagem montado
+OK volta primeira pessoa
+[Testes] 1041 ok, 0 falha(s)
+[Testes] 1041 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Custom back to Enum.CameraType.Scriptable
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

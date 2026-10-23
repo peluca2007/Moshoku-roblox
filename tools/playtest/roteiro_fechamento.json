@@ -1,0 +1,12 @@
+[
+ {"tool":"start_stop_play","args":{"is_start":true}},
+ {"sleep":8},
+ {"tool":"execute_luau","args":{"datamodel_type":"Client","code_file":"tools/playtest/fechar_parte1.luau"},"timeout":120},
+ {"tool":"start_stop_play","args":{"is_start":false}},
+ {"sleep":6},
+ {"tool":"start_stop_play","args":{"is_start":true}},
+ {"sleep":8},
+ {"tool":"execute_luau","args":{"datamodel_type":"Client","code_file":"tools/playtest/fechar_parte2.luau"},"timeout":150},
+ {"tool":"get_console_output","args":{},"max":3000},
+ {"tool":"start_stop_play","args":{"is_start":false}}
+]

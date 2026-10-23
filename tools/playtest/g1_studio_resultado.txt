@@ -1,0 +1,67 @@
+Fontes sincronizadas
+Game Started
+947 specs aprovados
+G1 cliente preparado para cliques reais
+apoio
+mira
+375px
+treino real
+limites
+acao real confirmada
+gestos G1 iniciados
+FINAL 0
+OK golpes visiveis na abertura
+OK apoio fora da lista de golpes
+OK sua vez anunciada
+OK motivo da carta visivel
+OK fim de turno destacado
+OK critico vem do recibo
+OK clique abre apoio
+OK clique arma apoio
+OK trocar grupo cancela mira
+OK grade compacta tem duas colunas
+OK Andar toque >=44
+OK Andar texto cabe
+OK EncerrarTurno toque >=44
+OK EncerrarTurno texto cabe
+OK barra dentro da janela
+OK cancao por clique recebe confirmacao real
+OK vinheta real anuncia cancao
+OK cancao real cobra uma Acao
+OK mesa/esconder aceita animacao
+OK mesa/esconder anima o corpo
+OK mesa/esconder respeita limite de pecas
+OK mesa/esconder limpa e devolve corpo
+OK mesa/dissonancia aceita animacao
+OK mesa/dissonancia anima o corpo
+OK mesa/dissonancia respeita limite de pecas
+OK mesa/dissonancia limpa e devolve corpo
+OK mesa/marcha aceita animacao
+OK mesa/marcha anima o corpo
+OK mesa/marcha respeita limite de pecas
+OK mesa/marcha limpa e devolve corpo
+OK mesa/insulto aceita animacao
+OK mesa/insulto anima o corpo
+OK mesa/insulto respeita limite de pecas
+OK mesa/insulto limpa e devolve corpo
+OK mesa/apontar aceita animacao
+OK mesa/apontar anima o corpo
+OK mesa/apontar respeita limite de pecas
+OK mesa/apontar limpa e devolve corpo
+OK ability/bardo-e-interacao/Principiante/inspiracao aceita animacao
+OK ability/bardo-e-interacao/Principiante/inspiracao anima o corpo
+OK ability/bardo-e-interacao/Principiante/inspiracao respeita limite de pecas
+OK ability/bardo-e-interacao/Principiante/inspiracao limpa e devolve corpo
+OK ability/furtividade-e-armadilhas/Principiante/primeiro-golpe aceita animacao
+OK ability/furtividade-e-armadilhas/Principiante/primeiro-golpe anima o corpo
+OK ability/furtividade-e-armadilhas/Principiante/primeiro-golpe respeita limite de pecas
+OK ability/furtividade-e-armadilhas/Principiante/primeiro-golpe limpa e devolve corpo
+OK cancelamento restaura corpo
+OK modo reduzido evita cena nova
+Console: [Testes] 947 ok, 0 falha(s)
+[Testes] 947 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

@@ -1,0 +1,7 @@
+J2 — Muro de Chamas no encontro autônomo (14/10/2026)
+
+`powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1`: 296 arquivos compilados, 0 erros; `RESULTADO: tudo ok`.
+
+Studio `Moshoku-Prototipo.rbxlx`: sincronizados de `src` `EncontroAutonomoHabilidades`, `EncontroAutonomoService`, as views de encontro/mapa e specs do serviço/habilidades. Play/TestRunner: **1.251 ok, 0 falhas**. Specs cobrem linhas cardinais/diagonais de 1–6 casas, início junto ao conjurador, rejeição de linhas inválidas, posse/PM, cobrança de 2 Ações/3 PM, replay, ausência de dano ao erguer sobre ator, atravessar duas casas da mesma parede uma só vez por movimento (3d6), Em Chamas, oclusão de ataque e expiração ao iniciar a 11ª rodada.
+
+Console sem erros de inicialização cliente. Play encerrado e Studio em Edit. Place não salvo. A mira foi sincronizada e compilada, mas não houve clique real de prévia/confirmar, inspeção visual, obstáculo de cenário ou multiplayer 2/4 clientes.

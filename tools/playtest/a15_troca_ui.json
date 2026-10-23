@@ -1,0 +1,61 @@
+[
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "local p=game.Players.LocalPlayer.PlayerGui.EscolhaDePersonagem:FindFirstChild(\"EscolhaDeArma\",true); p.Armas.CanvasPosition=Vector2.new(0,0); return \"rolagem\""
+    }
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.EscolhaDePersonagem.Frame.EscolhaDeArma.Armas.Arma_4"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "local p=game.Players.LocalPlayer.PlayerGui.EscolhaDePersonagem:FindFirstChild(\"EscolhaDeArma\",true); return p.Status.Text"
+    }
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.EscolhaDePersonagem.Frame.EscolhaDeArma.Voltar"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "local g=game.Players.LocalPlayer.PlayerGui.EscolhaDePersonagem; local c=g:FindFirstChild(\"Personagem_brutamontes\",true); assert(c.ArmaEscolhida.Text==\"Arma: Martelo de Guerra · d10\",c.ArmaEscolhida.Text); assert(c.ArmaEscolhida.TextFits); return \"clique real confirmou martelo no cartao\""
+    }
+  },
+  {
+    "tool": "screen_capture",
+    "args": {
+      "capture_id": "A15_cartao_375"
+    }
+  }
+]

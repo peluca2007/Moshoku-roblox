@@ -1,0 +1,34 @@
+Game Started
+retrato
+consulta real aberta; desenho oculto somente para nao sobrepor bancada
+bancada G18 criada
+374, 666 canvas=312, 440 papel=0.7864192724227905, 1.1191351413726807, 0.007561724167317152
+Lugar1
+sentado
+CLICK Modo_luta [182.9859161376953, 416.804931640625, 0, 334, 52, 440, 474.804931640625]
+CLICK Nivel_1 [182.9859161376953, 416.804931640625, 0, 334, 52, 440, 474.804931640625]
+opcoes atuais
+CLICK Modo_duelo [182.9859161376953, 356.0315856933594, 0, 274, 52, 440, 414.0315856933594]
+{"envios":[{"cmd":"salaConfigurar","d":{"modo":"duelo","nivel":1,"monstros":false}}],"input":"Enum.UserInputType.Touch","scroll":"0, 159","clicados":["Modo_luta","Nivel_1","Modo_duelo"],"antes":0}
+CLICK Aba_pessoas [180.97886657714844, 78.49879455566406, 0, 0, 52, 440, 136.49879455566406]
+CLICK Transferir_999 [182.9859161376953, 358.05712890625, 0, 276, 52, 440, 416.05712890625]
+confirmacao preservada
+CLICK Transferir_999 [182.9859161376953, 358.05712890625, 0, 276, 52, 440, 416.05712890625]
+transferir
+CLICK Transferir_999 [182.9859161376953, 358.05712890625, 0, 276, 52, 440, 416.05712890625]
+expirou
+CLICK Aba_sessao [89.97370910644531, 173.71072387695312, 0, 94, 52, 440, 231.71072387695312]
+entrou pelo controlador real com tipo Gamepad1 injetado
+foco
+levantou
+contexto em pe
+paisagem
+666, 374 canvas=368, 288 papel=1.6399999856948853, 1.28000009059906, 0.010000000707805157
+CLICK GuardarPapel [333, 246.40167236328125, 0, 236, 52, 288, 304.40167236328125]
+{"linhas":["OK emulador retrato","OK retrato papel dentro da tela","OK retrato alvo fechar >=48px","OK retrato aba >=44px nos dois eixos","OK retrato texto >=16px","OK sentar atualiza sem snapshot","OK modo/nivel atuais nao enviam nem apagam pronto","OK modo diferente envia uma intencao","OK confirmacao sobrevive snapshot","OK segundo clique transfere","OK confirmacao expira visivelmente","OK entrada automatica do controlador","OK foco inicial em alvo visivel","OK foco restaurado pelo nome","OK foco rola para ficar visivel","OK levantar bloqueia configuracao sem snapshot","OK paisagem papel dentro da tela","OK paisagem alvo fechar >=48px","OK paisagem aba >=44px nos dois eixos","OK paisagem texto >=16px","OK fechar por toque sem Esc Tab"],"falhas":0}
+restaurou true
+restaurou false
+{"linhas":["OK emulador retrato","OK retrato papel dentro da tela","OK retrato alvo fechar >=48px","OK retrato aba >=44px nos dois eixos","OK retrato texto >=16px","OK sentar atualiza sem snapshot","OK modo/nivel atuais nao enviam nem apagam pronto","OK modo diferente envia uma intencao","OK confirmacao sobrevive snapshot","OK segundo clique transfere","OK confirmacao expira visivelmente","OK entrada automatica do controlador","OK foco inicial em alvo visivel","OK foco restaurado pelo nome","OK foco rola para ficar visivel","OK levantar bloqueia configuracao sem snapshot","OK paisagem papel dentro da tela","OK paisagem alvo fechar >=48px","OK paisagem aba >=44px nos dois eixos","OK paisagem texto >=16px","OK fechar por toque sem Esc Tab","OK fechar consulta real restaura controles","OK valor original false preservado"],"falhas":0}
+1083 specs / 0 falhas
+Game Stopped
+default

@@ -1,0 +1,29 @@
+Game Started
+1014 specs / 0 falhas
+Treino real
+campo
+recolhido
+Marcha
+detalhes
+bancada limpa
+FINAL 0
+OK painel real abre para Bardo
+OK canção inativa e usos explicitos
+OK painel dentro da janela
+OK recolher por clique real
+OK resumo continua visivel
+OK Marcha confirmada pelo servidor
+OK resumo atualiza recolhido
+OK acao real cobrada
+OK abrir por clique real
+OK beneficiados e combinacoes legiveis
+OK snapshot igual preserva rolagem
+OK snapshot apos destruir nao falha
+OK sair oculta apoio
+Console: [Testes] 1014 ok, 0 falha(s)
+[Testes] 1014 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

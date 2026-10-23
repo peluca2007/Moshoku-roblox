@@ -1,0 +1,74 @@
+Fonte sincronizada
+Game Started
+1048 specs / 0 falhas
+Sala pronta
+Olhar baixo
+Ficha
+[{"lt":1,"pos":"250, 3.7999496459960938, -12","n":"HumanoidRootPart"},{"lt":1,"pos":"251.57965087890625, 3.719280481338501, -11.729920387268066","n":"LeftLowerArm"},{"lt":1,"pos":"248.44017028808594, 3.672358512878418, -11.812251091003418","n":"RightLowerArm"},{"lt":1,"pos":"251.5381622314453, 4.248678684234619, -12.013772964477539","n":"LeftUpperArm"},{"lt":1,"pos":"248.46603393554688, 4.235434532165527, -12.040306091308594","n":"RightUpperArm"},{"lt":0,"pos":"250, 4.007021427154541, -12.06985855102539","n":"UpperTorso"},{"lt":1,"pos":"251.5966796875, 3.252655506134033, -11.267342567443848","n":"LeftHand"},{"lt":0,"pos":"250.60731506347656, 2.424553394317627, -10.998885154724121","n":"LeftLowerLeg"},{"lt":0,"pos":"250.54702758789062, 2.773088216781616, -11.561298370361328","n":"LeftUpperLeg"},{"lt":0,"pos":"250, 2.9599204063415527, -12","n":"LowerTorso"},{"lt":1,"pos":"248.451171875, 3.138425827026367, -11.429102897644043","n":"RightHand"},{"lt":0,"pos":"249.4220733642578, 2.4243569374084473, -10.996228218078613","n":"RightLowerLeg"},{"lt":0,"pos":"249.46585083007812, 2.773021936416626, -11.560086250305176","n":"RightUpperLeg"},{"lt":1,"pos":"249.970947265625, 4.813705921173096, -12.21090030670166","n":"Handle"},{"lt":0,"pos":"250.6337890625, 1.7898879051208496, -10.751880645751953","n":"LeftFoot"},{"lt":1,"pos":"250, 5.429932594299316, -12.136817932128906","n":"Head"},{"lt":1,"pos":"250, 6.137237071990967, -12.233841896057129","n":"Handle"},{"lt":0,"pos":"249.981689453125, 2.6715245246887207, -11.596397399902344","n":"Handle"},{"lt":0,"pos":"249.40284729003906, 1.78969144821167, -10.748554229736328","n":"RightFoot"}]
+Marcadores
+Escolha confirmada
+[{"velocidade":{"y":1.7269001355515699,"x":-1.3356598568560652,"z":9.38440645709367},"inicio":1791692935.858474,"origem":{"y":4.999949645996094,"x":250,"z":-12},"id":"mago-de-fogo","tempoVoo":0.43333333333333337,"autor":2287856135,"objeto":1}]
+Soltou
+Preparacao
+CLICK Modo_duelo 501 337
+PvP bloqueado
+CLICK Modo_luta 501 298
+CLICK Aba_sala 501 192
+CLICK ArrumarSala 501 337
+Arrumado
+CLICK BrotosTodos 501 297
+CLICK GuardarPapel 504 516
+Rodada
+Brotos
+Admin
+CLICK Aba_sessao 501 113
+CLICK LancarDados 501 476
+{"maxY":12.699627876281739,"escuro":true,"frames":146,"fora":0}
+Erros 
+[Testes] 1048 ok, 0 falha(s)
+[Testes] 1048 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Custom back to Enum.CameraType.Scriptable
+[Admin] 2287856135 brotos
+FINAL 0
+OK sala mestre
+OK primeira pessoa
+OK cabeca oculta
+OK corpo visivel
+OK bandeja e caderno
+OK escudo moldura
+OK ficha abre por F
+OK sem barra HUD
+OK bracos alcancam
+OK braco original substituido
+OK sem girar
+OK folha inteira manipulavel
+OK sem botoes na folha
+OK camera livre segurando
+OK marcadores clicaveis
+OK escolha real
+OK pronto real
+OK arremesso pelo arrasto
+OK fecha ao arremessar
+OK escolha permanece
+OK soltar por Q
+OK modos explicitos
+OK inicio habilitado
+OK pvp solo bloqueado
+OK arrumar recolhe
+OK Brotos aberto
+OK rodada real concluida
+OK mestre nao muda
+OK dado real na mesa
+OK placar recreativo
+OK ADM brotos real
+OK transicao permanece na mesa
+OK subida moderada
+OK fade antes da arena
+OK fade revela arena
+OK partida real iniciou
+OK maos liberadas
+OK sem recusas no fluxo normal
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

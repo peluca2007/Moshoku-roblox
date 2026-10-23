@@ -1,0 +1,4 @@
+[
+  { "tool": "start_stop_play", "args": { "is_start": false } },
+  { "tool": "get_studio_state", "args": {}, "max": 1000 }
+]

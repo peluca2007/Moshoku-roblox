@@ -1,0 +1,4 @@
+[
+  { "tool": "execute_luau", "args": { "datamodel_type": "Client", "code": "game.ReplicatedStorage.Mesa:FireServer('iniciarLuta',{nivel=3}); return 'nivel 3 solicitado'" }, "max": 700 },
+  { "sleep": 2 }
+]

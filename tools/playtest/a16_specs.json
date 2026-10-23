@@ -1,0 +1,7 @@
+[
+  { "tool": "start_stop_play", "args": { "is_start": true } },
+  { "sleep": 5 },
+  { "tool": "execute_luau", "args": { "datamodel_type": "Server", "code": "local r=game.ServerScriptService.Server; local p,f=require(r.TestRunner).run(r.tests); return p..' aprovados / '..f..' falhas'" } },
+  { "tool": "get_console_output", "args": {}, "max": 18000 },
+  { "tool": "start_stop_play", "args": { "is_start": false } }
+]

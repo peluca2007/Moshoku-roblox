@@ -1,0 +1,6 @@
+HTTP: 200
+Protocolo: application/msgpack
+Rojo: 7.7.1
+Projeto: Moshoku RPG - Prototipo
+Porta: 127.0.0.1:34872
+Studio local: Edit; nenhum Play iniciado ou encerrado

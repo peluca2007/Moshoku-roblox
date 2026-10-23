@@ -1,0 +1,55 @@
+Game Started
+1030 specs / 0 falhas
+[10,15]
+{"ficha":"Ignis, Aprendiz de Fogo","cartas":["UIGridLayout","Carta_mesa/desarmar","Carta_mesa/esquivar","Carta_mesa/defender","Carta_mesa/ajudar","Carta_mesa/ataque-basico","Carta_mesa/ataque-a-distancia","Carta_brasa","Carta_bola-de-fogo","Carta_fagulha","Carta_toque-escaldante","Carta_muro-de-chamas","Carta_clarao"],"habilidades":["ability/fogo/Principiante/brasa","ability/fogo/Principiante/bola-de-fogo","ability/fogo/Principiante/fagulha","ability/fogo/Principiante/toque-escaldante","ability/fogo/Principiante/muro-de-chamas","ability/fogo/Principiante/clarao","mesa/desarmar","mesa/esquivar","mesa/defender","mesa/ajudar","mesa/ataque-basico","mesa/ataque-a-distancia"]}
+Inicio
+Previa
+Muralha confirmada
+Circulo
+Urso
+Urso: 4 patas, presas e sem colisao
+Caminhada
+Patas acompanham o pivo das pernas: 12 quadros
+Camera urso
+FINAL 8
+OK mago sem esconder
+FALHA primeiro clique fixa inicio
+OK inicio nao gasta
+FALHA segundo clique fixa fim
+FALHA previa quatro casas
+OK confirmacao visivel
+OK desenho nao gasta
+FALHA muralha real quatro casas
+FALHA custo duas acoes tres PM
+OK mira limpa
+FALHA nao ladino recusado sem custo
+FALHA circulo tem previa
+FALHA circulo aguarda confirmar
+OK ladino recebe esconder
+OK mago sem esconder
+FALHA primeiro clique fixa inicio
+OK inicio nao gasta
+FALHA segundo clique fixa fim
+FALHA previa quatro casas
+OK confirmacao visivel
+OK desenho nao gasta
+FALHA muralha real quatro casas
+FALHA custo duas acoes tres PM
+OK mira limpa
+FALHA nao ladino recusado sem custo
+FALHA circulo tem previa
+FALHA circulo aguarda confirmar
+OK ladino recebe esconder
+[Testes] 1030 ok, 0 falha(s)
+[Testes] 1030 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g12_verificar.py", line 75, in <module>
+    assert lua('return shared.G12.falhas').strip()=='0'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

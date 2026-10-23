@@ -1,0 +1,15 @@
+INFRA-ECONOMIA / TESTES-LOCAL — 13/10/2026
+
+Alteração em tools/testar.ps1:
+- Descoberta automática do Luau usa LOCALAPPDATA e o diretório Temp do perfil atual; removido fallback para caminho de usuário fixo.
+- -LuauDirectory e LUAU_DIR preservam precedência e, quando configurados com caminho inválido, falham explicitamente sem fallback.
+- Limpeza recursiva ocorre somente após validar caminho absoluto com pai igual à raiz temporária escolhida e nome moshoku-testes-<GUID>.
+
+Verificação pontual:
+- -LuauDirectory apontando para unidade/pasta inexistente: falha explícita de configuração; fallback não usado.
+- LUAU_DIR apontando para unidade/pasta inexistente: falha explícita de configuração; fallback não usado.
+
+Suíte: powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1
+Resultado: RESULTADO: tudo ok (fora do Studio); compilação 259 arquivos, 0 erros; specs executados sem falhas; catálogo confere com o site; simulações Painel e Estado do cliente ok.
+Observação de ambiente: o Python emitiu avisos repetidos "Failed to find real location of C:\Program Files\Python314\python.exe" ao montar specs, mas os specs reportaram resultados válidos e a suíte terminou com tudo ok.
+Limite: não executado playtest no Studio; esta alteração cobre descoberta/limpeza da suíte local.

@@ -1,0 +1,5 @@
+Comando: powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1
+Compilação: 259 fontes, 0 erros
+Specs puros, catálogo do site, simulação do painel e estado do cliente: passaram
+Resultado: RESULTADO: tudo ok (fora do Studio)
+Nota do host: o launcher exibiu avisos de localização Python314 durante os specs; não impediram a execução nem o resultado final.

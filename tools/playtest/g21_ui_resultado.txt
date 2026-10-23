@@ -1,0 +1,2 @@
+OK cliques Próxima → Iniciar → Voltar à sala; duas partidas; WalkSpeed16/consulta0/combate0/retorno16; câmera Custom; toque original restaurado; sem barra/miniaturas
+[Testes] 1107 ok, 0 falha(s)

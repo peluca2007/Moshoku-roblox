@@ -1,0 +1,33 @@
+iPhone7
+Game Started
+retrato
+Enum.UserInputType.Touch touch=true key=false
+[]
+painel cabe 374, 666 18, 278 172, 160 acaoativa=true
+toque arremessa
+[imagem salva em C:\Users\pedro\AppData\Local\Temp\studio-captura-1791733707274.jpg]
+paisagem
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1081 ok, 0 falha(s)
+G17UI 666, 374 18, -9 280, 157 264, 464 264, 111 true Enum.UserInputType.Touch
+AssistantCommand:1: assertion failed!
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+Game Stopped
+default
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_ui.py", line 44, in <module>
+    print(lua('local f=game.Players.LocalPlayer.PlayerGui.SalaMaoDicas.Comandos;local v=workspace.CurrentCamera.ViewportSize;print("G17UI",tostring(v),tostring(f.AbsolutePosition),tostring(f.AbsoluteSize),tostring(f.Acoes.AbsoluteCanvasSize),tostring(f.Acoes.AbsoluteSize),tostring(f.Parent.Enabled),tostring(game:GetService("UserInputService"):GetLastInputType()));assert(f.AbsolutePosition.X>=0 and f.AbsolutePosition.Y>=0 and f.AbsolutePosition.X+f.AbsoluteSize.X<=v.X and f.AbsolutePosition.Y+f.AbsoluteSize.Y<=v.Y);assert(f.Acoes.AbsoluteCanvasSize.Y>f.Acoes.AbsoluteSize.Y,"rolagem");return "ficha cabe e rola "..tostring(v)'),flush=True);shot('g17_toque_paisagem')
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_ui.py", line 13, in lua
+    def lua(code,dm='Client'): return call('execute_luau',code=code,datamodel_type=dm)
+                                      ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_ui.py", line 11, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: assertion failed!'}

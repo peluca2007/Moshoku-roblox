@@ -1,0 +1,15 @@
+# Preferência econômica deste projeto; escolha explícita no app pode prevalecer.
+model = "gpt-6-luna"
+model_reasoning_effort = "medium"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 2
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "medium"
+[mcp_servers.roblox-studio]
+command = "cmd.exe"
+args = [
+    "/c",
+    'C:\Users\pedro\AppData\Local\Roblox\mcp.bat',
+]

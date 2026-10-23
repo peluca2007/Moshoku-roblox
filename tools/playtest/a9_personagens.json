@@ -1,0 +1,41 @@
+[
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": true
+    }
+  },
+  {
+    "sleep": 8
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code_file": "tools/playtest/a9_personagens_e2e.luau"
+    },
+    "max": 2000
+  },
+  {
+    "sleep": 420
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "return (shared.A9 and shared.A9.pronto) and table.concat(shared.A9.linhas, '|') or 'ainda rodando'"
+    },
+    "max": 12000
+  },
+  {
+    "tool": "get_console_output",
+    "args": {},
+    "max": 6000
+  },
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": false
+    }
+  }
+]

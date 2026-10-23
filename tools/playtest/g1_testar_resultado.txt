@@ -1,0 +1,74 @@
+Compilação: 162 arquivo(s), 0 com erro
+A14Reacoes.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A15Armas.spec.luau: 7 ok, 0 falha(s)
+A15Encontro.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A16Regras.spec.luau: 6 ok, 0 falha(s)
+A16Servico.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A17Regras.spec.luau: 8 ok, 0 falha(s)
+A17Servico.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A18Regras.spec.luau: 17 ok, 0 falha(s)
+A18Servico.spec.luau: só no Studio
+A19Estado.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A19Formulas.spec.luau: 519 ok, 0 falha(s)
+A19Integracao.spec.luau: só no Studio
+A20Utilidades.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A3.spec.luau: 15 ok, 0 falha(s)
+A3Arvores.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A3Estados.spec.luau: 4 ok, 0 falha(s)
+A3Integracao.spec.luau: só no Studio
+A3Servico.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+A4Disparos.spec.luau: 3 ok, 0 falha(s)
+A4Gelo.spec.luau: só no Studio
+A5Basicos.spec.luau: só no Studio
+A6Inimigos.spec.luau: só no Studio
+A9Duelo.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+AdminComandos.spec.luau: 2 ok, 0 falha(s)
+AdminService.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+ApresentacaoAcoes.spec.luau: 4 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+CondicaoRules.spec.luau: 15 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+Dice.spec.luau: 9 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+FichaImport.spec.luau: 11 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+FichaSessao.spec.luau: 6 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+FichaV2.spec.luau: 12 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+JsonEstrutura.spec.luau: 7 ok, 0 falha(s)
+Livro.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+Maestrias.spec.luau: 9 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+MesaProtocol.spec.luau: 5 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+MesaSave.spec.luau: 27 ok, 0 falha(s)
+PersonagensVitrine.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+Progressao.spec.luau: 6 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+Reacoes.spec.luau: 6 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+Regras.spec.luau: 19 ok, 0 falha(s)
+RegrasLivro.spec.luau: só no Studio
+Failed to find real location of C:\Program Files\Python314\python.exe
+Sons.spec.luau: 5 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+TravaPartida.spec.luau: 4 ok, 0 falha(s)
+Failed to find real location of C:\Program Files\Python314\python.exe
+UploadPartes.spec.luau: 8 ok, 0 falha(s)
+Catálogo: confere com o site
+Painel: simulação ok
+Estado do cliente: simulação ok
+RESULTADO: tudo ok (fora do Studio)

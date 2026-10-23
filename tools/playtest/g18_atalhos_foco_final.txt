@@ -1,0 +1,32 @@
+Fonte conferida sem alteracao 247
+Game Started
+estado real e monitor prontos
+{"seated":true,"me":2287856135,"combat":false,"avatar":true,"snapshot":true,"master":2287856135,"snapshotViaExecute":false,"table":false,"text":"","focused":false}
+Success
+lobby {"seated": true, "me": 2287856135, "combat": false, "avatar": true, "snapshot": true, "changes": [], "master": 2287856135, "events": [{"before": false, "key": "M", "focused": false, "phase": "lobby", "after": false, "combat": false, "processed": false}], "table": false, "transient": [{"key": "M", "processed": false}], "text": "", "focused": false}
+OK M entregue no lobby sem alternar tabuleiro
+inicio solicitado
+OK partida real iniciou
+Success
+partida1 {"seated": true, "me": 2287856135, "combat": true, "avatar": true, "snapshot": true, "changes": [{"phase": "lobby", "value": true}, {"phase": "partida1", "value": false}], "master": 2287856135, "events": [{"before": false, "key": "M", "focused": false, "phase": "lobby", "after": false, "combat": false, "processed": false}, {"before": false, "key": "M", "focused": false, "phase": "partida1", "after": false, "combat": true, "processed": false}], "table": false, "transient": [{"key": "M", "processed": false}, {"key": "M", "processed": false}], "text": "", "focused": false}
+OK M entregue alterna partida
+Success
+partida2 {"seated": true, "me": 2287856135, "combat": true, "avatar": true, "snapshot": true, "changes": [{"phase": "lobby", "value": true}, {"phase": "partida1", "value": false}, {"phase": "partida2", "value": true}], "master": 2287856135, "events": [{"before": false, "key": "M", "focused": false, "phase": "lobby", "after": false, "combat": false, "processed": false}, {"before": false, "key": "M", "focused": false, "phase": "partida1", "after": false, "combat": true, "processed": false}, {"before": true, "key": "M", "focused": false, "phase": "partida2", "after": true, "combat": true, "processed": false}], "table": true, "transient": [{"key": "M", "processed": false}, {"key": "M", "processed": false}, {"key": "M", "processed": false}], "text": "", "focused": false}
+OK M entregue restaura partida
+Success
+texto {"seated": true, "me": 2287856135, "combat": true, "avatar": true, "snapshot": true, "changes": [{"phase": "lobby", "value": true}, {"phase": "partida1", "value": false}, {"phase": "partida2", "value": true}], "master": 2287856135, "events": [{"before": false, "key": "M", "focused": false, "phase": "lobby", "after": false, "combat": false, "processed": false}, {"before": false, "key": "M", "focused": false, "phase": "partida1", "after": false, "combat": true, "processed": false}, {"before": true, "key": "M", "focused": false, "phase": "partida2", "after": true, "combat": true, "processed": false}, {"before": true, "key": "M", "focused": true, "phase": "texto", "after": true, "combat": true, "processed": true}], "table": true, "transient": [{"key": "M", "processed": false}, {"key": "M", "processed": false}, {"key": "M", "processed": false}, {"key": "M", "processed": true}], "text": "", "focused": true}
+OK M entregue com foco nao alterna partida
+Texto apos keyDown M: ''
+Success
+textInput {"seated": true, "me": 2287856135, "combat": true, "avatar": true, "snapshot": true, "changes": [{"phase": "lobby", "value": true}, {"phase": "partida1", "value": false}, {"phase": "partida2", "value": true}], "master": 2287856135, "events": [{"before": false, "key": "M", "focused": false, "phase": "lobby", "after": false, "combat": false, "processed": false}, {"before": false, "key": "M", "focused": false, "phase": "partida1", "after": false, "combat": true, "processed": false}, {"before": true, "key": "M", "focused": false, "phase": "partida2", "after": true, "combat": true, "processed": false}, {"before": true, "key": "M", "focused": true, "phase": "texto", "after": true, "combat": true, "processed": true}], "table": true, "transient": [{"key": "M", "processed": false}, {"key": "M", "processed": false}, {"key": "M", "processed": false}, {"key": "M", "processed": true}], "text": "x", "focused": true}
+OK textInput insere marcador novo
+OK monitores recebem mesmas teclas
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+FINAL 0 falhas / 7 checks
+Game Stopped
+limpeza da fixture propria

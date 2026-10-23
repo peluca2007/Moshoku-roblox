@@ -1,0 +1,71 @@
+Estado inicial: - Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Game Started
+Specs: 943 specs aprovados
+iniciado
+EM ANDAMENTO 3
+EM ANDAMENTO 3
+EM ANDAMENTO 8
+EM ANDAMENTO 8
+EM ANDAMENTO 13
+EM ANDAMENTO 13
+EM ANDAMENTO 18
+EM ANDAMENTO 18
+EM ANDAMENTO 18
+EM ANDAMENTO 23
+EM ANDAMENTO 26
+EM ANDAMENTO 28
+EM ANDAMENTO 31
+EM ANDAMENTO 33
+EM ANDAMENTO 38
+EM ANDAMENTO 38
+FINAL 1
+OK    mago-de-fogo: escolha registrada
+OK    mago-de-fogo: personagem certo na mesa
+OK    mago-de-fogo: cartas na barra
+OK    mago-de-fogo: 13 cartas usadas sem erro interno
+OK    mago-de-fogo: saiu do treino e liberou a arena
+OK    maga-da-agua: escolha registrada
+OK    maga-da-agua: personagem certo na mesa
+OK    maga-da-agua: cartas na barra
+OK    maga-da-agua: 15 cartas usadas sem erro interno
+OK    maga-da-agua: saiu do treino e liberou a arena
+OK    mago-do-vento: escolha registrada
+OK    mago-do-vento: personagem certo na mesa
+OK    mago-do-vento: cartas na barra
+OK    mago-do-vento: 14 cartas usadas sem erro interno
+OK    mago-do-vento: saiu do treino e liberou a arena
+OK    mago-da-terra: escolha registrada
+OK    mago-da-terra: personagem certo na mesa
+OK    mago-da-terra: cartas na barra
+OK    mago-da-terra: 15 cartas usadas sem erro interno
+OK    mago-da-terra: saiu do treino e liberou a arena
+OK    curandeira: escolha registrada
+OK    curandeira: personagem certo na mesa
+OK    curandeira: cartas na barra
+OK    curandeira: 11 cartas usadas sem erro interno
+OK    curandeira: saiu do treino e liberou a arena
+OK    alquimista: escolha registrada
+OK    alquimista: personagem certo na mesa
+OK    alquimista: cartas na barra
+OK    alquimista: 12 cartas usadas sem erro interno
+OK    alquimista: saiu do treino e liberou a arena
+OK    teorico: escolha registrada
+OK    teorico: personagem certo na mesa
+OK    teorico: cartas na barra
+OK    teorico: 11 cartas usadas sem erro interno
+OK    teorico: saiu do treino e liberou a arena
+OK    invocador: escolha registrada
+OK    invocador: personagem certo na mesa
+OK    invocador: cartas na barra
+FALHA sem erro de execução: AssistantCommand:60: turno não renovado
+A9 personagens: 1 falha(s)
+Game Stopped
+Estado final: - Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\f2_verificar.py", line 60, in <module>
+    raise RuntimeError("Regress�o dos personagens falhou.")
+RuntimeError: Regress�o dos personagens falhou.

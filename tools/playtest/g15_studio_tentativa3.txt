@@ -1,0 +1,19 @@
+Fonte sincronizada
+Game Started
+1063 specs / 0 falhas
+Sala pronta
+bandeja
+Dados na mao
+Impulso nativo, dono servidor; velocidade 0.16790595650672913, -0.0018460750579833984, -0.14411231875419617
+Game Stopped
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 49, in <module>
+    print(lua('local p=game.Players:GetPlayers()[1];local m=workspace.SalaDadosFisicos:FindFirstChild("Dados_"..p.UserId);assert((m.Dado1.Position-shared.G15Pos).Magnitude>.05,"dado parado");return "Fisica moveu dado"','Server'),flush=True)
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 17, in lua
+    def lua(code,dm='Client'):return call('execute_luau',datamodel_type=dm,code=code)
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 15, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: dado parado'}

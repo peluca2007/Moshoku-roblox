@@ -1,0 +1,539 @@
+src/shared/data/weaponGroups.ts:274:22 - error TS2339: Property 'trim' does not exist on type 'string'.
+
+274   const limpo = nome.trim();
+                         ~~~~
+
+src/shared/data/weaponGroups.ts:277:32 - error TS2693: 'Object' only refers to a type, but is being used as a value here.
+
+277   for (const [chave, grupo] of Object.entries(GRUPO_POR_ARMA)) {
+                                   ~~~~~~
+
+src/shared/lib/types.ts:23:29 - error TS2345: Argument of type 'RegExp' is not assignable to parameter of type 'string'.
+
+23   const first = label.split(/\s+ou\s+/i)[0].trim();
+                               ~~~~~~~~~~~
+
+src/shared/lib/types.ts:23:45 - error TS2339: Property 'trim' does not exist on type 'string'.
+
+23   const first = label.split(/\s+ou\s+/i)[0].trim();
+                                               ~~~~
+
+src/shared/lib/types.ts:43:12 - error TS2345: Argument of type 'RegExp' is not assignable to parameter of type 'string'.
+
+43     .split(/\s+ou\s+/i)
+              ~~~~~~~~~~~
+
+src/shared/lib/types.ts:44:50 - error TS2339: Property 'trim' does not exist on type 'string'.
+
+44     .map((parte) => ATTRIBUTE_KEY_BY_LABEL[parte.trim()])
+                                                    ~~~~
+
+src/shared/lib/types.ts:135:22 - error TS2339: Property 'replace' does not exist on type 'string'.
+
+135   return incantation.replace(/\\n/g, "\n").trim().length >= INCANTATION_LENGTH[rank].min;
+                         ~~~~~~~
+
+src/shared/lib/types.ts:195:10 - error TS2304: Cannot find name 'Math'.
+
+195   return Math.floor((n - 1) / 2) + 1;
+             ~~~~
+
+src/shared/lib/types.ts:223:10 - error TS2304: Cannot find name 'Math'.
+
+223   return Math.min(4, 2 + (n - 1));
+             ~~~~
+
+src/shared/lib/types.ts:281:10 - error TS2304: Cannot find name 'Math'.
+
+281   return Math.round((1 + 0.2 * vigor) * 100) / 100;
+             ~~~~
+
+src/shared/store/selectors.ts:71:14 - error TS2339: Property 'length' does not exist on type 'AttributeKey[]'.
+
+71   if (chaves.length === 0) return padrao;
+                ~~~~~~
+
+src/shared/store/selectors.ts:91:6 - error TS2339: Property 'slice' does not exist on type 'AttributeKey[]'.
+
+91     .slice(0, race?.attributeChoices ?? 0)
+        ~~~~~
+
+src/shared/store/selectors.ts:92:14 - error TS7006: Parameter 'k' implicitly has an 'any' type.
+
+92     .filter((k) => k === key).length;
+                ~
+
+src/shared/store/selectors.ts:127:12 - error TS2339: Property 'slice' does not exist on type 'string[]'.
+
+127           .slice(0, permitidas.count)
+               ~~~~~
+
+src/shared/store/selectors.ts:128:20 - error TS7006: Parameter 's' implicitly has an 'any' type.
+
+128           .filter((s) => permitidas.from.includes(s))
+                       ~
+
+src/shared/store/selectors.ts:146:16 - error TS2550: Property 'from' does not exist on type 'ArrayConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+146   return Array.from(new Set(skills));
+                   ~~~~
+
+src/shared/store/selectors.ts:154:10 - error TS2304: Cannot find name 'Math'.
+
+154   return Math.max(0, choose.count - validas.length);
+             ~~~~
+
+src/shared/store/selectors.ts:154:45 - error TS2339: Property 'length' does not exist on type 'string[]'.
+
+154   return Math.max(0, choose.count - validas.length);
+                                                ~~~~~~
+
+src/shared/store/selectors.ts:208:10 - error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+
+208   return new Set(pagos).size * PA_POR_GRUPO;
+             ~~~~~~~~~~~~~~~~~~~
+
+src/shared/store/selectors.ts:233:10 - error TS2304: Cannot find name 'Math'.
+
+233   return Math.max(0, total - (state.raceAttributeChoices ?? []).length);
+             ~~~~
+
+src/shared/store/selectors.ts:233:65 - error TS2339: Property 'length' does not exist on type 'AttributeKey[]'.
+
+233   return Math.max(0, total - (state.raceAttributeChoices ?? []).length);
+                                                                    ~~~~~~
+
+src/shared/store/selectors.ts:237:10 - error TS2693: 'Object' only refers to a type, but is being used as a value here.
+
+237   return Object.fromEntries(
+             ~~~~~~
+
+src/shared/store/selectors.ts:256:37 - error TS2339: Property 'reverse' does not exist on type 'RankName[]'.
+
+256 const RANKS_DESCENDING = [...RANKS].reverse();
+                                        ~~~~~~~
+
+src/shared/store/selectors.ts:263:33 - error TS7006: Parameter 'r' implicitly has an 'any' type.
+
+263   return RANKS_DESCENDING.find((r) => unlocked.has(r));
+                                    ~
+
+src/shared/store/selectors.ts:272:12 - error TS2304: Cannot find name 'Math'.
+
+272     return Math.max(max, RANK_BONUS[u.rank]);
+               ~~~~
+
+src/shared/store/selectors.ts:304:83 - error TS2339: Property 'length' does not exist on type 'UnlockedRank[]'.
+
+304     return sum + value * state.unlockedRanks.filter((u) => u.treeId === a.treeId).length;
+                                                                                      ~~~~~~
+
+src/shared/store/selectors.ts:340:16 - error TS2550: Property 'flatMap' does not exist on type 'RankName[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2019' or later.
+
+340   return RANKS.flatMap((rank) => {
+                   ~~~~~~~
+
+src/shared/store/selectors.ts:340:25 - error TS7006: Parameter 'rank' implicitly has an 'any' type.
+
+340   return RANKS.flatMap((rank) => {
+                            ~~~~
+
+src/shared/store/selectors.ts:342:17 - error TS2339: Property 'length' does not exist on type '{ treeId: string; formula: string; media: number; }[]'.
+
+342     if (!lista?.length) return [];
+                    ~~~~~~
+
+src/shared/store/selectors.ts:388:19 - error TS2304: Cannot find name 'Math'.
+
+388   const natural = Math.floor(getTrainedBody(state) * fator);
+                      ~~~~
+
+src/shared/store/selectors.ts:412:10 - error TS2304: Cannot find name 'Math'.
+
+412   return Math.floor((PV_BASE + dados * 1.67) * getVigorFactor(vigor));
+             ~~~~
+
+src/shared/store/selectors.ts:449:24 - error TS2304: Cannot find name 'Math'.
+
+449   const atributoPiso = Math.max(espirito, 4);
+                           ~~~~
+
+src/shared/store/selectors.ts:503:20 - error TS2339: Property 'length' does not exist on type 'UnlockedRank[]'.
+
+503     if (corpoRanks.length === 0) return 0;
+                       ~~~~~~
+
+src/shared/store/selectors.ts:519:7 - error TS2304: Cannot find name 'Math'.
+
+519       Math.max(vigor + espirito, 0) +
+          ~~~~
+
+src/shared/store/selectors.ts:538:19 - error TS2339: Property 'length' does not exist on type 'UnlockedRank[]'.
+
+538     if (utilRanks.length === 0) return 0;
+                      ~~~~~~
+
+src/shared/store/selectors.ts:555:24 - error TS2304: Cannot find name 'Math'.
+
+555         segundoTermo = Math.max(
+                           ~~~~
+
+src/shared/store/selectors.ts:563:12 - error TS2304: Cannot find name 'Math'.
+
+563     return Math.max(intelecto + segundoTermo, 1) + patamarBonus;
+               ~~~~
+
+src/shared/store/selectors.ts:608:75 - error TS2304: Cannot find name 'Math'.
+
+608     if (grupoDaArma(item.name) === "escudos" && !temEscudos) return sum + Math.min(bonus, 1);
+                                                                              ~~~~
+
+src/shared/store/selectors.ts:669:18 - error TS2339: Property 'length' does not exist on type 'UnlockedRank[]'.
+
+669   if (corpoRanks.length === 0 || !baseDie) return null;
+                     ~~~~~~
+
+src/shared/store/selectors.ts:671:53 - error TS2304: Cannot find name 'Math'.
+
+671   const bestRankIndex = corpoRanks.reduce((m, u) => Math.max(m, RANKS.indexOf(u.rank)), -1);
+                                                        ~~~~
+
+src/shared/store/selectors.ts:754:10 - error TS2304: Cannot find name 'Math'.
+
+754   return Math.min(state.currentHp ?? maximo, maximo);
+             ~~~~
+
+src/shared/store/selectors.ts:782:110 - error TS2339: Property 'length' does not exist on type 'PurchasedAbility[]'.
+
+782   return state.purchasedAbilities.filter((a) => a.treeId === treeId && !origemNaturalDoSimbolo(state, a.id)).length;
+                                                                                                                 ~~~~~~
+
+src/shared/store/selectors.ts:826:27 - error TS2304: Cannot find name 'Math'.
+
+826   const purchasedPoints = Math.max(0, soma - budget);
+                              ~~~~
+
+src/shared/store/selectors.ts:831:64 - error TS2339: Property 'length' does not exist on type 'AttributeKey[]'.
+
+831   return saveAdvantagePaCostTotal((state.saveAdvantages ?? []).length);
+                                                                   ~~~~~~
+
+src/shared/store/selectors.ts:859:21 - error TS2304: Cannot find name 'Math'.
+
+859   const compradas = Math.max(0, state.skills.filter((s) => !gratuitas.has(s)).length - escolhasDeBonus);
+                        ~~~~
+
+src/shared/store/selectors.ts:859:79 - error TS2339: Property 'length' does not exist on type 'string[]'.
+
+859   const compradas = Math.max(0, state.skills.filter((s) => !gratuitas.has(s)).length - escolhasDeBonus);
+                                                                                  ~~~~~~
+
+src/shared/store/selectors.ts:860:10 - error TS2304: Cannot find name 'Math'.
+
+860   return Math.ceil(compradas / SKILLS_PER_PA);
+             ~~~~
+
+src/shared/store/selectors.ts:864:10 - error TS2304: Cannot find name 'Math'.
+
+864   return Math.ceil((state.proficiencies ?? []).length / PROFICIENCIES_PER_PA);
+             ~~~~
+
+src/shared/store/selectors.ts:864:48 - error TS2339: Property 'length' does not exist on type 'string[]'.
+
+864   return Math.ceil((state.proficiencies ?? []).length / PROFICIENCIES_PER_PA);
+                                                   ~~~~~~
+
+src/shared/store/selectors.ts:942:18 - error TS2304: Cannot find name 'Math'.
+
+942   const hpCost = Math.ceil(state.bonusHp / hpRate) * 2;
+                     ~~~~
+
+src/shared/store/selectors.ts:943:18 - error TS2304: Cannot find name 'Math'.
+
+943   const mpCost = Math.ceil(state.bonusMp / mpRate) * 2;
+                     ~~~~
+
+src/shared/store/selectors.ts:944:10 - error TS2304: Cannot find name 'Math'.
+
+944   return Math.max(0, hpCost) + Math.max(0, mpCost);
+             ~~~~
+
+src/shared/store/selectors.ts:944:32 - error TS2304: Cannot find name 'Math'.
+
+944   return Math.max(0, hpCost) + Math.max(0, mpCost);
+                                   ~~~~
+
+src/shared/store/selectors.ts:966:13 - error TS2304: Cannot find name 'Math'.
+
+966     hpRate: Math.max(1, getHighestRankBonus(state) * 4),
+                ~~~~
+
+src/shared/store/selectors.ts:967:13 - error TS2304: Cannot find name 'Math'.
+
+967     mpRate: Math.max(1, bonusMagia * 2),
+                ~~~~
+
+src/shared/store/selectors.ts:1029:20 - error TS2304: Cannot find name 'Math'.
+
+1029       return sum + Math.max(0, openedTrees.size - 1);
+                        ~~~~
+
+src/shared/store/selectors.ts:1029:32 - error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+
+1029       return sum + Math.max(0, openedTrees.size - 1);
+                                    ~~~~~~~~~~~~~~~~
+
+src/shared/store/selectors.ts:1134:24 - error TS2345: Argument of type '(x: number, y: number) => number' is not assignable to parameter of type '(a: number, b: number) => boolean'.
+  Type 'number' is not assignable to type 'boolean'.
+
+1134       disponiveis.sort((x, y) => x - y);
+                            ~~~~~~~~~~~~~~~
+
+src/shared/store/selectors.ts:1135:50 - error TS2339: Property 'length' does not exist on type 'number[]'.
+
+1135       while (quantidade < exigido && disponiveis.length > 0) {
+                                                      ~~~~~~
+
+src/shared/store/selectors.ts:1251:10 - error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: readonly defined[], callback: (value: CondicaoNaFicha | null, index: number, array: readonly (CondicaoNaFicha | null)[]) => value is CondicaoNaFicha): CondicaoNaFicha[]', gave the following error.
+    The 'this' context of type '(CondicaoNaFicha | null)[]' is not assignable to method's 'this' of type 'readonly defined[]'.
+      Type 'CondicaoNaFicha | null' is not assignable to type 'defined'.
+        Type 'null' is not assignable to type 'defined'.
+  Overload 2 of 2, '(this: readonly defined[], callback: (value: CondicaoNaFicha | null, index: number, array: readonly (CondicaoNaFicha | null)[]) => boolean | undefined): (CondicaoNaFicha | null)[]', gave the following error.
+    The 'this' context of type '(CondicaoNaFicha | null)[]' is not assignable to method's 'this' of type 'readonly defined[]'.
+
+1251   return (state.condicoes ?? [])
+              ~~~~~~~~~~~~~~~~~~~~~~~
+1252     .map((ativa): CondicaoNaFicha | null => {
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ ... 
+1261         : null;
+     ~~~~~~~~~~~~~~~
+1262     })
+     ~~~~~~
+
+
+src/shared/store/selectors.ts:1289:10 - error TS2304: Cannot find name 'Math'.
+
+1289   return Math.min(q.acumulos, q.bonusDeRankDaFonte ?? TETO_DE_ACUMULOS);
+              ~~~~
+
+src/shared/store/selectors.ts:1428:3 - error TS2322: Type '(BonusDePericia | null)[]' is not assignable to type 'BonusDePericia[]'.
+  Type 'BonusDePericia | null' is not assignable to type 'BonusDePericia'.
+    Type 'null' is not assignable to type 'BonusDePericia'.
+
+1428   return state.skills
+       ~~~~~~
+
+src/shared/store/selectors.ts:1428:10 - error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: readonly defined[], callback: (value: BonusDePericia | null, index: number, array: readonly (BonusDePericia | null)[]) => value is BonusDePericia | null): (BonusDePericia | null)[]', gave the following error.
+    The 'this' context of type '(BonusDePericia | null)[]' is not assignable to method's 'this' of type 'readonly defined[]'.
+      Type 'BonusDePericia | null' is not assignable to type 'defined'.
+        Type 'null' is not assignable to type 'defined'.
+  Overload 2 of 2, '(this: readonly defined[], callback: (value: BonusDePericia | null, index: number, array: readonly (BonusDePericia | null)[]) => boolean | undefined): (BonusDePericia | null)[]', gave the following error.
+    The 'this' context of type '(BonusDePericia | null)[]' is not assignable to method's 'this' of type 'readonly defined[]'.
+
+1428   return state.skills
+              ~~~~~~~~~~~~
+1429     .map((nome) => getBonusDePericia(state, nome))
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+src/shared/store/selectors.ts:1428:10 - error TS2684: The 'this' context of type '(BonusDePericia | null)[]' is not assignable to method's 'this' of type 'defined[]'.
+  Type 'BonusDePericia | null' is not assignable to type 'defined'.
+    Type 'null' is not assignable to type 'defined'.
+
+1428   return state.skills
+              ~~~~~~~~~~~~
+1429     .map((nome) => getBonusDePericia(state, nome))
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1430     .filter((p): p is BonusDePericia => p !== null)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/shared/store/selectors.ts:1431:21 - error TS18047: 'a' is possibly 'null'.
+
+1431     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+                         ~
+
+src/shared/store/selectors.ts:1431:28 - error TS2339: Property 'localeCompare' does not exist on type 'string'.
+
+1431     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+                                ~~~~~~~~~~~~~
+
+src/shared/store/selectors.ts:1431:42 - error TS18047: 'b' is possibly 'null'.
+
+1431     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+                                              ~
+
+src/shared/data/skills.ts:45:36 - error TS2339: Property 'toLowerCase' does not exist on type 'string'.
+
+45   return SKILLS.find((s) => s.name.toLowerCase() === name.toLowerCase());
+                                      ~~~~~~~~~~~
+
+src/shared/data/skills.ts:45:59 - error TS2339: Property 'toLowerCase' does not exist on type 'string'.
+
+45   return SKILLS.find((s) => s.name.toLowerCase() === name.toLowerCase());
+                                                             ~~~~~~~~~~~
+
+src/shared/data/trees/index.ts:50:21 - error TS2339: Property 'length' does not exist on type 'TreeRankDef[]'.
+
+50   return tree.ranks.length === 0;
+                       ~~~~~~
+
+src/shared/data/trees/teorica.ts:68:28 - error TS2304: Cannot find name 'Error'.
+
+68   if (!r.valida) throw new Error(`Magia Teórica: a carta ${id} não é uma fórmula válida — ${r.erros.join(" ")}`);
+                              ~~~~~
+
+src/shared/data/trees/teorica.ts:69:61 - error TS2339: Property 'replace' does not exist on type 'string'.
+
+69   const range = r.alcance === "toque" ? "Toque" : r.alcance.replace(/ m$/, " metros");
+                                                               ~~~~~~~
+
+src/shared/data/trees/teorica.ts:84:27 - error TS2693: 'Boolean' only refers to a type, but is being used as a value here.
+
+84     effect: partes.filter(Boolean).join(" "),
+                             ~~~~~~~
+
+src/shared/lib/simbolosTeoricos.ts:22:10 - error TS2693: 'Boolean' only refers to a type, but is being used as a value here.
+
+22   return Boolean(origemNaturalDoSimbolo(c, id))
+            ~~~~~~~
+
+src/shared/lib/simbolosTeoricos.ts:34:27 - error TS2304: Cannot find name 'Math'.
+
+34     .reduce((maior, u) => Math.max(maior, RANKS_TEORICOS.indexOf(u.rank as RankTeorico)), -1);
+                             ~~~~
+
+src/shared/lib/simbolosTeoricos.ts:42:22 - error TS2339: Property 'length' does not exist on type '("lancar" | "erguer" | "selar" | "sinalizar")[]'.
+
+42   if (escolha.verbos.length > 1 && rank < 2) problemas.push("Dois verbos só a partir do Avançado.");
+                        ~~~~~~
+
+src/shared/lib/weaponDie.ts:106:23 - error TS2304: Cannot find name 'Math'.
+
+106   const raw = index + Math.max(0, steps);
+                          ~~~~
+
+src/shared/lib/weaponDie.ts:107:18 - error TS2304: Cannot find name 'Math'.
+
+107   const target = Math.min(top, Math.max(0, raw));
+                     ~~~~
+
+src/shared/lib/weaponDie.ts:107:32 - error TS2304: Cannot find name 'Math'.
+
+107   const target = Math.min(top, Math.max(0, raw));
+                                   ~~~~
+
+src/shared/lib/weaponDie.ts:108:18 - error TS2304: Cannot find name 'Math'.
+
+108   const excess = Math.max(0, raw - top);
+                     ~~~~
+
+src/shared/lib/magiaTeorica.ts:170:30 - error TS2304: Cannot find name 'Math'.
+
+170 const medir = (m: number) => Math.max(1.5, Math.floor(m / 1.5) * 1.5);
+                                 ~~~~
+
+src/shared/lib/magiaTeorica.ts:170:44 - error TS2304: Cannot find name 'Math'.
+
+170 const medir = (m: number) => Math.max(1.5, Math.floor(m / 1.5) * 1.5);
+                                               ~~~~
+
+src/shared/lib/magiaTeorica.ts:171:28 - error TS2693: 'String' only refers to a type, but is being used as a value here.
+
+171 const fmt = (m: number) => String(m).replace(".", ",");
+                               ~~~~~~
+
+src/shared/lib/magiaTeorica.ts:179:36 - error TS2304: Cannot find name 'Math'.
+
+179       return `Quem encosta sofre ${Math.ceil(dados / 2)}d6 de dano ígneo (Agilidade contra CD 8 + BC pra metade), uma vez por rodada. Golpe de arma não transmite o calor.`;
+                                       ~~~~
+
+src/shared/lib/magiaTeorica.ts:189:92 - error TS2304: Cannot find name 'Math'.
+
+189       return `Ao erguê-la, um aliado ao toque recebe ${dados * 5} PV temporários por até ${Math.min(duracaoTurnos, 10)} turnos.`;
+                                                                                               ~~~~
+
+src/shared/lib/magiaTeorica.ts:224:14 - error TS2339: Property 'length' does not exist on type '("lancar" | "erguer" | "selar" | "sinalizar")[]'.
+
+224   if (verbos.length > 1) extras.push([`2º verbo (${VERBOS[verbos[1]].nome})`, 1]);
+                 ~~~~~~
+
+src/shared/lib/magiaTeorica.ts:231:14 - error TS2339: Property 'length' does not exist on type '("lancar" | "erguer" | "selar" | "sinalizar")[]'.
+
+231   if (verbos.length === 0) erros.push("Falta o verbo: uma fórmula sem verbo é mana parada.");
+                 ~~~~~~
+
+src/shared/lib/magiaTeorica.ts:232:14 - error TS2339: Property 'length' does not exist on type '("lancar" | "erguer" | "selar" | "sinalizar")[]'.
+
+232   if (verbos.length > 2) erros.push("No máximo dois verbos numa fórmula.");
+                 ~~~~~~
+
+src/shared/lib/magiaTeorica.ts:233:14 - error TS2339: Property 'length' does not exist on type '("lancar" | "erguer" | "selar" | "sinalizar")[]'.
+
+233   if (verbos.length === 2 && indice(escolha.rank) < 2) erros.push("Dois verbos na mesma fórmula só a partir do Avançado.");
+                 ~~~~~~
+
+src/shared/lib/magiaTeorica.ts:255:31 - error TS2304: Cannot find name 'Math'.
+
+255   const dadosSaida = emArea ? Math.ceil(dadosBase / 2) : dadosBase;
+                                  ~~~~
+
+src/shared/lib/magiaTeorica.ts:256:54 - error TS2304: Cannot find name 'Math'.
+
+256   const dadosEco = fere && escolha.forma === "eco" ? Math.ceil(dadosBase / 2) : 0;
+                                                         ~~~~
+
+src/shared/lib/magiaTeorica.ts:263:7 - error TS2304: Cannot find name 'Math'.
+
+263     ? Math.ceil(p.pv * (1 + (escolha.essencia === "terra" ? 0.5 : 0) + (escolha.forma === "quadrado" ? 0.5 : 0)))
+          ~~~~
+
+src/shared/lib/magiaTeorica.ts:290:27 - error TS2304: Cannot find name 'Math'.
+
+290       : `até ${fmt(noAr ? Math.min(tamanho, 12) : tamanho)} m na maior dimensão${noAr && tamanho > 12 ? " (no ar, 12 m no máximo)" : ""}`;
+                              ~~~~
+
+src/shared/lib/magiaTeorica.ts:329:21 - error TS2339: Property 'toLowerCase' does not exist on type '"Mana" | "Fogo" | "Água" | "Vento" | "Terra" | "Som" | "Vida"'.
+  Property 'toLowerCase' does not exist on type '"Mana"'.
+
+329       : `Lança ${de.toLowerCase()} a até ${alcance}: ${dano} de dano ${essencia.tipo}${emArea ? ` num raio de ${fmt(p.tamanho)} m` : escolha.forma === "estrela" ? "" : " num alvo"}.`;
+                        ~~~~~~~~~~~
+
+src/shared/lib/magiaTeorica.ts:335:32 - error TS2339: Property 'toLowerCase' does not exist on type '"Mana" | "Fogo" | "Água" | "Vento" | "Terra" | "Som" | "Vida"'.
+  Property 'toLowerCase' does not exist on type '"Mana"'.
+
+335     resumo = `Um sinal de ${de.toLowerCase()} ${lancar ? `a até ${alcance}` : "no ponto do desenho"}, ${escolha.forma === "onda" ? `percebido num raio de ${fmt(tamanho)} m` : "visto ou ouvido por quem estiver perto"}. Sem dano, cura ou condição.`;
+                                   ~~~~~~~~~~~
+
+src/shared/lib/magiaTeorica.ts:345:19 - error TS2339: Property 'length' does not exist on type 'string[]'.
+
+345     valida: erros.length === 0,
+                      ~~~~~~
+
+src/shared/lib/dice.ts:7:25 - error TS2339: Property 'replace' does not exist on type 'string'.
+
+7   const match = formula.replace(/\s/g, "").match(/^(\d+)?d(\d+)([+-]\d+)?$/);
+                          ~~~~~~~
+
+src/shared/lib/dice.ts:9:30 - error TS2693: 'Number' only refers to a type, but is being used as a value here.
+
+9   return { count: match[1] ? Number(match[1]) : 1, sides: Number(match[2]), mod: match[3] ? Number(match[3]) : 0 };
+                               ~~~~~~
+
+src/shared/lib/dice.ts:9:59 - error TS2693: 'Number' only refers to a type, but is being used as a value here.
+
+9   return { count: match[1] ? Number(match[1]) : 1, sides: Number(match[2]), mod: match[3] ? Number(match[3]) : 0 };
+                                                            ~~~~~~
+
+src/shared/lib/dice.ts:9:93 - error TS2693: 'Number' only refers to a type, but is being used as a value here.
+
+9   return { count: match[1] ? Number(match[1]) : 1, sides: Number(match[2]), mod: match[3] ? Number(match[3]) : 0 };
+                                                                                              ~~~~~~
+
+src/shared/lib/dice.ts:21:10 - error TS2304: Cannot find name 'Math'.
+
+21   return Math.round((count * (sides + 1)) / 2 + mod);
+            ~~~~
+

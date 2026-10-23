@@ -1,0 +1,15 @@
+Fonte sincronizada
+Game Started
+1063 specs / 0 falhas
+Sala pronta
+bandeja
+Dados na mao
+Game Stopped
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 45, in <module>
+    call('user_mouse_input',datamodel_type='Client',actions=[dict(action='mouseButtonDown',mouse_button='left'),dict(action='wait',wait_time_ms=350),dict(action='mouseButtonUp',mouse_button='left')]);time.sleep(.2)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 15, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'Either x and y, instance_path, or a prior action that establishes mouse position is required'}

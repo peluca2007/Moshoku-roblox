@@ -1,0 +1,34 @@
+Fontes sincronizadas
+Game Started
+985 specs / 0 falhas
+Console: [Testes] 985 ok, 0 falha(s)
+[Testes] 985 ok, 0 falha(s)
+Treino Ladina
+Console final: [Testes] 985 ok, 0 falha(s)
+[Testes] 985 ok, 0 falha(s)
+ServerScriptService.Server.AvatarFichas:17: attempt to iterate over a nil value
+Stack Begin
+Script 'ServerScriptService.Server.AvatarFichas', Line 17 - function andar
+Script 'ServerScriptService.Server.AvatarFichas', Line 201 - function sincronizar
+Script 'ServerScriptService.Server.AvatarFichas', Line 210 - function sincronizar
+Script 'ServerScriptService.Server.MesaService', Line 271 - function broadcast
+Script 'ServerScriptService.Server.MesaService', Line 1730 - function dispatch
+Script 'ServerScriptService.Server.MesaService', Line 1742
+Stack End
+AssistantCommand:1: attempt to index nil with 'AbsolutePosition'
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_verificar.py", line 67, in <module>
+    pos=json.loads(lua('local o=game.Players.LocalPlayer.PlayerGui.AcoesDoTurno.Barra.Cartas:FindFirstChild("Carta_mesa/esconder"); local p=o.AbsolutePosition+Vector2.new(30,24); return game.HttpService:JSONEncode({p.X,p.Y})'))
+                   ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_verificar.py", line 24, in lua
+    return call("execute_luau", datamodel_type="Client", code=code)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_verificar.py", line 20, in call
+    raise RuntimeError(r)
+RuntimeError: {'isError': True, 'text': "sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: attempt to index nil with 'AbsolutePosition'"}

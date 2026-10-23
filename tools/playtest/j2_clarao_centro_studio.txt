@@ -1,0 +1,8 @@
+J2 — Clarão com centro escolhido
+
+No Studio, os módulos alterados e a entrada do servidor foram sincronizados em Edit; Play executou o TestRunner e voltou a Edit.
+Output final: [Testes] 1424 ok, 0 falha(s).
+
+Os specs cobrem o centro canônico, centro bloqueado recusado sem gastar Ação/PM, círculo deslocado, exclusão do conjurador e alvo fora do raio. A suíte local compilou 320 fontes sem erros e terminou em RESULTADO: tudo ok. build-place.ps1 gerou o place e validou o XML.
+
+Limites: não houve clique real no mapa, avaliação visual nem sessão multiplayer. O place aberto no Studio não foi salvo.

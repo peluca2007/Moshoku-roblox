@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 32, in <module>
+    result=lua(studio_sync.chunk_code(items[i:i+6]),'Edit');assert result.startswith('alterados:'),result
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 17, in lua
+    def lua(code,dm='Client'):return call('execute_luau',datamodel_type=dm,code=code)
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 14, in call
+    r=c.call(tool,dict(studio_id=sid,**kw),timeout=60)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\studio_mcp.py", line 90, in call
+    return self._call(tool, args, timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\studio_mcp.py", line 93, in _call
+    response = self.request("tools/call", {"name": tool, "arguments": args}, timeout)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\studio_mcp.py", line 71, in request
+    raise TimeoutError(method)
+TimeoutError: tools/call

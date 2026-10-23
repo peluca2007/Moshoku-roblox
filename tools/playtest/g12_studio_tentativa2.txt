@@ -1,0 +1,15 @@
+Game Started
+1030 specs / 0 falhas
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g12_verificar.py", line 51, in <module>
+    print(lua('''local r={falhas=0,linhas={}};shared.G12=r;function r.check(n,ok) table.insert(r.linhas,(if ok then "OK " else "FALHA ")..n);if not ok then r.falhas+=1 end end;local re=game.ReplicatedStorage.Mesa;r.con=re.OnClientEvent:Connect(function(k,d) if k=="snapshot" then r.snap=d elseif k=="log" and d.tone=="erro" then r.erro=d.text end end);re:FireServer("escolherPersonagem",{id="mago-de-fogo"});task.wait(.5);re:FireServer("iniciarTreino",{});task.wait(2);r.state=require(game.Players.LocalPlayer.PlayerScripts.Client.MesaState);r.me=r.state.findToken(r.snap.combat.turnId);r.mana=r.me.mana;r.x,r.z=r.me.x,r.me.z;r.check("mago sem esconder",not table.find(r.me.habilidades,"mesa/esconder"));return game.HttpService:JSONEncode({r.x,r.z})'''),flush=True)
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g12_verificar.py", line 25, in lua
+    return call("execute_luau", datamodel_type="Client", code=code)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g12_verificar.py", line 21, in call
+    raise RuntimeError(r)
+RuntimeError: {'isError': True, 'text': "sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: attempt to index nil with 'mana'"}

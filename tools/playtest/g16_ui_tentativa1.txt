@@ -1,0 +1,28 @@
+emulador iPhone7
+Game Started
+1069 specs / 0 falhas
+bancada criada
+666, 374
+recusa
+rolagem
+reabrir
+dados
+consulta recebendo
+ficha preservada
+lista
+recusa preservada
+confirmado
+ocupado
+Game Stopped
+default
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g16_ui.py", line 58, in <module>
+    lua('local r=shared.G16UI;r.eleicao.atualizar(nil,true);r.pages.abrir("mestre");r.pages.gui.Pagina.Modo_luta.Text=string.rep("Descri��o longa de uma op��o ",7);return "preparacao"');time.sleep(.7)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g16_ui.py", line 13, in lua
+    def lua(code,dm='Client'): return call('execute_luau',code=code,datamodel_type=dm)
+                                      ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g16_ui.py", line 11, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: ReplicatedStorage.Shared.PreparacaoSala:13: attempt to concatenate string with nil'}

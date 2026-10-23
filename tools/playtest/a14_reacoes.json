@@ -1,0 +1,8 @@
+[
+  { "tool": "start_stop_play", "args": { "is_start": true } },
+  { "sleep": 8 },
+  { "tool": "execute_luau", "args": { "datamodel_type": "Client", "code_file": "tools/playtest/a14_reacoes_e2e.luau" }, "max": 2000 },
+  { "sleep": 90 },
+  { "tool": "execute_luau", "args": { "datamodel_type": "Client", "code": "return (shared.A14 and shared.A14.pronto) and table.concat(shared.A14.linhas, '|') or ('ainda rodando: ' .. table.concat(shared.A14.linhas, '|'))" }, "max": 9000 },
+  { "tool": "start_stop_play", "args": { "is_start": false } }
+]

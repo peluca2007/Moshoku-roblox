@@ -1,0 +1,28 @@
+Fontes sincronizadas
+Game Started
+969 specs aprovados
+treino real
+Fogo
+agua
+vento
+terra
+adaptacao
+Fagulha real
+braseiro
+Console final: [Testes] 969 ok, 0 falha(s)
+[Testes] 969 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g5_verificar.py", line 80, in <module>
+    key('Escape')
+    ~~~^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g5_verificar.py", line 33, in key
+    call("user_keyboard_input", datamodel_type="Client", actions=[dict(action="keyPress", key_code=name)])
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g5_verificar.py", line 20, in call
+    raise RuntimeError(r)
+RuntimeError: {'isError': True, 'text': 'VirtualInput::SendKey: key is permanently bound to a CoreGUI core action. VirtualInput cannot process this key.'}

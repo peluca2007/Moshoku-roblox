@@ -1,0 +1,8 @@
+[
+ {"tool":"start_stop_play","args":{"is_start":true}},
+ {"sleep":10},
+ {"tool":"execute_luau","args":{"datamodel_type":"Server","code":"local d = game:GetService('ServerStorage'):WaitForChild('MesaDebug', 10); return 'nao-mestre: ' .. tostring(d:Invoke('commandAs', 999, 'fichaImportBegin', { byteCount = 10, partCount = 1 })) .. ' | apply: ' .. tostring(d:Invoke('commandAs', 999, 'fichaImportApply', { proposalId = 'p1', version = 1 }))"},"timeout":30},
+ {"tool":"execute_luau","args":{"datamodel_type":"Client","code_file":"tools/playtest/ficha_v2_e2e.luau"},"timeout":150},
+ {"tool":"get_console_output","args":{},"max":4000},
+ {"tool":"start_stop_play","args":{"is_start":false}}
+]

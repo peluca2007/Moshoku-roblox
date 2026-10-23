@@ -1,0 +1,20 @@
+J2 — habilidades, Cura, Poção Menor, Defender e Em Chamas
+Data: 14/10/2026
+Ambiente: Roblox Studio, place Moshoku-Prototipo.rbxlx, Edit → Play → Edit.
+Sincronização: módulos J2 e specs atualizados no DataModel do Studio a partir de src.
+Runner: require(ServerScriptService.Server.TestRunner).run(ServerScriptService.Server.tests)
+Resultado: 1228 ok, 0 falha(s).
+
+Specs exercitados: EncontroTurnos (custo 2 Ações, ID longo, custo inválido, replay/idempotência) e EncontroAutonomoService (Bola/Toque/Cura só quando compradas, Cura em si ou aliado caído, Ferida Fresca por sequência causal entre turnos, custos 2 Ações/PM, PV atual, bônus do Toque com metade dos PV, Em Chamas, consumo idempotente da Poção Menor presente no inventário, Defender reduz o próximo ataque e expira na próxima vez).
+Fixtures temporárias na UI cliente: quatro jogadores, três criaturas, habilidades e item disponíveis produziram 22 botões; a lista rolável mediu 748 px de conteúdo, 300 px visíveis; em viewport 635 px, painel 420 px entre y=62 e y=482. Recibo simulado de Cura mostrou “Curador curou Aliado · 9 PV · Ferida Fresca dobrou os dados” mesmo durante a vez do jogador. Fixtures removidas ao final da execução. Viewport curto com aparelho físico não testado.
+O Studio voltou para Edit. O place não foi salvo nem publicado. Isto não é playtest visual ou multiplayer: clique real, outros clientes e experiência publicada não foram verificados.
+
+
+Continuação 14/10 — sincronização direcionada dos módulos e specs J1/J2 alterados.
+Studio TestRunner: 1.231 ok, 0 falha(s).
+Play encerrado; estado Edit confirmado. Place não salvo nem publicado.
+
+
+Continuação 14/10 — descanso terminal RB-25:
+Fontes alteradas sincronizadas no Studio Edit; TestRunner no Play: 1.231 ok, 0 falha(s).
+Play encerrado; estado Edit confirmado. Place não salvo nem publicado. A tela foi sincronizada; não houve avaliação visual nem teste multiplayer.

@@ -1,0 +1,22 @@
+Fonte sincronizada
+Game Started
+1063 specs / 0 falhas
+Sala pronta
+bandeja
+Dados na mao
+Impulso nativo, dono servidor; velocidade 2.085960626602173, -2.6934657096862793, -2.507774829864502
+Fisica moveu dado
+Pousou
+Brotos confirmado
+Game Stopped
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 56, in <module>
+    aim();key('ButtonB');time.sleep(.6)
+          ~~~^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 19, in key
+    call('user_keyboard_input',datamodel_type='Client',actions=[dict(action='keyPress',key_code=k)])
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g15_verificar.py", line 15, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'VirtualInput::SendKey: key is permanently bound to a CoreGUI core action. VirtualInput cannot process this key.'}

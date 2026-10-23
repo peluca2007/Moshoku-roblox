@@ -1,0 +1,3 @@
+J2 — perseguição da IA (14/10/2026)
+
+Studio Moshoku-Prototipo.rbxlx: fontes e specs J2 sincronizados em Edit. Play/TestRunner: **1214 ok, 0 falhas**. Casos adicionais cobrem destino de perseguição que respeita ocupantes, criatura que usa o deslocamento do molde, gasta uma Ação e ataca ao alcançar adjacência, e retirada do derrotado da fila ativa. No cliente, uma fixture descartável recebeu o recibo creature-move e validou o texto “Goblin avançou · (10, 11)”; menus foram restaurados e a fixture removida. Play encerrado; Studio retornou a Edit. Place não salvo. Não houve playtest manual nem multiplayer real.

@@ -1,0 +1,141 @@
+[
+  {
+    "sleep": 3
+  },
+  {
+    "tool": "screen_capture",
+    "args": {
+      "capture_id": "A12_inicio"
+    }
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "local p=game.Players.LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo; local n=0; for _,o in p.Pagina_Inicio:GetChildren() do if o:IsA('TextButton') and o.Visible then n+=1 end end; assert(n==5); assert(p.Pagina_Inicio.Visible and not p.Pagina_Jogar.Visible); return 'Abertura: 5 a\u00c3\u0192\u00c2\u00a7\u00c3\u0192\u00c2\u00b5es; modos, admin e ajustes separados'"
+    }
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Inicio.Jogar"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "local p=game.Players.LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo; assert(p.Pagina_Jogar.Visible and not p.Pagina_Inicio.Visible); return 'Clique Jogar abre modos'"
+    }
+  },
+  {
+    "tool": "screen_capture",
+    "args": {
+      "capture_id": "A12_modos"
+    }
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Jogar.Voltar"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Inicio.Ajustes"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Ajustes.Volume"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Ajustes.Movimento"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "sleep": 1
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "local p=game.Players.LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Ajustes; assert(p.Volume.Rotulo.Text:find('100%%')); assert(p.Movimento.Rotulo.Text:find('reduzidas')); local g=game.SoundService:FindFirstChild('MoshokuEfeitos'); assert(g and math.abs(g.Volume-1)<.01); return 'Cliques reais: volume 100% e anima\u00e7\u00f5es reduzidas'"
+    }
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Server",
+      "code": "local r=game.ServerScriptService.Server; local p,f=require(r.TestRunner).run(r.tests); assert(f==0); return p..' specs aprovados'"
+    }
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code_file": "tools/playtest/a12_feedback.luau"
+    }
+  }
+]

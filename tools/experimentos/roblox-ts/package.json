@@ -1,0 +1,11 @@
+{
+  "name": "exp-rbxts",
+  "private": true,
+  "version": "0.0.0",
+  "devDependencies": {
+    "@rbxts/compiler-types": "3.0.0-types.0",
+    "@rbxts/types": "1.0.957",
+    "roblox-ts": "3.0.0",
+    "typescript": "5.5.4"
+  }
+}

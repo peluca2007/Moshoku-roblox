@@ -1,0 +1,10 @@
+J1 progressão temporária — 14/10/2026
+
+Fonte: powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1
+Resultado: 296 fontes compiladas, 0 erros; RESULTADO: tudo ok (fora do Studio).
+
+Studio MoshokuRPGMesa: iniciou em Edit; sincronizados PersonagemSessao, specs de sessão/adaptador, FichaPersonagemProprio e CriacaoPersonagemView sem salvar o place. Play/TestRunner: 1.240 specs, 0 falhas. Casos cobrem compra de habilidade do rank aberto, replay sem duplicação, payload extra, pedido conflitante, ficha ausente, combate e passagem validada para purchasedIds.
+
+O primeiro Play identificou uma expectativa errada no spec (repetição versus reutilização conflitante) e erro de runtime: TextBox não tem MaxLength. Ambos corrigidos; o campo agora limita por pontos de código Unicode, e a validação do servidor permanece. Na execução final, cliente iniciou sem erros registrados no Output.
+
+Play encerrado e Studio em Edit; place não salvo. Verificação de integração por clique real, compra multiplayer, persistência entre sessões e servidor publicado não realizada. PA continua infinito provisório; sem abertura de rank, XP, custo novo ou compra de item.

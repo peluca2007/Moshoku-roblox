@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Infinite yield possible on 'ReplicatedStorage:WaitForChild(\"Mesa\")'\nStack Begin\nScript 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start\nScript 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3\nStack End\n[Testes] 1096 ok, 0 falha(s)"
+    }
+  ],
+  "isError": false
+}

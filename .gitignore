@@ -1,0 +1,34 @@
+# Gerados (src é a referência; o place sai de tools/build-place.ps1)
+*.rbxlx
+*.rbxl
+*.rbxlx.lock
+sourcemap.json
+build/
+
+# Áudios: Pixabay não permite redistribuir arquivos soltos; vozes ficam fora até decisão do Pedro
+audios/
+assets/sons/*.mp3
+assets/vozes-npcs/**/*.ogg
+assets/vozes-npcs/**/*.m4a
+assets/vozes-npcs/**/*.wav
+assets/vozes-npcs/**/*.mp3
+
+# Evidências de playtest (capturas pesadas; o registro textual fica em docs/TESTES.md)
+docs/evidencias/**/*.png
+docs/evidencias/**/*.jpg
+tools/playtest/*.png
+tools/playtest/*.jpg
+
+# Blender: saídas e caches
+*.blend1
+tools/blender/**/saida/
+
+# Ambiente local
+__pycache__/
+*.pyc
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+node_modules/
+Nova pasta/
+desktop.ini
+Thumbs.db

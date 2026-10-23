@@ -1,0 +1,18 @@
+Game Started
+Lugar1
+selecao agendada fora do comando MCP
+{'fim': True, 'ancora': False, 'selecionado': True, 'snapshot': True, 'entrada': True}
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+Setting GuiService.SelectedObject to invalid GuiObject
+Setting GuiService.SelectedObject to invalid GuiObject
+Setting GuiService.SelectedObject to invalid GuiObject
+Setting GuiService.SelectedObject to invalid GuiObject
+Setting GuiService.SelectedObject to invalid GuiObject
+Setting GuiService.SelectedObject to invalid GuiObject
+Setting GuiService.SelectedObject to invalid GuiObject
+Game Stopped

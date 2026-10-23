@@ -1,0 +1,9 @@
+{
+  "name": "Moshoku RPG - Prototipo",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {"Shared": {"$path": "src/shared"}},
+    "ServerScriptService": {"RPGServer": {"$path": "src/server.server.luau"}, "Server": {"$path": "src/server"}},
+    "StarterPlayer": {"StarterPlayerScripts": {"RPGClient": {"$path": "src/client.client.luau"}, "Client": {"$path": "src/client"}}}
+  }
+}

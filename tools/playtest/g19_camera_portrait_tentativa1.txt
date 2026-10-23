@@ -1,0 +1,25 @@
+Game Started
+sala pronta
+MEDIDA {"vp": [374, 666], "pieces": [{"id": "t1", "x": 187, "on": true, "y": 263.63568115234375}, {"id": "t2", "x": 187, "on": true, "y": 131.76812744140625}, {"id": "t3", "x": 100.33808135986328, "on": true, "y": 166.6094970703125}, {"id": "t4", "x": 273.66192626953125, "on": true, "y": 166.6094970703125}], "corners": [{"y": 100.61587524414062, "x": 58.21839904785156, "on": true}, {"y": 323.4399719238281, "x": 32.74278259277344, "on": true}, {"y": 100.61587524414062, "x": 315.7816162109375, "on": true}, {"y": 323.4399719238281, "x": 341.2572326660156, "on": true}], "fade": false, "panel": false, "transition": {"maxY": 12.695527076721191, "escuro": true, "inicio": 1791752274.8191, "frames": 37, "fora": 0}, "center": [187, 201.99998474121094], "position": [-2.5, 94.90650177001953, 70.00125122070312], "keys": [], "table": true, "serial": 1, "area": {"x2": 374, "y2": 340, "y1": 64, "x1": 0}}
+OK start centralizado sem painel fantasma
+OK start centros dos participantes dentro da area util
+OK start quatro cantos da regiao cabem sem HUD
+OK start corte escuro revelou partida
+OK viewport emulado correto
+Game Stopped
+fixture propria removida
+default
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g19_camera.py", line 87, in <module>
+    print(call("get_console_output"),flush=True)
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g19_camera.py", line 15, in call
+    result=c.call(tool,dict(studio_id=sid,**args),timeout=60)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\studio_mcp.py", line 90, in call
+    return self._call(tool, args, timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\studio_mcp.py", line 93, in _call
+    response = self.request("tools/call", {"name": tool, "arguments": args}, timeout)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\studio_mcp.py", line 71, in request
+    raise TimeoutError(method)
+TimeoutError: tools/call

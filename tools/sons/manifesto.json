@@ -1,0 +1,154 @@
+{
+  "espada-corte": {
+    "arquivo": "assets/sons/espada-corte.mp3",
+    "origem": "public/sons/arena/espada-corte.mp3",
+    "sha256": "ca772bf2e8742b0644062f3b1e7a9f03344a3b1c9b5546d01d7d21cb9ae708db",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://103695653863803"
+  },
+  "espada-metal": {
+    "arquivo": "assets/sons/espada-metal.mp3",
+    "origem": "public/sons/arena/espada-metal.mp3",
+    "sha256": "ea2ed6bc3c19e37b6fdd2c2850fc630bcb173f3db94d878a87f481db13e47876",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://133019894363951"
+  },
+  "espada-combo": {
+    "arquivo": "assets/sons/espada-combo.mp3",
+    "origem": "public/sons/arena/espada-combo.mp3",
+    "sha256": "efc9fdb4d2e8d3b3d677fdccaaff0f00431e5b017879a8ca0cc9ea4542a934e1",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://97732414173082"
+  },
+  "aparar": {
+    "arquivo": "assets/sons/aparar.mp3",
+    "origem": "public/sons/arena/aparar.mp3",
+    "sha256": "32413d643b3e6f8498d4807922c2d7b0996c6ccea48053fd43b42df30d2ac263",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://97386344301275"
+  },
+  "flecha-impacto-1": {
+    "arquivo": "assets/sons/flecha-impacto-1.mp3",
+    "origem": "public/sons/arena/flecha-impacto-1.mp3",
+    "sha256": "edd022d088846ac305cd85df3f301e17a1f1b39d1ec258d97bf0f5c09017dc5b",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://129700547306010"
+  },
+  "flecha-impacto-2": {
+    "arquivo": "assets/sons/flecha-impacto-2.mp3",
+    "origem": "public/sons/arena/flecha-impacto-2.mp3",
+    "sha256": "7270f40fc03cb64870f6905db36eeee2209c1eff1de8ca9bf2e7ff0aca21f9fb",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://120428283997985"
+  },
+  "lanca": {
+    "arquivo": "assets/sons/lanca.mp3",
+    "origem": "public/sons/arena/lanca.mp3",
+    "sha256": "08fb73db2254400909bee22a8b00000d2e3fa9d977502c4a666850987140bbcd",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://90057993077385"
+  },
+  "soco": {
+    "arquivo": "assets/sons/soco.mp3",
+    "origem": "public/sons/arena/soco.mp3",
+    "sha256": "07fc45c6ef91b6e78dfd7024d5307ecd4ba3009e22441f43df167f8ee9420928",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://84453480355784"
+  },
+  "moedas": {
+    "arquivo": "assets/sons/moedas.mp3",
+    "origem": "public/sons/arena/moedas.mp3",
+    "sha256": "cb4af4112115e1d9f5dbeb83ffdea14dd6eafcc8e8609551f28467f0a2c08f52",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://126704616317774"
+  },
+  "brilho": {
+    "arquivo": "assets/sons/brilho.mp3",
+    "origem": "public/sons/arena/brilho.mp3",
+    "sha256": "d527b2abe7dcdcce7f0a9145b98d6545060367f89260e5b4384799a554e2f35d",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://117974689608419"
+  },
+  "fogo": {
+    "arquivo": "assets/sons/fogo.mp3",
+    "origem": "public/sons/arena/fogo.mp3",
+    "sha256": "10817bd18c0dc06c2c66e80ce1a839f768e22c35822b000da1b3ae3cadd4baa0",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://137399367521835"
+  },
+  "fogo-impacto": {
+    "arquivo": "assets/sons/fogo-impacto.mp3",
+    "origem": "public/sons/arena/fogo-impacto.mp3",
+    "sha256": "8370ae9cf09b3332836c9a359602e2a5d8e72bc5074b4b0aeb2f91718ee0ee4c",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://80973572132812"
+  },
+  "gelo": {
+    "arquivo": "assets/sons/gelo.mp3",
+    "origem": "public/sons/arena/gelo.mp3",
+    "sha256": "d168c23b73bf7416ca7c48ffb04f34973a785768a428449ced6a8fd9ff5e2800",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://126582366704269"
+  },
+  "agua": {
+    "arquivo": "assets/sons/agua.mp3",
+    "origem": "public/sons/arena/agua.mp3",
+    "sha256": "347e2fa8f371ad55c3edf6ca7b384b12731f3a0fafa04166a740942cbacba0aa",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://103436371462795"
+  },
+  "vento": {
+    "arquivo": "assets/sons/vento.mp3",
+    "origem": "public/sons/arena/vento.mp3",
+    "sha256": "89942d6189ebbb95e4d67517b09121723bc9e4e89e950b4283cd6ada571fda3a",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://87273513111120"
+  },
+  "vento-impacto": {
+    "arquivo": "assets/sons/vento-impacto.mp3",
+    "origem": "public/sons/arena/vento-impacto.mp3",
+    "sha256": "9a690b61c5fe6602404dabf7a2adc532ed7f0b2182f4e639d2f58aeaf7f9b85d",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://86654506723670"
+  },
+  "terra": {
+    "arquivo": "assets/sons/terra.mp3",
+    "origem": "public/sons/arena/terra.mp3",
+    "sha256": "95505d005ce2c0ca06a3db397bf68ad61e1eab0ce7259612ea9c03d12d10b3b4",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://131552822090123"
+  },
+  "cura-1": {
+    "arquivo": "assets/sons/cura-1.mp3",
+    "origem": "public/sons/arena/cura-1.mp3",
+    "sha256": "53afd51f7897dc412f546a033c9443fe0290bdbf0378d00fe297822a7b53b1b0",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://75954149001115"
+  },
+  "cura-2": {
+    "arquivo": "assets/sons/cura-2.mp3",
+    "origem": "public/sons/arena/cura-2.mp3",
+    "sha256": "c2ac41c1b294d5b682c83f1f6a7cf26a39f71e3951bfe2416d76cfd8671665b9",
+    "classificacao": "efeito-no-catalogo-do-site",
+    "semVozConfirmado": false,
+    "assetId": "rbxassetid://73324541149522"
+  }
+}

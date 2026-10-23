@@ -1,0 +1,10 @@
+Game Started
+Lugar1
+selecao agendada fora do comando MCP
+{'fim': True, 'snapshot': True, 'selecionado': True, 'entrada': False}
+Game Stopped
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_foco.py", line 21, in <module>
+    r=json.loads(lua('return game.HttpService:JSONEncode(shared.G18Foco)'));print(r,flush=True);assert r.get('entrada') and r.get('selecionado') and r.get('snapshot') and r.get('fim'),r
+                                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'fim': True, 'snapshot': True, 'selecionado': True, 'entrada': False}

@@ -1,0 +1,5 @@
+[
+  {"tool":"execute_luau","args":{"datamodel_type":"Client","code_file":"tools/playtest/a19_cliente.luau"}},
+  {"sleep":25},
+  {"tool":"execute_luau","args":{"datamodel_type":"Client","code":"assert(shared.A19 and shared.A19.pronto); return table.concat(shared.A19.linhas,' | ')..' Falhas: '..shared.A19.falhas"},"max":4500}
+]

@@ -1,0 +1,107 @@
+Game Started
+1041 specs / 0 falhas
+Sala iniciada
+Papel
+CLICK VirarPagina [525.4353637695312, 251.41094970703125]
+Pagina
+CLICK FichaSeguinte [525.4356079101562, 324.3137512207031]
+CLICK FichaAnterior [525.4354858398438, 272.07666015625]
+CLICK AssumirFicha [525.4380493164062, 402.9569396972656]
+Escolha
+CLICK GuardarPapel [525.4353637695312, 516.614013671875]
+CLICK Modo [525.432861328125, 95.84504699707031]
+Modo confirmado
+CLICK Modo [525.432861328125, 95.84504699707031]
+Modo confirmado
+CLICK Modo [525.432861328125, 95.84504699707031]
+Modo confirmado
+Modo
+CLICK LancarDados [525.432861328125, 258.29656982421875]
+FINAL 0
+OK primeiro mestre
+OK seis vagas incluindo mestre
+OK dez cadeiras
+OK primeira pessoa
+OK avatar sentado
+OK menu antigo fechado
+OK papel fisico aberto
+OK pagina atributos
+OK ficha confirmada servidor
+OK modo duelo confirmado
+OK modo treino confirmado
+OK modo luta confirmado
+OK modos pelo caderno
+OK partida real iniciou
+OK camera tabuleiro
+OK sala oculta no jogo
+OK personagem montado
+OK volta primeira pessoa
+[Testes] 1041 ok, 0 falha(s)
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+[Testes] 1041 ok, 0 falha(s)
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView:14: attempt to index boolean with 'monstroDoMestre'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.SalaMonstrosView', Line 14
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Custom back to Enum.CameraType.Scriptable
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g16_multiplayer.py", line 19, in <module>
+    assert 'Mode: Edit' in call('get_studio_state'),'Play alheio preservado'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Play alheio preservado

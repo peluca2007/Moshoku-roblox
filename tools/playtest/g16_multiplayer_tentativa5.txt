@@ -1,0 +1,10 @@
+G16TesteServidor
+G16TesteCliente
+teste solicitado
+{"resultado":{"ok":false,"jogadores":2,"erro":"ServerScriptService.G16TesteServidor:21: Players.Player1.PlayerScripts.G16TesteCliente:14: Há um obstáculo entre vocês.\nPlayers.Player1.PlayerScripts.G16TesteCliente:14\nPlayers.Player1.PlayerScripts.G16TesteCliente:10\n\nServerScriptService.G16TesteServidor:21 function passo\nServerScriptService.G16TesteServidor:23 function enviar\nServerScriptService.G16TesteServidor:41\nServerScriptService.G16TesteServidor:31\n","linhas":["Player1 antes: 258, 3.7999496459960938, -7 anchored=false health=100","Player2 antes: 260.0647277832031, 3.214998960494995, -9.058571815490723 anchored=false health=100"]},"chamou":true}
+fixtures removidas de Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g16_multiplayer.py", line 37, in <module>
+    print(result,flush=True);parsed=json.loads(result);assert parsed['chamou'] and parsed['resultado']['ok'],result;break
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {"resultado":{"ok":false,"jogadores":2,"erro":"ServerScriptService.G16TesteServidor:21: Players.Player1.PlayerScripts.G16TesteCliente:14: H� um obst�culo entre voc�s.\nPlayers.Player1.PlayerScripts.G16TesteCliente:14\nPlayers.Player1.PlayerScripts.G16TesteCliente:10\n\nServerScriptService.G16TesteServidor:21 function passo\nServerScriptService.G16TesteServidor:23 function enviar\nServerScriptService.G16TesteServidor:41\nServerScriptService.G16TesteServidor:31\n","linhas":["Player1 antes: 258, 3.7999496459960938, -7 anchored=false health=100","Player2 antes: 260.0647277832031, 3.214998960494995, -9.058571815490723 anchored=false health=100"]},"chamou":true}

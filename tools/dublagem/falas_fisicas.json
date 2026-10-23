@@ -1,0 +1,41 @@
+{
+  "tecnicas": [
+    {"arvore": "deus-da-espada", "id": "corte-de-braco", "nome": "Corte de Braço", "quando": "ao cortar o braço do alvo", "falas": [["Seu braço é meu!", 1.5], ["Corte de Braço!", 1.2]]},
+    {"arvore": "deus-da-espada", "id": "investida-espada", "nome": "Investida", "quando": "ao disparar em direção ao alvo", "falas": [["Aaaaaah — INVESTIDA!", 1.8], ["Não vou parar!", 1.3]]},
+    {"arvore": "deus-da-espada", "id": "golpe-continuo", "nome": "Golpe Contínuo", "quando": "nos três cortes seguidos", "falas": [["Um... dois... TRÊS!", 1.8], ["Sem parar, sem respirar!", 2.0]]},
+    {"arvore": "deus-da-agua-corpo", "id": "provocar", "nome": "Provocar", "quando": "grito que puxa o ódio", "falas": [["Aqui! Olhem para mim!", 1.8], ["Venham, covardes!", 1.5]]},
+    {"arvore": "deus-do-norte", "id": "forma-quadrupede", "nome": "Forma Quadrúpede", "quando": "ao correr agachado e atacar", "falas": [["Grrraaah!", 1.2], ["Como uma fera!", 1.2]]},
+    {"arvore": "deus-do-norte", "id": "arremesso-de-espada", "nome": "Arremesso de Espada", "quando": "ao arremessar a espada", "falas": [["Leve isso!", 1.0], ["Toma a minha espada!", 1.5]]},
+    {"arvore": "deus-do-norte", "id": "bala-de-lagrimas", "nome": "Bala de Lágrimas", "quando": "ao soprar o tempero nos olhos", "falas": [["Chore, então!", 1.1], ["Bala de Lágrimas!", 1.4]]},
+    {"arvore": "deus-do-norte", "id": "primeiros-socorros-de-campo", "nome": "Primeiros Socorros de Campo", "quando": "ao socorrer um aliado", "falas": [["Aguenta firme, eu cuido disso!", 2.2]]},
+    {"arvore": "deus-do-norte", "id": "golpe-baixo", "nome": "Golpe Baixo", "quando": "ao varrer as pernas do alvo", "falas": [["Olhe para baixo!", 1.3], ["Cai!", 0.7]]},
+    {"arvore": "armas-pesadas", "id": "investida-devastadora", "nome": "Investida Devastadora", "quando": "ao esmagar após a corrida", "falas": [["SAIAM DA FRENTE!", 1.5], ["DEVASTAÇÃO!", 1.4]]},
+    {"arvore": "armas-pesadas", "id": "agarrao", "nome": "Agarrão", "quando": "ao agarrar o alvo", "falas": [["Peguei você!", 1.2]]},
+    {"arvore": "armas-pesadas", "id": "golpe-circular", "nome": "Golpe Circular", "quando": "ao girar a arma em volta de si", "falas": [["Todos de uma vez!", 1.5], ["Cheguem mais perto!", 1.5]]},
+    {"arvore": "armas-pesadas", "id": "cabecada", "nome": "Cabeçada", "quando": "ao dar a cabeçada", "falas": [["Toma essa!", 1.0], ["CABEÇADA!", 1.1]]},
+    {"arvore": "cavalaria-e-escudos", "id": "muralha-de-um", "nome": "Muralha da Companhia", "quando": "ao erguer o escudo sobre os aliados", "falas": [["Atrás de mim! Ninguém passa!", 2.2]]},
+    {"arvore": "cavalaria-e-escudos", "id": "golpe-de-escudo", "nome": "Golpe de Escudo", "quando": "ao bater com o escudo", "falas": [["Para trás!", 1.0], ["Golpe de Escudo!", 1.4]]},
+    {"arvore": "cavalaria-e-escudos", "id": "puxar", "nome": "Puxar", "quando": "ao puxar o aliado para perto", "falas": [["Venha para cá!", 1.2]]},
+    {"arvore": "cavalaria-e-escudos", "id": "provocar-odio", "nome": "Provocar Ódio", "quando": "grito que puxa o ódio", "falas": [["Eu sou o seu inimigo!", 1.6], ["É comigo que vocês vão lutar!", 2.0]]},
+    {"arvore": "cavalaria-e-escudos", "id": "provocar-odio-soberano", "nome": "Provocar Ódio Soberano", "quando": "grito soberano que domina a atenção", "falas": [["NENHUM DE VOCÊS VAI PASSAR POR MIM!", 2.8]]},
+    {"arvore": "arquearia", "id": "disparo-duplo", "nome": "Disparo Duplo", "quando": "ao soltar duas flechas", "falas": [["Duas de uma vez!", 1.4], ["Não vai escapar!", 1.4]]},
+    {"arvore": "arquearia", "id": "tiro-de-contencao", "nome": "Tiro de Contenção", "quando": "ao acertar a perna do alvo", "falas": [["Fique onde está!", 1.3]]},
+    {"arvore": "mesa", "id": "ataque-basico", "nome": "Ataque básico", "quando": "ao golpear com a arma (todo personagem tem)", "falas": [["Hah!", 0.5], ["Yaah!", 0.6], ["Toma!", 0.6]]},
+    {"arvore": "mesa", "id": "ataque-a-distancia", "nome": "Disparo", "quando": "ao disparar a arma de longe", "falas": [["Hm!", 0.4], ["Lá vai!", 0.8]]}
+  ],
+  "geral": [
+    {"id": "dor-leve", "quando": "ao sofrer dano comum", "falas": [["Argh!", 0.5], ["Ugh!", 0.5], ["Hn!", 0.4]]},
+    {"id": "dor-forte", "quando": "ao sofrer acerto crítico ou dano grande", "falas": [["AAAARGH!", 1.0], ["Aaaah!", 1.0]]},
+    {"id": "queda", "quando": "ao cair no chão (condição Caído)", "falas": [["Uff!", 0.6]]},
+    {"id": "esquiva", "quando": "quando o ataque erra ou resiste", "falas": [["Hah! Errou!", 0.9], ["Tarde demais.", 1.0]]},
+    {"id": "acerto-critico", "quando": "ao acertar um crítico", "falas": [["É ISSO!", 0.9], ["Em cheio!", 0.9]]},
+    {"id": "erro", "quando": "quando o próprio ataque erra", "falas": [["Droga!", 0.6], ["Ainda não...", 0.9]]},
+    {"id": "minha-vez", "quando": "no início do turno do jogador", "falas": [["Minha vez!", 0.8], ["Vamos lá.", 0.7]]},
+    {"id": "cura-recebida", "quando": "ao receber cura", "falas": [["Obrigado.", 0.7], ["Isso ajudou.", 0.9]]},
+    {"id": "concentracao-perdida", "quando": "ao perder o cântico por dano", "falas": [["O cântico... se perdeu!", 1.8]]},
+    {"id": "inconsciente", "quando": "ao cair a 0 PV", "falas": [["Não... ainda não...", 1.8], ["Eu... não posso...", 1.6]]},
+    {"id": "vitoria", "quando": "ao vencer o encontro", "falas": [["Conseguimos!", 1.1], ["Acabou. Estamos vivos.", 1.8]]},
+    {"id": "derrota", "quando": "ao perder o encontro", "falas": [["Nos... derrotaram...", 1.8]]},
+    {"id": "pedido-de-ajuda", "quando": "ao ficar com pouco PV", "falas": [["Preciso de ajuda!", 1.2]]}
+  ]
+}

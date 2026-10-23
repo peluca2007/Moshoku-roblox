@@ -1,0 +1,7 @@
+J2 — Brasa autônoma (14/10/2026)
+
+Local: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1` compilou **292 fontes/0 erros** e terminou em **RESULTADO: tudo ok**. O spec autônomo de habilidade depende da hierarquia Roblox e roda no Studio.
+
+`EncontroAutonomoHabilidades.spec` cobre acesso de Fogo, acerto/crítico e BC do resolvedor comum, resistência/imunidade ígneas e recusa por árvore/alcance. `EncontroAutonomoService.spec` cobre exposição apenas ao ator com ficha Fogo, custo de 1 Ação, retransmissão idempotente e recusa da segunda Brasa na mesma rodada. O estado autônomo ainda não guarda Em Chamas; o bônus condicional +1d4 não está ativo nesta fatia.
+
+Sem clique real no botão nem multiplayer. Place não salvo.

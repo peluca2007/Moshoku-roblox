@@ -1,0 +1,40 @@
+Game Started
+1030 specs / 0 falhas
+Bancada iniciada
+persistente
+Desafio
+Modelos reais: 1 goblin / 1 lobo
+Animacoes: acerto critico e erro
+Resultado real
+FINAL 0
+OK nome distancia selecao
+OK fora alcance
+OK origem atualizada no snapshot
+OK cancelamento limpa
+OK callbacks apos destruir
+OK vitoria limpa mira
+OK resultado persistente
+OK proxima por clique
+OK derrota
+OK vencedor pvp
+OK nova partida fecha resultado
+OK fim depois de destruir
+OK desafio real iniciou
+OK cena acerto
+OK cena em andamento
+OK cena limpa e raiz preservada
+OK corpo real restaurado
+OK cena erro
+OK cena em andamento
+OK cena limpa e raiz preservada
+OK corpo real restaurado
+OK fim real confirmado
+OK tela real vitoria
+OK menu real reaberto
+Console: [Testes] 1030 ok, 0 falha(s)
+[Testes] 1030 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

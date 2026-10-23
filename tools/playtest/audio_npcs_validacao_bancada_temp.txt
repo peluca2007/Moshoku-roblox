@@ -1,0 +1,46 @@
+Failed to find real location of C:\Program Files\Python314\python.exe
+47 originais preservados;47 WAV decodificados/headers/hashes;56 vinculos;9 aliases: OK
+Traceback (most recent call last):
+  File "<stdin>", line 25, in <module>
+  File "C:\Program Files\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Acesso negado: 'C:\\Users\\pedro\\AppData\\Local\\Packages\\sandbox.{53b1ced7-d454-4272-8823-a91df86adb3d}\\AC\\Temp\\moshoku-audio-test-6cum1qqn\\docs'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python314\Lib\shutil.py", line 707, in _rmtree_unsafe
+    os.rmdir(path)
+    ~~~~~~~~^^^^^^
+PermissionError: [WinError 5] Acesso negado: 'C:\\Users\\pedro\\AppData\\Local\\Packages\\sandbox.{53b1ced7-d454-4272-8823-a91df86adb3d}\\AC\\Temp\\moshoku-audio-test-6cum1qqn'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 22, in <module>
+  File "C:\Program Files\Python314\Lib\tempfile.py", line 972, in __exit__
+    self.cleanup()
+    ~~~~~~~~~~~~^^
+  File "C:\Program Files\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\shutil.py", line 711, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Program Files\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] Acesso negado: 'C:\\Users\\pedro\\AppData\\Local\\Packages\\sandbox.{53b1ced7-d454-4272-8823-a91df86adb3d}\\AC\\Temp\\moshoku-audio-test-6cum1qqn'

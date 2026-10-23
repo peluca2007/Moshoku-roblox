@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"linhas\":[\"OK entrada cria voz no motor\",\"OK fase de mesma prioridade espera sem perder ou sobrepor\",\"OK fase pendente do chefe nao bloqueia segundo canal de outro NPC\",\"OK aviso interrompe entrada e tem precedencia\",\"OK snapshot repetido nao repete aviso\",\"OK ocultacao interrompe audio e fila\",\"OK destruir impede callbacks registrados de recriar sons\",\"OK volume zero respeitado sem fila futura\",\"OK dez criaturas respeitam duas vozes e quatro pendentes\",\"OK fim de combate cancela sons e pendencias\"],\"falhas\":0}"
+    }
+  ],
+  "isError": false
+}

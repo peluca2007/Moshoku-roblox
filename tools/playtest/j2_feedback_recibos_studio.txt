@@ -1,0 +1,5 @@
+J2 — feedback animado do mapa.
+Studio Play/TestRunner: 1.234 ok, 0 falhas.
+Fixture cliente enviou recibo de ataque confirmado: criou 1 UIStroke animado na casa do alvo. Recibo de ataque errado não criou outro flash. A apresentação usa somente recibos recebidos; não calcula acerto nem dano.
+Suíte local: 296 fontes, 0 erros; RESULTADO: tudo ok (fora do Studio).
+Play encerrado, Studio em Edit; place não salvo.

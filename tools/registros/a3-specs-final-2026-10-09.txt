@@ -1,0 +1,9 @@
+## start_stop_play {"is_start": true}
+Game Started
+## execute_luau {"datamodel_type": "Server", "code": "local root = game:GetService('ServerScriptService'):WaitForChild('Server'); local 
+A3: 186 ok, 0 falhas
+## get_console_output {}
+[Testes] 186 ok, 0 falha(s)
+[Testes] 186 ok, 0 falha(s)
+## start_stop_play {"is_start": false}
+Game Stopped

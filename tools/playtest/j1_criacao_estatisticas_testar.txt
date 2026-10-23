@@ -1,0 +1,10 @@
+J1 criação e estatísticas — 13/10/2026
+Comando: powershell -ExecutionPolicy Bypass -File tools/testar.ps1
+Compilação: 267 fontes Luau; 0 erros.
+CriacaoPersonagem.spec.luau: 9 ok, 0 falhas.
+EstatisticasPersonagem.spec.luau: 4 ok, 0 falhas.
+Catálogo: confere com o site.
+Painel: simulação ok.
+Estado do cliente: simulação ok.
+RESULTADO: tudo ok (fora do Studio).
+Limite: sem Play no Studio, criador visual, persistência ou comparação diferencial de vetor para este recorte.

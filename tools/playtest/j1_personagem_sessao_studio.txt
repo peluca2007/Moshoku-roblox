@@ -1,0 +1,21 @@
+J1 — ficha temporária e integração de sessão
+Data: 13/10/2026
+
+Workspace sincronizado no Studio `Moshoku-Prototipo.rbxlx` (instância Edit). O
+segundo Studio, `MoshokuRPGMesa`, permaneceu intocado. Place local não salvo.
+
+TestRunner em Play: [Testes] 1141 ok, 0 falha(s). Incluiu os 10 casos de
+PersonagemSessao e specs de AtributosPersonagem, PericiasPersonagem,
+CriacaoPersonagem e EstatisticasPersonagem.
+
+Fluxo de cliente/servidor: o menu fica normalmente oculto na sala; para cobrir a
+tela nesta verificação, InicioJogo foi habilitado apenas localmente. Clique real
+em Montar ficha abriu CriacaoPersonagem. Submissão da construção padrão chegou
+ao servidor e o evento privado retornou a prévia com PV 40, PM 0, PT 3, PP 0,
+CA 10, deslocamento 9m, iniciativa +0 e atributos calculados. O botão voltou a
+ficar ativo como ATUALIZAR FICHA DESTA SESSÃO.
+
+Play encerrado e Studio voltou a Edit. Nenhum arquivo foi salvo no place.
+Limites: um cliente; não verificados celular, sincronização multiplayer,
+persistência ou uso da ficha em combate. A ficha segue explicitamente
+temporária e não selecionável em combate.

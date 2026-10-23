@@ -1,0 +1,14 @@
+Fonte conferida sem alteracao 247
+Game Started
+estado real e monitor prontos
+Game Stopped
+limpeza da fixture propria
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_atalhos.py", line 74, in <module>
+    print(lua('''local p=game.Players.LocalPlayer;shared.G18Input={events={}};shared.G18Input.connection=game.UserInputService.InputBegan:Connect(function(i,processed) if i.UserInputType==Enum.UserInputType.Keyboard then table.insert(shared.G18Input.events,{key=i.KeyCode.Name,processed=processed}) end end);local r=game.HttpService:JSONDecode(p.PlayerScripts.G18Monitor:GetAttribute("Estado"));assert(r.master==r.me,"mestre local ausente");assert(r.seated,"assento da sala ausente");r.snapshotViaExecute=require(p.PlayerScripts.Client.MesaState).snapshot()~=nil;return game.HttpService:JSONEncode(r)'''), flush=True)
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_atalhos.py", line 26, in lua
+    return call("execute_luau", datamodel_type=dm, code=code)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_atalhos.py", line 22, in call
+    raise RuntimeError(r)
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: assento da sala ausente'}

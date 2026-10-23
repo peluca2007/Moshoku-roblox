@@ -1,0 +1,7 @@
+J2 — mapa tático e destinos por toque/clique
+`powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1`
+Compilação: 296 fontes Luau, 0 erros.
+`EncontroAutonomoMapaTatico.spec`: 3 ok, 0 falhas.
+Catálogo, simulador de painel e estado do cliente: ok.
+RESULTADO: tudo ok (fora do Studio).
+Warnings conhecidos do Python314 aparecem na localização do executável, sem impedir a suíte.

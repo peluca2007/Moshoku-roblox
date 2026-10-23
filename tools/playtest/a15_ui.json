@@ -1,0 +1,38 @@
+[
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "local gui=game.Players.LocalPlayer.PlayerGui.EscolhaDePersonagem; gui.Enabled=true; local f=gui:FindFirstChildWhichIsA(\"Frame\"); f.Size=UDim2.fromOffset(375,667); local grade=f:FindFirstChildWhichIsA(\"ScrollingFrame\"); grade.Visible=true; f.EscolhaDeArma.Visible=false; task.wait(0.5); local c=grade.Personagem_brutamontes; grade.CanvasPosition=Vector2.new(0,c.AbsolutePosition.Y-grade.AbsolutePosition.Y+grade.CanvasPosition.Y); return c:GetFullName()"
+    }
+  },
+  {
+    "tool": "user_mouse_input",
+    "args": {
+      "datamodel_type": "Client",
+      "actions": [
+        {
+          "action": "mouseButtonClick",
+          "mouse_button": "left",
+          "instance_path": "LocalPlayer.PlayerGui.EscolhaDePersonagem.Frame.ScrollingFrame.Personagem_brutamontes"
+        }
+      ]
+    }
+  },
+  {
+    "sleep": 2
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "task.wait(0.5); local g=game.Players.LocalPlayer.PlayerGui.EscolhaDePersonagem; local p=g:FindFirstChild(\"EscolhaDeArma\",true); assert(p.Visible); local n=0; for _,b in p.Armas:GetChildren() do if b:IsA(\"TextButton\") then assert(b.TextFits,b.Text); assert(not b.TextWrapped); assert(b.AbsoluteSize.X<375); n+=1 end end; return n..\" armas legíveis a 375 px\""
+    }
+  },
+  {
+    "tool": "screen_capture",
+    "args": {
+      "capture_id": "A15_375"
+    }
+  }
+]

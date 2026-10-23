@@ -1,0 +1,9 @@
+[
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Server",
+      "code_file": "tools/playtest/a16_servico_atual.luau"
+    }
+  }
+]

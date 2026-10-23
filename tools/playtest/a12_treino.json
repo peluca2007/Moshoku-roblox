@@ -1,0 +1,10 @@
+[
+ {"tool":"user_mouse_input","args":{"datamodel_type":"Client","actions":[{"action":"mouseButtonClick","mouse_button":"left","instance_path":"LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Ajustes.Voltar"}]}},
+ {"sleep":1},
+ {"tool":"user_mouse_input","args":{"datamodel_type":"Client","actions":[{"action":"mouseButtonClick","mouse_button":"left","instance_path":"LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Inicio.Jogar"}]}},
+ {"sleep":1},
+ {"tool":"user_mouse_input","args":{"datamodel_type":"Client","actions":[{"action":"mouseButtonClick","mouse_button":"left","instance_path":"LocalPlayer.PlayerGui.InicioJogo.MenuInicial.Conteudo.Pagina_Jogar.Treinar"}]}},
+ {"sleep":2},
+ {"tool":"execute_luau","args":{"datamodel_type":"Client","code":"local g=game.Players.LocalPlayer.PlayerGui.InicioJogo; assert(not g.MenuInicial.Visible); assert(g.Navegacao.Visible); return 'Treino por clique: menu fechado e unico atalho visivel'"}},
+ {"tool":"start_stop_play","args":{"is_start":false}}
+]

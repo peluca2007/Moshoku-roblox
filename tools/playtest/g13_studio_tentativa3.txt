@@ -1,0 +1,41 @@
+Game Started
+1041 specs / 0 falhas
+Sala iniciada
+Papel
+CLICK VirarPagina [520.793701171875, 475.4140625]
+Pagina
+CLICK FichaSeguinte [520.7957153320312, 237.28289794921875]
+CLICK FichaAnterior [520.793701171875, 207.40274047851562]
+CLICK AssumirFicha [520.793701171875, 177.52328491210938]
+Escolha
+CLICK GuardarPapel [520.7936401367188, 297.04180908203125]
+CLICK Modo [520.7977294921875, 177.52444458007812]
+CLICK Modo [520.7977294921875, 177.52444458007812]
+CLICK Modo [520.7977294921875, 177.52444458007812]
+Modo
+CLICK LancarDados [520.7977294921875, 147.64488220214844]
+FINAL 5
+OK primeiro mestre
+OK seis vagas incluindo mestre
+OK dez cadeiras
+OK primeira pessoa
+OK avatar sentado
+OK menu antigo fechado
+OK papel fisico aberto
+FALHA pagina atributos
+OK ficha confirmada servidor
+OK modos pelo caderno
+FALHA partida real iniciou
+FALHA camera tabuleiro
+FALHA sala oculta no jogo
+FALHA personagem montado
+OK volta primeira pessoa
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g13_verificar.py", line 54, in <module>
+    assert lua('return shared.G13.falhas').strip()=='0'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

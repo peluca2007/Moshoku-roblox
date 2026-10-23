@@ -1,0 +1,63 @@
+Fonte sincronizada
+Game Started
+Chat fechado apenas nesta sessao de teste: true
+Sala pronta
+Preparacao
+Leitura livre
+CLICK Modo_duelo 501 314
+PvP bloqueado
+CLICK Modo_luta 501 276
+CLICK Aba_sala 501 177
+CLICK ArrumarSala 501 313
+Arrumado
+CLICK BrotosTodos 501 276
+CLICK GuardarPapel 504 482
+Rodada
+Brotos
+Admin
+CLICK Aba_sessao 501 103
+CLICK LancarDados 501 444
+{"maxY":0,"escuro":false,"frames":0,"fora":0}
+Erros Esta árvore não permite escolher essa arma. | Escolha uma ficha primeiro.
+Entrada
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1081 ok, 0 falha(s)
+[Admin] 2287856135 brotos
+FINAL 5
+OK sala mestre
+OK primeira pessoa
+OK cabeca oculta
+OK corpo visivel
+OK bandeja e caderno
+OK escudo moldura
+OK modos explicitos
+FALHA inicio habilitado
+OK preparacao sem obstrucao
+OK pvp solo bloqueado
+OK arrumar recolhe
+OK Brotos aberto
+OK rodada real concluida
+OK mestre nao muda
+OK placar recreativo
+OK ADM brotos real
+FALHA transicao permanece na mesa
+OK subida moderada
+FALHA fade antes da arena
+OK fade revela arena
+FALHA partida real iniciou
+OK maos liberadas
+FALHA sem recusas no fluxo normal
+OK Q cancela sem menu Roblox
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_regressao.py", line 91, in <module>
+    assert lua('return shared.G14.falhas').strip()=='0'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

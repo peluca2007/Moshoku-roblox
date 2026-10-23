@@ -1,0 +1,71 @@
+local D = require(game:GetService("ReplicatedStorage").Shared.Regras.Dojo)
+
+local mestre = { patamar = "Santo" }
+local deus = { patamar = "Deus", divino = true }
+
+return {
+	["mestre precisa estar dois patamares acima; divino e salto narrativo abrem excecao"] = function(t)
+		t.eq(D.podeEnsinar(mestre, "Principiante"), true)
+		t.eq(D.podeEnsinar(mestre, "Intermediário"), true)
+		t.eq((D.podeEnsinar(mestre, "Avançado")), false)
+		t.eq((D.podeEnsinar({ patamar = "Rei" }, "Santo")), false)
+		t.eq(D.podeEnsinar({ patamar = "Rei", saltoNarrativo = true }, "Santo"), true)
+		t.eq(D.podeEnsinar(deus, "Imperador"), true)
+		t.eq((D.podeEnsinar(mestre, "Lenda")), false)
+	end,
+	["recompensa escala com o patamar do aluno"] = function(t)
+		local a, b, c = D.recompensa("Principiante"), D.recompensa("Santo"), D.recompensa("Deus")
+		t.eq(a.travados, 2) t.eq(a.livre, 1)
+		t.eq(b.travados, 3) t.eq(b.livre, 2)
+		t.eq(c.travados, 4) t.eq(c.livre, 2)
+		t.eq(D.recompensa("Intermediário").travados, 2)
+		t.eq(D.recompensa("Avançado").livre, 2)
+		t.eq(D.recompensa("x"), nil)
+	end,
+	["uma provacao por arvore e o estado original nao muda"] = function(t)
+		local inicial = D.novoEstado()
+		local novo, ganho = D.concluir(inicial, "Arquearia", deus, "Principiante", "travado")
+		t.eq(ganho.travados, 2)
+		t.eq(novo.paTravado.Arquearia, 2)
+		t.eq(novo.paLivre, 0)
+		t.eq(inicial.provacoes.Arquearia, nil, "estado original alterado")
+		local de, _, motivo = D.concluir(novo, "Arquearia", deus, "Principiante", "livre")
+		t.eq(de, nil)
+		t.ok(motivo ~= nil)
+		-- Outra árvore continua disponível.
+		t.ok(D.concluir(novo, "Furtividade", mestre, "Principiante", "livre") ~= nil)
+	end,
+	["porta livre nao deixa PA travado"] = function(t)
+		local novo, ganho = D.concluir(D.novoEstado(), "Arquearia", deus, "Intermediário", "livre")
+		t.eq(ganho.livre, 1)
+		t.eq(novo.paLivre, 1)
+		t.eq(ganho.travados, 0)
+		t.eq(novo.paTravado.Arquearia, nil)
+		t.eq(novo.provacoes.Arquearia.escolha, "pa")
+	end,
+	["marca do mestre permite exatamente uma segunda provacao so com PA livre"] = function(t)
+		local e1, g1 = D.concluir(D.novoEstado(), "Arquearia", deus, "Principiante", "marca")
+		t.eq(g1.marca, true)
+		t.eq(g1.livre + g1.travados, 0)
+		local pode = D.podeIniciar(e1, "Arquearia", deus, "Avançado")
+		t.eq(pode.modo, "retorno")
+		local sem = D.concluir(e1, "Arquearia", deus, "Avançado", "travado")
+		t.eq(sem, nil)
+		local e2, g2 = D.concluir(e1, "Arquearia", deus, "Avançado", "livre")
+		t.eq(g2.livre, 2)
+		t.eq(e2.paLivre, 2)
+		t.eq(e2.marcaRetorno.Arquearia, true)
+		t.eq((D.podeIniciar(e2, "Arquearia", deus, "Avançado")), nil)
+	end,
+	["pedidos invalidos sao recusados e PA travado morre ao abandonar a arvore"] = function(t)
+		t.eq((D.podeIniciar(nil, "Arquearia", deus, "Principiante")), nil)
+		t.eq((D.podeIniciar(D.novoEstado(), "", deus, "Principiante")), nil)
+		t.eq((D.concluir(D.novoEstado(), "Arquearia", deus, "Principiante", "xyz")), nil)
+		t.eq((D.concluir(D.novoEstado(), "Arquearia", mestre, "Avançado", "livre")), nil)
+		local e = D.concluir(D.novoEstado(), "Arquearia", deus, "Principiante", "travado")
+		t.eq(D.abandonar(e, "Arquearia").paTravado.Arquearia, nil)
+		t.eq(e.paTravado.Arquearia, 2)
+		t.eq(D.estadoValido({ provacoes = { a = { escolha = "pa", patamar = "Lenda" } }, marcaRetorno = {}, paTravado = {} }), false)
+		t.eq(D.estadoValido(e), true)
+	end,
+}

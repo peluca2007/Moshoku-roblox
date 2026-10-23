@@ -1,0 +1,40 @@
+Game Started
+retrato
+bancada G18 criada
+374, 666 canvas=312, 440 papel=0.7864192724227905, 1.1191351413726807, 0.007561724167317152
+Lugar1
+sentado
+CLICK Modo_luta [182.9859161376953, 416.804931640625]
+CLICK Nivel_1 [182.9859161376953, 416.804931640625]
+opcoes atuais
+CLICK Modo_duelo [182.9859161376953, 356.0315856933594]
+{"input":"Enum.UserInputType.Touch","scroll":"0, 159","antes":0,"envios":[]}
+CLICK Aba_pessoas [180.97886657714844, 78.49879455566406]
+CLICK Transferir_999 [182.9859161376953, 358.05712890625]
+confirmacao preservada
+CLICK Transferir_999 [182.9859161376953, 358.05712890625]
+transferir
+CLICK Transferir_999 [182.9859161376953, 358.05712890625]
+expirou
+CLICK Aba_sessao [89.97370910644531, 173.71072387695312]
+foco
+levantou
+contexto em pe
+paisagem
+666, 374 canvas=368, 288 papel=1.6399999856948853, 1.28000009059906, 0.010000000707805157
+CLICK GuardarPapel [333, 246.40167236328125]
+{"linhas":["OK emulador retrato","OK retrato papel dentro da tela","OK retrato alvo fechar >=48px","OK retrato aba >=44px nos dois eixos","OK retrato texto >=16px","OK sentar atualiza sem snapshot","OK modo/nivel atuais nao enviam nem apagam pronto","FALHA modo diferente envia uma intencao","OK confirmacao sobrevive snapshot","OK segundo clique transfere","OK confirmacao expira visivelmente","FALHA foco restaurado pelo nome","FALHA foco rola para ficar visivel","OK levantar bloqueia configuracao sem snapshot","OK paisagem papel dentro da tela","OK paisagem alvo fechar >=48px","OK paisagem aba >=44px nos dois eixos","OK paisagem texto >=16px","OK fechar por toque sem Esc Tab"],"falhas":3}
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+Setting GuiService.SelectedObject to invalid GuiObject
+Game Stopped
+default
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_ui.py", line 53, in <module>
+    result=json.loads(lua('return game.HttpService:JSONEncode({falhas=shared.G18.falhas})'));assert result['falhas']==0,result
+                                                                                                    ^^^^^^^^^^^^^^^^^^^
+AssertionError: {'falhas': 3}

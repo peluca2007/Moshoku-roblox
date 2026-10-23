@@ -1,0 +1,14 @@
+G22 — Studio MCP, 11/10/2026
+Studio: MoshokuRPGMesa, 83b59b89-e672-43db-a936-0b38a2d3e624.
+Suíte: [Testes] 1107 ok, 0 falha(s).
+Desafio real iniciado; encerramento acelerado pelo remoto adjust do mestre (PV das criaturas), como G21.
+Resultado visível; Proxima = Preparar próxima partida.
+Clique real Proxima: resultado fechou, SalaPapelInterface abriu com LancarDados.
+Clone do painel real em larguras337, alturas400/220: todos TextFits true; rolagem em220 permite acessar Campo integralmente.
+Medidas: Titulo293x54, Detalhe293x56, Recuperacao293x40, Proxima293x48, Campo293x48.
+Render de SalaPreparacaoView com estado de jogador injetado no cliente: título Preparação do grupo; MeuPronto envia salaPronto; sem LancarDados/Modo_luta.
+Reabrir consulta por C: Sessão presente.
+Limites: tentativa de clique na aba Sala via instance_path não mudou a aba (inclusive após CanvasPosition zero); não valida troca de abas por clique. Reset da aba revisado estaticamente. Sem teste físico de celular/controle nem nova rodada multiplayer nesta tarefa.
+Primeira assertiva do ensaio exigia overflow em altura400; era incorreta, pois conteúdo cabia. Corrigida para exigir overflow só em220; ensaio final aprovado.
+Output contém aviso histórico de WaitForChild Mesa em avatar sintético Reset45206551; suíte passa.
+Play próprio encerrado, nenhuma publicação.

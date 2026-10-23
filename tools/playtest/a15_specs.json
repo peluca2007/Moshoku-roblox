@@ -1,0 +1,24 @@
+[
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": true
+    }
+  },
+  {
+    "sleep": 8
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Server",
+      "code": "local r=game.ServerScriptService.Server; local p,f=require(r.TestRunner).run(r.tests); assert(f==0); return p..\" specs aprovados\""
+    },
+    "max": 1800
+  },
+  {
+    "tool": "get_console_output",
+    "args": {},
+    "max": 9000
+  }
+]

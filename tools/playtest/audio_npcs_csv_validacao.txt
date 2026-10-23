@@ -1,0 +1,7 @@
+Failed to find real location of C:\Program Files\Python314\python.exe
+separador: recusado antes de gravar; CSV preservado
+coluna: recusado antes de gravar; CSV preservado
+chave_vazia: recusado antes de gravar; CSV preservado
+linha_curta: recusado antes de gravar; CSV preservado
+linha_longa: recusado antes de gravar; CSV preservado
+5 casos OK; fixture removida; originais e pacote real intocados

@@ -1,0 +1,6 @@
+[Testes] FALHA G5Servico.spec › G5 servidor: bônus não é aceito do payload: ServerScriptService.Server.tests.G5Servico.spec:116: esperado 43, obtido 50
+[Testes] FALHA G5Servico.spec › G5 servidor: Bola e Brasa completam 3 Ações com bônus real e limite: ServerScriptService.Server.tests.G5Servico.spec:111: esperado 43, obtido 50
+[Testes] 966 ok, 2 falha(s)
+[Testes] FALHA G5Servico.spec › G5 servidor: bônus não é aceito do payload: ServerScriptService.Server.tests.G5Servico.spec:116: esperado 43, obtido 50
+[Testes] FALHA G5Servico.spec › G5 servidor: Bola e Brasa completam 3 Ações com bônus real e limite: ServerScriptService.Server.tests.G5Servico.spec:111: esperado 43, obtido 50
+[Testes] 966 ok, 2 falha(s)

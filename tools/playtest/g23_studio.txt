@@ -1,0 +1,7 @@
+G23 Studio local — 13/10/2026
+Studio: Moshoku-Prototipo.rbxlx (71a97e65-7bfc-48e1-83a5-c45b02993c95); DataModel Client durante Play.
+Resultado Output: [Testes] 1107 ok, 0 falha(s).
+Interação real: aproximei do papel, E no prompt pegou Ficha_mago-de-fogo; R abriu a consulta. A árvore da PlayerGui mostrou SalaPapelInterface e os controles contextuais da ficha. Captura ScreenCapture_231 mostrou somente o viewport 3D e não incluiu os painéis de interface; não é evidência de ausência de sobreposição entre mãos e botões.
+Source alterada antes do Play e sincronizada apenas no Studio local. Play encerrado; Studio retornou a Edit. Place não salvo.
+Diagnóstico: Output tem duas consultas inválidas deste próprio agente: nome incorreto `Ficha_mago` e tentativa de ler `.Visible` em SurfaceGui. Não são erros do runtime. O capturador também informou que restaurou CameraType após uma inspeção temporária. Esses avisos não invalidam os 1107 specs, mas impede alegar Output completamente limpo.
+Limite: acessibilidade/ergonomia visual dos botões inferiores não verificada visualmente; requer captura que inclua UI ou inspeção humana.

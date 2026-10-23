@@ -1,0 +1,45 @@
+Fonte sincronizada
+Game Started
+1048 specs / 0 falhas
+Sala pronta
+Olhar baixo
+Ficha
+CLICK AssumirFicha 501 190
+CLICK ProntoFicha 501 228
+Escolha confirmada
+[{"velocidade":{"y":-6.268988325188694,"x":1.3282992583060252,"z":-1.8608538778184354},"inicio":1791691320.588315,"origem":{"y":4.999949645996094,"x":250,"z":-12},"id":"mago-de-fogo","tempoVoo":0.43333333333333337,"autor":2287856135,"objeto":1}]
+Soltou
+Preparacao
+CLICK Modo_duelo 501 337
+PvP bloqueado
+CLICK Modo_luta 501 298
+CLICK Aba_sala 501 192
+CLICK ArrumarSala 501 337
+Arrumado
+CLICK BrotosTodos 501 297
+CLICK GuardarPapel 504 516
+Rodada
+Brotos
+Admin
+CLICK Aba_sessao 501 113
+CLICK LancarDados 501 476
+Erros 
+[Testes] 1048 ok, 0 falha(s)
+[Testes] 1048 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Custom back to Enum.CameraType.Scriptable
+[Admin] 2287856135 brotos
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g14_verificar.py", line 80, in <module>
+    print(lua('local r=shared.G14;return "FINAL "..r.falhas.."\n"..table.concat(r.linhas,"\n")'),flush=True)
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g14_verificar.py", line 15, in lua
+    def lua(code,dm='Client'):return call('execute_luau',datamodel_type=dm,code=code)
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g14_verificar.py", line 13, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: Failed to parse command code'}

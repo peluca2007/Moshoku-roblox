@@ -1,0 +1,11 @@
+J2 orçamento de Ações — 13/10/2026
+
+Studio: Moshoku-Prototipo.rbxlx
+Sincronização: fontes atualizadas em Edit para EncontroTurnos, EncontroAutonomoService, specs de turno/serviço e EncontroAutonomoView.
+Execução: Play/TestRunner iniciado pelo MCP do Roblox Studio.
+Resultado observado no Output: [Testes] 1189 ok, 0 falha(s)
+Estado final observado: Play encerrado; Studio em Edit.
+Place não salvo.
+
+Cobertura nova: 3 Ações no estado inicial; consumo com incremento de versão; replay exato sem segundo consumo; quarta Ação recusada; três Ações restauradas ao encerrar turno; serviço só consome por API interna e recusa ator que não está na vez.
+Limites: nenhum encontro real iniciado por jogador; nenhum efeito de combate/movimento está ligado ao orçamento; sem multiplayer, política de desconexão/prazo ou avaliação humana da interface.

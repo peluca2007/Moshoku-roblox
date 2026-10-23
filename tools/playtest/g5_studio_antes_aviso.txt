@@ -1,0 +1,64 @@
+Fontes sincronizadas
+Game Started
+970 specs aprovados
+treino real
+Fogo
+agua
+vento
+terra
+adaptacao
+Fagulha real
+braseiro
+FINAL 0
+OK arvore real abre
+OK guia Fogo real
+OK guia Fogo texto completo
+OK guia Fogo texto completo
+OK guia Fogo texto completo
+OK guia Fogo texto completo
+OK guia Fogo texto completo
+OK guia reconhece tecnicas conhecidas
+OK guia agua
+OK texto agua completo
+OK texto agua completo
+OK texto agua completo
+OK texto agua completo
+OK texto agua completo
+OK indica aprendizado agua
+OK guia vento
+OK texto vento completo
+OK texto vento completo
+OK texto vento completo
+OK texto vento completo
+OK texto vento completo
+OK indica aprendizado vento
+OK guia terra
+OK texto terra completo
+OK texto terra completo
+OK texto terra completo
+OK texto terra completo
+OK texto terra completo
+OK indica aprendizado terra
+OK Fagulha mostra regra do jogo
+OK Fagulha texto completo
+OK Fagulha preserva texto do livro separado
+OK selecionar Fagulha nao cobra
+OK Fagulha tem mira de casas
+OK Fagulha recebe recibo real
+OK Fagulha cobra uma Acao real
+OK Fagulha cobra um PM real
+OK perigo baixo renderizado
+OK chama pequena renderizada
+OK aviso de dano renderizado
+OK fora de alcance nao cobra real
+OK recusa preserva mana real
+Console: [Testes] 970 ok, 0 falha(s)
+[Testes] 970 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Console final: [Testes] 970 ok, 0 falha(s)
+[Testes] 970 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

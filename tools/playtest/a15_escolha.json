@@ -1,0 +1,42 @@
+[
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": true
+    }
+  },
+  {
+    "sleep": 8
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Server",
+      "code": "local r=game.ServerScriptService.Server; local p,f=require(r.TestRunner).run(r.tests); return p..\" aprovados / \"..f..\" falhas\""
+    },
+    "max": 1200
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code_file": "tools/playtest/a15_escolha.luau"
+    }
+  },
+  {
+    "sleep": 18
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "assert(shared.A15 and shared.A15.pronto); assert(shared.A15.falhas==0,table.concat(shared.A15.linhas,\"\\n\")); return table.concat(shared.A15.linhas,\"\\n\")"
+    },
+    "max": 3500
+  },
+  {
+    "tool": "get_console_output",
+    "args": {},
+    "max": 4000
+  }
+]

@@ -1,0 +1,45 @@
+Game Started
+monitor
+contorno ao mirar
+sem prompt de pegar
+clique mantido pega ficha
+sem botao segurar
+dicas inferiores esquerda
+soltar clique larga sem impulso
+F arremessa com impulso
+liberar depois de F nao duplica
+leitura apoia consulta sem perder ficha
+sem marcadores nas maos
+Q larga leitura
+clique curto nao deixa objeto preso
+bandeja
+dados pegos por clique mantido
+copia suave sem mover fisica local
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1081 ok, 0 falha(s)
+SalaDadosEmMaos is not a valid member of Workspace "Workspace"
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_verificar.py", line 62, in <module>
+    check('dados com cores distintas','workspace.SalaDadosEmMaos.Dado1.Color~=workspace.SalaDadosEmMaos.Dado2.Color and workspace.SalaDadosEmMaos.Dado2.Color~=workspace.SalaDadosEmMaos.Dado3.Color')
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_verificar.py", line 22, in check
+    def check(name,expr):print(lua('shared.G17.check('+json.dumps(name)+','+expr+');return '+json.dumps(name)),flush=True)
+                               ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_verificar.py", line 16, in lua
+    def lua(code,dm='Client'):return call('execute_luau',code=code,datamodel_type=dm)
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g17_verificar.py", line 14, in call
+    if r.get('isError') or 'erro' in r:raise RuntimeError(r)
+                                       ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: SalaDadosEmMaos is not a valid member of Workspace "Workspace"'}

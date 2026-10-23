@@ -1,0 +1,3 @@
+Building project 'Moshoku RPG - Prototipo'
+Built project to moshoku-f3-rojo.rbxlx
+XML válido; build Rojo concluído.

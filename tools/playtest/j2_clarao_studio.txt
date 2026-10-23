@@ -1,0 +1,7 @@
+J2 — Clarão no encontro autônomo (14/10/2026)
+
+Antes do Studio: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1` compilou 296 arquivos, sem erros; resultado `tudo ok`.
+
+Studio `Moshoku-Prototipo.rbxlx`: sincronizados de `src` os módulos de habilidades/combate/serviço/cliente e os specs J2. Play/TestRunner: **1.248 ok, 0 falhas**. Specs verificam posse da habilidade, círculo de quatro casas centrado no conjurador, inclusão de aliado, exclusão fora do raio, salvamento de Vigor, aplicação de Cego somente na falha, ausência de dano, custo de Ação/PM, replay sem cobrança duplicada, expiração após a próxima vez do alvo e vantagem/desvantagem para ataques conforme o catálogo.
+
+Console após executar a suíte: sem erros de inicialização do cliente. Play encerrado e Studio retornou a Edit. Place não salvo. Não houve clique real do botão, avaliação visual, obstáculo/oclusão ou multiplayer 2/4 clientes; na grade atual não há paredes, então linha de visão é livre nesta integração.

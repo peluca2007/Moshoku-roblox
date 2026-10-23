@@ -1,0 +1,23 @@
+emulador iPhone7
+Game Started
+1069 specs / 0 falhas
+bancada criada
+374, 666
+recusa
+rolagem
+reabrir
+dados
+consulta recebendo
+ficha preservada
+lista
+recusa preservada
+confirmado
+ocupado
+texto legivel
+paisagem
+666, 374
+{"linhas":["OK emulador em retrato","OK convite cabe em retrato","OK convite congela enquanto aberto","OK recusar por clique recolhe","OK recusa envia escolha falsa","OK prazo vazio nao prende novamente","OK pode reconsiderar sem reconectar","OK aceitar por clique","OK mesa libera para dados fisicos","OK rolar por clique","OK resultado proprio recolhe convite","OK guardar consulta retoma ficha recebida","OK consulta nao descarta nem repede posse","OK entregar abre lista","OK aguarda confirmacao com papel aberto","OK recusa mantem papel e reabilita","OK confirmacao fecha somente remetente","OK alvo ocupado identificado e desabilitado","OK opcoes longas cabem sem cortar","OK alvo de clique preserva altura","OK convite cabe em paisagem baixa","OK opcoes rolaveis"],"falhas":0}
+[Testes] 1069 ok, 0 falha(s)
+[Testes] 1069 ok, 0 falha(s)
+Game Stopped
+default

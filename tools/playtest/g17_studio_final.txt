@@ -1,0 +1,38 @@
+Game Started
+1081 specs / 0 falhas
+Render3D=false The current thread cannot call 'Set3dRenderingEnabled' (lacking capability RobloxScript) camera=250, 5.54275322, -11.8446712, -1, 0, 0, 0, 0.98934257, 0.145606741, 0, 0.145606741, -0.98934257 subject=Humanoid
+monitor
+contorno ao mirar
+sem prompt de pegar
+clique mantido pega ficha
+sem botao segurar
+dicas inferiores esquerda
+soltar clique larga sem impulso
+F arremessa com impulso
+liberar depois de F nao duplica
+leitura apoia consulta sem perder ficha
+sem marcadores nas maos
+Q larga leitura
+clique curto nao deixa objeto preso
+bandeja
+dados pegos por clique mantido
+copia suave sem mover fisica local
+dados com cores distintas
+F libera dados fisicos e limpa copia
+dono servidor
+pouso suave confirma tres faces
+liberar clique larga dados
+Brotos real com arremesso
+sem erros de pedidos no fluxo
+{"falhas":0,"erros":[],"linhas":["OK contorno ao mirar","OK sem prompt de pegar","OK clique mantido pega ficha","OK sem botao segurar","OK dicas inferiores esquerda","OK soltar clique larga sem impulso","OK F arremessa com impulso","OK liberar depois de F nao duplica","OK leitura apoia consulta sem perder ficha","OK sem marcadores nas maos","OK Q larga leitura","OK clique curto nao deixa objeto preso","OK dados pegos por clique mantido","OK copia suave sem mover fisica local","OK dados com cores distintas","OK F libera dados fisicos e limpa copia","OK pouso suave confirma tres faces","OK liberar clique larga dados","OK Brotos real com arremesso","OK sem erros de pedidos no fluxo"]}
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1081 ok, 0 falha(s)
+[Testes] 1081 ok, 0 falha(s)
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

@@ -1,0 +1,29 @@
+Fontes sincronizadas
+Game Started
+985 specs / 0 falhas
+Console: [Testes] 985 ok, 0 falha(s)
+[Testes] 985 ok, 0 falha(s)
+Treino Ladina
+hover
+limpeza
+Caido
+pose caida
+recuperacao
+arma
+cura de zero
+Console final: [Testes] 985 ok, 0 falha(s)
+[Testes] 985 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_verificar.py", line 83, in <module>
+    print(lua('local r=shared.G6;game.ReplicatedStorage.Mesa:FireServer("sairPartida",{});task.wait(1.5);r.check("saida limpa cones",#workspace.VisaoFurtivaLocal:GetChildren()==0);r.con:Disconnect();return "FINAL "..r.falhas.."\n"..table.concat(r.linhas,"\n")'),flush=True)
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_verificar.py", line 24, in lua
+    return call("execute_luau", datamodel_type="Client", code=code)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_verificar.py", line 20, in call
+    raise RuntimeError(r)
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: Failed to parse command code'}

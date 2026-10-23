@@ -1,0 +1,6 @@
+[
+  { "tool": "execute_luau", "args": { "datamodel_type": "Client", "code_file": "tools/playtest/a18_chefe.luau" }, "max": 1200 },
+  { "sleep": 20 },
+  { "tool": "execute_luau", "args": { "datamodel_type": "Client", "code": "assert(shared.A18Chefe and shared.A18Chefe.pronto); assert(shared.A18Chefe.falhas==0,table.concat(shared.A18Chefe.linhas,'\\n')); return table.concat(shared.A18Chefe.linhas,'\\n')" }, "max": 3000 },
+  { "tool": "get_console_output", "args": {}, "max": 4000 }
+]

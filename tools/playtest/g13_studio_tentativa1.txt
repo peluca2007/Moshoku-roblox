@@ -1,0 +1,29 @@
+Game Started
+1041 specs / 0 falhas
+Sala iniciada
+Papel
+CLICK VirarPagina [520.7976684570312, 475.41400146484375]
+Pagina
+CLICK FichaSeguinte [520.7977294921875, 237.28289794921875]
+CLICK FichaAnterior [520.797607421875, 207.40264892578125]
+CLICK AssumirFicha [520.7976684570312, 177.523681640625]
+Escolha
+CLICK GuardarPapel [520.7976684570312, 297.04180908203125]
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g13_verificar.py", line 49, in <module>
+    paper_button('Modo');paper_button('Modo');paper_button('Modo')
+    ~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g13_verificar.py", line 25, in paper_button
+    pos=json.loads(lua(code))
+                   ~~~^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g13_verificar.py", line 14, in lua
+    def lua(code,dm='Client'):return call('execute_luau',datamodel_type=dm,code=code)
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g13_verificar.py", line 12, in call
+    if r.get('isError') or 'erro' in r: raise RuntimeError(r)
+                                        ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: Modo is not a valid member of ScrollingFrame "Players.Reset45206551.PlayerGui.SalaPapelInterface.Pagina"'}

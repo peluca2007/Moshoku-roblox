@@ -1,0 +1,39 @@
+Game Started
+Ladina
+Visao sem custo
+Norte
+[Testes] 989 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+AssistantCommand:1: Arremesso de Espada
+1 AÇÃO • 12 CASAS
+
+Alcance: 12 casas (18 m)
+
+Dano: 1d10 + 3
+
+Acerto: d20 + agilidade + Rank + 2 do jogo contra CA. 1 natural erra; 20 é crítico.
+
+Seu acerto: d20 +3 (antes de condições, cobertura e reações).
+
+Sua arma fica na casa do alvo, acertando ou errando. Pegar arma: 1 Ação, até 1 casa.
+
+Recupere a arma na casa de impacto: 1 Ação. Interceptação como Reação pertence à A14. Dano de arma normal
+
+No livro
+1 Ação: ataque à distância (Agilidade + Rank) até 18m. 
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_conferir_ui.py", line 63, in <module>
+    print(lua('local g=game.Players.LocalPlayer.PlayerGui.AcoesDoTurno;assert(g.TooltipAcao.Visible);local s=g.TooltipAcao.Conteudo.Texto.Text;assert(string.find(s,"Dano:",1,true));assert(string.find(s,"Seu acerto: d20 +5",1,true),s);assert(string.match(s,"1d%d+"),s);assert(shared.G6Foto.snap.jogo.acoes.usadas==0);return s'),flush=True)
+          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_conferir_ui.py", line 24, in lua
+    return call("execute_luau", datamodel_type="Client", code=code)
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_conferir_ui.py", line 20, in call
+    raise RuntimeError(r)
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: Arremesso de Espada\n1 A��O � 12 CASAS\n\nAlcance: 12 casas (18 m)\n\nDano: 1d10 + 3\n\nAcerto: d20 + agilidade + Rank + 2 do jogo contra CA. 1 natural erra; 20 � cr�tico.\n\nSeu acerto: d20 +3 (antes de condi��es, cobertura e rea��es).\n\nSua arma fica na casa do alvo, acertando ou errando. Pegar arma: 1 A��o, at� 1 casa.\n\nRecupere a arma na casa de impacto: 1 A��o. Intercepta��o como Rea��o pertence � A14. Dano de arma normal\n\nNo livro\n1 A��o: ataque � dist�ncia (Agilidade + Rank) at� 18m. '}

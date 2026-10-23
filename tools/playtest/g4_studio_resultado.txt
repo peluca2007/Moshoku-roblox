@@ -1,0 +1,58 @@
+Fontes sincronizadas
+Game Started
+952 specs aprovados
+Canal G4 isolado pronto
+Cliente G4 pronto
+leitura
+rolagem
+respondeu
+nova
+tecla 4
+digitando
+chat protegido
+prazos
+recriou
+pendente real
+ReacoesService: escolha aceita
+passar real
+ReacoesService: passar aceito
+timeout real
+ReacoesService: prazo encerrado sem escolha
+limpo
+FINAL 0
+OK reacao abre centralizada
+OK janela compacta limitada
+OK deixar passar tem 44 px
+OK prazo tem segundos
+OK atalhos cabem
+OK detalhes nao truncados
+OK opcoes longas tem rolagem
+OK Opcao_1 tem toque >=44
+OK Opcao_2 tem toque >=44
+OK Opcao_3 tem toque >=44
+OK Opcao_4 tem toque >=44
+OK arrasto real rola detalhes
+OK clique na opcao envia id correto
+OK responder fecha janela
+OK tecla depois de responder nao duplica
+OK atalho 4 funciona
+OK passar explicito envia nil
+OK campo de digitacao focado
+OK digitar nao escolhe nem passa
+OK zero passa depois de sair do chat
+OK prazo curto sinaliza urgencia
+OK expira visualmente sem resposta inventada
+OK fecho e prazo antigos nao fecham nova pergunta
+OK nova pergunta conserva o id
+OK fecho do servidor esconde pergunta
+OK fim do combate limpa pergunta
+OK recriar nao duplica ouvintes
+OK pergunta real do servidor aparece
+OK escolha real fecha UI
+OK timeout real fecha UI sem enviar
+Console: [Testes] 952 ok, 0 falha(s)
+[Testes] 952 ok, 0 falha(s)
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

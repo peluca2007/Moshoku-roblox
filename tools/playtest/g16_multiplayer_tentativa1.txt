@@ -1,0 +1,10 @@
+G16TesteServidor
+G16TesteCliente
+teste solicitado
+{"resultado":{"ok":false,"jogadores":2,"erro":"ServerScriptService.G16TesteServidor:36: specs falharam\nServerScriptService.G16TesteServidor:36\nServerScriptService.G16TesteServidor:31\n","linhas":[]},"chamou":true}
+fixtures removidas de Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g16_multiplayer.py", line 37, in <module>
+    print(result,flush=True);parsed=json.loads(result);assert parsed['chamou'] and parsed['resultado']['ok'],result;break
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {"resultado":{"ok":false,"jogadores":2,"erro":"ServerScriptService.G16TesteServidor:36: specs falharam\nServerScriptService.G16TesteServidor:36\nServerScriptService.G16TesteServidor:31\n","linhas":[]},"chamou":true}

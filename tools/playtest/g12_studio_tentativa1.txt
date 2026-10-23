@@ -1,0 +1,11 @@
+Game Started
+1028 specs / 2 falhas
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g12_verificar.py", line 49, in <module>
+    result=call('execute_luau',datamodel_type='Server',code='local r=game.ServerScriptService.Server;local p,f=require(r.TestRunner).run(r.tests);return p.." specs / "..f.." falhas"');print(result,flush=True);assert ' / 0 falhas' in result
+                                                                                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

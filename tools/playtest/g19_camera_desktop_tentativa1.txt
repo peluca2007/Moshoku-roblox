@@ -1,0 +1,37 @@
+Game Started
+sala pronta
+MEDIDA {"vp": [1007, 635], "pieces": [{"id": "t1", "x": 503.5, "on": true, "y": 267.64227294921875}, {"id": "t2", "x": 503.5, "on": true, "y": 133.84596252441406}, {"id": "t3", "x": 416.58807373046875, "on": true, "y": 169.0478057861328}, {"id": "t4", "x": 590.4119262695312, "on": true, "y": 169.0478057861328}], "corners": [{"y": 102.24301147460938, "x": 374.9170227050781, "on": true}, {"y": 328.1399841308594, "x": 348.02899169921875, "on": true}, {"y": 102.24301147460938, "x": 632.0830078125, "on": true}, {"y": 328.1399841308594, "x": 658.9710083007812, "on": true}], "fade": false, "panel": false, "transition": {"maxY": 12.699652671813965, "escuro": true, "inicio": 1791752191.838845, "frames": 146, "fora": 0}, "center": [503.5, 204.5], "position": [-2.5, 91.20069885253906, 64.21373748779297], "keys": [], "table": true, "serial": 1, "area": {"x2": 1007, "y2": 345, "y1": 64, "x1": 0}}
+OK start centralizado sem painel fantasma
+OK start centros dos participantes dentro da area util
+OK start quatro cantos da regiao cabem sem HUD
+OK start corte escuro revelou partida
+OK aproximacao substitui altura fixa148
+Success
+MEDIDA {"vp": [1007, 635], "pieces": [{"id": "t1", "x": 503.5, "on": true, "y": 379.75860595703125}, {"id": "t2", "x": 503.5, "on": true, "y": 222.31597900390625}, {"id": "t3", "x": 409.43572998046875, "on": true, "y": 263.4461669921875}, {"id": "t4", "x": 597.5642700195312, "on": true, "y": 263.4461669921875}], "corners": [{"y": 182.58949279785156, "x": 365.3535461425781, "on": true}, {"y": 447.45806884765625, "x": 333.82684326171875, "on": true}, {"y": 182.58949279785156, "x": 641.646484375, "on": true}, {"y": 447.45806884765625, "x": 673.1731567382812, "on": true}], "fade": false, "panel": false, "transition": {"maxY": 12.699652671813965, "escuro": true, "inicio": 1791752191.838845, "frames": 146, "fora": 0}, "center": [503.5, 301.4599304199219], "position": [-2.5, 91.20069885253906, 40.19681167602539], "keys": [{"key": "W", "processed": false}], "table": true, "serial": 2, "area": {"x2": 1007, "y2": 345, "y1": 64, "x1": 0}}
+OK pan manual recebido e altera enquadramento
+MEDIDA {"vp": [1007, 635], "pieces": [{"id": "t1", "x": 503.5, "on": true, "y": 379.75860595703125}, {"id": "t2", "x": 503.5, "on": true, "y": 222.31597900390625}, {"id": "t3", "x": 409.43572998046875, "on": true, "y": 263.4461669921875}, {"id": "t4", "x": 597.5642700195312, "on": true, "y": 263.4461669921875}], "corners": [{"y": 182.58949279785156, "x": 365.3535461425781, "on": true}, {"y": 447.45806884765625, "x": 333.82684326171875, "on": true}, {"y": 182.58949279785156, "x": 641.646484375, "on": true}, {"y": 447.45806884765625, "x": 673.1731567382812, "on": true}], "fade": false, "panel": false, "transition": {"maxY": 12.699652671813965, "escuro": true, "inicio": 1791752191.838845, "frames": 146, "fora": 0}, "center": [503.5, 301.4599304199219], "position": [-2.5, 91.20069885253906, 40.19681167602539], "keys": [{"key": "W", "processed": false}], "table": true, "serial": 3, "area": {"x2": 1007, "y2": 345, "y1": 64, "x1": 0}}
+OK snapshot nao recentraliza pan manual
+Success
+MEDIDA {"vp": [1007, 635], "pieces": [{"id": "t1", "x": 503.5, "on": true, "y": 438.4982604980469}, {"id": "t2", "x": 503.5, "on": false, "y": -759.90185546875}, {"id": "t3", "x": -371.58056640625, "on": false, "y": -690.3682250976562}, {"id": "t4", "x": 1378.58056640625, "on": false, "y": -690.3682250976562}], "corners": [{"y": -633.8887329101562, "x": -210.91046142578125, "on": false}, {"y": 7821.3896484375, "x": -17763.19921875, "on": false}, {"y": -633.8887329101562, "x": 1217.910400390625, "on": false}, {"y": 7821.3896484375, "x": 18770.19921875, "on": false}], "fade": false, "panel": false, "transition": {"maxY": 12.699652671813965, "escuro": true, "inicio": 1791752191.838845, "frames": 146, "fora": 0}, "center": [503.5, -315.649169921875], "position": [-2.5, 6.1719279289245605, 22.66517448425293], "keys": [{"key": "W", "processed": false}, {"key": "M", "processed": false}], "table": false, "serial": 4, "area": {"x2": 1007, "y2": 345, "y1": 64, "x1": 0}}
+OK primeiro M entregue sai da camera de mesa
+Success
+MEDIDA {"vp": [1007, 635], "pieces": [{"id": "t1", "x": 503.5, "on": true, "y": 379.75860595703125}, {"id": "t2", "x": 503.5, "on": true, "y": 222.31597900390625}, {"id": "t3", "x": 409.43572998046875, "on": true, "y": 263.4461669921875}, {"id": "t4", "x": 597.5642700195312, "on": true, "y": 263.4461669921875}], "corners": [{"y": 182.58949279785156, "x": 365.3535461425781, "on": true}, {"y": 447.45806884765625, "x": 333.82684326171875, "on": true}, {"y": 182.58949279785156, "x": 641.646484375, "on": true}, {"y": 447.45806884765625, "x": 673.1731567382812, "on": true}], "fade": false, "panel": false, "transition": {"maxY": 12.699652671813965, "escuro": true, "inicio": 1791752191.838845, "frames": 146, "fora": 0}, "center": [503.5, 301.4599304199219], "position": [-2.5, 91.20069885253906, 40.19681167602539], "keys": [{"key": "W", "processed": false}, {"key": "M", "processed": false}, {"key": "M", "processed": false}], "table": true, "serial": 5, "area": {"x2": 1007, "y2": 345, "y1": 64, "x1": 0}}
+OK segundo M entregue preserva pan manual
+voltou sentado
+MEDIDA {"vp": [1007, 635], "pieces": [{"id": "t5", "x": 503.5, "on": true, "y": 267.64227294921875}, {"id": "t6", "x": 503.5, "on": true, "y": 133.84596252441406}, {"id": "t7", "x": 416.58807373046875, "on": true, "y": 169.0478057861328}, {"id": "t8", "x": 590.4119262695312, "on": true, "y": 169.0478057861328}], "corners": [{"y": 102.24301147460938, "x": 374.9170227050781, "on": true}, {"y": 328.1399841308594, "x": 348.02899169921875, "on": true}, {"y": 102.24301147460938, "x": 632.0830078125, "on": true}, {"y": 328.1399841308594, "x": 658.9710083007812, "on": true}], "fade": false, "panel": false, "transition": {"maxY": 12.699371337890625, "escuro": true, "inicio": 1791752216.472779, "frames": 145, "fora": 0}, "center": [503.5, 204.5], "position": [-2.5, 91.20069885253906, 64.21373748779297], "keys": [{"key": "W", "processed": false}, {"key": "M", "processed": false}, {"key": "M", "processed": false}, {"key": "E", "processed": true}, {"key": "S", "processed": false}, {"key": "E", "processed": true}], "table": true, "serial": 6, "area": {"x2": 1007, "y2": 345, "y1": 64, "x1": 0}}
+OK reinicio centralizado sem painel fantasma
+OK reinicio centros dos participantes dentro da area util
+OK reinicio quatro cantos da regiao cabem sem HUD
+OK reinicio corte escuro revelou partida
+OK nova partida descarta pan anterior e tem transicao propria
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1086 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+FINAL 0 falhas / 14 checks desktop
+Game Stopped
+fixture propria removida
+default

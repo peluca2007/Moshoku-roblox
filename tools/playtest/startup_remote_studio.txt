@@ -1,0 +1,7 @@
+Studio local: Moshoku-Prototipo.rbxlx; fontes server.server, MesaState e MesaProtocol sincronizadas por MCP em Edit.
+Play local: iniciado e encerrado pelo MCP. Estado final: Edit.
+Output: [Testes] 1107 ok, 0 falha(s); nenhum aviso Infinite yield/WaitForChild Mesa no Output lido.
+Servidor durante Play: ReplicatedStorage.MesaPronta=true e RemoteEvent Mesa presente.
+Handshake tardio: iniciar MesaState.start() e ready() no cliente após prontidão retornou snapshot=true.
+Segunda janela MoshokuRPGMesa: preservada em Edit; place local não salvo após Play.
+Limite: execução confirma startup e handshake no Studio local; sem teste de várias conexões/aparelhos nem servidor publicado.

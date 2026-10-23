@@ -1,0 +1,30 @@
+[
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": true
+    }
+  },
+  {
+    "sleep": 8
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code_file": "tools/playtest/a8_corpos_e2e.luau"
+    },
+    "max": 4000
+  },
+  {
+    "tool": "get_console_output",
+    "args": {},
+    "max": 3000
+  },
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": false
+    }
+  }
+]

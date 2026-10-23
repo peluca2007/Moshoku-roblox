@@ -1,0 +1,20 @@
+{
+  "stats": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"fichaSecreta\":true,\"master\":false,\"voz\":\"boss__treant-anciao\",\"pvSecreto\":true}"
+      }
+    ],
+    "isError": false
+  },
+  "oculto": {
+    "content": [
+      {
+        "type": "text",
+        "text": "OK token oculto e voz ausentes no recorte não mestre"
+      }
+    ],
+    "isError": false
+  }
+}

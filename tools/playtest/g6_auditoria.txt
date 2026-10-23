@@ -1,0 +1,28 @@
+Game Started
+mago-de-fogo BC=3 CA=10 arma=nil
+maga-da-agua BC=3 CA=10 arma=nil
+mago-do-vento BC=3 CA=10 arma=nil
+mago-da-terra BC=3 CA=10 arma=nil
+curandeira BC=3 CA=10 arma=nil
+alquimista BC=3 CA=10 arma=nil
+teorico BC=3 CA=10 arma=nil
+invocador BC=3 CA=10 arma=nil
+espadachim BC=3 CA=8 arma=nil
+duelista-da-agua BC=3 CA=12 arma=nil
+guerreiro-do-norte BC=3 CA=10 arma=nil
+brutamontes BC=3 CA=10 arma=nil
+escudeiro BC=4 CA=13 arma=nil
+arqueira BC=3 CA=12 arma=nil
+ladina BC=3 CA=12 arma=nil
+bardo BC=3 CA=10 arma=nil
+tatico BC=3 CA=10 arma=nil
+patamar=1 CA=12 resistencia=2
+patamar=2 CA=14 resistencia=2
+patamar=3 CA=16 resistencia=3
+patamar=4 CA=18 resistencia=4
+patamar=5 CA=20 resistencia=5
+patamar=6 CA=22 resistencia=6
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit

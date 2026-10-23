@@ -1,0 +1,38 @@
+Game Started
+retrato
+bancada G18 criada
+374, 666 canvas=312, 440 papel=0.7864192724227905, 1.1191351413726807, 0.007561724167317152
+Lugar1
+sentado
+CLICK Modo_luta [182.9859161376953, 474.804931640625] {"pos":"183, 475, 0","tipo":"Enum.UserInputType.Touch"}
+CLICK Nivel_1 [186.65826416015625, 807.8233642578125] {"pos":"187, 808, 0","tipo":"Enum.UserInputType.Touch"}
+opcoes atuais
+CLICK Modo_duelo [186.65773010253906, 803.449951171875] {"pos":"187, 803, 0","tipo":"Enum.UserInputType.Touch"}
+{"input":"Enum.UserInputType.Touch","scroll":"0, 159","antes":0,"envios":[]}
+CLICK Aba_pessoas [186.48284912109375, 783.3001098632812] {"pos":"186, 783, 0","tipo":"Enum.UserInputType.Touch"}
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+AssistantCommand:1: botao ausente
+Stack Begin
+Script 'AssistantCommand', Line 1
+Stack End
+Game Stopped
+default
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_ui.py", line 39, in <module>
+    paper('Aba_pessoas');paper('Transferir_999')
+                         ~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_ui.py", line 15, in paper
+    pos=json.loads(lua('local g=shared.G18.pages.gui;local sc=g.Pagina;local b=g:FindFirstChild("'+name+'",true);assert(b,"botao ausente");local y=b.AbsolutePosition.Y-sc.AbsolutePosition.Y;if b:IsDescendantOf(sc) then if y<0 then sc.CanvasPosition+=Vector2.new(0,y) elseif y+b.AbsoluteSize.Y>sc.AbsoluteSize.Y then sc.CanvasPosition+=Vector2.new(0,y+b.AbsoluteSize.Y-sc.AbsoluteSize.Y) end end;task.wait(.2);local a=b.AbsolutePosition+b.AbsoluteSize/2;local p=g.Adornee;local w=p.CFrame:PointToWorldSpace(Vector3.new(-(a.X/g.CanvasSize.X-.5)*p.Size.X,(.5-a.Y/g.CanvasSize.Y)*p.Size.Y,-p.Size.Z/2-.002));local q=workspace.CurrentCamera:WorldToViewportPoint(w);return game.HttpService:JSONEncode({q.X,q.Y})'))
+                   ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_ui.py", line 13, in lua
+    def lua(code,dm='Client'):return call('execute_luau',code=code,datamodel_type=dm)
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g18_ui.py", line 11, in call
+    if r.get('isError') or 'erro' in r:raise RuntimeError(r)
+                                       ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'isError': True, 'text': 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:86: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: botao ausente'}

@@ -1,0 +1,94 @@
+Fonte sincronizada
+Game Started
+1064 specs / 0 falhas
+Sala pronta
+bandeja
+Dados na mao
+Enquadramento
+Impulso nativo, dono servidor; velocidade -3.580030918121338, 0.9850580096244812, 0.9385207891464233
+Fisica: pico 22.89000701904297, deslocamento 2.8935699462890625
+Pousou
+Escala
+Brotos confirmado
+Prompt nativo (ButtonB fisico nao emulado pelo MCP)
+Prompt
+Gestos de dados/jogador verificados em bancada
+Arrumado
+Alvo real carregado por avatar de bancada
+Alvo
+Salto real soltou pelo remoto
+Solto
+OK lobby ativo
+OK pegar por E real
+OK maos dados confirmadas
+OK sem dialogo ao pegar
+OK prompt toque e controle
+OK braco alcanca dados
+OK trio inteiro no campo de visao
+OK pouso confirmado
+OK tres faces reais
+OK tamanho fisico restaurado
+OK Brotos pela mao conclui
+OK faces iguais ao Brotos
+OK mestre preservado
+OK prompt na mao com B e toque
+OK soltar pelo prompt nativo
+OK papel remoto existe antes
+OK dados nao viram papel remoto
+OK amigo nao vira papel remoto
+OK braco remoto visivel
+OK braco restaurado ao sair
+OK arrumar limpa dados
+OK alvo real carregado
+OK escape visivel no toque
+OK escape recolhe interface
+G15: 0 falhas
+Erros: 
+[Testes] 1064 ok, 0 falha(s)
+[Testes] 1064 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (27.2, 76.2) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (57.6, 96.6) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (83.1, 113.7) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (112.2, 133.2) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (140.0, 151.8) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (166.7, 169.7) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (195.1, 188.7) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (222.5, 207.0) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils] VirtualInput::SendMousePosition: position (278.8, 244.8) hits CoreGUI.
+Stack Begin
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 286
+Script 'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.TestAutomationUtils', Line 164
+Stack End
+Game Stopped

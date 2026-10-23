@@ -1,0 +1,13 @@
+[
+  {"tool": "start_stop_play", "args": {"is_start": true}},
+  {"sleep": 6},
+  {"tool": "execute_luau", "args": {"datamodel_type": "Server", "code": "local r=game:GetService('ServerScriptService').Server; local p,f=require(r.TestRunner).run(r.tests); return string.format('%d ok, %d falhas',p,f)"}},
+  {"tool": "execute_luau", "args": {"datamodel_type": "Client", "code_file": "tools/playtest/a10_sons.luau"}},
+  {"sleep": 7},
+  {"tool": "execute_luau", "args": {"datamodel_type": "Client", "code": "return shared.A10 and shared.A10.pronto and (table.concat(shared.A10.linhas, '\\n') .. ' | falhas=' .. shared.A10.falhas) or 'PENDENTE'"}},
+  {"tool": "execute_luau", "args": {"datamodel_type": "Client", "code_file": "tools/playtest/a10_carregar.luau"}},
+  {"sleep": 12},
+  {"tool": "execute_luau", "args": {"datamodel_type": "Client", "code": "return shared.A10Carga and shared.A10Carga.pronto and (table.concat(shared.A10Carga.linhas, '\\n') .. ' | falhas=' .. shared.A10Carga.falhas .. ' total=' .. shared.A10Carga.total) or 'CARGA PENDENTE'"}, "max": 7000},
+  {"tool": "get_console_output", "args": {}, "max": 4000},
+  {"tool": "start_stop_play", "args": {"is_start": false}}
+]

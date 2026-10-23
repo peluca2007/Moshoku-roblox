@@ -1,0 +1,40 @@
+[
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": true
+    }
+  },
+  {
+    "sleep": 5
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code_file": "tools/playtest/a16_cliente.luau"
+    }
+  },
+  {
+    "sleep": 55
+  },
+  {
+    "tool": "execute_luau",
+    "args": {
+      "datamodel_type": "Client",
+      "code": "assert(shared.A16 and shared.A16.pronto); return table.concat(shared.A16.linhas,' | ')..' Falhas: '..shared.A16.falhas"
+    },
+    "max": 5000
+  },
+  {
+    "tool": "get_console_output",
+    "args": {},
+    "max": 5000
+  },
+  {
+    "tool": "start_stop_play",
+    "args": {
+      "is_start": false
+    }
+  }
+]

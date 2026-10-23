@@ -1,0 +1,50 @@
+Fontes sincronizadas
+Game Started
+988 specs / 0 falhas
+Console: [Testes] 988 ok, 0 falha(s)
+[Testes] 988 ok, 0 falha(s)
+Treino Ladina
+hover
+limpeza
+Caido
+pose caida
+recuperacao
+arma
+cura de zero
+FINAL 1
+OK hover abre consulta
+OK hover mostra cone e regra
+OK hover mostra casas vigiadas
+OK hover nao cobra
+OK perfil do treino
+OK sair do hover limpa previa
+OK sair do hover fecha consulta
+OK Esconder real garantido
+OK Esconder cobra uma Acao
+OK Levantar visivel
+FALHA Caido horizontal estavel
+OK Caido raiz ancorada
+OK Levantar restaura pose
+OK Levantar paga uma Acao
+OK metade do movimento disponivel
+OK botao Levantar some
+OK andar apos levantar nao cobra de novo
+OK arremesso deixa arma real
+OK arma desenhada com lamina cabo e guarda
+OK recuperar arma remove objeto real
+OK zero PV nao oferece Levantar
+OK cura real recupera PV
+OK cura real restaura avatar
+OK saida limpa cones
+Console final: [Testes] 988 ok, 0 falha(s)
+[Testes] 988 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g6_verificar.py", line 84, in <module>
+    result=lua('return "FINAL "..shared.G6.falhas');assert 'FINAL 0' in result,result
+                                                           ^^^^^^^^^^^^^^^^^^^
+AssertionError: FINAL 1

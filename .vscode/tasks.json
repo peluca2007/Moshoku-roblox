@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Rojo: iniciar sincronização",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/tools/rojo.ps1"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated"},
+      "runOptions": {"instanceLimit": 1}
+    }
+  ]
+}

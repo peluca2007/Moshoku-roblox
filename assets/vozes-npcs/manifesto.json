@@ -1,0 +1,1433 @@
+{
+  "versao": 1,
+  "status": "preparado_localmente_sem_ids_roblox",
+  "politica": {
+    "originais": "preservados",
+    "bordas": "RMS -50dBFS com margem150ms; revisar de ouvido",
+    "ganho_db": 0,
+    "reuso_urso_lobo": "autorizado por Pedro; sem pitch ou áudio duplicado"
+  },
+  "gravacoes": {
+    "boss__treant-anciao__ruptura-aviso__01": {
+      "original": "audios/`boss__treant-anciao__ruptura-aviso__01.ogg.m4a",
+      "sha256_original": "13920e22094fdaea8e9804e28f3c8b79ea4132f3510cbc6e4dd9289f8c978c69",
+      "arquivo": "arquivos/boss__treant-anciao__ruptura-aviso__01.wav",
+      "segundos_original": 3.136,
+      "segundos": 3.136,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": 0.0,
+      "amostras_proximas_limite": 641,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "6d2afb34197dc3ba40f8c5ac77abf63ebc12c8475b7bf46529aa2ffa0858bb25"
+    },
+    "npc__bandido-de-estrada__pouca-vida__01": {
+      "original": "audios/`npc__bandido-de-estrada__pouca-vida__01.ogg.m4a",
+      "sha256_original": "11b790b9d9c35c363b1b26559c5fc9b0786a06aa4f8b0e341efbce304b4547f3",
+      "arquivo": "arquivos/npc__bandido-de-estrada__pouca-vida__01.wav",
+      "segundos_original": 1.664,
+      "segundos": 1.65,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.014,
+      "pico_dbfs": -6.38,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "27e6b8556cb46ef123a0c9e59ccffec431e9cb932c561a20fdb613a86d937ee5"
+    },
+    "npc__goblin-batedor__ataque__02": {
+      "original": "audios/`npc__goblin-batedor__ataque__02.ogg.m4a",
+      "sha256_original": "3d2673055686f08443b9a8234335a6832f2fabfa9d76f6aeaca908f8817e9d62",
+      "arquivo": "arquivos/npc__goblin-batedor__ataque__02.wav",
+      "segundos_original": 1.707,
+      "segundos": 1.57,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.137,
+      "pico_dbfs": -0.0,
+      "amostras_proximas_limite": 30,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "f580a94228b7d50a617461ec51e83df9e526321cd863051566668f9393f79792"
+    },
+    "npc__goblin-batedor__dor-leve__01": {
+      "original": "audios/`npc__goblin-batedor__dor-leve__01.ogg.m4a",
+      "sha256_original": "e61e00b2d36b51f384200e2dbad3c52f0a2f37a3c9a5bc9efdb18e539e2a8b5c",
+      "arquivo": "arquivos/npc__goblin-batedor__dor-leve__01.wav",
+      "segundos_original": 1.323,
+      "segundos": 1.24,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.083,
+      "pico_dbfs": -3.25,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "40b6f1a836df5a44e6eed5596cd613210325688962994b35d3031fb953accd2f"
+    },
+    "npc__lobo-cinzento__derrota__01": {
+      "original": "audios/`npc__lobo-cinzento__derrota__01.ogg.m4a",
+      "sha256_original": "bb5f5e972072dbbaff560da77f86da4bec3ee3376decaff65c9c8eee833980a0",
+      "arquivo": "arquivos/npc__lobo-cinzento__derrota__01.wav",
+      "segundos_original": 2.133,
+      "segundos": 2.133,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -2.71,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "aa3d1913962bbd88029a4e9d0e85a957d4c37c217a9aa8e8f6ffe2b7a660b179"
+    },
+    "npc__lobo-cinzento__pouca-vida__01": {
+      "original": "audios/`npc__lobo-cinzento__pouca-vida__01.ogg.m4a",
+      "sha256_original": "3abf728d9a1188977df8029df381af196a6df1b736912f8a3ca508962200216f",
+      "arquivo": "arquivos/npc__lobo-cinzento__pouca-vida__01.wav",
+      "segundos_original": 2.453,
+      "segundos": 2.453,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -11.9,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "f1e2f893107f4e760074e21e56d1e58885426beac1c984ecd2973c36ed58da2e"
+    },
+    "boss__treant-anciao__ataque__01": {
+      "original": "audios/boss__treant-anciao__ataque__01.ogg.m4a",
+      "sha256_original": "408455c52c3c2cf6d90b6b326d79cd7faad92e748e02d82cdf5e90294a2c6d99",
+      "arquivo": "arquivos/boss__treant-anciao__ataque__01.wav",
+      "segundos_original": 1.941,
+      "segundos": 1.941,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.12,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "233b88ab47b1f1e23f429eab31a06847e322d3158bb4d38f6778c1070d4ff027"
+    },
+    "boss__treant-anciao__ataque__02": {
+      "original": "audios/boss__treant-anciao__ataque__02.ogg.m4a",
+      "sha256_original": "84daac86b91a18b10ff73ee4c3156cb1f37d8a7f692510175ade88da4cf1182b",
+      "arquivo": "arquivos/boss__treant-anciao__ataque__02.wav",
+      "segundos_original": 1.088,
+      "segundos": 1.088,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -3.73,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "ae7c28a987f98ea51bb1820f952d9750ba22c90a90e6356933028a62a5ff284c"
+    },
+    "boss__treant-anciao__derrota__01": {
+      "original": "audios/boss__treant-anciao__derrota__01.ogg`.m4a",
+      "sha256_original": "c2191dc20d78f099ae41b5d58dd0e074af731787dce4e08ee9f133a8f7be00dd",
+      "arquivo": "arquivos/boss__treant-anciao__derrota__01.wav",
+      "segundos_original": 4.267,
+      "segundos": 4.01,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.257,
+      "pico_dbfs": -3.09,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "6a23383132fc7c9243727f81bc9be7be5b929237bdaa8e9eb3d49be3c02ebe8d"
+    },
+    "boss__treant-anciao__dor-forte__01": {
+      "original": "audios/boss__treant-anciao__dor-forte__01.ogg.m4a",
+      "sha256_original": "53289273a5ca6d8f86bb6a85581ef735318ef6ba51fd22dd670348502997ceaf",
+      "arquivo": "arquivos/boss__treant-anciao__dor-forte__01.wav",
+      "segundos_original": 0.896,
+      "segundos": 0.896,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -5.2,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "a8ae18104f2dbe1d90a59ff90730e7dc83aa6b2db28822412544d37a48d0fcdd"
+    },
+    "boss__treant-anciao__dor-leve__01": {
+      "original": "audios/boss__treant-anciao__dor-leve__01.ogg.m4a",
+      "sha256_original": "65ded93274ebf3a91bb32beda02800f7021361ea01f8541ffe30117595f0a622",
+      "arquivo": "arquivos/boss__treant-anciao__dor-leve__01.wav",
+      "segundos_original": 1.131,
+      "segundos": 0.93,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.201,
+      "pico_dbfs": -10.99,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "2449a7d27354c5b21c8e5df90ce2fa04ab66ddad616237664ec248c19b2d8635"
+    },
+    "boss__treant-anciao__entrada__01": {
+      "original": "audios/boss__treant-anciao__entrada__01.og.m4a",
+      "sha256_original": "cfc9db5ed7f4d6f2f9a87f7f771f3087835573567805f7ef7201887d35c6cf2b",
+      "arquivo": "arquivos/boss__treant-anciao__entrada__01.wav",
+      "segundos_original": 3.84,
+      "segundos": 3.84,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.0,
+      "amostras_proximas_limite": 13,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "b6f5fa09b011eb50a9c51ae865e6bfe4620ff189dc87b7e84c17152e8505acab"
+    },
+    "boss__treant-anciao__entrada__02": {
+      "original": "audios/boss__treant-anciao__entrada__02.ogg.m4a",
+      "sha256_original": "e298a4b5a1627a78499f07de69c4241a052daa094deefba30ee1bd3e28ae347a",
+      "arquivo": "arquivos/boss__treant-anciao__entrada__02.wav",
+      "segundos_original": 2.624,
+      "segundos": 2.624,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.17,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "4c899b59ef0f194203b7a6b637ad040f1a1de3f8a5f67f9eb704909ebd88c3c7"
+    },
+    "boss__treant-anciao__fase-2__01": {
+      "original": "audios/boss__treant-anciao__fase-2__01.og.m4a",
+      "sha256_original": "f57e61506e64eb8f6a04b3e1084dca029d097e78f8240e9458a54c18725c2954",
+      "arquivo": "arquivos/boss__treant-anciao__fase-2__01.wav",
+      "segundos_original": 2.603,
+      "segundos": 2.51,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.093,
+      "pico_dbfs": -0.33,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "03c94ed1c8dfe31dd788fcd20c4ae9993c6992e09b9371cc872b4e5f5a36f81c"
+    },
+    "boss__treant-anciao__fase-3__01": {
+      "original": "audios/boss__treant-anciao__fase-3__01.ogg.m4a",
+      "sha256_original": "c6abad69ebaab89d076a933a12a9e164cfb3c0b4dd239d0ebe52663d811d4080",
+      "arquivo": "arquivos/boss__treant-anciao__fase-3__01.wav",
+      "segundos_original": 2.453,
+      "segundos": 2.453,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.08,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "e57787b75b63921a44fe6d64731ba94985a273baa778560fd8c9c5350cb283f0"
+    },
+    "boss__treant-anciao__furia-aviso__01": {
+      "original": "audios/boss__treant-anciao__furia-aviso__01.ogg.m4a",
+      "sha256_original": "718bfefa61ddb3c32276c4777be0bb68b16368a446ee16143d2092fdab714d01",
+      "arquivo": "arquivos/boss__treant-anciao__furia-aviso__01.wav",
+      "segundos_original": 1.621,
+      "segundos": 1.58,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.041,
+      "pico_dbfs": -1.3,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "c7aa71670d35d2ea275217c65f97660253c32b715b642da062d20317d5f284a2"
+    },
+    "boss__treant-anciao__furia-execucao__01": {
+      "original": "audios/boss__treant-anciao__furia-execucao__01.ogg.m4a",
+      "sha256_original": "d9d93f82310df32d030b4e3e4249744d76bc6bf6fdaeaa711362882dae5df335",
+      "arquivo": "arquivos/boss__treant-anciao__furia-execucao__01.wav",
+      "segundos_original": 1.536,
+      "segundos": 1.536,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -1.94,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "ad112cd54e48b78a5047fb14d8c309a96da3d9d5e725dd10f851b538f1511a24"
+    },
+    "boss__treant-anciao__raizes-aviso__01": {
+      "original": "audios/boss__treant-anciao__raizes-aviso__01.ogg`.m4a",
+      "sha256_original": "8647efa27b11438df2a042b96cab2a67b9180b0fe39826cca664ff2e67cc43c5",
+      "arquivo": "arquivos/boss__treant-anciao__raizes-aviso__01.wav",
+      "segundos_original": 2.027,
+      "segundos": 2.027,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.06,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "ca3e77001ccf23dc49043c58f9a8961488d09e381c8aab4f2abbf3fb82a64b67"
+    },
+    "boss__treant-anciao__raizes-execucao__01": {
+      "original": "audios/boss__treant-anciao__raizes-execucao__01.ogg`.m4a",
+      "sha256_original": "8e1d460519b6c2e6daf26f6751d1fdd19b1f96afb3940697c0afb7b8c41d64fe",
+      "arquivo": "arquivos/boss__treant-anciao__raizes-execucao__01.wav",
+      "segundos_original": 1.643,
+      "segundos": 1.643,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -3.35,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "78acbc0b217b94d1ccd2f907e189c2e21ff0c04c5f85fa4f8b0320ac7b2d8fb3"
+    },
+    "boss__treant-anciao__ruptura-execucao__01": {
+      "original": "audios/boss__treant-anciao__ruptura-execucao__01.og.m4a",
+      "sha256_original": "d64ab7f4373cc9bf0edbe17dbe4b00be5e53fbde759ca1256af1739517beb716",
+      "arquivo": "arquivos/boss__treant-anciao__ruptura-execucao__01.wav",
+      "segundos_original": 1.579,
+      "segundos": 1.579,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -8.76,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "f3922c1d74fa0dcd72c299cdcf3b41ed7f6f4ad740807827b6a1f4b6cc4d2392"
+    },
+    "npc__bandido-de-estrada__acerto__01": {
+      "original": "audios/npc__bandido-de-estrada__acerto__01.ogg.m4a",
+      "sha256_original": "36ca09dd0ed0f8f190c939a99484d9f39217676b9cfc78155d6caeb0a4e2e51f",
+      "arquivo": "arquivos/npc__bandido-de-estrada__acerto__01.wav",
+      "segundos_original": 2.069,
+      "segundos": 1.98,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.089,
+      "pico_dbfs": -12.63,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "2d29fff4ef5ae75e07e294a90d45356a94902f64c973000273610b486737b372"
+    },
+    "npc__bandido-de-estrada__ataque__01": {
+      "original": "audios/npc__bandido-de-estrada__ataque__01.ogg.m4a",
+      "sha256_original": "57691949eeed3c61a1a1909191c363ec1ab01c0f3e9f4ff66995f63f33bd6d49",
+      "arquivo": "arquivos/npc__bandido-de-estrada__ataque__01.wav",
+      "segundos_original": 1.365,
+      "segundos": 1.365,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.07,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "e5c126a3fbd7d36d1c7c94405a9c60627f6dffed18ff00c3ef10db8eeab47116"
+    },
+    "npc__bandido-de-estrada__ataque__02": {
+      "original": "audios/npc__bandido-de-estrada__ataque__02.ogg.m4a",
+      "sha256_original": "03659d72355c8359a17e2332ab2b4d86d35067bf46d0cc4a41b5ff09ee2cabf0",
+      "arquivo": "arquivos/npc__bandido-de-estrada__ataque__02.wav",
+      "segundos_original": 1.195,
+      "segundos": 1.195,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.0,
+      "amostras_proximas_limite": 21,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "3e125292d65a6a7683f8dca9201ac8d7eeb693dd9455ed97463bdd77b3acdf63"
+    },
+    "npc__bandido-de-estrada__avistar__01": {
+      "original": "audios/npc__bandido-de-estrada__avistar__01.ogg.m4a",
+      "sha256_original": "c50d9b3d581faa4d7ccee6ea8b7c59c418ecfecd8a6571275777a1a620776e8f",
+      "arquivo": "arquivos/npc__bandido-de-estrada__avistar__01.wav",
+      "segundos_original": 1.408,
+      "segundos": 1.408,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.77,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "ec31c630108f957cf2e118f6801729fd2faea8422197598403992832b87ad3cb"
+    },
+    "npc__bandido-de-estrada__avistar__02": {
+      "original": "audios/npc__bandido-de-estrada__avistar__02.ogg.m4a",
+      "sha256_original": "d85352e37524f830b1eb1cc1e17834c9490b348c46e19206f58cb80e6cce66d6",
+      "arquivo": "arquivos/npc__bandido-de-estrada__avistar__02.wav",
+      "segundos_original": 1.835,
+      "segundos": 1.835,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -1.76,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "12375067661559ec430abcea1ffa92631fb75b527eb9421620eee5994dc8901d"
+    },
+    "npc__bandido-de-estrada__derrota__01": {
+      "original": "audios/npc__bandido-de-estrada__derrota__01.ogg.m4a",
+      "sha256_original": "2c803749b5ef10d12831052da64154d5862d976d745a0b1f394229d052d84c75",
+      "arquivo": "arquivos/npc__bandido-de-estrada__derrota__01.wav",
+      "segundos_original": 3.115,
+      "segundos": 3.115,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -8.14,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "d81ca45e165f590cf08e48f70ece39d078513f51fceb2bd6e142090640a46a23"
+    },
+    "npc__bandido-de-estrada__dor-forte__01": {
+      "original": "audios/npc__bandido-de-estrada__dor-forte__01.ogg`.m4a",
+      "sha256_original": "f4d5cbb103744ad415dfb415b5ad3dc6e8d6838eb74af45e4be818a09d5147d9",
+      "arquivo": "arquivos/npc__bandido-de-estrada__dor-forte__01.wav",
+      "segundos_original": 2.155,
+      "segundos": 2.155,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.28,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "35ccab4e4c254c03238b6d011caaf8970c888ab2679e181a3b3d7a3ce67a3549"
+    },
+    "npc__bandido-de-estrada__dor-leve__01": {
+      "original": "audios/npc__bandido-de-estrada__dor-leve__01.ogg.m4a",
+      "sha256_original": "e6b5c296f43966d6beb0228eafcc5a0337ea7e00578fe878ab832329da75e962",
+      "arquivo": "arquivos/npc__bandido-de-estrada__dor-leve__01.wav",
+      "segundos_original": 1.195,
+      "segundos": 1.195,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -4.7,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "e7d62a3a9afa0866eb6dd5e50eda7a12f8ee6f4ef29d8a27726363af9ede4cc9"
+    },
+    "npc__bandido-de-estrada__erro__01": {
+      "original": "audios/npc__bandido-de-estrada__erro__01.ogg.m4a",
+      "sha256_original": "24d9529aafb38d6c132d4cf014f36fc156afe18be4378ef39dac7ccc057202f7",
+      "arquivo": "arquivos/npc__bandido-de-estrada__erro__01.wav",
+      "segundos_original": 1.195,
+      "segundos": 1.19,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.005,
+      "pico_dbfs": -3.14,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "d0b2464e30c151b535cff1cf8db2b6fe0f76e2d22c1040faf6fff9298cc9048d"
+    },
+    "npc__goblin-batedor__acerto__01": {
+      "original": "audios/npc__goblin-batedor__acerto__01.ogg.m4a",
+      "sha256_original": "97219124c6daf99d9396349b7f46e45c83abe1d77589e2a28b360b6e03cfdb4b",
+      "arquivo": "arquivos/npc__goblin-batedor__acerto__01.wav",
+      "segundos_original": 1.749,
+      "segundos": 1.71,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.039,
+      "pico_dbfs": -5.85,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "31838d6ad23dce916184ff8829f6e1c7c58ebd0ac8319b023a333783cc7e2693"
+    },
+    "npc__goblin-batedor__ataque__01": {
+      "original": "audios/npc__goblin-batedor__ataque__01.ogg.m4a",
+      "sha256_original": "6d958eb3702eeb748e0400e8ca5863b530750f0d331d216e4765a874df32323d",
+      "arquivo": "arquivos/npc__goblin-batedor__ataque__01.wav",
+      "segundos_original": 1.6,
+      "segundos": 1.51,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.09,
+      "pico_dbfs": -0.29,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "77973b9b22e8821c56cafe66c664326c3735f6d9d0a4105f3881849f1232573d"
+    },
+    "npc__goblin-batedor__avistar__01": {
+      "original": "audios/npc__goblin-batedor__avistar__01.ogg.m4a",
+      "sha256_original": "68c20afa862e8652808ca2dc593141a71aa45108a883219b73b5a8684d44f24f",
+      "arquivo": "arquivos/npc__goblin-batedor__avistar__01.wav",
+      "segundos_original": 1.856,
+      "segundos": 1.856,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.13,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "f1e6ac967c573812f2fbb6e351f0388d2de9ab261f751e93f43db828fdcec9ca"
+    },
+    "npc__goblin-batedor__avistar__02": {
+      "original": "audios/npc__goblin-batedor__avistar__02.ogg.m4a",
+      "sha256_original": "0b1abdb020865c680f324068f3dd82df618a840ca1f930ec180162d47ff52715",
+      "arquivo": "arquivos/npc__goblin-batedor__avistar__02.wav",
+      "segundos_original": 1.749,
+      "segundos": 1.64,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.109,
+      "pico_dbfs": -3.01,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "6cc1019efae23ed8502d390b46e23f4a9266833e1537fa2b06bb2da337d1b69f"
+    },
+    "npc__goblin-batedor__derrota__01": {
+      "original": "audios/npc__goblin-batedor__derrota__01.ogg.m4a",
+      "sha256_original": "83b44eb6e03493635a4b17811f409b59c14b145e4a533d60f371bd2082c8d189",
+      "arquivo": "arquivos/npc__goblin-batedor__derrota__01.wav",
+      "segundos_original": 1.92,
+      "segundos": 1.92,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -6.96,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "d9c71fe8f56550c8fabf755f0516445f00ef710bcc07e46aba59004c296acd6f"
+    },
+    "npc__goblin-batedor__dor-forte__01": {
+      "original": "audios/npc__goblin-batedor__dor-forte__01.ogg.m4a",
+      "sha256_original": "b2e91d8327bed21ec5c3c94fda75f7b642b8a91d6f2e34c7e41cebfc50ba8acc",
+      "arquivo": "arquivos/npc__goblin-batedor__dor-forte__01.wav",
+      "segundos_original": 1.643,
+      "segundos": 1.643,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.43,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "9cffec545272449334cf632f66aa6014aa2c7304d15b04c9cd20edf0bc0a8364"
+    },
+    "npc__goblin-batedor__dor-leve__02": {
+      "original": "audios/npc__goblin-batedor__dor-leve__02.ogg.m4a",
+      "sha256_original": "80060fc7700ccdb2ae78e29485d77e41b9273546e92f92ca595e9f3a119382dc",
+      "arquivo": "arquivos/npc__goblin-batedor__dor-leve__02.wav",
+      "segundos_original": 1.301,
+      "segundos": 1.301,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -3.88,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "d8df00541bd2f17015e4531d4e332752ca2e9a76d6740bfd2896117e1a95a48c"
+    },
+    "npc__goblin-batedor__erro__01": {
+      "original": "audios/npc__goblin-batedor__erro__01.ogg.m4a",
+      "sha256_original": "7f10abc7bf2a634f77e2233cbdbbb9b3d1de2fb84d3179890618815dd07763a9",
+      "arquivo": "arquivos/npc__goblin-batedor__erro__01.wav",
+      "segundos_original": 1.664,
+      "segundos": 1.664,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -1.37,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "e5b80bd9e5dee29d057c13cbb1698237ccb054a28898b0e032ac118d5df3daf0"
+    },
+    "npc__goblin-batedor__pouca-vida__01": {
+      "original": "audios/npc__goblin-batedor__pouca-vida__01.ogg.m4a",
+      "sha256_original": "b78452c1571299d2182d04c8d39b7b0fe67c6f753f30888b7bbd8c6ffac0b081",
+      "arquivo": "arquivos/npc__goblin-batedor__pouca-vida__01.wav",
+      "segundos_original": 1.664,
+      "segundos": 1.58,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.084,
+      "pico_dbfs": -3.39,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "b0a3c8abc6b7846775fe9fc7ff634fe5f25a53631cadb219cf05b53f182d4cef"
+    },
+    "npc__goblin-batedor__provocacao__01": {
+      "original": "audios/npc__goblin-batedor__provocacao__01.ogg.m4a",
+      "sha256_original": "774a7957f5e136784cb3d5cb061b24af1f9366ea7e1902918ed5563a30c288ea",
+      "arquivo": "arquivos/npc__goblin-batedor__provocacao__01.wav",
+      "segundos_original": 2.091,
+      "segundos": 2.03,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.061,
+      "pico_dbfs": -7.13,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "7c6037cf4e7bda5ed3a7da07f28ec217b8a6743fa388f6d8fd5ab49661bd0ffb"
+    },
+    "npc__lobo-cinzento__alerta__01": {
+      "original": "audios/npc__lobo-cinzento__alerta__01.ogg.m4a",
+      "sha256_original": "2739a87e5e4f209f51b4a5d08a119160596775c23c842bcee5a5d4e82fa2e00c",
+      "arquivo": "arquivos/npc__lobo-cinzento__alerta__01.wav",
+      "segundos_original": 1.451,
+      "segundos": 1.451,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -16.05,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "75a034dbb7a8edd1174b6894efc8755d1a710e2e489047f9fc198f1a4867ec0f"
+    },
+    "npc__lobo-cinzento__ameaca__01": {
+      "original": "audios/npc__lobo-cinzento__ameaca__01.ogg.m4a",
+      "sha256_original": "1cf49b228b75553a2f6d4c6fb5fe19c8a6b9a0e436ce3a7e5ea20a7d11f687cf",
+      "arquivo": "arquivos/npc__lobo-cinzento__ameaca__01.wav",
+      "segundos_original": 1.664,
+      "segundos": 1.664,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.42,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "c67f6f109de97701e52059fe9885388c5dbfbb8a0539e764404b5a1a035b88a6"
+    },
+    "npc__lobo-cinzento__ataque__01": {
+      "original": "audios/npc__lobo-cinzento__ataque__01.ogg.m4a",
+      "sha256_original": "b8bdc565875abc24f738112e02b4bb1610b837a4be34b911b7de9202c90cf69f",
+      "arquivo": "arquivos/npc__lobo-cinzento__ataque__01.wav",
+      "segundos_original": 1.728,
+      "segundos": 1.728,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.15,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "71aa230eb3621779149b560088b2e34e9cbfdedf95c410cf53b1adef8756521f"
+    },
+    "npc__lobo-cinzento__ataque__02": {
+      "original": "audios/npc__lobo-cinzento__ataque__02.ogg.m4a",
+      "sha256_original": "190b4ac266b68b00f56218d48f224496b15bb197bf8676c4f23965c55181aa96",
+      "arquivo": "arquivos/npc__lobo-cinzento__ataque__02.wav",
+      "segundos_original": 1.259,
+      "segundos": 1.259,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.71,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "c43b94071f652703c31bbc863ce5e6d51b5cda18ffccc45a55fa5d014f7c624c"
+    },
+    "npc__lobo-cinzento__dor-forte__01": {
+      "original": "audios/npc__lobo-cinzento__dor-forte__01.ogg.m4a",
+      "sha256_original": "6029585093d6d99d2dfc0d53924a1ceac23697cb0525edb576b618708df7f310",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-forte__01.wav",
+      "segundos_original": 2.709,
+      "segundos": 2.709,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.22,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "b267706d58dccea997a1a94d4591d8650384b0b2de68c014db4af51fd324c4e2"
+    },
+    "npc__lobo-cinzento__dor-leve__01": {
+      "original": "audios/npc__lobo-cinzento__dor-leve__01.ogg.m4a",
+      "sha256_original": "8b1a9b005757c2f8e5e2c46b6f7137bdf75da7c199ae3207d6579f6fca6de67e",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-leve__01.wav",
+      "segundos_original": 1.365,
+      "segundos": 1.365,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -0.24,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "668058728ba87a19472a1dd8e6f0c193c29bcf4f6d15562027a118738e616ee4"
+    },
+    "npc__lobo-cinzento__dor-leve__02": {
+      "original": "audios/npc__lobo-cinzento__dor-leve__02.ogg.m4a",
+      "sha256_original": "37b713b7b4ced378c338569cb5ccf056aa68d43b727d86f44bcd884acbb00bd5",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-leve__02.wav",
+      "segundos_original": 1.024,
+      "segundos": 1.024,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -6.45,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "1a401f319a856720a40dc198eebc51b9122ef418ac030728cea5a5004173e10e"
+    },
+    "npc__lobo-cinzento__uivo__01": {
+      "original": "audios/npc__lobo-cinzento__uivo__01.ogg.m4a",
+      "sha256_original": "0a2923e27e279ad7367da8404a401d8649848f43a6b4b0aac92e63f7bc6c95f4",
+      "arquivo": "arquivos/npc__lobo-cinzento__uivo__01.wav",
+      "segundos_original": 3.499,
+      "segundos": 3.499,
+      "corte_inicio_s": 0.0,
+      "corte_fim_s": 0.0,
+      "pico_dbfs": -4.31,
+      "amostras_proximas_limite": 0,
+      "ganho_db": 0,
+      "amostragem_hz": 44100,
+      "canais": 1,
+      "bits": 16,
+      "sha256_wav": "4bf7fcdf1b62ce384a80c18836d6c8836abfbb1e86f8fbb141d64d73875fbe97"
+    }
+  },
+  "entradas": {
+    "npc__goblin-batedor__avistar__01": {
+      "gravacao": "npc__goblin-batedor__avistar__01",
+      "arquivo": "arquivos/npc__goblin-batedor__avistar__01.wav",
+      "segundos": 1.856,
+      "reutilizado": false,
+      "alvo": 1.5,
+      "maximo": 2.2
+    },
+    "npc__goblin-batedor__avistar__02": {
+      "gravacao": "npc__goblin-batedor__avistar__02",
+      "arquivo": "arquivos/npc__goblin-batedor__avistar__02.wav",
+      "segundos": 1.64,
+      "reutilizado": false,
+      "alvo": 1.3,
+      "maximo": 1.9
+    },
+    "npc__goblin-batedor__ataque__01": {
+      "gravacao": "npc__goblin-batedor__ataque__01",
+      "arquivo": "arquivos/npc__goblin-batedor__ataque__01.wav",
+      "segundos": 1.51,
+      "reutilizado": false,
+      "alvo": 0.8,
+      "maximo": 1.2
+    },
+    "npc__goblin-batedor__ataque__02": {
+      "gravacao": "npc__goblin-batedor__ataque__02",
+      "arquivo": "arquivos/npc__goblin-batedor__ataque__02.wav",
+      "segundos": 1.57,
+      "reutilizado": false,
+      "alvo": 0.5,
+      "maximo": 0.9
+    },
+    "npc__goblin-batedor__acerto__01": {
+      "gravacao": "npc__goblin-batedor__acerto__01",
+      "arquivo": "arquivos/npc__goblin-batedor__acerto__01.wav",
+      "segundos": 1.71,
+      "reutilizado": false,
+      "alvo": 1.0,
+      "maximo": 1.5
+    },
+    "npc__goblin-batedor__erro__01": {
+      "gravacao": "npc__goblin-batedor__erro__01",
+      "arquivo": "arquivos/npc__goblin-batedor__erro__01.wav",
+      "segundos": 1.664,
+      "reutilizado": false,
+      "alvo": 1.0,
+      "maximo": 1.5
+    },
+    "npc__goblin-batedor__dor-leve__01": {
+      "gravacao": "npc__goblin-batedor__dor-leve__01",
+      "arquivo": "arquivos/npc__goblin-batedor__dor-leve__01.wav",
+      "segundos": 1.24,
+      "reutilizado": false,
+      "alvo": 0.4,
+      "maximo": 0.8
+    },
+    "npc__goblin-batedor__dor-leve__02": {
+      "gravacao": "npc__goblin-batedor__dor-leve__02",
+      "arquivo": "arquivos/npc__goblin-batedor__dor-leve__02.wav",
+      "segundos": 1.301,
+      "reutilizado": false,
+      "alvo": 0.4,
+      "maximo": 0.8
+    },
+    "npc__goblin-batedor__dor-forte__01": {
+      "gravacao": "npc__goblin-batedor__dor-forte__01",
+      "arquivo": "arquivos/npc__goblin-batedor__dor-forte__01.wav",
+      "segundos": 1.643,
+      "reutilizado": false,
+      "alvo": 0.8,
+      "maximo": 1.3
+    },
+    "npc__goblin-batedor__provocacao__01": {
+      "gravacao": "npc__goblin-batedor__provocacao__01",
+      "arquivo": "arquivos/npc__goblin-batedor__provocacao__01.wav",
+      "segundos": 2.03,
+      "reutilizado": false,
+      "alvo": 1.6,
+      "maximo": 2.3
+    },
+    "npc__goblin-batedor__pouca-vida__01": {
+      "gravacao": "npc__goblin-batedor__pouca-vida__01",
+      "arquivo": "arquivos/npc__goblin-batedor__pouca-vida__01.wav",
+      "segundos": 1.58,
+      "reutilizado": false,
+      "alvo": 1.4,
+      "maximo": 2.1
+    },
+    "npc__goblin-batedor__derrota__01": {
+      "gravacao": "npc__goblin-batedor__derrota__01",
+      "arquivo": "arquivos/npc__goblin-batedor__derrota__01.wav",
+      "segundos": 1.92,
+      "reutilizado": false,
+      "alvo": 1.1,
+      "maximo": 1.7
+    },
+    "npc__lobo-cinzento__alerta__01": {
+      "gravacao": "npc__lobo-cinzento__alerta__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__alerta__01.wav",
+      "segundos": 1.451,
+      "reutilizado": false,
+      "alvo": 0.9,
+      "maximo": 1.4
+    },
+    "npc__lobo-cinzento__ameaca__01": {
+      "gravacao": "npc__lobo-cinzento__ameaca__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__ameaca__01.wav",
+      "segundos": 1.664,
+      "reutilizado": false,
+      "alvo": 1.2,
+      "maximo": 1.8
+    },
+    "npc__lobo-cinzento__ataque__01": {
+      "gravacao": "npc__lobo-cinzento__ataque__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__ataque__01.wav",
+      "segundos": 1.728,
+      "reutilizado": false,
+      "alvo": 0.5,
+      "maximo": 0.9
+    },
+    "npc__lobo-cinzento__ataque__02": {
+      "gravacao": "npc__lobo-cinzento__ataque__02",
+      "arquivo": "arquivos/npc__lobo-cinzento__ataque__02.wav",
+      "segundos": 1.259,
+      "reutilizado": false,
+      "alvo": 0.5,
+      "maximo": 0.9
+    },
+    "npc__lobo-cinzento__dor-leve__01": {
+      "gravacao": "npc__lobo-cinzento__dor-leve__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-leve__01.wav",
+      "segundos": 1.365,
+      "reutilizado": false,
+      "alvo": 0.4,
+      "maximo": 0.8
+    },
+    "npc__lobo-cinzento__dor-leve__02": {
+      "gravacao": "npc__lobo-cinzento__dor-leve__02",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-leve__02.wav",
+      "segundos": 1.024,
+      "reutilizado": false,
+      "alvo": 0.6,
+      "maximo": 1.0
+    },
+    "npc__lobo-cinzento__dor-forte__01": {
+      "gravacao": "npc__lobo-cinzento__dor-forte__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-forte__01.wav",
+      "segundos": 2.709,
+      "reutilizado": false,
+      "alvo": 0.9,
+      "maximo": 1.4
+    },
+    "npc__lobo-cinzento__uivo__01": {
+      "gravacao": "npc__lobo-cinzento__uivo__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__uivo__01.wav",
+      "segundos": 3.499,
+      "reutilizado": false,
+      "alvo": 2.0,
+      "maximo": 2.8
+    },
+    "npc__lobo-cinzento__pouca-vida__01": {
+      "gravacao": "npc__lobo-cinzento__pouca-vida__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__pouca-vida__01.wav",
+      "segundos": 2.453,
+      "reutilizado": false,
+      "alvo": 1.1,
+      "maximo": 1.7
+    },
+    "npc__lobo-cinzento__derrota__01": {
+      "gravacao": "npc__lobo-cinzento__derrota__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__derrota__01.wav",
+      "segundos": 2.133,
+      "reutilizado": false,
+      "alvo": 1.1,
+      "maximo": 1.7
+    },
+    "npc__bandido-de-estrada__avistar__01": {
+      "gravacao": "npc__bandido-de-estrada__avistar__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__avistar__01.wav",
+      "segundos": 1.408,
+      "reutilizado": false,
+      "alvo": 1.0,
+      "maximo": 1.5
+    },
+    "npc__bandido-de-estrada__avistar__02": {
+      "gravacao": "npc__bandido-de-estrada__avistar__02",
+      "arquivo": "arquivos/npc__bandido-de-estrada__avistar__02.wav",
+      "segundos": 1.835,
+      "reutilizado": false,
+      "alvo": 1.8,
+      "maximo": 2.5
+    },
+    "npc__bandido-de-estrada__ataque__01": {
+      "gravacao": "npc__bandido-de-estrada__ataque__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__ataque__01.wav",
+      "segundos": 1.365,
+      "reutilizado": false,
+      "alvo": 0.6,
+      "maximo": 1.0
+    },
+    "npc__bandido-de-estrada__ataque__02": {
+      "gravacao": "npc__bandido-de-estrada__ataque__02",
+      "arquivo": "arquivos/npc__bandido-de-estrada__ataque__02.wav",
+      "segundos": 1.195,
+      "reutilizado": false,
+      "alvo": 0.4,
+      "maximo": 0.8
+    },
+    "npc__bandido-de-estrada__acerto__01": {
+      "gravacao": "npc__bandido-de-estrada__acerto__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__acerto__01.wav",
+      "segundos": 1.98,
+      "reutilizado": false,
+      "alvo": 1.1,
+      "maximo": 1.6
+    },
+    "npc__bandido-de-estrada__erro__01": {
+      "gravacao": "npc__bandido-de-estrada__erro__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__erro__01.wav",
+      "segundos": 1.19,
+      "reutilizado": false,
+      "alvo": 0.6,
+      "maximo": 1.0
+    },
+    "npc__bandido-de-estrada__dor-leve__01": {
+      "gravacao": "npc__bandido-de-estrada__dor-leve__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__dor-leve__01.wav",
+      "segundos": 1.195,
+      "reutilizado": false,
+      "alvo": 0.5,
+      "maximo": 0.9
+    },
+    "npc__bandido-de-estrada__dor-forte__01": {
+      "gravacao": "npc__bandido-de-estrada__dor-forte__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__dor-forte__01.wav",
+      "segundos": 2.155,
+      "reutilizado": false,
+      "alvo": 0.9,
+      "maximo": 1.4
+    },
+    "npc__bandido-de-estrada__pouca-vida__01": {
+      "gravacao": "npc__bandido-de-estrada__pouca-vida__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__pouca-vida__01.wav",
+      "segundos": 1.65,
+      "reutilizado": false,
+      "alvo": 1.8,
+      "maximo": 2.5
+    },
+    "npc__bandido-de-estrada__derrota__01": {
+      "gravacao": "npc__bandido-de-estrada__derrota__01",
+      "arquivo": "arquivos/npc__bandido-de-estrada__derrota__01.wav",
+      "segundos": 3.115,
+      "reutilizado": false,
+      "alvo": 1.1,
+      "maximo": 1.7
+    },
+    "npc__urso-de-presas-vermelhas__entrada__01": {
+      "gravacao": "npc__lobo-cinzento__ameaca__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__ameaca__01.wav",
+      "segundos": 1.664,
+      "reutilizado": true,
+      "alvo": 1.7,
+      "maximo": 2.5
+    },
+    "npc__urso-de-presas-vermelhas__ameaca__01": {
+      "gravacao": "npc__lobo-cinzento__alerta__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__alerta__01.wav",
+      "segundos": 1.451,
+      "reutilizado": true,
+      "alvo": 1.2,
+      "maximo": 1.8
+    },
+    "npc__urso-de-presas-vermelhas__ataque__01": {
+      "gravacao": "npc__lobo-cinzento__ataque__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__ataque__01.wav",
+      "segundos": 1.728,
+      "reutilizado": true,
+      "alvo": 0.6,
+      "maximo": 1.0
+    },
+    "npc__urso-de-presas-vermelhas__ataque__02": {
+      "gravacao": "npc__lobo-cinzento__ataque__02",
+      "arquivo": "arquivos/npc__lobo-cinzento__ataque__02.wav",
+      "segundos": 1.259,
+      "reutilizado": true,
+      "alvo": 0.6,
+      "maximo": 1.0
+    },
+    "npc__urso-de-presas-vermelhas__dor-leve__01": {
+      "gravacao": "npc__lobo-cinzento__dor-leve__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-leve__01.wav",
+      "segundos": 1.365,
+      "reutilizado": true,
+      "alvo": 0.5,
+      "maximo": 0.9
+    },
+    "npc__urso-de-presas-vermelhas__dor-leve__02": {
+      "gravacao": "npc__lobo-cinzento__dor-leve__02",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-leve__02.wav",
+      "segundos": 1.024,
+      "reutilizado": true,
+      "alvo": 0.5,
+      "maximo": 0.9
+    },
+    "npc__urso-de-presas-vermelhas__dor-forte__01": {
+      "gravacao": "npc__lobo-cinzento__dor-forte__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__dor-forte__01.wav",
+      "segundos": 2.709,
+      "reutilizado": true,
+      "alvo": 1.0,
+      "maximo": 1.6
+    },
+    "npc__urso-de-presas-vermelhas__pouca-vida__01": {
+      "gravacao": "npc__lobo-cinzento__pouca-vida__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__pouca-vida__01.wav",
+      "segundos": 2.453,
+      "reutilizado": true,
+      "alvo": 1.3,
+      "maximo": 1.9
+    },
+    "npc__urso-de-presas-vermelhas__derrota__01": {
+      "gravacao": "npc__lobo-cinzento__derrota__01",
+      "arquivo": "arquivos/npc__lobo-cinzento__derrota__01.wav",
+      "segundos": 2.133,
+      "reutilizado": true,
+      "alvo": 1.5,
+      "maximo": 2.2
+    },
+    "boss__treant-anciao__entrada__01": {
+      "gravacao": "boss__treant-anciao__entrada__01",
+      "arquivo": "arquivos/boss__treant-anciao__entrada__01.wav",
+      "segundos": 3.84,
+      "reutilizado": false,
+      "alvo": 2.4,
+      "maximo": 3.2
+    },
+    "boss__treant-anciao__entrada__02": {
+      "gravacao": "boss__treant-anciao__entrada__02",
+      "arquivo": "arquivos/boss__treant-anciao__entrada__02.wav",
+      "segundos": 2.624,
+      "reutilizado": false,
+      "alvo": 2.0,
+      "maximo": 2.8
+    },
+    "boss__treant-anciao__ataque__01": {
+      "gravacao": "boss__treant-anciao__ataque__01",
+      "arquivo": "arquivos/boss__treant-anciao__ataque__01.wav",
+      "segundos": 1.941,
+      "reutilizado": false,
+      "alvo": 0.9,
+      "maximo": 1.4
+    },
+    "boss__treant-anciao__ataque__02": {
+      "gravacao": "boss__treant-anciao__ataque__02",
+      "arquivo": "arquivos/boss__treant-anciao__ataque__02.wav",
+      "segundos": 1.088,
+      "reutilizado": false,
+      "alvo": 0.7,
+      "maximo": 1.2
+    },
+    "boss__treant-anciao__raizes-aviso__01": {
+      "gravacao": "boss__treant-anciao__raizes-aviso__01",
+      "arquivo": "arquivos/boss__treant-anciao__raizes-aviso__01.wav",
+      "segundos": 2.027,
+      "reutilizado": false,
+      "alvo": 1.6,
+      "maximo": 2.3
+    },
+    "boss__treant-anciao__raizes-execucao__01": {
+      "gravacao": "boss__treant-anciao__raizes-execucao__01",
+      "arquivo": "arquivos/boss__treant-anciao__raizes-execucao__01.wav",
+      "segundos": 1.643,
+      "reutilizado": false,
+      "alvo": 0.9,
+      "maximo": 1.4
+    },
+    "boss__treant-anciao__fase-2__01": {
+      "gravacao": "boss__treant-anciao__fase-2__01",
+      "arquivo": "arquivos/boss__treant-anciao__fase-2__01.wav",
+      "segundos": 2.51,
+      "reutilizado": false,
+      "alvo": 1.9,
+      "maximo": 2.7
+    },
+    "boss__treant-anciao__ruptura-aviso__01": {
+      "gravacao": "boss__treant-anciao__ruptura-aviso__01",
+      "arquivo": "arquivos/boss__treant-anciao__ruptura-aviso__01.wav",
+      "segundos": 3.136,
+      "reutilizado": false,
+      "alvo": 1.5,
+      "maximo": 2.2
+    },
+    "boss__treant-anciao__ruptura-execucao__01": {
+      "gravacao": "boss__treant-anciao__ruptura-execucao__01",
+      "arquivo": "arquivos/boss__treant-anciao__ruptura-execucao__01.wav",
+      "segundos": 1.579,
+      "reutilizado": false,
+      "alvo": 0.8,
+      "maximo": 1.3
+    },
+    "boss__treant-anciao__fase-3__01": {
+      "gravacao": "boss__treant-anciao__fase-3__01",
+      "arquivo": "arquivos/boss__treant-anciao__fase-3__01.wav",
+      "segundos": 2.453,
+      "reutilizado": false,
+      "alvo": 2.1,
+      "maximo": 2.9
+    },
+    "boss__treant-anciao__furia-aviso__01": {
+      "gravacao": "boss__treant-anciao__furia-aviso__01",
+      "arquivo": "arquivos/boss__treant-anciao__furia-aviso__01.wav",
+      "segundos": 1.58,
+      "reutilizado": false,
+      "alvo": 1.4,
+      "maximo": 2.1
+    },
+    "boss__treant-anciao__furia-execucao__01": {
+      "gravacao": "boss__treant-anciao__furia-execucao__01",
+      "arquivo": "arquivos/boss__treant-anciao__furia-execucao__01.wav",
+      "segundos": 1.536,
+      "reutilizado": false,
+      "alvo": 1.1,
+      "maximo": 1.7
+    },
+    "boss__treant-anciao__dor-leve__01": {
+      "gravacao": "boss__treant-anciao__dor-leve__01",
+      "arquivo": "arquivos/boss__treant-anciao__dor-leve__01.wav",
+      "segundos": 0.93,
+      "reutilizado": false,
+      "alvo": 0.6,
+      "maximo": 1.0
+    },
+    "boss__treant-anciao__dor-forte__01": {
+      "gravacao": "boss__treant-anciao__dor-forte__01",
+      "arquivo": "arquivos/boss__treant-anciao__dor-forte__01.wav",
+      "segundos": 0.896,
+      "reutilizado": false,
+      "alvo": 1.0,
+      "maximo": 1.6
+    },
+    "boss__treant-anciao__derrota__01": {
+      "gravacao": "boss__treant-anciao__derrota__01",
+      "arquivo": "arquivos/boss__treant-anciao__derrota__01.wav",
+      "segundos": 4.01,
+      "reutilizado": false,
+      "alvo": 2.3,
+      "maximo": 3.2
+    }
+  },
+  "faltantes": [],
+  "revisar_duracao": [
+    {
+      "chave": "npc__goblin-batedor__ataque__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.51,
+      "maximo": 1.2
+    },
+    {
+      "chave": "npc__goblin-batedor__ataque__02",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.57,
+      "maximo": 0.9
+    },
+    {
+      "chave": "npc__goblin-batedor__acerto__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.71,
+      "maximo": 1.5
+    },
+    {
+      "chave": "npc__goblin-batedor__erro__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.664,
+      "maximo": 1.5
+    },
+    {
+      "chave": "npc__goblin-batedor__dor-leve__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.24,
+      "maximo": 0.8
+    },
+    {
+      "chave": "npc__goblin-batedor__dor-leve__02",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.301,
+      "maximo": 0.8
+    },
+    {
+      "chave": "npc__goblin-batedor__dor-forte__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.643,
+      "maximo": 1.3
+    },
+    {
+      "chave": "npc__goblin-batedor__derrota__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.92,
+      "maximo": 1.7
+    },
+    {
+      "chave": "npc__lobo-cinzento__alerta__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.451,
+      "maximo": 1.4
+    },
+    {
+      "chave": "npc__lobo-cinzento__ataque__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.728,
+      "maximo": 0.9
+    },
+    {
+      "chave": "npc__lobo-cinzento__ataque__02",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.259,
+      "maximo": 0.9
+    },
+    {
+      "chave": "npc__lobo-cinzento__dor-leve__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.365,
+      "maximo": 0.8
+    },
+    {
+      "chave": "npc__lobo-cinzento__dor-leve__02",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.024,
+      "maximo": 1.0
+    },
+    {
+      "chave": "npc__lobo-cinzento__dor-forte__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 2.709,
+      "maximo": 1.4
+    },
+    {
+      "chave": "npc__lobo-cinzento__uivo__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 3.499,
+      "maximo": 2.8
+    },
+    {
+      "chave": "npc__lobo-cinzento__pouca-vida__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 2.453,
+      "maximo": 1.7
+    },
+    {
+      "chave": "npc__lobo-cinzento__derrota__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 2.133,
+      "maximo": 1.7
+    },
+    {
+      "chave": "npc__bandido-de-estrada__ataque__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.365,
+      "maximo": 1.0
+    },
+    {
+      "chave": "npc__bandido-de-estrada__ataque__02",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.195,
+      "maximo": 0.8
+    },
+    {
+      "chave": "npc__bandido-de-estrada__acerto__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.98,
+      "maximo": 1.6
+    },
+    {
+      "chave": "npc__bandido-de-estrada__erro__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.19,
+      "maximo": 1.0
+    },
+    {
+      "chave": "npc__bandido-de-estrada__dor-leve__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.195,
+      "maximo": 0.9
+    },
+    {
+      "chave": "npc__bandido-de-estrada__dor-forte__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 2.155,
+      "maximo": 1.4
+    },
+    {
+      "chave": "npc__bandido-de-estrada__derrota__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 3.115,
+      "maximo": 1.7
+    },
+    {
+      "chave": "npc__urso-de-presas-vermelhas__ataque__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.728,
+      "maximo": 1.0
+    },
+    {
+      "chave": "npc__urso-de-presas-vermelhas__ataque__02",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.259,
+      "maximo": 1.0
+    },
+    {
+      "chave": "npc__urso-de-presas-vermelhas__dor-leve__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.365,
+      "maximo": 0.9
+    },
+    {
+      "chave": "npc__urso-de-presas-vermelhas__dor-leve__02",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.024,
+      "maximo": 0.9
+    },
+    {
+      "chave": "npc__urso-de-presas-vermelhas__dor-forte__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 2.709,
+      "maximo": 1.6
+    },
+    {
+      "chave": "npc__urso-de-presas-vermelhas__pouca-vida__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 2.453,
+      "maximo": 1.9
+    },
+    {
+      "chave": "boss__treant-anciao__entrada__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 3.84,
+      "maximo": 3.2
+    },
+    {
+      "chave": "boss__treant-anciao__ataque__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.941,
+      "maximo": 1.4
+    },
+    {
+      "chave": "boss__treant-anciao__raizes-execucao__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.643,
+      "maximo": 1.4
+    },
+    {
+      "chave": "boss__treant-anciao__ruptura-aviso__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 3.136,
+      "maximo": 2.2
+    },
+    {
+      "chave": "boss__treant-anciao__ruptura-execucao__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 1.579,
+      "maximo": 1.3
+    },
+    {
+      "chave": "boss__treant-anciao__derrota__01",
+      "tipo": "acima_duracao_sugerida",
+      "segundos": 4.01,
+      "maximo": 3.2
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+Comando: powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-place.ps1
+Resultado: Moshoku-Prototipo.rbxlx gerado e XML verificado.

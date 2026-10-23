@@ -1,0 +1,102 @@
+Fontes sincronizadas
+Game Started
+952 specs aprovados
+G3 pronto
+consulta
+conteudo
+fechou
+self
+confirmou
+lista
+alvos
+lista confirmada
+sem acoes
+bloqueio
+consulta viva
+passiva compacta
+rolagem
+aba
+bancada limpa
+treino real
+consulta real
+acao real
+FINAL 1
+OK confirmacao oculta sem mira
+OK consulta nao abre sozinha
+OK interrogacao abre consulta
+OK consultar nao arma nem envia
+OK descricao completa disponivel
+OK custo da acao explicito
+FALHA tocar no conteudo nao fecha consulta
+OK voltar fecha consulta
+OK self tem confirmacao explicita
+OK preparar nao executa
+OK confirmacao executa uma vez
+OK confirmar limpa mira
+OK lista sem alvos pede selecao
+OK lista vazia nao executa
+OK contagem explicita dos alvos
+OK lista confirmada conserva alvos
+OK confirmacao acompanha recurso gasto
+OK confirmacao nao contorna bloqueio local
+OK carta bloqueada abre explicacao
+OK bloqueio conserva descricao
+OK consulta acompanha disponibilidade
+OK novo turno fecha consulta e cancela mira
+OK passiva pode ser lida
+OK consulta nao inventa custo zero
+OK consulta cabe em 375 px
+OK Fechar tem 44 px
+OK Voltar tem 44 px
+OK fechar pelo X funciona
+OK lista permite rolagem antes de trocar
+OK trocar grupo volta ao inicio
+OK sair do combate fecha consulta
+OK consulta real nao gasta acao
+OK botao real recebe acao confirmada
+OK confirmacao real cobra uma Acao
+OK botao real some depois de usar
+Game Stopped
+- Current Studio Mode: Edit
+- Available DataModels: Edit
+- Focused DataModel in the viewport: Edit
+Traceback (most recent call last):
+  File "C:\Users\pedro\OneDrive\�rea de Trabalho\Moshokurpgroblox\tools\playtest\g3_verificar.py", line 105, in <module>
+    assert "FINAL 0" in result and "FALHA " not in result, result
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: FINAL 1
+OK confirmacao oculta sem mira
+OK consulta nao abre sozinha
+OK interrogacao abre consulta
+OK consultar nao arma nem envia
+OK descricao completa disponivel
+OK custo da acao explicito
+FALHA tocar no conteudo nao fecha consulta
+OK voltar fecha consulta
+OK self tem confirmacao explicita
+OK preparar nao executa
+OK confirmacao executa uma vez
+OK confirmar limpa mira
+OK lista sem alvos pede selecao
+OK lista vazia nao executa
+OK contagem explicita dos alvos
+OK lista confirmada conserva alvos
+OK confirmacao acompanha recurso gasto
+OK confirmacao nao contorna bloqueio local
+OK carta bloqueada abre explicacao
+OK bloqueio conserva descricao
+OK consulta acompanha disponibilidade
+OK novo turno fecha consulta e cancela mira
+OK passiva pode ser lida
+OK consulta nao inventa custo zero
+OK consulta cabe em 375 px
+OK Fechar tem 44 px
+OK Voltar tem 44 px
+OK fechar pelo X funciona
+OK lista permite rolagem antes de trocar
+OK trocar grupo volta ao inicio
+OK sair do combate fecha consulta
+OK consulta real nao gasta acao
+OK botao real recebe acao confirmada
+OK confirmacao real cobra uma Acao
+OK botao real some depois de usar

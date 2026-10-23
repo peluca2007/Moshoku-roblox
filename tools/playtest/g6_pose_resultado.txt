@@ -1,0 +1,8 @@
+Game Started
+caido
+Server root 0, 1, 0 | Workspace.Reset45206551.LowerTorso.Root A0 0, -4.371138828673793e-08, -1 P1 0, -4.371138828673793e-08, -1
+Client root 0, 1, 0 | Workspace.Reset45206551.LowerTorso.Root A0 0, 0, -1 P1 0, 0, -1
+camera
+[Testes] 988 ok, 0 falha(s)
+[Roblox][sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Actions.ExecuteLuauActions] The execute_luau changed camera type. Resetting from Enum.CameraType.Scriptable back to Enum.CameraType.Custom
+Game Stopped

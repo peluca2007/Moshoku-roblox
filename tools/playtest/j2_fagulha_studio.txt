@@ -1,0 +1,9 @@
+J2 Fagulha — 14/10/2026
+
+Fonte sincronizada no Studio em Edit. TestRunner: 1.237 ok, 0 falhas.
+Fixture client do mapa: casa (11,10) selecionável em mira partindo de (10,10).
+`powershell -NoProfile -ExecutionPolicy Bypass -File tools/testar.ps1`: compilação 296 arquivos/0 erros; specs puros e simulações do catálogo, painel e estado do cliente; RESULTADO: tudo ok (fora do Studio).
+
+Os specs do serviço cobrem disponibilidade somente com compra, alcance e PM, cobrança de 1 Ação/1 PM, criação de uma zona, dano ígneo ao cruzar a rota e expiração quando a rodada global avança da segunda para a terceira. O caminho de movimento inclui as casas percorridas e encerra quando o ator chega a zero PV.
+
+O Studio foi parado depois da execução; estado final Edit. Place não salvo. Não houve clique real em célula, encontro visual ativo nem sessão real de 2/4 clientes. A grade J2 não tem parede/oclusão e ainda não possui ação de empurrar/arrastar, então esses casos permanecem sem cobertura nesta integração.

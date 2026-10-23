@@ -1,0 +1,12 @@
+Game Started
+Lugar1
+{"enabled":true,"canvas":"616, 480","visivel":true,"parent":"Pagina","nav":true,"mesma":true,"size":"576, 52","scroll":"0, 301","selecionado":"nil","viewport":"1007, 635","selectable":true,"interactable":true,"pos":"16, 337"}
+apos snapshot=nil parent=nil
+Infinite yield possible on 'ReplicatedStorage:WaitForChild("Mesa")'
+Stack Begin
+Script 'Players.Reset45206551.PlayerScripts.Client.MesaState', Line 45 - function start
+Script 'Players.Reset45206551.PlayerScripts.RPGClient', Line 3
+Stack End
+[Testes] 1083 ok, 0 falha(s)
+Setting GuiService.SelectedObject to invalid GuiObject
+Game Stopped

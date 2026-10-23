@@ -240,6 +240,55 @@ Definida pelo Pedro em perguntas e respostas com o Claude. Onde conflitar, subst
 - **Primeira versão jogável atualizada:** vila → mestre/caçadas → regiões a pé com eventos e patrulhas → chefe → retorno a pé/final. A viagem por painel deste roteiro está superada. Abertura e treinadores atuais: P2 em [TAREFAS](TAREFAS.md); verificação W1b em [TESTES](TESTES.md).
 - **Em aberto (decisão técnica/balanceamento das IAs):** custo exato em dias de cada ação, quantos defeitos e quanto PA extra; grade em terreno irregular (árvore/rocha viram casa bloqueada ou cobertura?); como o ausente recupera o atraso.
 
+## 13. Fluxo taverna → sala → história e arenas por região (Pedro, 23/10/2026)
+
+Pedido do Pedro, com a análise de game design do Claude. Onde conflitar, substitui §12 nos pontos "encontro: a grade nasce ali mesmo" e "mestre fora". O resto de §12 (run, árvore de história, prazo, caçadas, patrulhas visíveis, surpresa, fuga) continua valendo.
+
+**Fluxo do jogador**
+
+1. **Taverna (hub):** ao entrar no jogo, o jogador chega a uma taverna cheia de gente, com servidores públicos. Ali já existe um **personagem pronto** para começar sem passar pela criação. A customização é opcional e fica na taverna: aparência e troca do modelo pronto.
+2. **Play cria a sala:** quem aperta Play cria uma sala. Os amigos entram por convite ou código. O servidor da partida é a sala.
+3. **Sala em primeira pessoa:** é a sala social que já existe (fichas, dados, livros, pegar o amigo; ver [SALA](SALA.md)). Quem criou a sala é o **mestre-anfitrião**: configura e dá o start. "Mestre" aqui quer dizer líder da sala, não um narrador humano; ADM continua sendo uma permissão separada.
+4. **Modo História:** é o único modo por enquanto e é cooperativo. Ao dar start, o grupo vai para o mundo com a câmera estilo Project Zomboid (`client/CameraMundo`).
+5. **Combate em arena fixa por região:** a patrulha encosta, vem a transição estilo Pokémon e o grupo luta numa **arena pronta da região onde estava**. Cada arena tem cenário próprio e NPCs de fundo assistindo ou reagindo:
+   - cidade: arena da cidade, com moradores em volta;
+   - fora da cidade: arena do campo;
+   - Floresta Sombria: arena da floresta;
+   - Ruínas: arena das ruínas.
+
+   Ao terminar, o grupo volta ao ponto do mapa de onde saiu.
+
+**Por que arena fixa (diagnóstico de 23/10)**
+
+- Hoje existem dois motores de combate. O da sala (`EncontroService`/`TreinoService` + `HabilidadeService` + `client/Magias`/`Coreografia`) cobre as 19 árvores e tem animações, e sempre rodou na mesma arena: é o combate que estava "certinho".
+- O J2 (`EncontroAutonomoService`, ~3,3 mil linhas) foi refeito para a grade nascer no terreno. Ele reimplementa habilidade por habilidade (só Fogo, Vento, Água, Cura e Terra) e não mostra as animações da sala (MAX1 em [TESTES](TESTES.md)). O terreno irregular (árvores, rochas, desnível) gera defeitos que não existem numa arena plana.
+- Decisão: **um só motor**, o da sala, rodando em arenas de grade plana com cenário por região. O J2 deixa de ser o combate do mundo. As peças úteis que só existem nele (patrulha visível, cone, surpresa, fuga pela borda, IA de criaturas) são aproveitadas na entrada e na arena. Depois disso o código do J2 sai do `src`, e o git guarda o histórico.
+- Com isso, ficam suspensos até a migração: a MAX2 (animações no J2) e o defeito "Perfil inicial incompleto ou incompatível", que é do J2.
+
+**Grupo (proposta do Claude, a confirmar com o Pedro)**
+
+- Até **4 jogadores** por sala no Modo História. Por turnos, cada jogador a mais aumenta a espera.
+- Solo é permitido, porque quem entra sem amigo e não consegue jogar vai embora, mas o jogo puxa para o grupo:
+  - a luta inclui todos que estão por perto;
+  - quem cai só é levantado por um aliado;
+  - eventos e recompensas melhoram com mais gente;
+  - o grupo não pode se separar além de um raio.
+
+**Treinadores**
+
+Na primeira cidade ficam o Ladino e a Mestra da Água (P2). O Pedro quer RNG, mas com só dois treinadores não há o que sortear. Proposta: um **conjunto de treinadores** do qual cada run sorteia quais aparecem na cidade (§12 previa 3–4 por vila). Ladino e Água são os dois primeiros; o sorteio passa a valer a partir de 4 treinadores prontos.
+
+**Ordem de trabalho proposta**
+
+1. Uma arena regional (cidade) rodando a Luta da sala com criaturas, entrada pela patrulha e volta ao mapa.
+2. Arenas da floresta, do campo e das ruínas.
+3. Taverna como lugar de entrada, Play → sala, start do Modo História. A separação em places do Roblox (hub com servidores públicos e partida em servidor reservado via `TeleportService`) exige jogo publicado, então é testada no fim.
+4. Personagem pronto na taverna e customização opcional.
+5. Mais treinadores e o sorteio.
+6. Retirar o J2 e o que ficou sem uso.
+
+**Em aberto:** confirmar grupo/solo; quais NPCs de fundo e o que fazem em cada arena; se Treino, Desafios e PvP continuam acessíveis na sala ou ficam guardados.
+
 ## Histórico da discussão
 
 - **Codex → rascunho do Claude**, aceito pelo Claude:

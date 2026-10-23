@@ -3074,8 +3074,9 @@ function EncontroAutonomoService.start(deps)
   if deps.lutaNaArena then
    local definicao = patrulhas[patrulha]
    if type(definicao) ~= "table" then
-    definicao = { nome = "Patrulha", marco = definicao,
-     zona = if definicao == "region/encounter/ruinas" then "region/ruinas-do-vale" else "region/clareira-inicial" }
+    local ruinas = definicao == "region/encounter/ruinas"
+    definicao = { nome = "Patrulha", marco = definicao, arena = if ruinas then "ruinas" else "campo",
+     zona = if ruinas then "region/ruinas-do-vale" else "region/clareira-inicial" }
    end
    inicioPatrulhaEmCurso = true
    local okArena, comecou = pcall(deps.lutaNaArena, player, patrulha, definicao)

@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Perfis = require(ReplicatedStorage.Shared.Mundo.AmbientePerfis)
+local Arenas = require(ReplicatedStorage.Shared.Mundo.ArenasDados)
 local ModoCamera = require(script.Parent.ModoCamera)
 local CeuMundo = require(script.Parent.CeuMundo)
 
@@ -39,12 +40,11 @@ end
 
 -- Arena regional do Modo História (PLANO §13): o tabuleiro fica em z=900, mas a luz segue a
 -- região da luta e a hora da run. Devolve o ponto do mundo que a arena representa, ou nil.
-local PONTO_DA_ARENA = { cidade = Vector3.new(0, 0, -150) }
 local function pontoDaArena(raiz: BasePart): Vector3?
 	if raiz.Position.Z <= MESA_Z_MIN then return nil end
 	local mesa = workspace:FindFirstChild("Mesa")
-	local arena = mesa and mesa:GetAttribute("ArenaRegional")
-	return if type(arena) == "string" then PONTO_DA_ARENA[arena] else nil
+	local ponto = mesa and Arenas.pontoDoMundo(mesa:GetAttribute("ArenaRegional"))
+	return if ponto then Vector3.new(ponto.x, 0, ponto.z) else nil
 end
 
 local function naSala(raiz: BasePart): boolean

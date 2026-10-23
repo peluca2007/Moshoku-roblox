@@ -7,9 +7,9 @@ Patrulha encosta → Luta da mesa (motor da sala) no tabuleiro com o cenário da
 | Desvio do contato da patrulha para a arena | `server/EncontroAutonomoService.iniciarPorPatrulha` chama `deps.lutaNaArena` antes de montar o J2; com a ponte ligada, o J2 no terreno não é criado. `lutaNaArenaAtiva` congela as patrulhas durante a luta. |
 | Ponte (grupo ≤4 num raio de 40 studs, criaturas da patrulha, âncora, recompensa, trégua de 12 s, aviso à run) | `server/LutaDoMundoServico.luau`, ligado em `server.server.luau` |
 | Início da luta pelo servidor com a ficha própria (sem fila nem objetos da sala) | `server/EncontroService.iniciarLutaDoMundo`, exposto por `MesaService` como `iniciarLutaDoMundo`; fim chama `opcoes.aoTerminar(resultado)`; mesa limpa no meio avisa com `"cancelada"` |
-| Zona → arena e layout da arena (props e moradores, relativos ao tabuleiro) | `shared/Mundo/ArenasDados.luau` (só `cidade` por enquanto; outras zonas usam o livro da mesa) |
-| Montagem e troca do cenário em volta do tabuleiro | `server/Mundo/ArenaCenario.luau` (`preparar` no início do servidor, `aplicar(arenaId | nil)`); moradores usam `Mundo/Npcs.criarCorpo` |
-| Luz da arena (segue a região e a hora da run, não a noite da sala) | `client/AmbienteMundo.pontoDaArena`, pelo atributo `Mesa.ArenaRegional` |
+| Patrulha → arena e layout de cada arena (props, criaturas espreitando, moradores, ponto do mapa para a luz) | `shared/Mundo/ArenasDados.luau`: `daPatrulha` (`definicao.arena` > id > zona). Cidade = ratos do celeiro/horta; campo = goblin do campo, passagem e patrulha antiga da clareira; floresta = Floresta Sombria; ruínas = Ruínas do Vale. Nova arena: acrescentar layout em `LAYOUTS` e o mapeamento. |
+| Montagem e troca do cenário em volta do tabuleiro | `server/Mundo/ArenaCenario.luau` (`preparar` monta as quatro arenas no início do servidor, uma por quadro; `aplicar(arenaId | nil)`); moradores usam `Mundo/Npcs.criarCorpo` |
+| Luz da arena (segue a região e a hora da run, não a noite da sala) | `client/AmbienteMundo.pontoDaArena` lê `Mesa.ArenaRegional` e usa `ArenasDados.pontoDoMundo` |
 | Tela de resultado só com "Continuar" | evento `encontro` com `mundo = true`; `client/ResultadoView` |
 | Recompensa (Apêndice G da criatura) | `shared/EncontroAutonomoElenco.recompensaDe` + `Regras/RecompensaEncontro` |
 

@@ -291,7 +291,7 @@ Pedido do Pedro, com a análise de game design do Claude. Onde conflitar, substi
 **Ordem de trabalho proposta**
 
 1. ~~Uma arena regional (cidade) rodando a Luta da sala com criaturas, entrada pela patrulha e volta ao mapa.~~ Feito em 23/10 (ARENA1 em [TAREFAS](TAREFAS.md)); todas as patrulhas já vão para a mesa, e as zonas sem arena própria usam o livro.
-2. Arenas da floresta, do campo e das ruínas.
+2. ~~Arenas da floresta, do campo e das ruínas.~~ Feito em 23/10 (ARENA2).
 3. Taverna como lugar de entrada, Play → sala, start do Modo História. A separação em places do Roblox (hub com servidores públicos e partida em servidor reservado via `TeleportService`) exige jogo publicado, então é testada no fim.
 4. Personagem pronto na taverna e customização opcional.
 5. Save e retomada da run com o grupo na sala.

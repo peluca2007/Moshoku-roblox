@@ -157,7 +157,7 @@ function LutaDoMundo.start(deps)
 		}
 		ativa = luta
 		luta.ancorados = ancorar(grupo)
-		if deps.cenario then pcall(deps.cenario.aplicar, Arenas.daZona(definicao.zona)) end
+		if deps.cenario then pcall(deps.cenario.aplicar, Arenas.daPatrulha(definicao)) end
 		local erro = deps.iniciarLuta(grupo, criaturas, {
 			nome = definicao.nome,
 			aoTerminar = function(resultado) terminar(luta, resultado) end,

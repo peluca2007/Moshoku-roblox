@@ -1,3 +1,9 @@
+## Arenas do campo, da floresta e das ruínas — PLANO §13 passo 2 (Claude, 23/10/2026)
+
+- Local: **686 fontes/0 erros; RESULTADO: tudo ok**; `ArenasDados.spec` 2/0 (as 10 patrulhas caem na arena certa; todo cenário fica fora da grade).
+- Studio, Play real (memória, sem salvar/publicar), uma luta por patrulha, vencida com `/adm pv`: goblin do campo → `campo` (24 peças, 4 camponeses); lobos da borda → `floresta` (27 peças); goblins das Ruínas → `ruinas` (23 peças). Em todas: personagem na grade em menos de 5 s, luz própria por região (ambiente diferente em floresta e ruínas), vitória com ouro pago (5 → 15 → 20) e volta solta ao ponto do contato. Em Edit, as quatro arenas montaram todas as peças (nenhum modelo faltando).
+- Não verificado: aparência das arenas na tela (o 3D do Studio parou de renderizar nas capturas, em Play e em Edit); bandidos da passagem e patrulha antiga da clareira jogados (cobertos só pelo spec); multiplayer; celular.
+
 ## Arena da cidade — PLANO §13 passo 1 (Claude, 23/10/2026)
 
 - Local: `tools/testar.ps1` → **686 fontes/0 erros; RESULTADO: tudo ok**; `ArenasDados.spec` 2/0.

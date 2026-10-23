@@ -106,7 +106,10 @@ end
 
 -- Monta antes (pré-aquecimento): a primeira luta não espera malhas nem avatares.
 function ArenaCenario.preparar()
-	if not construidas.cidade then construidas.cidade = construir("cidade") end
+	for _, arenaId in Arenas.ids() do
+		if not construidas[arenaId] then construidas[arenaId] = construir(arenaId) end
+		task.wait() -- uma arena por quadro: não trava o servidor no início
+	end
 end
 
 function ArenaCenario.aplicar(arenaId)

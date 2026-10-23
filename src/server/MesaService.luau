@@ -2003,6 +2003,10 @@ function MesaService.start(rng: Random?)
 			return personagemSessao.consultar(player)
 		end,
 		emCombate = function() return combat.active or montagemPartida.ocupada() end,
+		-- Modo História (PLANO §13): luta da patrulha no tabuleiro da mesa, iniciada só pelo servidor.
+		iniciarLutaDoMundo = function(grupo, criaturas, opcoes)
+			return encontro.iniciarLutaDoMundo(grupo, criaturas, opcoes)
+		end,
 	})
 end
 

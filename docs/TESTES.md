@@ -1,3 +1,12 @@
+## Arena da cidade — PLANO §13 passo 1 (Claude, 23/10/2026)
+
+- Local: `tools/testar.ps1` → **686 fontes/0 erros; RESULTADO: tudo ok**; `ArenasDados.spec` 2/0.
+- Studio (MoshokuRPGMesa, persistência em memória, sem salvar/publicar): `TestRunner.run(Server.tests)` → **1975 ok, 0 falha(s)**, incluindo `LutaDoMundo.spec` (7 casos: ficha própria mesmo com pronto escolhido, recusa sem perfil antes de limpar, cancelamento, grupo por raio, âncora/volta, recompensa só na vitória, trégua, início recusado).
+- Play real com cliente (ficha Ária/Água criada pelo remoto): a patrulha "Ratos no celeiro" encostou → Luta da mesa com a ficha própria, rato com IA agindo, câmera no tabuleiro, `Mesa.ArenaRegional = cidade`, personagem na casa da ficha (z≈922) em menos de 1 s. Captura mostrou piso de pedra, casas, barracas e moradores em volta da grade.
+- Derrota (ataques básicos de cajado contra rato de 32 PV): grupo devolvido ao ponto do contato. Defeito achado e corrigido: a patrulha vizinha puxava o grupo na hora → trégua de 12 s.
+- Vitória (inimigo zerado por `/adm pv`): resultado só com "Continuar", ouro 0 → 5 na ficha, personagem solto no ponto do contato, patrulha derrotada e escondida, livro da mesa restaurado, luz de tarde (16h30).
+- Não verificado: captura da arena com a luz de dia (as capturas do Studio saíram cinza nessa parte, até apontando para a vila); multiplayer real (2+ clientes); celular; lutas das regiões sem arena própria (usam o livro); luta do chefe da run (continua J2); equilíbrio das criaturas no motor da mesa (rato de 32 PV derrubou a maga solo, igual ao catálogo usado pelo J2).
+
 ## MAX1 — personagem com tudo desbloqueado (19/10/2026)
 
 **Studio real:** `103924996569541_AutoRecovery_0.rbxl`, Play via MCP. Fixture de cobertura descartável, com **19 árvores, 114 ranks e 632 IDs de habilidade/talento** do catálogo. Todos os ranks/compras foram incluídos diretamente; atributos e reservas são sintéticos para evitar falta de recursos. Isto **não** comprova construção legal, progressão normal ou perfil persistido. Serviço J2 real em instância isolada, RemoteEvent/cliente/apresentação reais, miniaturas e avatar reais, RNG/relógio controlados, sem recompensas, campanha ou DataStore. Câmera fixada e criação escondida apenas no fixture para inspeção; não valida a câmera/entrada normais. Não houve alteração de src ou sincronização de módulos do produto.

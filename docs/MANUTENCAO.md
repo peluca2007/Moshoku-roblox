@@ -1,3 +1,20 @@
+## Luta do mundo na arena regional (PLANO §13, 23/10/2026)
+
+Patrulha encosta → Luta da mesa (motor da sala) no tabuleiro com o cenário da região → grupo volta ao ponto do contato.
+
+| Comportamento | Onde |
+| --- | --- |
+| Desvio do contato da patrulha para a arena | `server/EncontroAutonomoService.iniciarPorPatrulha` chama `deps.lutaNaArena` antes de montar o J2; com a ponte ligada, o J2 no terreno não é criado. `lutaNaArenaAtiva` congela as patrulhas durante a luta. |
+| Ponte (grupo ≤4 num raio de 40 studs, criaturas da patrulha, âncora, recompensa, trégua de 12 s, aviso à run) | `server/LutaDoMundoServico.luau`, ligado em `server.server.luau` |
+| Início da luta pelo servidor com a ficha própria (sem fila nem objetos da sala) | `server/EncontroService.iniciarLutaDoMundo`, exposto por `MesaService` como `iniciarLutaDoMundo`; fim chama `opcoes.aoTerminar(resultado)`; mesa limpa no meio avisa com `"cancelada"` |
+| Zona → arena e layout da arena (props e moradores, relativos ao tabuleiro) | `shared/Mundo/ArenasDados.luau` (só `cidade` por enquanto; outras zonas usam o livro da mesa) |
+| Montagem e troca do cenário em volta do tabuleiro | `server/Mundo/ArenaCenario.luau` (`preparar` no início do servidor, `aplicar(arenaId | nil)`); moradores usam `Mundo/Npcs.criarCorpo` |
+| Luz da arena (segue a região e a hora da run, não a noite da sala) | `client/AmbienteMundo.pontoDaArena`, pelo atributo `Mesa.ArenaRegional` |
+| Tela de resultado só com "Continuar" | evento `encontro` com `mundo = true`; `client/ResultadoView` |
+| Recompensa (Apêndice G da criatura) | `shared/EncontroAutonomoElenco.recompensaDe` + `Regras/RecompensaEncontro` |
+
+Ainda no J2: luta do chefe da run (`criarEncontroDaRun`) e marcos com ProximityPrompt. Specs: `LutaDoMundo.spec` (Studio) e `ArenasDados.spec`.
+
 ## Vozes NPCs
 
 - `tools/dublagem/integrar_npcs.py`: valida importacao.csv preenchido e gera somente shared/DublagemNPCs com47IDs/56entradas e duração medida; não executar gerar.py para NPCs.

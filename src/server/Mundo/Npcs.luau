@@ -152,4 +152,7 @@ function Npcs.start(deps)
 	return pasta
 end
 
+-- Corpo R15 com a aparência do jogo, sem prompt nem animação: também serve aos moradores das arenas.
+Npcs.criarCorpo = criarCorpo
+
 return Npcs

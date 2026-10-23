@@ -37,6 +37,8 @@ local ENCONTROS = {
 }
 local ENCONTRO_DO_GRUPO = { "goblin", "lobo", "bando", "bando" }
 local CASAS_DO_GRUPO = { { 10, 15 }, { 7, 15 }, { 13, 15 }, { 10, 17 }, {4,15}, {16,15}, {4,17}, {7,17}, {13,17}, {16,17} }
+-- Luta do mundo: inimigos da patrulha diante do grupo, mesma distância dos encontros da sala.
+local CASAS_INIMIGAS = { { 10, 6 }, { 7, 6 }, { 13, 6 }, { 10, 4 }, { 4, 6 }, { 16, 6 }, { 7, 4 }, { 13, 4 } }
 local ATRASO_DA_IA, ATRASO_APOS_AGIR = 0.9, 1.7
 local PRAZO_DA_VEZ = 60 -- segundos, só com mais de um jogador
 local PADRAO = "mago-de-fogo"
@@ -51,7 +53,7 @@ end
 -- avancarVez(id), mudou(), logAll(texto, tom), currentTurnId(), desligarTreino()
 function EncontroService.start(deps)
 	local handlers, tokens, combat = deps.handlers, deps.tokens, deps.combat
-	local estado = { ativo = false, modo = nil :: string?, prazoFim = nil :: number?, prazoId = nil :: string? }
+	local estado = { ativo = false, modo = nil :: string?, prazoFim = nil :: number?, prazoId = nil :: string?, mundo = nil :: any }
 	-- Injetáveis para teste (duelo precisa de 2+ jogadores; o Studio via MCP abre 1).
 	local jogadores = deps.jogadores or function()
 		return Players:GetPlayers()
@@ -116,8 +118,11 @@ function EncontroService.start(deps)
 		return grupo
 	end
 
+	-- Luta do mundo: cada jogador entra com o personagem próprio da run, nunca o pronto da sala.
+	local forcarPessoal = false
 	local function personagemDe(player: Player): string
 		instalarMontagem()
+		if forcarPessoal then return PESSOAL end
 		local id = escolhas[player.UserId]
 		return if id == PESSOAL or (id and VALIDOS[id]) then id else PADRAO
 	end
@@ -203,11 +208,15 @@ function EncontroService.start(deps)
 			return
 		end
 		local modo = estado.modo
+		local mundo = estado.mundo
 		chefes.limpar(); chefeAtual, nivelAtual = nil, nil
 		table.clear(equipesAtuais)
-		estado.ativo, estado.modo, estado.prazoFim, estado.prazoId = false, nil, nil, nil
+		estado.ativo, estado.modo, estado.prazoFim, estado.prazoId, estado.mundo = false, nil, nil, nil, nil
 		handlers.combatEnd(nil, {}, true)
-		if modo == "duelo" then
+		if mundo then
+			deps.logAll(if resultado == "vitoria" then "Vitória! O grupo volta ao caminho (PV, PM e PT cheios)."
+				else "Derrota... O grupo recobra os sentidos onde caiu (PV, PM e PT cheios).", "sistema")
+		elseif modo == "duelo" then
 			deps.logAll(if vencedor then "Fim do duelo: " .. vencedor .. " venceu! Todos se recuperam." else "Fim do duelo: ninguém ficou de pé.", "sistema")
 		elseif resultado == "vitoria" then
 			deps.logAll("Vitória! Os inimigos foram derrotados. O grupo descansa e se recupera (PV, PM e PT cheios).", "sistema")
@@ -215,8 +224,12 @@ function EncontroService.start(deps)
 			deps.logAll("Derrota... O grupo acorda na entrada do campo, ferido mas de pé (PV, PM e PT cheios).", "sistema")
 		end
 		recuperar()
-		deps.remote:FireAllClients("encontro", { resultado = resultado, modo = modo, vencedor = vencedor })
+		deps.remote:FireAllClients("encontro", { resultado = resultado, modo = modo, vencedor = vencedor, mundo = mundo ~= nil })
 		deps.mudou()
+		if mundo and mundo.aoTerminar then
+			local ok, erro = pcall(mundo.aoTerminar, resultado)
+			if not ok then warn("[Luta do mundo] Fim: " .. tostring(erro)) end
+		end
 	end
 
 	-- Vigia o fim do encontro, inclusive quando o último golpe sai no meio de um turno.
@@ -435,11 +448,54 @@ function EncontroService.start(deps)
 		return api.emDuelo() and Equipes.aliados(a, b, equipesAtuais)
 	end
 
+	-- Luta do Modo História (PLANO §13): começa pelo servidor quando a patrulha encosta, sem fila nem
+	-- objetos da sala. `criaturas` são IDs do catálogo; `opcoes` = { nome, aoTerminar(resultado) }.
+	-- Mesmo caminho da Luta da sala: personagens pessoais, IA das criaturas e vigia de fim.
+	function api.iniciarLutaDoMundo(grupo, criaturas, opcoes)
+		if type(grupo) ~= "table" or #grupo == 0 or #grupo > #CASAS_DO_GRUPO then return "Grupo inválido para a luta." end
+		if type(criaturas) ~= "table" or #criaturas == 0 or #criaturas > #CASAS_INIMIGAS then return "Inimigos inválidos para a luta." end
+		if combat.active or estado.ativo then return "Já há um combate em andamento; espere ele acabar." end
+		forcarPessoal = true
+		local indisponivel = validarGrupo(grupo)
+		forcarPessoal = false
+		if indisponivel then return indisponivel end
+		local solicitante = grupo[1]
+		prepararMesa(solicitante)
+		forcarPessoal = true
+		local ok, erro, entradas = pcall(criarJogadores, solicitante, CASAS_DO_GRUPO, grupo)
+		forcarPessoal = false
+		if not ok then return tostring(erro) end
+		if erro then return erro end
+		for i, creatureId in criaturas do
+			local casa = CASAS_INIMIGAS[i]
+			local e, nova = handlers.criarCriatura(solicitante, { creatureId = creatureId, x = casa[1], z = casa[2] }, true)
+			if e then return e end
+			local inimigo = tokens[nova.id]
+			inimigo.ia = true
+			inimigo.version += 1
+			table.insert(entradas, { id = inimigo.id, initiative = deps.random:NextInteger(1, 20) + 1 })
+		end
+		estado.ativo, estado.modo, estado.mundo = true, "luta", opcoes or {}
+		participantesAtuais = #grupo
+		for _, p in grupo do fila[p.UserId] = nil end
+		handlers.combatStart(solicitante, { entries = ordenarIniciativa(entradas) }, true)
+		deps.logAll("Encontro: " .. tostring(opcoes and opcoes.nome or "inimigos no caminho") .. ". Os inimigos agem sozinhos.", "sistema")
+		vigiar()
+		return nil
+	end
+	api.iniciarLutaDoMundo = montagem.proteger(api.iniciarLutaDoMundo)
+
 	function api.desligar()
 		geracao += 1
+		local mundo = estado.mundo
 		chefes.limpar(); chefeAtual, nivelAtual = nil, nil
 		table.clear(equipesAtuais)
-		estado.ativo, estado.modo, estado.prazoFim, estado.prazoId = false, nil, nil, nil
+		estado.ativo, estado.modo, estado.prazoFim, estado.prazoId, estado.mundo = false, nil, nil, nil, nil
+		-- Mesa limpa no meio da luta do mundo: o grupo não pode ficar preso na arena.
+		if mundo and mundo.aoTerminar then
+			local ok, erro = pcall(mundo.aoTerminar, "cancelada")
+			if not ok then warn("[Luta do mundo] Cancelada: " .. tostring(erro)) end
+		end
 	end
 
 	function api.sala(player)

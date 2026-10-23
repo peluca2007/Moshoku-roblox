@@ -55,7 +55,25 @@ local missoes = require(Server.MissaoService).start({
 	conectado = function(player) return player ~= nil and player.Parent == game:GetService("Players") end,
 	avisar = mesa.avisarPessoal,
 })
+-- Modo História (PLANO §13): patrulha -> luta da mesa na arena da região -> volta ao mapa.
+local arenaCenario = require(Server.Mundo.ArenaCenario)
+task.spawn(arenaCenario.preparar)
+local lutaDoMundo = require(Server.LutaDoMundoServico).start({
+	iniciarLuta = mesa.iniciarLutaDoMundo,
+	corpoPessoal = mesa.corpoPessoal,
+	recompensar = function(player, encounterId, moedas, marcoId, pa)
+		local sucesso, total, cumpridas = mesa.recompensarEncontroPessoal(player, encounterId, moedas, marcoId, pa)
+		if sucesso then missoes.notificarConclusoes(player, cumpridas) end
+		return sucesso, total
+	end,
+	cenario = arenaCenario,
+	aoEncerrar = function(...)
+		if runServico then runServico.encerrado(...) end
+	end,
+})
 encontro = require(Server.EncontroAutonomoService).start({
+	lutaNaArena = lutaDoMundo.iniciar,
+	lutaNaArenaAtiva = lutaDoMundo.ativa,
 	corpoPessoal = mesa.corpoPessoal,
 	consumirItemPessoal = mesa.consumirItemPessoal,
 	recompensarEncontro = function(player, encounterId, moedas, marcoId, pa)
@@ -92,6 +110,7 @@ local cacadas = require(Server.CacadasService).start({
 	emCombate = function() return mesa.emCombate() or encontro.emEncontroAtivo() end,
 })
 encontro.definirCacadas(cacadas)
+lutaDoMundo.definirCacadas(cacadas)
 -- A segunda provação abre o rank na mesma ficha e nas cartas J2; só o servidor concede.
 runServico.observar(function(sessao)
 	if not sessao or not sessao.run or sessao.run.fim then return end

@@ -3070,6 +3070,19 @@ function EncontroAutonomoService.start(deps)
     and patrulha.visivel(player)
   end
   if not elegivel() then return false end
+  -- Modo História (PLANO §13): a luta vai para a arena regional da mesa; o J2 no terreno só sem a ponte.
+  if deps.lutaNaArena then
+   local definicao = patrulhas[patrulha]
+   if type(definicao) ~= "table" then
+    definicao = { nome = "Patrulha", marco = definicao,
+     zona = if definicao == "region/encounter/ruinas" then "region/ruinas-do-vale" else "region/clareira-inicial" }
+   end
+   inicioPatrulhaEmCurso = true
+   local okArena, comecou = pcall(deps.lutaNaArena, player, patrulha, definicao)
+   inicioPatrulhaEmCurso = nil
+   if not okArena then warn("[Patrulha] Arena recusada: " .. tostring(comecou)) end
+   return okArena and comecou == true
+  end
   inicioPatrulhaEmCurso = true
   local contato = patrulha.contextoContato and patrulha.contextoContato(player)
   local arena
@@ -3224,7 +3237,8 @@ function EncontroAutonomoService.start(deps)
    workspace = workspaceAtual, agora = agora, tempoMundo = function() return tempoMundo() end,
    reaparecerSegundos = EncontrosPorZona.REAPARECER_SEGUNDOS,
    jogadores = deps.jogadoresPatrulha or function() return Players:GetPlayers() end,
-   ocupado = function() return next(encontros) ~= nil or inicioPatrulhaEmCurso == true end,
+   ocupado = function() return next(encontros) ~= nil or inicioPatrulhaEmCurso == true
+    or (deps.lutaNaArenaAtiva ~= nil and deps.lutaNaArenaAtiva() == true) end,
    elegivel = function(player)
     if not jogadorConectado(player) or combateLegadoAtivo(player) or posicaoNaFila[player.UserId] then return false end
     local ficha = corpoPessoal and corpoPessoal(player)

@@ -76,7 +76,9 @@ function View.start(state, inicio, sala, encontroAutonomo)
 			resultado.fechar(); fundo.Visible = false; fn()
 		end)
 	end
+	local mundo = false -- luta do Modo História na arena regional: o servidor já devolveu o grupo ao mapa
 	botao("Proxima", "Escolher próxima partida", 6, T.cores.ouro, function()
+		if mundo then return end
 		if sala and state.snapshot() and state.snapshot().salaConceitual then sala.abrirPreparacao() else inicio.abrirJogar() end
 	end)
 	botao("Campo", "Continuar", 7, T.cores.painel, function() end)
@@ -97,8 +99,9 @@ function View.start(state, inicio, sala, encontroAutonomo)
 		end
 		local objetivo = Objetivos.atual({ run = ultimoRun, semRun = ultimoRun == nil, emEncontro = false })
 		proximo.Text = if objetivo then "Próximo: " .. objetivo.titulo .. (if objetivo.linha and objetivo.linha ~= "" then " · " .. objetivo.linha else "") else "Próximo: consulte RUN."
+		painel.Campo.Visible=not mundo
 		painel.Campo.Text=if j2 then "Voltar à vila" elseif s and s.salaConceitual then "Voltar à sala" else "Voltar ao campo"
-		painel.Proxima.Text=if j2 then "Continuar" elseif s and s.salaConceitual then "Preparar próxima partida" else "Escolher próxima partida"
+		painel.Proxima.Text=if j2 or mundo then "Continuar" elseif s and s.salaConceitual then "Preparar próxima partida" else "Escolher próxima partida"
 		local abrir=resultado.visivel and not fundo.Visible
 		fundo.Visible=resultado.visivel
 		if abrir then
@@ -112,6 +115,7 @@ function View.start(state, inicio, sala, encontroAutonomo)
 		if destruido then return end
 		local r = Apresentacao.resumir(dados)
 		if not r then return end
+		mundo = type(dados) == "table" and dados.mundo == true
 		state.setMira(nil)
 		resultado.receber(r);atualizar(state.snapshot())
 	end)

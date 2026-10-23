@@ -133,4 +133,10 @@ function EncontroAutonomoElenco.recompensas(atores)
 	return lista
 end
 
+-- Valores do Apêndice G da criatura (RecompensaEncontro); também usados pela luta do mundo na mesa.
+function EncontroAutonomoElenco.recompensaDe(creatureId)
+	local dados = RECOMPENSAS[creatureId]
+	return if dados then table.clone(dados) else nil
+end
+
 return EncontroAutonomoElenco

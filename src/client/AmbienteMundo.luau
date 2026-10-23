@@ -37,7 +37,18 @@ local function efeito(classe: string, nome: string): Instance
 	return objeto
 end
 
+-- Arena regional do Modo História (PLANO §13): o tabuleiro fica em z=900, mas a luz segue a
+-- região da luta e a hora da run. Devolve o ponto do mundo que a arena representa, ou nil.
+local PONTO_DA_ARENA = { cidade = Vector3.new(0, 0, -150) }
+local function pontoDaArena(raiz: BasePart): Vector3?
+	if raiz.Position.Z <= MESA_Z_MIN then return nil end
+	local mesa = workspace:FindFirstChild("Mesa")
+	local arena = mesa and mesa:GetAttribute("ArenaRegional")
+	return if type(arena) == "string" then PONTO_DA_ARENA[arena] else nil
+end
+
 local function naSala(raiz: BasePart): boolean
+	if pontoDaArena(raiz) then return false end
 	if raiz.Position.Z > MESA_Z_MIN then
 		return true
 	end
@@ -129,14 +140,15 @@ function AmbienteMundo.start()
 			local raiz = personagem and personagem:FindFirstChild("HumanoidRootPart")
 			if raiz and raiz:IsA("BasePart") then
 				local dentro = naSala(raiz)
+				local ponto = pontoDaArena(raiz) or raiz.Position
 				-- O alvo só muda de verdade quando a zona (ou a mistura da trilha) muda.
-				local pesos = Perfis.pesos(raiz.Position.X, raiz.Position.Z, dentro)
+				local pesos = Perfis.pesos(ponto.X, ponto.Z, dentro)
 				local hora = if dentro then nil else ReplicatedStorage:GetAttribute("RunHora")
-				atualizarLuz(raiz, Perfis.luzPessoal(raiz.Position.X, raiz.Position.Z, dentro, hora))
+				atualizarLuz(raiz, Perfis.luzPessoal(ponto.X, ponto.Z, dentro, hora))
 				local chave = tostring(hora) .. (if dentro then "sala" elseif pesos.ruinas >= 1 then "ruinas" else tostring(math.floor(pesos.floresta * 500)))
 				if chave ~= chaveAlvo then
 					chaveAlvo = chave
-					alvo = Perfis.modularHora(Perfis.alvo(raiz.Position.X, raiz.Position.Z, dentro), hora)
+					alvo = Perfis.modularHora(Perfis.alvo(ponto.X, ponto.Z, dentro), hora)
 					tau = if dentro then Perfis.TAU_SALA else Perfis.TAU_ZONA
 					mudouEm = agora
 				end

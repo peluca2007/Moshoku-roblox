@@ -1677,6 +1677,15 @@ function HabilidadeService.start(deps)
 		if not entrada or entrada.kind ~= "creature" then
 			return "Criatura desconhecida."
 		end
+		-- Papel do Apêndice G opcional (ex.: guardião da run como lacaio para um jogador só), sem mudar o molde.
+		if payload.papel ~= nil then
+			if payload.papel ~= "lacaio" and payload.papel ~= "padrao" and payload.papel ~= "chefe" then
+				return "Papel de criatura inválido."
+			end
+			entrada = table.clone(entrada)
+			entrada.data = table.clone(entrada.data)
+			entrada.data.papel = payload.papel
+		end
 		local ficha = Criaturas.ficha(entrada)
 		local falha, id = handlers.createToken(player, {
 			name = string.sub(ficha.nome, 1, 32),

@@ -15,6 +15,18 @@ local POR_ZONA = table.freeze({
 	["region/ruinas-do-vale"] = "ruinas",
 })
 
+-- Marco do mundo / luta do chefe da run (areaId de EncontrosPorZona) -> arena.
+local POR_MARCO = table.freeze({
+	["region/encounter/clearing"] = "campo",
+	["region/encounter/forest"] = "floresta",
+	["region/encounter/dark-forest"] = "floresta",
+	["region/encounter/ruinas"] = "ruinas",
+})
+
+function ArenasDados.daMarco(areaId)
+	return if type(areaId) == "string" then POR_MARCO[areaId] else nil
+end
+
 function ArenasDados.daZona(zona)
 	return if type(zona) == "string" then POR_ZONA[zona] else nil
 end

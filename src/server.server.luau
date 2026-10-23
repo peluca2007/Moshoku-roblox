@@ -68,11 +68,13 @@ local lutaDoMundo = require(Server.LutaDoMundoServico).start({
 	end,
 	cenario = arenaCenario,
 	aoEncerrar = function(...)
+		if dojoService then dojoService.encerrado(...) end
 		if runServico then runServico.encerrado(...) end
 	end,
 })
 encontro = require(Server.EncontroAutonomoService).start({
 	lutaNaArena = lutaDoMundo.iniciar,
+	lutaNoMarco = lutaDoMundo.iniciarMarco,
 	lutaNaArenaAtiva = lutaDoMundo.ativa,
 	corpoPessoal = mesa.corpoPessoal,
 	consumirItemPessoal = mesa.consumirItemPessoal,
@@ -93,16 +95,17 @@ dojoService = require(Server.DojoService).start({
 	consultar = mesa.consultarDojoPessoal,
 	atualizar = mesa.atualizarDojoPessoal,
 	emCombate = mesa.emCombate,
-	encontro = encontro,
+	-- Provação do Hanzo também na arena da mesa (PLANO §13), não no J2.
+	encontro = {
+		emEncontroAtivo = function() return encontro.emEncontroAtivo() or lutaDoMundo.ativa() end,
+		criarProvaDojo = lutaDoMundo.iniciarProvaDojo,
+	},
 })
 runServico = require(Server.RunServico).start({
 	emEncontro = function() return mesa.emCombate() or encontro.emEncontroAtivo() end,
 	corpoPessoal = mesa.fichaParaTestes or mesa.corpoPessoal, -- bônus para os testes dos eventos de viagem (F8); aceita perfil sem árvore
-	-- Luta de chefe da run: o encontro J2 é montado pelo EncontroAutonomoService (R7b).
-	iniciarLuta = function(jogadores, luta)
-		if type(encontro.criarEncontroDaRun) ~= "function" then return nil, "Luta do chefe indisponível." end
-		return encontro.criarEncontroDaRun(jogadores, luta)
-	end,
+	-- Luta do guardião da run na arena da mesa (PLANO §13); o fim volta por runServico.encerrado.
+	iniciarLuta = lutaDoMundo.iniciarChefe,
 	conta = require(Server.ContaServico).start(),
 })
 local cacadas = require(Server.CacadasService).start({

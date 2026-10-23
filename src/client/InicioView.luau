@@ -192,6 +192,8 @@ function Inicio.start(state, escolha, admin, criacao, encontroAutonomo)
 				status.Text="Encontro iniciado."
 			end
 		end)
+		-- PLANO §13: o J2 saiu do mundo; as lutas nascem de patrulhas, marcos, guardião e dojo, na arena da mesa.
+		botaoFila.Visible,botaoInicio.Visible=false,false
 	end
 	botao(jogar,"Lutar","02   Desafios","Três níveis. Até quatro aventureiros.",function() abrir("Desafios") end,true)
 	botao(jogar,"Duelo","03   PvP por equipes","Monte os lados ou jogue cada um por si.",function() abrir("PvP") end)

@@ -24,7 +24,7 @@ local function mesa()
 	d.habilidades = function() return hab end
 	d.handlers.criarPremontado = function() return "Não deveria montar o pronto da sala." end
 	d.handlers.criarCriatura = function(_, payload)
-		return nil, { id = novo({ kind = "npc", catalogId = payload.creatureId, pv = 10, pvMax = 10, x = payload.x, z = payload.z }) }
+		return nil, { id = novo({ kind = "npc", catalogId = payload.creatureId, papel = payload.papel, pv = 10, pvMax = 10, x = payload.x, z = payload.z }) }
 	end
 	d.handlers.combatStart = function(_, payload) d.combat.active = true; inicio = payload end
 	d.handlers.combatEnd = function() d.combat.active = false end
@@ -147,9 +147,13 @@ return {
 		t.eq(patrulha.derrotas, 0)
 		t.eq(registro.encerrados[1].estado.phase, "defeat")
 		t.eq(api.iniciar(a, patrulha, CELEIRO), false, "trégua logo após a luta")
+		local idDojo = api.iniciarProvaDojo(a)
+		t.ok(idDojo ~= nil, "a trégua não barra o que o jogador pediu")
+		registro.lutas[#registro.lutas].info.aoTerminar("cancelada")
+		t.eq(api.iniciar(a, patrulha, CELEIRO), false, "trégua renovada pela luta pedida")
 		passar(LutaDoMundo.TREGUA_SEGUNDOS + 1)
 		t.eq(api.iniciar(a, patrulha, CELEIRO), true)
-		registro.lutas[2].info.aoTerminar("cancelada")
+		registro.lutas[#registro.lutas].info.aoTerminar("cancelada")
 		m1:Destroy()
 	end,
 	["inicio recusado devolve cenario e solta o personagem"] = function(t)
@@ -168,6 +172,64 @@ return {
 		local api, registro, patrulha = ponte({ a }, { corpoPessoal = function() return { session = { current = { pv = 0 } } } end })
 		t.eq(api.iniciar(a, patrulha, CELEIRO), false)
 		t.eq(#registro.lutas, 0)
+		m1:Destroy()
+	end,
+	["luta do mundo repassa o papel pedido pela composicao"] = function(t)
+		local d, api, p = mesa()
+		t.eq(api.iniciarLutaDoMundo({ p }, { { id = "creature/urso-de-presas-vermelhas", papel = "lacaio" }, "creature/lobo-cinzento" }), nil)
+		local papeis = {}
+		for _, token in d.tokens do if token.kind == "npc" then papeis[token.catalogId] = token.papel or "catalogo" end end
+		t.eq(papeis["creature/urso-de-presas-vermelhas"], "lacaio")
+		t.eq(papeis["creature/lobo-cinzento"], "catalogo")
+		api.desligar()
+	end,
+	["guardiao da run vai para a arena da regiao e devolve o id que a run espera"] = function(t)
+		local m1 = personagem("A", Vector3.new(0, 5, -420))
+		local a = { UserId = 1, Character = m1, Parent = Players }
+		local api, registro = ponte({ a })
+		local id, erro = api.iniciarChefe({ a }, { areaId = "region/encounter/dark-forest", criaturas = { "creature/urso-de-presas-vermelhas" } })
+		t.ok(id ~= nil, tostring(erro))
+		local luta = registro.lutas[1]
+		t.eq(registro.cenarios[1], "floresta")
+		t.eq(type(luta.criaturas[1]), "table")
+		t.eq(luta.criaturas[1].papel, "lacaio", "urso sozinho contra um jogador entra como lacaio, como no J2")
+		luta.info.aoTerminar("vitoria")
+		t.eq(registro.encerrados[1].estado.encounterId, id)
+		t.eq(registro.encerrados[1].estado.phase, "victory")
+		t.eq(registro.pagos[1].marco, "region/encounter/dark-forest")
+		t.eq(api.iniciarChefe({}, { areaId = "region/encounter/ruinas", criaturas = { "creature/goblin-batedor" } }), nil)
+		m1:Destroy()
+	end,
+	["marco usa o elenco do marco e a arena do campo"] = function(t)
+		local m1 = personagem("A", Vector3.new(0, 5, -80))
+		local a = { UserId = 1, Character = m1, Parent = Players }
+		local api, registro = ponte({ a })
+		local ok = api.iniciarMarco(a, "region/encounter/clearing")
+		t.eq(ok, true)
+		t.eq(registro.cenarios[1], "campo")
+		t.ok(#registro.lutas[1].criaturas >= 1)
+		local recusado, motivo = api.iniciarMarco(a, "region/encounter/clearing")
+		t.eq(recusado, false)
+		t.ok(motivo ~= nil)
+		registro.lutas[1].info.aoTerminar("derrota")
+		t.eq(#registro.pagos, 0)
+		m1:Destroy()
+	end,
+	["provacao do dojo luta um lobo na cidade sem ouro e avisa o dojo pelo participante"] = function(t)
+		local m1 = personagem("A", Vector3.new(0, 5, -150))
+		local a = { UserId = 7, Character = m1, Parent = Players }
+		local api, registro = ponte({ a })
+		local id = api.iniciarProvaDojo(a)
+		t.ok(id ~= nil)
+		t.eq(registro.cenarios[1], "cidade")
+		t.eq(#registro.lutas[1].criaturas, 1)
+		t.eq(registro.lutas[1].criaturas[1], "creature/lobo-cinzento")
+		registro.lutas[1].info.aoTerminar("vitoria")
+		t.eq(#registro.pagos, 0, "o dojo dá a própria recompensa")
+		local fim = registro.encerrados[1]
+		local atorId = fim.encontro.ordemInicial[1]
+		t.eq(fim.encontro.atoresPorId[atorId].userId, 7)
+		t.eq(fim.estado.encounterId, id)
 		m1:Destroy()
 	end,
 }

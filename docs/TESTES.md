@@ -1,3 +1,15 @@
+## J2 fora do mundo: guardião, marcos e dojo na arena — PLANO §13 (Claude, 23/10/2026)
+
+- Local: **RESULTADO: tudo ok**. Studio: `TestRunner.run(Server.tests)` → **1979 ok, 0 falha(s)** (`LutaDoMundo.spec` com papel repassado, guardião, marco, dojo e trégua só para patrulhas).
+- Play real (memória, sem salvar/publicar):
+  - Dojo: Hanzo → provação na arena `cidade` contra um lobo → vitória → dojo respondeu `podeEscolher=true`.
+  - Run: iniciada pelo remoto; a caminho da Floresta, a patrulha de lobos puxou o grupo (arena `floresta`, vitória); evento de trilha resolvido; no marco, o voto "Enfrentar o guardião" levou ao nó `chefe-floresta` → arena `floresta` com o urso como lacaio (34 PV; o urso da patrulha tem 68) → vitória liberou "Pegar o Selo", personagem de volta ao ponto exato.
+  - Marco da clareira (segurar E) → arena `campo` com goblin → vitória e volta.
+  - Menu sem "Encontro autônomo"/"Entrar no grupo"; placa da sala removida.
+- Defeito achado e corrigido: a trégua barrava chefe/marco/dojo com a mensagem errada ("sem PV"); agora vale só para patrulhas.
+- Observação de design: a patrulha do urso fica ao lado do marco do guardião e puxou o grupo antes da luta do chefe.
+- Não verificado: guardião das Ruínas (bando de goblins) jogado; loot raro do chefe (não saiu nesta rolagem); multiplayer; celular; aparência na tela.
+
 ## Arenas do campo, da floresta e das ruínas — PLANO §13 passo 2 (Claude, 23/10/2026)
 
 - Local: **686 fontes/0 erros; RESULTADO: tudo ok**; `ArenasDados.spec` 2/0 (as 10 patrulhas caem na arena certa; todo cenário fica fora da grade).

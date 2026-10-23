@@ -449,7 +449,7 @@ function EncontroService.start(deps)
 	end
 
 	-- Luta do Modo História (PLANO §13): começa pelo servidor quando a patrulha encosta, sem fila nem
-	-- objetos da sala. `criaturas` são IDs do catálogo; `opcoes` = { nome, aoTerminar(resultado) }.
+	-- objetos da sala. `criaturas`: IDs do catálogo ou { id, papel }; `opcoes` = { nome, aoTerminar(resultado) }.
 	-- Mesmo caminho da Luta da sala: personagens pessoais, IA das criaturas e vigia de fim.
 	function api.iniciarLutaDoMundo(grupo, criaturas, opcoes)
 		if type(grupo) ~= "table" or #grupo == 0 or #grupo > #CASAS_DO_GRUPO then return "Grupo inválido para a luta." end
@@ -466,9 +466,11 @@ function EncontroService.start(deps)
 		forcarPessoal = false
 		if not ok then return tostring(erro) end
 		if erro then return erro end
-		for i, creatureId in criaturas do
+		for i, criatura in criaturas do
 			local casa = CASAS_INIMIGAS[i]
-			local e, nova = handlers.criarCriatura(solicitante, { creatureId = creatureId, x = casa[1], z = casa[2] }, true)
+			-- Entrada simples (ID) ou { id, papel } quando a composição muda o papel do Apêndice G.
+			local creatureId, papel = if type(criatura) == "table" then criatura.id else criatura, if type(criatura) == "table" then criatura.papel else nil
+			local e, nova = handlers.criarCriatura(solicitante, { creatureId = creatureId, x = casa[1], z = casa[2], papel = papel }, true)
 			if e then return e end
 			local inimigo = tokens[nova.id]
 			inimigo.ia = true

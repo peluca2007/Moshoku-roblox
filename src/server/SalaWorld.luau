@@ -54,8 +54,7 @@ function W.create(deps)
 	local caderno=objeto("LivroDeAjustes",Vector3.new(2.5,.3,3),Vector3.new(253.5,3.7,-5),Color3.fromRGB(60,75,86),"livro");caderno:SetAttribute("ObjetoId","livro-ajustes")
 	objeto("SeloPronto",Vector3.new(2,.2,2),Vector3.new(246.5,3.65,0),Color3.fromRGB(67,129,96),"pronto")
 	objeto("SeloEscolha",Vector3.new(1.8,.12,1.8),Vector3.new(253.4,3.65,0),latao,"assumir")
-	local expedicao=objeto("ExpedicaoAutonoma",Vector3.new(4,2.6,.2),Vector3.new(238.5,4,-18.8),Color3.fromRGB(104,74,49),"autonomo")
-	expedicao.CFrame=CFrame.new(238.5,4,-18.8)*CFrame.Angles(0,math.rad(180),0)
+	-- A placa ExpedicaoAutonoma (encontro J2) saiu com o PLANO §13: o Modo História começa no mundo.
 	objeto("SineteAdmin",Vector3.new(.8,.25,.8),Vector3.new(253.6,3.77,-7.3),latao,"admin")
 	objeto("TabuleiroDaSala",Vector3.new(6,.12,7),Vector3.new(250,3.57,0),Color3.fromRGB(39,60,53),"tabuleiro")
 	for i=0,6 do

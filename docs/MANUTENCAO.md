@@ -13,7 +13,13 @@ Patrulha encosta → Luta da mesa (motor da sala) no tabuleiro com o cenário da
 | Tela de resultado só com "Continuar" | evento `encontro` com `mundo = true`; `client/ResultadoView` |
 | Recompensa (Apêndice G da criatura) | `shared/EncontroAutonomoElenco.recompensaDe` + `Regras/RecompensaEncontro` |
 
-Ainda no J2: luta do chefe da run (`criarEncontroDaRun`) e marcos com ProximityPrompt. Specs: `LutaDoMundo.spec` (Studio) e `ArenasDados.spec`.
+| Marcos do mundo (segurar E) | `EncontroAutonomoService.solicitarInicio` valida marco/alcance/frequência e chama `deps.lutaNoMarco` → `LutaDoMundoServico.iniciarMarco` (elenco de `EncontrosPorZona.elegivel`, arena por `ArenasDados.daMarco`) |
+| Guardião da run | `RunServico` (deps.iniciarLuta) → `LutaDoMundoServico.iniciarChefe` (composição de `EncontrosPorZona.paraRun`, papel do Apêndice G repassado à mesa); o fim volta por `runServico.encerrado` com o mesmo encounterId |
+| Provação do dojo (Hanzo) | `DojoService` recebe em `server.server` um adaptador cujo `criarProvaDojo` é `LutaDoMundoServico.iniciarProvaDojo` (um lobo, arena da cidade, sem ouro); o fim chega a `dojoService.encerrado` pelo participante |
+| Papel da criatura na mesa | `HabilidadeService.criarCriatura` aceita `papel` (lacaio/padrao/chefe) validado; `EncontroService.iniciarLutaDoMundo` aceita `{ id, papel }` |
+| Fora do mundo | "Encontro autônomo" recusado no servidor com a ponte ligada; botões escondidos em `client/InicioView`; placa ExpedicaoAutonoma retirada de `SalaWorld`. A trégua de 12 s vale só para patrulhas. |
+
+O código do J2 continua no `src` sem uso no mundo (PLANO §13 passo 7). Specs: `LutaDoMundo.spec` (Studio) e `ArenasDados.spec`.
 
 ## Vozes NPCs
 

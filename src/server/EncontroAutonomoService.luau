@@ -1106,6 +1106,11 @@ function EncontroAutonomoService.start(deps)
 		end
 		local conectadoOk, estaConectado = pcall(jogadorConectado, player)
 		if not conectadoOk or not estaConectado then return false end
+		-- Modo História (PLANO §13): sem J2 no mundo; lutas nascem de patrulhas e marcos, na arena da mesa.
+		if deps.lutaNoMarco and pedido.command == "start-autonomous" then
+			enviarRecusa(player, nil, "As lutas começam no mundo: encontre uma patrulha ou um marco.")
+			return false
+		end
 		for chave in pedido do
 			if chave ~= "command" and chave ~= "requestId"
 				and not (pedido.command == "start-world-encounter" and chave == "areaId")
@@ -1150,6 +1155,14 @@ function EncontroAutonomoService.start(deps)
 		-- Tentativas recusadas por marco/alcance não reservam requestId nem cooldown;
 		-- só uma intenção que passou a validação de contexto pode consumir a janela.
 		ultimosInicios[player.UserId] = { requestId = pedido.requestId, command = pedido.command, at = agora() }
+		if deps.lutaNoMarco then
+			local okArena, comecou, motivo = pcall(deps.lutaNoMarco, player, pedido.areaId)
+			if not okArena or not comecou then
+				enviarRecusa(player, nil, if okArena and motivo then motivo else "Não foi possível iniciar o encontro.")
+				return false
+			end
+			return true
+		end
 
 		local ok, emCombate = pcall(combateLegadoAtivo, player)
 		if not ok or emCombate == true then

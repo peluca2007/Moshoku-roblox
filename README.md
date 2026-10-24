@@ -4,7 +4,7 @@ Direção do Pedro (13/10/2026): **exploração de mundo aberto e combate por tu
 
 Para trabalhar: leia [arquitetura atual](docs/ARQUITETURA.md), consulte a tarefa em [TAREFAS](docs/TAREFAS.md) e localize o comportamento em [MANUTENCAO](docs/MANUTENCAO.md). Consulte histórico somente quando necessário; confirme entregas antes de refazê-las.
 
-**24/10/2026 — começo jogável (versão 0.3.0, [PATCH-NOTES](docs/PATCH-NOTES.md)):** apertar Play leva da abertura à criação, à vila, à provação de um treinador, à primeira luta na arena e de volta ao mapa, conferido no Studio. Não testado ainda em celular, telas médias e multiplayer.
+**24/10/2026 — começo jogável (versão 0.3.0, [PATCH-NOTES](docs/PATCH-NOTES.md)):** apertar Play leva da abertura à criação, à vila, à provação de um treinador, à primeira luta na arena e de volta ao mapa, conferido no Studio. Foco no PC por ora (celular fica para depois); multiplayer ainda não testado.
 
 **Estado atual (17/10/2026):** exploração a pé com combate por turnos e **runs cooperativas** (1–4 jogadores): vila, acampamento, Floresta Sombria e Ruínas pela passagem das montanhas. W1b substitui viagem por painel por eventos de caminho, relógio de 8 minutos/dia, caçadas na praça e patrulhas por região; segunda árvore aprendida integra a ficha. Verificação local e limites de Studio em [TESTES](docs/TESTES.md); estado das entregas em [TAREFAS](docs/TAREFAS.md). Ferramentas de mesa continuam no mesmo núcleo. **23/10:** a patrulha que encosta leva o grupo à Luta da mesa numa arena com o cenário da região (cidade, campo, floresta e ruínas; [PLANO §13](docs/PLANO.md)) e devolve todos ao ponto do contato. O mesmo vale para marcos, guardião da run e dojo; o combate J2 antigo foi apagado.
 

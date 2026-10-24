@@ -20,7 +20,7 @@ O começo do jogo foi jogado de ponta a ponta no Studio e é considerado jogáve
 
 ### Limitações conhecidas
 - Patrulhas ignoram quem ainda não aprendeu um caminho (de propósito: a primeira provação vem antes da primeira luta).
-- Não testado em celular, em telas médias (700–1099 px), com dois jogadores reais nem no jogo publicado.
+- Foco no PC por ora: celular fica para depois. Não testado em telas médias (700–1099 px), com dois jogadores reais nem no jogo publicado.
 
 ### Técnico
 - Combate J2 apagado; patrulhas/marcos em `server/PatrulhasDoMundo`, ponte em `server/LutaDoMundoServico`, arenas em `shared/Mundo/ArenasDados` e `server/Mundo/ArenaCenario`.

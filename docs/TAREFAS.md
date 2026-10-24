@@ -8,7 +8,7 @@ Como usar: antes de editar um arquivo, veja se há reserva ativa abaixo; registr
 
 **Rumo de 23/10/2026 (Pedro): [PLANO §13](PLANO.md#13-fluxo-taverna--sala--história-e-arenas-por-região-pedro-23102026).** O combate do Modo História passa a usar o motor da sala em arenas fixas por região; o J2 deixa de ser o combate do mundo. A **MAX2 fica suspensa** (sem edição desde 19/10) junto com o defeito do J2 "Perfil inicial incompleto ou incompatível". Não retomar o J2 sem nova decisão.
 
-**Começo do jogo: jogável (Pedro, 24/10/2026).** Pedro considerou a parte inicial concluída e jogável depois de INICIO1/INICIO2 (versão 0.3.0). Pendências que não bloqueiam: celular, telas médias, multiplayer real e jogo publicado; patrulhas ignoram quem ainda não tem caminho (por desenho). Próximos passos de §13 seguem em [PLANO](PLANO.md).
+**Começo do jogo: jogável (Pedro, 24/10/2026).** Pedro considerou a parte inicial concluída e jogável depois de INICIO1/INICIO2 (versão 0.3.0). **Foco no PC por ora (Pedro, 24/10)**: celular fica para depois. Pendências que não bloqueiam: telas médias de PC (700–1099 px), multiplayer real e jogo publicado; patrulhas ignoram quem ainda não tem caminho (por desenho). Próximos passos de §13 seguem em [PLANO](PLANO.md).
 
 INICIO2 — Claude, **concluída (24/10/2026)**. Luta do mundo: snapshot enviado ao começar (a tela de combate não aparecia quando o jogador agia primeiro), relógio no topo durante a luta e ouro na tela de vitória. Arquivos: `server/{EncontroService,LutaDoMundoServico}`, `server.server`, `client/{MesaState,ResultadoView,RelogioRunView}`, spec `LutaDoMundo`. **Tudo ok; Studio 1665/0**; replay em [TESTES](TESTES.md). Não verificados: celular, larguras médias, multiplayer.
 

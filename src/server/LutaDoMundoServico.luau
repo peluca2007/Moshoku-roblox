@@ -7,7 +7,6 @@ local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EncontrosPorZona = require(ReplicatedStorage.Shared.EncontrosPorZona)
-local Elenco = require(ReplicatedStorage.Shared.EncontroAutonomoElenco)
 local Recompensa = require(ReplicatedStorage.Shared.Regras.RecompensaEncontro)
 local Arenas = require(ReplicatedStorage.Shared.Mundo.ArenasDados)
 local Protocol = require(ReplicatedStorage.Shared.MesaProtocol)
@@ -102,7 +101,7 @@ function LutaDoMundo.start(deps)
 	local function pagar(luta)
 		local valores = {}
 		for _, criatura in luta.criaturas do
-			local valor = Elenco.recompensaDe(idDe(criatura))
+			local valor = Recompensa.daCriatura(idDe(criatura))
 			if valor then
 				if type(criatura) == "table" and criatura.papel then valor.papel = criatura.papel end
 				table.insert(valores, valor)

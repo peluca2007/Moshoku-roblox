@@ -4,15 +4,15 @@ Consolidada em 14/10/2026. Este arquivo orienta o trabalho atual; detalhes por m
 
 ## Produto e limites
 
-W1b (17/10): o servidor observa presença nas regiões/trechos e o tempo contínuo da run; viagem por painel/teleporte regional saiu do fluxo. Um dia dura 480s e pausa em combate. Caçadas e patrulhas adicionais usam o J2/R2 existente, com um encontro ativo por servidor; ficha mantém árvore inicial e lista adicional aprendida por concessão interna. Contratos e localização em [MANUTENCAO](MANUTENCAO.md#mundo-aberto-w1b-17102026); limites verificados em [TESTES](TESTES.md). Sem Studio nesta entrega.
+W1b (17/10): o servidor observa presença nas regiões/trechos e o tempo contínuo da run; viagem por painel/teleporte regional saiu do fluxo. Um dia dura 480s e pausa em combate. Caçadas e patrulhas levam à Luta da mesa na arena da região, com uma luta do mundo por vez; ficha mantém árvore inicial e lista adicional aprendida por concessão interna. Contratos e localização em [MANUTENCAO](MANUTENCAO.md#mundo-aberto-w1b-17102026); limites verificados em [TESTES](TESTES.md).
 
 RPG com exploração livre e combate por turnos. A direção é mundo aberto; começar por uma pequena região conectada, com caminhos e pontos de interesse. O jogo deve funcionar sem mestre humano; preservar o núcleo compartilhado para um futuro modo com mestre. O lobby atual ainda tem o papel de mestre na preparação: a direção futura não significa que essa dependência já foi removida.
 
-Hoje há sala social, Treino, Desafios, PvP, ferramentas de mesa e um perfil pessoal persistido limitado às escolhas J1/J3a. Criação completa, mundo aberto e progressão/recompensas persistentes seguem como evolução. O combate clássico do primeiro protótipo está pausado e não é inicializado. A integração CLEG de 19/10 foi revertida; CombatService/BattleController/CameraController originais permanecem pausados. Patrulhas e chefes usam o combate J2 de exploração. A verificação do protótipo original está em andamento; estado e evidências em [TAREFAS](TAREFAS.md) e [TESTES](TESTES.md).
+Hoje há sala social, Treino, Desafios, PvP, ferramentas de mesa e um perfil pessoal persistido limitado às escolhas J1/J3a. Criação completa, mundo aberto e progressão/recompensas persistentes seguem como evolução. O combate clássico do primeiro protótipo está pausado e não é inicializado. A integração CLEG de 19/10 foi revertida; CombatService/BattleController/CameraController originais permanecem pausados. Desde 23/10 toda luta do mundo (patrulha, marco, guardião da run, provação do dojo) usa a Luta da mesa numa arena fixa por região ([PLANO §13](PLANO.md)); o J2 foi apagado. Estado e evidências em [TAREFAS](TAREFAS.md) e [TESTES](TESTES.md).
 
 ## Responsabilidades existentes
 
-Durante J2, `EncontroAutonomoAvatares` aplica às personagens reais a posição recebida do estado autoritativo; o serviço restaura controles e posição ao descartar o encontro após retorno ou limpeza.
+Na luta do mundo, `LutaDoMundoServico` ancora o grupo na entrada do tabuleiro, `AvatarFichas` leva cada avatar à casa da ficha e, no fim, a ponte devolve todos ao ponto do contato.
 
 | Camada | Responsabilidade |
 | --- | --- |
@@ -24,9 +24,9 @@ Durante J2, `EncontroAutonomoAvatares` aplica às personagens reais a posição 
 
 MesaService integra o estado e os comandos; EncontroService/TreinoService coordenam partidas; HabilidadeService resolve habilidades; SalaService coordena o lobby. MesaPersistence guarda campanhas. Não confundir essa persistência com o futuro perfil do jogador.
 
-O núcleo J2 combina `shared/EncontroTurnos`, `EncontroIniciativa`, módulos puros de elenco/movimento/mapa/combate, `server/EncontroAutonomoService` e apresentação cliente. O servidor inicia com perfis J1 validados e criaturas canônicas, controla ação, recurso, alvo, efeito, versões e recibos; cliente envia intenção. Habilidades elegíveis de Fogo, Vento, Água, Cura e Terra usam catálogo e executor canônicos; a lista atual e as adaptações estão em [JOGO.md](JOGO.md) e [FIDELIDADE.md](FIDELIDADE.md). Quatro rochas do bosque bloqueiam movimento, rotas da IA, empurrões e visão; linha de visão usa supercobertura também para Muro de Chamas. Turnos individuais expiram automaticamente após 60 s, sem pausa por desconexão; o grupo recebe recibos, mas snapshots e reconexão ficam privados. O mapa 20×20 representa o estado confirmado e não move avatar; o serviço sincroniza avatares/miniaturas pela geometria do marco escolhido. J4 mantém dois marcos ligados por trilha; inspeção visual, combate completo no bosque, multiplayer real e recompensa permanecem pendentes. FIDELIDADE e TESTES registram detalhes e evidências.
+O combate é um só: `EncontroService` (Luta/Duelo/Treino) + `HabilidadeService` no tabuleiro da mesa (`MesaProtocol.BOARD`), com animações em `client/Magias`/`Coreografia`. O servidor controla ação, recurso, alvo, efeito e fim; o cliente envia intenção. No Modo História, `PatrulhasDoMundo` (contato e marcos) e `RunServico`/`DojoService` pedem a luta a `LutaDoMundoServico`, que veste o tabuleiro com o cenário da região (`Mundo/ArenaCenario`, `shared/Mundo/ArenasDados`). Pendentes: multiplayer real, conferência visual das arenas e defeitos do personagem pronto (F1) na mesa.
 
-Separar responsabilidades gradualmente, preservando testes. Agrupar arquivos por sistema dentro de servidor/cliente/shared quando a mudança tiver escopo verificável; não criar pastas ou módulos vazios antecipadamente. Atualizar MANUTENCAO ao mover um comportamento e conferir gerador/sincronização ao mudar caminhos. Em J2, `EncontroAutonomoMiniaturas` desenha no mundo apenas posições confirmadas; as peças são cosméticas, não colidem e não comandam avatares.
+Separar responsabilidades gradualmente, preservando testes. Agrupar arquivos por sistema dentro de servidor/cliente/shared quando a mudança tiver escopo verificável; não criar pastas ou módulos vazios antecipadamente. Atualizar MANUTENCAO ao mover um comportamento e conferir gerador/sincronização ao mudar caminhos.
 
 ## Contratos que continuam valendo
 

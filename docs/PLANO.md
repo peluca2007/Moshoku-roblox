@@ -296,7 +296,7 @@ Pedido do Pedro, com a análise de game design do Claude. Onde conflitar, substi
 4. Personagem pronto na taverna e customização opcional.
 5. Save e retomada da run com o grupo na sala.
 6. Mais treinadores e o sorteio por região.
-7. Retirar o J2 e o que ficou sem uso. Desde 23/10 (ARENA3) nenhuma luta do mundo usa o J2: patrulha, marco, guardião da run e dojo vão para a mesa; falta apagar o código.
+7. ~~Retirar o J2 e o que ficou sem uso.~~ Feito em 23/10 (ARENA3 e ARENA4): nenhuma luta do mundo usa o J2 e o código dele saiu do `src`.
 
 **Em aberto:** confirmar solo; quais NPCs de fundo e o que fazem em cada arena; como retomar a run quando nem todo o grupo voltar; se o Treino continua na sala.
 

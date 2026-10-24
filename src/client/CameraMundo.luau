@@ -15,7 +15,7 @@
 -- Os motivos ativos aparecem no atributo `CameraMundoPausada` do LocalPlayer (leitura/diagnóstico).
 -- Rede de segurança: se alguém trocar o CameraType por conta própria enquanto controlamos,
 -- cedemos 1,5 s ("externo") e avisamos no Output, em vez de brigar a cada frame.
--- Motivos em uso: "encontro-autonomo", "sobreposicao-sala", "transicao-sala" (SalaView).
+-- Motivos em uso: "sobreposicao-sala", "transicao-sala" (SalaView).
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

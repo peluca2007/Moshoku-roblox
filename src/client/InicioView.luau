@@ -10,7 +10,7 @@ local Fluxo = require(script.Parent.AberturaFluxo)
 local Abertura = require(ReplicatedStorage.Shared.Regras.AberturaRun)
 local AjudaConteudo = require(ReplicatedStorage.Shared.AjudaConteudo)
 local Inicio = {}
-function Inicio.start(state, escolha, admin, criacao, encontroAutonomo)
+function Inicio.start(state, escolha, admin, criacao)
 	local pg=Players.LocalPlayer:WaitForChild("PlayerGui")
 	pg:WaitForChild("MesaPanel").Enabled=false
 	local ouro=T.cores.ouro
@@ -135,66 +135,6 @@ function Inicio.start(state, escolha, admin, criacao, encontroAutonomo)
 	local adm=botao(ajustes,"Administracao","Administração",nil,admin.abrir); adm.Visible=false
 	texto(jogar,"TituloModo","OUTROS MODOS · MESA",26,13,ouro)
 	botao(jogar,"Treinar","01   Campo de treino","Pratique suas habilidades contra bonecos.",function() pedir("iniciarTreino") end)
-	local inicioAutonomoPendente=false
-	if encontroAutonomo then
-		local pedidoFilaPendente=false
-		local botaoInicio=nil
-		local botaoFila=botao(jogar,"GrupoAutonomo","Entrar no grupo","Junte-se voluntariamente a até três outros jogadores.",function()
-			local fila=encontroAutonomo.fila()
-			local presente=false
-			for _,membro in ipairs(fila.jogadores or {}) do if membro.userId==state.localUserId() then presente=true;break end end
-			pedidoFilaPendente=true
-			if not encontroAutonomo.alterarFila(not presente) then
-				pedidoFilaPendente=false
-				status.Text="Não foi possível alterar o grupo agora."
-			end
-		end)
-		local function atualizarFila(fila)
-			local membros=fila.jogadores or {}
-			local presente=false
-			for _,membro in ipairs(membros) do if membro.userId==state.localUserId() then presente=true;break end end
-			local lider=presente and fila.liderUserId==state.localUserId()
-			botaoFila.Rotulo.Text=if presente then "Sair do grupo"..(if lider then " · líder" else "").." · "..tostring(#membros).."/4" else "Entrar no grupo · "..tostring(#membros).."/4"
-			botaoFila.Descricao.Text=if presente
-				then (if lider then "Você pode iniciar a expedição para o grupo." else "Aguardando a pessoa que lidera a fila.")
-				else "Junte-se voluntariamente a até três outros jogadores."
-			if botaoInicio then
-				botaoInicio.Descricao.Text=if not presente then "Solo ou entre na fila para cooperar."
-					elseif lider then "Você lidera · encontro com até quatro jogadores."
-					else "Aguardando a liderança iniciar a expedição."
-				botaoInicio.Active=not presente or lider
-			end
-			if pedidoFilaPendente then
-				pedidoFilaPendente=false
-				status.Text=if presente then "Você entrou no grupo. Quem criou o grupo pode iniciar." else "Você saiu do grupo."
-			end
-		end
-		encontroAutonomo.onRecusado(function(mensagem)
-			if pedidoFilaPendente then pedidoFilaPendente=false;status.Text=mensagem or "Não foi possível alterar o grupo." end
-		end)
-		botaoInicio=botao(jogar,"EncontroAutonomo","Encontro autônomo","Solo ou entre na fila para cooperar.",function()
-			inicioAutonomoPendente=true
-			status.Text="Preparando seu encontro…"
-			if not encontroAutonomo.iniciar() then
-				inicioAutonomoPendente=false
-				status.Text="Não foi possível iniciar agora. Confira se já está em uma partida."
-			end
-		end,true)
-		encontroAutonomo.onFila(atualizarFila)
-		encontroAutonomo.onRecusado(function(mensagem)
-			if not inicioAutonomoPendente then return end
-			inicioAutonomoPendente=false
-			status.Text=mensagem or "Encontro recusado."
-		end)
-		encontroAutonomo.onEstado(function()
-			if inicioAutonomoPendente then
-				inicioAutonomoPendente=false
-				status.Text="Encontro iniciado."
-			end
-		end)
-		-- PLANO §13: o J2 saiu do mundo; as lutas nascem de patrulhas, marcos, guardião e dojo, na arena da mesa.
-		botaoFila.Visible,botaoInicio.Visible=false,false
-	end
 	botao(jogar,"Lutar","02   Desafios","Três níveis. Até quatro aventureiros.",function() abrir("Desafios") end,true)
 	botao(jogar,"Duelo","03   PvP por equipes","Monte os lados ou jogue cada um por si.",function() abrir("PvP") end)
 	botao(jogar,"PrepararGrupo","Entrar no grupo",nil,function() pedir("entrarFila",{modo="luta"}) end)

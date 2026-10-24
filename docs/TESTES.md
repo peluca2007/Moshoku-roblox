@@ -1,3 +1,11 @@
+## J2 apagado do src — PLANO §13 passo 7 (Claude, 23/10/2026)
+
+- Saíram 27 módulos (serviço, avatares, miniaturas, geometria e grade do J2; estado, telas e animações do cliente; combate, habilidades, técnicas, terreno, movimento, elenco, turnos, iniciativa e simulação B1) e 28 specs só do J2. Patrulhas e marcos foram para `server/PatrulhasDoMundo`; a recompensa das criaturas para `RecompensaEncontro.daCriatura`. Specs mistos foram ajustados (região inicial, floresta e ruínas sem grade; caçadas checam a recompensa nova).
+- Local: **RESULTADO: tudo ok**. Studio: **1665 ok, 0 falha(s)** (eram 1979; a diferença são os specs do J2).
+- Play real (memória, sem salvar/publicar): servidor sobe sem erro, 10 patrulhas, nenhuma grade tática no mundo, sem o remoto `EncontroAutonomo`; marco do bosque → arena `floresta` (lobo) → vitória; bandidos da passagem → arena `campo` → vitória e volta ao ponto. Cliente sem erro de módulo; botões do J2 ausentes.
+- Ruído de teste: teleportar no cliente um personagem que o servidor ancorou na arena dessincroniza a posição; um Play novo resolveu.
+- Não verificado: multiplayer; celular; guardião das Ruínas; aparência das arenas. Os roteiros antigos de `tools/playtest` que usavam o J2 (e2e_bot_combate, mundo_bot_combate, r2*, f6*) ficaram obsoletos.
+
 ## J2 fora do mundo: guardião, marcos e dojo na arena — PLANO §13 (Claude, 23/10/2026)
 
 - Local: **RESULTADO: tudo ok**. Studio: `TestRunner.run(Server.tests)` → **1979 ok, 0 falha(s)** (`LutaDoMundo.spec` com papel repassado, guardião, marco, dojo e trégua só para patrulhas).

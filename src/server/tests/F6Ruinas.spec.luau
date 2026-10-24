@@ -1,8 +1,6 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Layout = require(Shared.Mundo.RuinasLayout)
 local Props = require(Shared.Mundo.PropsLayout)
-local Terreno = require(Shared.EncontroAutonomoTerreno)
-local Elenco = require(Shared.EncontroAutonomoElenco)
 local Zonas = require(Shared.EncontrosPorZona)
 
 local Historia = require(Shared.Mundo.HistoriaV1)
@@ -49,38 +47,6 @@ return {
 			t.ok((x - Layout.CAMARA.x)^2 + (z - Layout.CAMARA.z)^2 <= Layout.CAMARA.raio^2)
 		end
 	end,
-	["altar bloqueia sua ocupacao e colunas projetam casas cobertas pelos retangulos"] = function(t)
-		local bloqueadas = Terreno.celulas(AREA)
-		local chaves = Terreno.chaves(AREA)
-		t.ok(chaves["10:10"], "centro do altar precisa ser bloqueado")
-		local pecas = Layout.pecas()
-		local altar
-		for _, peca in pecas do if peca[3] == "altar" then altar = Props.retangulo(peca) end end
-		t.ok(altar ~= nil)
-		local centroX = Layout.ARENA.x + (10 - 10.5) * Layout.ARENA.passo
-		local centroZ = Layout.ARENA.z + (10 - 10.5) * Layout.ARENA.passo
-		t.ok(casaDentroDoRetangulo(centroX, centroZ, altar), "centro da casa 10:10 fica no altar")
-		local projetadas = 0
-		for _, peca in pecas do
-			if peca[3] == "coluna" or peca[3] == "colunaquebrada" then
-				local ret = Props.retangulo(peca)
-				for x = 1, 20 do
-					for z = 1, 20 do
-						local cx = Layout.ARENA.x + (x - 10.5) * Layout.ARENA.passo
-						local cz = Layout.ARENA.z + (z - 10.5) * Layout.ARENA.passo
-						if casaDentroDoRetangulo(cx, cz, ret) then
-							projetadas += 1
-							t.ok(chaves[x .. ":" .. z], "coluna sem bloqueio projetado em " .. x .. ":" .. z)
-						end
-					end
-				end
-			end
-		end
-		t.ok(projetadas > 0, "colunas devem projetar bloqueios na grade de 1.8")
-		for _, celula in bloqueadas do
-			t.ok(celula.x >= 1 and celula.x <= 20 and celula.z >= 1 and celula.z <= 20)
-		end
-	end,
 	["patrulha cruza trecho sem intersecao com retangulos de props"] = function(t)
 		local patrulha = Layout.PATRULHA
 		t.eq(#patrulha, 2)
@@ -92,29 +58,6 @@ return {
 			if familia == "coluna" or familia == "colunaquebrada" or familia == "muro"
 				or familia == "altar" then
 				t.ok(not sobrepoe(segmento, Props.retangulo(peca)), "rota interceptada por prop " .. i)
-			end
-		end
-	end,
-	["formacao de ruinas gera posicoes livres e unicas para grupos de um a quatro"] = function(t)
-		local depsFake = deps()
-		depsFake.areaId = AREA
-		local bloqueadas = Terreno.celulas(AREA)
-		for n = 1, 4 do
-			local jogadores = {}
-			for i = 1, n do jogadores[i] = jogador(100 + i) end
-			local criaturas = {}
-			for i = 1, n * 2 do criaturas[i] = "creature/goblin-batedor" end
-			local atores, erro = Elenco.montar(jogadores, criaturas, depsFake)
-			t.eq(erro, nil)
-			t.eq(#atores, n * 3)
-			local iniciais = {}
-			for i = 1, #atores do iniciais[i] = atores[i] end
-			t.ok(Terreno.posicoesIniciaisLivres(iniciais, bloqueadas), "grupo " .. n .. " nasce livre")
-			local vistos = {}
-			for _, ator in iniciais do
-				local chave = ator.x .. ":" .. ator.z
-				t.ok(not vistos[chave], "posicao inicial repetida: " .. chave)
-				vistos[chave] = true
 			end
 		end
 	end,

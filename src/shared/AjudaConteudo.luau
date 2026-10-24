@@ -1,5 +1,5 @@
 -- Conteúdo puro da ajuda F5; não depende de Instances, rede ou regras mutáveis.
--- Fontes: AberturaFluxo/CriacaoRapidaView/RunView/ViagemView, EncontroAutonomoView,
+-- Fontes: AberturaFluxo/CriacaoRapidaView/RunView/ViagemView,
 -- BoardView (somente mesa), Mundo/Npcs e RunTreinadores/TreinadorView.
 local abas = {
 	{
@@ -14,10 +14,10 @@ local abas = {
 	{
 		id = "combate", titulo = "Explorar e lutar",
 		paragrafos = {
-			"Explore as trilhas e observe as patrulhas visíveis. Se uma patrulha alcançar você, a grade de combate nasce no local. Tenha uma ficha criada.",
-			"Espere sua vez. Use Atacar (ou Disparar) no alvo; para mover, escolha uma casa livre na grade ou um dos botões Mover. Alcance, ações e movimento são limitados.",
+			"Explore as trilhas e observe as patrulhas visíveis. Se uma patrulha alcançar você, o grupo por perto vai para a arena da região e volta ao mesmo lugar no fim. Tenha uma ficha criada.",
+			"Espere sua vez. Escolha uma habilidade em Golpes, Apoio ou Tudo e depois o alvo; para mover, use Andar e clique numa casa livre. Alcance, ações e movimento são limitados.",
 			"Use Encerrar turno quando terminar. Sua vez também termina ao esgotar o tempo.",
-			"Para fugir, chegue à borda da grade e use Fugir na sua vez, com uma Ação disponível. Há um teste de Atletismo: falhar encerra sua vez; fugir não dá recompensa.",
+			"Marcos com aviso no mundo, o guardião da run e a provação do dojo também levam à arena. Vencer paga ouro; perder derruba quem lutou na run.",
 			"Surpresa: alcançar a patrulha pelas costas sem ser detectado dá prioridade na primeira rodada e deixa o alvo Desprevenido até começar a agir.",
 		},
 	},
@@ -33,8 +33,8 @@ local abas = {
 	{
 		id = "controles", titulo = "Controles",
 		paragrafos = {
-			"Teclado/mouse: clique nos botões e nas casas da grade. Nas interações do mundo, use a tecla mostrada no aviso. Não há atalho de teclado para Atacar ou Encerrar turno no combate de exploração.",
-			"Toque: toque nos botões, avisos de interação e casas da grade; deslize listas para ler. Na ajuda, toque numa aba e deslize o texto.",
+			"Teclado/mouse: clique nos botões e nas casas do tabuleiro. Nas interações do mundo, use a tecla mostrada no aviso. Na arena, M alterna a visão do tabuleiro e a roda do mouse ajusta o zoom.",
+			"Toque: toque nos botões, avisos de interação e casas do tabuleiro; deslize listas para ler. Na ajuda, toque numa aba e deslize o texto.",
 			"Controle: navegue pelos botões com a seleção de interface do Roblox e confirme com A. Nos NPCs, siga o botão indicado no aviso. Na ajuda, B fecha o painel.",
 			"Somente na visão da mesa: M alterna a visão durante a partida; WASD move a câmera e a roda do mouse ajusta o zoom. No toque, arraste para mover a câmera e faça pinça para zoom. Clique direito, Q ou B do controle cancela a mira/seleção da mesa.",
 		},

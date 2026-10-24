@@ -1,9 +1,9 @@
-"""Contratos visuais J2; chamado exclusivamente por tools/testar.ps1."""
+"""Contratos visuais do combate e telas; chamado exclusivamente por tools/testar.ps1."""
 from pathlib import Path
 import re
 
 root = Path(__file__).resolve().parents[2]
-names = ["EncontroAutonomoView", "EncontroAutonomoGradeView", "EncontroAutonomoMapaTaticoView", "EncontroAutonomoApresentacao", "FeedbackCombate", "ResultadoView", "UI/ExtraCombate"]
+names = ["FeedbackCombate", "ResultadoView", "UI/ExtraCombate"]
 errors = []
 sources = {}
 for name in names:
@@ -15,14 +15,7 @@ for name in names:
             errors.append(f"{name}: contrato proibido: {token}")
     if "\ufffd" in source or "??o" in source:
         errors.append(f"{name}: texto corrompido")
-for name in ("EncontroAutonomoGradeView", "EncontroAutonomoMapaTaticoView"):
-    for token in ('Instance.new("ScrollingFrame")', 'Enum.ScrollingDirection.XY', 'Tema.toqueMinimo'):
-        if token not in sources[name]:
-            errors.append(f"{name}: acessibilidade ausente: {token}")
-for token in ('InterfaceCombate', '"Render-se"', 'desistirConfirmacaoVersao', 'Extra.acoes'):
-    if token not in sources["EncontroAutonomoView"]:
-        errors.append("EncontroAutonomoView: contrato ausente: " + token)
-for token in ('gui.IgnoreGuiInset = true', '"Voltar à vila"', 'encontroAutonomo.avisarRetorno()'):
+for token in ('gui.IgnoreGuiInset = true', 'dados.mundo == true'):
     if token not in sources["ResultadoView"]:
         errors.append("ResultadoView: contrato ausente: " + token)
 # U7: contratos de apresentação, sem simular renderização.

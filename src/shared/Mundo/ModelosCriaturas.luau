@@ -1,5 +1,5 @@
 -- Mapa único criatura -> modelo do Blender (módulos em server/Mundo/Modelos).
--- Dados puros: patrulhas do mundo (PatrulhaModelo) e miniaturas J2 (EncontroAutonomoMiniaturas)
+-- Dados puros: patrulhas do mundo (PatrulhaModelo)
 -- consultam só este módulo. Pivôs das juntas: Shared.Mundo.PivosModelos (nome do módulo).
 -- escalaMundo: patrulha andando pelo mapa; escalaCombate: miniatura na grade (casas de 1,8 stud). Pequenas/médias
 -- mantêm a escala do mundo (o avatar do jogador também é em tamanho real); as grandes encolhem para caber.

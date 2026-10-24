@@ -1,10 +1,7 @@
 -- Blockout físico da primeira região de exploração. Não contém regras de jogo;
 -- interações e encontros continuam com autoridade nos serviços próprios.
 local RegiaoInicial = {}
-local Geometria = require(script.Parent.EncontroAutonomoGeometria)
-local Terreno = require(game:GetService("ReplicatedStorage").Shared.EncontroAutonomoTerreno)
 local ArvoreMundo = require(script.Parent.Mundo.ArvoreMundo)
-local GradeTatica = require(script.Parent.Mundo.GradeTatica)
 
 local NOME_REGIAO = "RegiaoInicial"
 
@@ -30,10 +27,6 @@ local function marco(pai, id, papel)
 	pai:SetAttribute("AreaId", id)
 	pai:SetAttribute("AreaRole", papel)
 	return pai
-end
-
-local function criarGrade(clareira, marcoEncontro, idGrade)
-	return GradeTatica.criar(clareira, marcoEncontro, idGrade, parte, marco)
 end
 
 function RegiaoInicial.start(deps)
@@ -137,31 +130,11 @@ function RegiaoInicial.start(deps)
 	promptBosque.MaxActivationDistance = 12
 	promptBosque.RequiresLineOfSight = true
 	promptBosque.Parent = marcoBosque
-	-- Grade criada depois de todo o cenario estar no workspace.
-	local arenaBosque = Instance.new("Folder")
-	arenaBosque.Name = "Encontro do bosque"
-	marco(arenaBosque, "region/clareira-inicial/encontro-bosque", "encounter-area")
-	arenaBosque.Parent = regiao
-	local rochas = Instance.new("Folder")
-	rochas.Name = "Obstáculos de terreno"
-	rochas.Parent = arenaBosque
-	for indice, celula in ipairs(Terreno.celulas("region/encounter/forest")) do
-		local posicao = Geometria.posicao(Geometria.centro(marcoBosque), celula.x, celula.z)
-		local rocha = parte(rochas, "Rocha " .. indice, Vector3.new(2.4, 1.8, 2.4),
-			Vector3.new(posicao.X, 0.98, posicao.Z), Color3.fromRGB(107, 107, 96), Enum.Material.Rock)
-		rocha.Shape = Enum.PartType.Ball
-		rocha.CanTouch, rocha.CanQuery = false, false
-		rocha:SetAttribute("AreaRole", "movement-obstacle")
-		rocha:SetAttribute("GridX", celula.x)
-		rocha:SetAttribute("GridZ", celula.z)
-	end
 	for _, dados in ipairs({ {16, 13}, {68, 15}, {16, 68}, {68, 68} }) do
 		arvore(bosque, dados[1], dados[2], 0.72)
 	end
 
 	regiao.Parent = workspaceAtual
-	criarGrade(clareira, marcoEncontro, "region/clareira-inicial/grade-tatica")
-	criarGrade(arenaBosque, marcoBosque, "region/clareira-inicial/encontro-bosque/grade-tatica")
 	return regiao
 end
 
@@ -176,23 +149,6 @@ function RegiaoInicial.iniciarPatrulha(deps)
  config.pontos = { Vector3.new(54, 1.5, 43), Vector3.new(64, 1.5, 43),
   Vector3.new(64, 1.5, 54), Vector3.new(54, 1.5, 54) }
  return require(script.Parent.Mundo.PatrulhaVisivel).criar(config)
-end
-
--- Ancora privada de projecao: usa o contrato geometrico atual sem mover marcos.
-function RegiaoInicial.criarArenaPatrulha(mundo, posicao, ignorar)
- local pasta = Instance.new("Folder")
- pasta.Name = "Encontro da patrulha"
- pasta.Parent = mundo
- local centro = Vector3.new(posicao.X, 0, posicao.Z)
- local ancora = parte(pasta, "Centro privado J2", Vector3.one, centro - Vector3.new(0, 0, 8),
-  Color3.new())
- ancora.Transparency = 1
- ancora.CanCollide, ancora.CanTouch, ancora.CanQuery = false, false, false
- marco(ancora, "region/patrol/anchor", "encounter-trigger")
- ancora:SetAttribute("EncounterId", "region/encounter/patrol")
- local _, bloqueadas = GradeTatica.criar(pasta, ancora, "region/patrol/grid", parte, marco, centro,
-  { workspace = mundo, ignorar = ignorar })
- return { pasta = pasta, centro = centro, areaId = "region/encounter/patrol", bloqueadas = bloqueadas }
 end
 
 return RegiaoInicial

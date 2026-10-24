@@ -10,8 +10,7 @@ local Objetivos = require(Shared.Regras.Objetivos)
 local FX = require(script.Parent.MenuEfeitos)
 local View = {}
 
-function View.start(state, inicio, sala, encontroAutonomo)
-	local j2 = false
+function View.start(state, inicio, sala)
 	local resultado=EstadoResultado.new()
 	local inicial=state.snapshot();if inicial then resultado.snapshot(inicial.combat.active) end
 	local gui = Instance.new("ScreenGui")
@@ -67,12 +66,6 @@ function View.start(state, inicio, sala, encontroAutonomo)
 		c.CornerRadius, c.Parent = UDim.new(0, T.raios.botao), b
 		Extra.botao(b, nome == "Proxima", false)
 		b.Activated:Connect(function()
-			if j2 and encontroAutonomo then
-				if not encontroAutonomo.avisarRetorno() then return end
-				Players.LocalPlayer:SetAttribute("InterfaceCombate", false)
-				resultado.fechar(); fundo.Visible = false; j2 = false
-				return
-			end
 			resultado.fechar(); fundo.Visible = false; fn()
 		end)
 	end
@@ -100,8 +93,8 @@ function View.start(state, inicio, sala, encontroAutonomo)
 		local objetivo = Objetivos.atual({ run = ultimoRun, semRun = ultimoRun == nil, emEncontro = false })
 		proximo.Text = if objetivo then "Próximo: " .. objetivo.titulo .. (if objetivo.linha and objetivo.linha ~= "" then " · " .. objetivo.linha else "") else "Próximo: consulte RUN."
 		painel.Campo.Visible=not mundo
-		painel.Campo.Text=if j2 then "Voltar à vila" elseif s and s.salaConceitual then "Voltar à sala" else "Voltar ao campo"
-		painel.Proxima.Text=if j2 or mundo then "Continuar" elseif s and s.salaConceitual then "Preparar próxima partida" else "Escolher próxima partida"
+		painel.Campo.Text=if s and s.salaConceitual then "Voltar à sala" else "Voltar ao campo"
+		painel.Proxima.Text=if mundo then "Continuar" elseif s and s.salaConceitual then "Preparar próxima partida" else "Escolher próxima partida"
 		local abrir=resultado.visivel and not fundo.Visible
 		fundo.Visible=resultado.visivel
 		if abrir then
@@ -123,39 +116,6 @@ function View.start(state, inicio, sala, encontroAutonomo)
 		if destruido then return end
 		resultado.snapshot(s.combat.active);atualizar(s)
 	end)
-	if encontroAutonomo and type(encontroAutonomo.onEstado) == "function" then
-		local ultimoEncontro
-		encontroAutonomo.onEstado(function(dados)
-			if dados and dados.phase == "active" then j2 = false; resultado.fechar(); fundo.Visible = false end
-			if destruido or type(dados) ~= "table" or (dados.phase ~= "victory" and dados.phase ~= "defeat")
-				or ultimoEncontro == dados.encounterId then return end
-			ultimoEncontro = dados.encounterId
-			j2 = true
-			local ganhou = dados.phase == "victory"
-			local ganho = math.max(0, math.floor(tonumber(dados.ouroGanho) or 0))
-			local total = math.max(0, math.floor(tonumber(dados.ouroTotal) or 0))
-			resultado.receber({ titulo = if ganhou then "VITÓRIA" else "DERROTA",
-				detalhe = if ganhou then "O grupo superou o desafio." else "O grupo caiu. Reúna-se, ajuste sua estratégia e tente novamente.",
-				cor = if ganhou then "SUCESSO" else "PERIGO" })
-			local derrotados, totalInimigos = 0, 0
-			for _, ator in dados.actors or {} do
-				if ator.kind == "criatura" then
-					totalInimigos += 1
-					if ator.defeated or (ator.pv or 0) <= 0 then derrotados += 1 end
-				end
-			end
-			-- O resumo usa o estado final confirmado, sem inferir baixas por PV restaurado.
-			local resumo = resultado.resultado or resultado.pendente
-			if resumo then resumo.detalhe ..= string.format("\nInimigos derrotados: %d/%d", derrotados, totalInimigos) end
-			if ganhou then
-				recursos.Text = string.format("%s +%d moedas · total %d\n♥ Grupo recuperado", T.icone("conta"), ganho, total)
-			else
-				recursos.Text = "Sem recompensa\n♥ Grupo recuperado"
-			end
-			if type(dados.paGanho) == "number" then recursos.Text ..= string.format("\n%d PA de aprimoramento ganhos.", dados.paGanho) end
-			atualizar(state.snapshot())
-		end)
-	end
 	return gui
 end
 return View

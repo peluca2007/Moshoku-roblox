@@ -727,6 +727,7 @@ Adaptação de produto, sem alterar o livro: o PLANO §12 pede oferta ponderada 
 **Dados incompletos.** Nas árvores de PT a maioria das habilidades não traz custo de recurso no catálogo; "campo ausente" não foi tratado como 0. Alcances não foram comparados entre catálogo e porte.
 
 ## R3b — criação por run: modos, PA extra e defeitos (Claude, 14/10/2026)
+Atualização 23/10/2026: com o J2 apagado (PLANO §13), as lutas acontecem no motor da mesa, que ainda não aplica os efeitos de defeitos em combate; eles continuam valendo em perícias/eventos de caminho. A bancada B1 abaixo descreve o motor J2 e é histórica.
 Adaptação de produto do PLANO §12, sem regra nova do livro. Valores **provisórios** (`RunCriacao`): sem árvore +2 PA; personagem pronto +3 PA e +1 por defeito (2 defeitos), recompensa final ×1,25 por defeito (×1,5), nunca abaixo da base. O livro dá 3 PA iniciais (J1) e a Progressao usa PA infinito, portanto o PA extra é só registrado até o motor contar PA. A ficha pronta vem de `PersonagensProntos` (17 fichas, uma por árvore); só as de árvore elegível entram no sorteio, com as mais fortes mais raras. Defeitos usam Desvantagem/deslocamento já existentes no livro (ver `RunDefeitos`); a mecânica só é aplicada quando o motor consumir `efeitos`. Pendente: UI de escolha, persistência do plano (R5), aplicar os efeitos no combate/perícias.
 
 ## R2b — surpresa, fuga e entrada na grade (regras puras, Claude, 14/10/2026)

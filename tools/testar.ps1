@@ -90,7 +90,6 @@ try {
         if ($LASTEXITCODE -ne 0) { $failures++; Write-Output "ERRO ao montar $($spec.Name)"; continue }
         $output = & $luau $runFile 2>&1
         $result = $output | Where-Object { "$_" -like 'RESULTADO*' } | Select-Object -Last 1
-        $output | Where-Object { "$_" -like 'B1 SIM*' } | ForEach-Object { Write-Output "  $_" }
         $output | Where-Object { "$_" -like 'FALHA*' } | ForEach-Object { Write-Output "  $_" }
         if ($LASTEXITCODE -ne 0 -or -not $result) {
             $failures++

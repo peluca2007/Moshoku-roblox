@@ -1,7 +1,7 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local C = require(Shared.Regras.Cacadas)
 local E = require(Shared.EncontrosPorZona)
-local Elenco = require(Shared.EncontroAutonomoElenco)
+local Recompensa = require(Shared.Regras.RecompensaEncontro)
 local CriaturasDados = require(Shared.Livro.Dados.Criaturas)
 local porId = {}
 for _, d in ipairs(CriaturasDados) do porId[d.id] = d end
@@ -88,19 +88,16 @@ return {
   t.eq(E.elencoPatrulha("invalido",1),nil)
   t.eq(E.elencoPatrulha("ratos-celeiro",0),nil)
  end,
- ["metadados J2 preservam recompensa e respiracao de novas criaturas"] = function(t)
-  local deps = {
-   conectado = function() return true end,
-   corpoPessoal = function() return {name="Heroi",calculated={initiative={bonus=0,advantage=false},movementMeters=9}} end,
-   criatura = function(id) return Criaturas.ficha(porId[id]) end,
-  }
-  for _,id in ipairs({"creature/rato-gigante","creature/aranha-da-floresta","creature/bandido-de-estrada","creature/golem-de-pedra-menor"}) do
-   local atores = Elenco.montar({{UserId=1}}, {id}, deps)
-   local c, d = atores[2], porId[id].data
-   t.eq(c.recompensa.patamar,d.patamar)
-   t.eq(c.recompensa.papel,d.papel)
-   t.eq(c.respira,id ~= "creature/golem-de-pedra-menor")
+ ["recompensa das criaturas das patrulhas segue o catalogo"] = function(t)
+  for _,d in ipairs(E.patrulhas()) do
+   local r, dados = Recompensa.daCriatura(d.criatura), porId[d.criatura].data
+   t.ok(r ~= nil, d.criatura)
+   t.eq(r.patamar,dados.patamar)
+   t.eq(r.papel,dados.papel)
+   r.patamar = 99
+   t.eq(Recompensa.daCriatura(d.criatura).patamar,dados.patamar, "devolve cópia")
   end
+  t.eq(Recompensa.daCriatura("creature/inexistente"),nil)
  end,
  ["reaparecimento usa tempo decorrido da run e espera completa"] = function(t)
   t.eq(E.podeReaparecer(100,100),false)

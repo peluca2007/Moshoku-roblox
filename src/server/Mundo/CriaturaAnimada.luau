@@ -1,6 +1,6 @@
 -- Monta um modelo de criatura (Mundo/Modelos) e o anima por código em volta dos pivôs de
 -- Shared.Mundo.PivosModelos. Só visual: peças ancoradas, sem colisão/consulta, sem regra de jogo.
--- Usado por Mundo/PatrulhaModelo (patrulhas) e EncontroAutonomoMiniaturas (combate J2).
+-- Usado por Mundo/PatrulhaModelo (patrulhas do mundo).
 -- Frente do modelo = -Z. `cf` é sempre a base no chão (centro x/z do pivô, y = chão).
 local Montar = require(script.Parent.MontarModelo)
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")

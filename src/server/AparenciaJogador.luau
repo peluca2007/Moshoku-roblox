@@ -86,7 +86,7 @@ function Servico.start(deps)
    end
   end
  end
- local mesa, encontro = deps.mesa, deps.encontro
+ local mesa, emLuta = deps.mesa, deps.emLuta or function() return false end
 	local conta = deps.conta or require(script.Parent.ContaServico).start()
 	local remote = Instance.new("RemoteEvent")
 	remote.Name, remote.Parent = Servico.REMOTE, ReplicatedStorage
@@ -94,7 +94,7 @@ function Servico.start(deps)
 	local function conectado(p) return p.Parent == Players and Players:GetPlayerByUserId(p.UserId) == p end
 	local function combate(p)
 		local h = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
-		return mesa.emCombate() or encontro.emEncontroAtivo() or (h and h.Anchored) == true
+		return mesa.emCombate() or emLuta() or (h and h.Anchored) == true
 	end
 	local function contexto(p)
 		if criacao[p] and os.clock() < criacao[p] then return true end

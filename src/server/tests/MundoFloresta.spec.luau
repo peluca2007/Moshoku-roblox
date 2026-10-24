@@ -1,11 +1,10 @@
 -- SOMENTE STUDIO: a floresta monta Instances do mundo.
 local Floresta = require(script.Parent.Parent.Mundo.Floresta)
 local Layout = require(game:GetService("ReplicatedStorage").Shared.Mundo.FlorestaLayout)
-local Terreno = require(game:GetService("ReplicatedStorage").Shared.EncontroAutonomoTerreno)
 local TerrenoLayout = require(game:GetService("ReplicatedStorage").Shared.Mundo.TerrenoLayout)
 
 return {
-	["floresta monta marco catalogado, grade e rochas declaradas"] = function(t)
+	["floresta monta marco catalogado sem grade nem rochas do J2"] = function(t)
 		local mundo = Instance.new("Folder")
 		local floresta = Floresta.start({ workspace = mundo })
 		local segunda = Floresta.start({ workspace = mundo })
@@ -22,12 +21,8 @@ return {
 		t.eq(marco:GetAttribute("AreaRole"), "encounter-trigger")
 		t.eq(TerrenoLayout.altura(Layout.MARCO.x, Layout.MARCO.z), 0)
 		t.ok(prompt ~= nil and prompt.Enabled and prompt.RequiresLineOfSight)
-		t.eq(#grade:GetChildren(), 42)
-		t.eq(#rochas:GetChildren(), #Terreno.celulas("region/encounter/dark-forest"))
-		for _, rocha in ipairs(rochas:GetChildren()) do
-			t.eq(rocha:GetAttribute("AreaRole"), "movement-obstacle")
-			t.ok(rocha.CanCollide and rocha.Anchored and not rocha.CanTouch)
-		end
+		t.eq(grade, nil)
+		t.eq(rochas, nil)
 		mundo:Destroy()
 	end,
 }

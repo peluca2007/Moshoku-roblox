@@ -39,12 +39,12 @@ assert 'dica = "Toque em AJUDA para abrir o guia"' in ajuda
 
 resultado = read("src/client/ResultadoView.luau")
 assert 'r.titulo .. (if venceu then "!" else "")' in resultado
-assert 'T.icone("combate")' in resultado and 'T.icone("conta")' in resultado
+assert 'T.icone("combate")' in resultado
 assert 'Objetivos.atual({ run = ultimoRun' in resultado
 assert 'if fundo.Visible and atualizar then atualizar(state.snapshot()) end' in resultado
 assert "Grupo recuperado" in resultado
 assert "Dano observado nesta conexão" not in resultado
-assert "Reúna-se, ajuste sua estratégia e tente novamente" in resultado
+assert "Reúna-se e tente outra estratégia" in read("src/shared/ApresentacaoResultado.luau")
 
 criação = read("src/client/CriacaoPersonagemView.luau")
 assert "BorderSizePixel = 0, Text = texto" in criação

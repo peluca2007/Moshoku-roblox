@@ -67,7 +67,7 @@ end
 
 -- Elegível = tem ação suficiente no combate do jogo hoje (muda quando mais habilidades forem portadas), ou
 -- vale fora do combate na run (`valorNaRun`: Navegação e Liderança dá o Explorador, que pesa 2 no voto, encurta
--- a viagem, melhora eventos e evita emboscada — RunVotacao/RunViagem/EncontroPatrulha).
+-- a viagem, melhora eventos e evita emboscada — RunVotacao/RunViagem).
 function Forca.elegivel(id)
 	local a = Forca.ARVORES[id]
 	if not a then return false end

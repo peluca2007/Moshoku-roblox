@@ -12,7 +12,7 @@ local modoCamera=require(script.Parent.ModoCamera)
 local mundo=require(script.Parent.CameraMundo) -- câmera do mundo: pausa/retoma e dona do mouse fora da sala
 local Movimento=require(script.Parent.BloqueioMovimento)
 local V={}
-function V.start(state,encontroAutonomo)
+function V.start(state)
 	local player=Players.LocalPlayer;local pg=player:WaitForChild("PlayerGui")
 	local pasta=Instance.new("Folder");pasta.Name="SalaObjetosLocais";pasta.Parent=workspace
 	local papeis={}
@@ -35,9 +35,9 @@ function V.start(state,encontroAutonomo)
 		local world=workspace:WaitForChild("SalaRPG",20);if not world then return end
 		for _,p in world:GetChildren() do
 			local acao=p:GetAttribute("SalaObjeto")
-			local titulos={mestre="MOSHOKU\nPreparar a sessão",livro="CADERNO",ajustes="AJUSTES",assumir="ASSUMIR FICHA",admin="ADM",pronto="PRONTO",dados="LANÇAR",tabuleiro="MAPA DA SESSÃO",autonomo="EXPEDIÇÃO\nSOLO · GOBLIN + LOBO"}
+			local titulos={mestre="MOSHOKU\nPreparar a sessão",livro="CADERNO",ajustes="AJUSTES",assumir="ASSUMIR FICHA",admin="ADM",pronto="PRONTO",dados="LANÇAR",tabuleiro="MAPA DA SESSÃO"}
 			if titulos[acao] and p.Name~="AbaEscudo" and not p.Name:find("Dado") and p.Name~="TabuleiroDaSala" then
-				local face=if acao=="mestre" or acao=="autonomo" then Enum.NormalId.Front else Enum.NormalId.Top
+				local face=if acao=="mestre" then Enum.NormalId.Front else Enum.NormalId.Top
 				local superficie=if p.Name=="LivroDeAjustes" then world:FindFirstChild("CapaCaderno") or p else p
 				local g=O.superficie(superficie,face,600,250);local l=O.texto(g,titulos[acao],UDim2.fromScale(.05,.16),UDim2.fromScale(.9,.7),48,Color3.fromRGB(245,228,190));l.TextXAlignment=Enum.TextXAlignment.Center
 				rotulos[acao]=l;atualizarSelo()
@@ -56,7 +56,7 @@ function V.start(state,encontroAutonomo)
 
 	local snap,sala,eu=nil,nil,nil
 	local combateAnterior=nil
-	local lobby=false;local foco=nil;local ultimaTrans=nil;local ultimoOlhar=0;local cameraPapel=nil;local erroAte=0;local tinhaTransicao=false;local ultimoPlacar=nil;local autonomoAtivo=false
+	local lobby=false;local foco=nil;local ultimaTrans=nil;local ultimoOlhar=0;local cameraPapel=nil;local erroAte=0;local tinhaTransicao=false;local ultimoPlacar=nil
 	local corpo=require(script.Parent.SalaCorpo).new(pasta)
 	local fisicos=require(script.Parent.SalaDadosControle).new(state)
 	local direcaoInicial=false
@@ -95,7 +95,7 @@ function V.start(state,encontroAutonomo)
 	local function pronto() if lobby and eu and eu.admitido then state.send("salaPronto",{ativo=not eu.pronto}) end end
 	local function interagir(objeto)
 		foco=objeto
-		if autonomoAtivo or not lobby or resultadoAberto() or pg.AdminPanel.Enabled or paginas.congelar() or eleicao.congelar() or not foco or not eu or not eu.admitido then return end
+		if not lobby or resultadoAberto() or pg.AdminPanel.Enabled or paginas.congelar() or eleicao.congelar() or not foco or not eu or not eu.admitido then return end
 		local acao=foco:GetAttribute("SalaObjeto")
 		if acao=="dados" or acao=="jogador" then if not fisicos.ocupado() then paginas.fechar();fisicos.interagir(foco) end;return end
 		if fisicos.ocupado() then return end
@@ -110,9 +110,6 @@ function V.start(state,encontroAutonomo)
 			if acao=="mestre" and (not h or not h.SeatPart) then hint.Text="Sente-se à mesa para usar o escudo.";erroAte=os.clock()+4;return end
 			paginas.abrir("mestre")
 		elseif acao=="ajustes" then paginas.abrir("ajustes")
-		elseif acao=="autonomo" then
-			if not encontroAutonomo or not encontroAutonomo.iniciar() then hint.Text="Não foi possível iniciar agora. Confira sua ficha e a partida atual.";erroAte=os.clock()+4
-			else hint.Text="Preparando a expedição…";erroAte=os.clock()+4 end
 		elseif acao=="pronto" then state.send("salaPronto",{ativo=not eu.pronto})
 		end
 	end
@@ -167,7 +164,7 @@ function V.start(state,encontroAutonomo)
 			local sel=pg:FindFirstChild("EscolhaDePersonagem");if sel then sel.Enabled=false end
 		end
 		combateAnterior=s.combat.active==true
-		gui.Enabled=not autonomoAtivo and (lobby or (sala and sala.eleicao~=nil) or false)
+		gui.Enabled=lobby or (sala and sala.eleicao~=nil) or false
 		soltos.atualizar(sala and sala.papeisSoltos,lobby)
 		
 		for _,p in papeis do O.visivel(p,lobby and Fichas.disponiveis(sala or {},p:GetAttribute("FichaId"))>0) end
@@ -193,39 +190,20 @@ function V.start(state,encontroAutonomo)
 			local chave=table.concat(linhas,"\n");if chave~=ultimoPlacar then ultimoPlacar=chave;placar.Text=chave;paginas.placar(linhas) end
 		end
 	end)
-	if encontroAutonomo then
-		encontroAutonomo.onEstado(function(estadoAutonomo)
-			if estadoAutonomo.phase == "active" or estadoAutonomo.phase == "victory" or estadoAutonomo.phase == "defeat" then
-				autonomoAtivo=true
-				Movimento.definir("encontro-autonomo",true)
-				suspenderToque(true)
-				gui.Enabled=false
-			end
-		end)
-		encontroAutonomo.onRetorno(function()
-			autonomoAtivo=false
-			Movimento.definir("encontro-autonomo",false)
-			suspenderToque(false)
-			gui.Enabled=lobby or (sala and sala.eleicao~=nil) or false
-		end)
-		encontroAutonomo.onRecusado(function(mensagem)
-			if not autonomoAtivo and lobby then hint.Text=mensagem or "Encontro recusado.";erroAte=os.clock()+5 end
-		end)
-	end
 	-- AvisosJogo já apresenta recusas do servidor; aqui ficam apenas orientações locais.
 	RunService:BindToRenderStep("SalaPrimeiraPessoa",Enum.RenderPriority.Camera.Value+3,function(dt)
 		local camera=workspace.CurrentCamera
 		eleicao.redimensionar()
-		fisicos.atualizar(sala,lobby and not autonomoAtivo and eu and eu.admitido and not (sala and sala.transicao) and not paginas.congelar() and not eleicao.congelar() and not pg.AdminPanel.Enabled,dt)
+		fisicos.atualizar(sala,lobby and eu and eu.admitido and not (sala and sala.transicao) and not paginas.congelar() and not eleicao.congelar() and not pg.AdminPanel.Enabled,dt)
 		if not sala then Movimento.definir("consulta",false);suspenderToque(false);pegada.atualizar(false,nil,nil);return end
 		local fimAberto=resultadoAberto()
 		Movimento.definir("consulta",lobby and not fimAberto and (paginas.congelar() or eleicao.congelar() or pg.AdminPanel.Enabled))
-		suspenderToque(lobby and (autonomoAtivo or paginas.congelar() or eleicao.congelar() or pg.AdminPanel.Enabled or fimAberto))
+		suspenderToque(lobby and (paginas.congelar() or eleicao.congelar() or pg.AdminPanel.Enabled or fimAberto))
 		O.visivel(papelPlacar,lobby and ultimoPlacar~=nil)
 		if lobby then
-			local overlay=autonomoAtivo or paginas.congelar() or eleicao.congelar() or pg.AdminPanel.Enabled or fimAberto
+			local overlay=paginas.congelar() or eleicao.congelar() or pg.AdminPanel.Enabled or fimAberto
 			-- A câmera do mundo cede enquanto a sobreposição congela a vista (e volta sozinha).
-			mundo.pausa("encontro-autonomo",autonomoAtivo);mundo.pausa("sobreposicao-sala",overlay and not autonomoAtivo)
+			mundo.pausa("sobreposicao-sala",overlay)
 			soltos.animar(workspace:GetServerTimeNow())
 			interacoes.atualizar(not overlay and not sala.transicao,eu and eu.admitido,snap.you.admin,prontoConfirmado)
 			hint.Visible=os.clock()<erroAte or not eu or not eu.admitido

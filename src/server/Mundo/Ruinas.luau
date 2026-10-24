@@ -5,7 +5,6 @@
 local Layout = require(game:GetService("ReplicatedStorage").Shared.Mundo.RuinasLayout)
 local Passagem = require(game:GetService("ReplicatedStorage").Shared.Mundo.PassagemLayout)
 local Props = require(script.Parent.Props)
-local Grade = require(script.Parent.GradeTatica)
 
 local Ruinas = {}
 local NOME = "RuinasDoVale"
@@ -62,12 +61,6 @@ function Ruinas.start(deps)
  marco:SetAttribute("AreaId", a.marco)
  marco:SetAttribute("AreaRole", "encounter-trigger")
  marco:SetAttribute("EncounterId", a.id)
- -- Terreno compartilhado plano em y=0; grade apenas visual.
- Grade.criar(regiao, marco, "region/ruinas-do-vale/grade-tatica", function(pai, nome, tamanho, pos, cor, material)
-  return parte(pai, nome, tamanho, CFrame.new(pos), cor, material)
- end, function(item, id, papel)
-  item:SetAttribute("AreaId", id); item:SetAttribute("AreaRole", papel)
- end)
  return regiao
 end
 

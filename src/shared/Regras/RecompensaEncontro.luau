@@ -57,4 +57,20 @@ function R.gerar(criaturas, rng, itens)
 	return { moedas = moedas, tralhas = tralhas, itens = equipamento, valorTotal = total }
 end
 function R._dados() return table.clone(BASE), table.clone(PAPEL), table.clone(ARQUETIPO), table.clone(SUB) end
+
+-- Valores do Apêndice G das criaturas do mundo (entrada de R.gerar), vindos do antigo elenco J2.
+local CRIATURAS = table.freeze({
+	["creature/rato-gigante"] = { patamar = 1, papel = "lacaio", arquetipo = "agil", subArquetipo = "besta" },
+	["creature/aranha-da-floresta"] = { patamar = 2, papel = "padrao", arquetipo = "agil", subArquetipo = "besta" },
+	["creature/bandido-de-estrada"] = { patamar = 1, papel = "padrao", arquetipo = "bruto", subArquetipo = "humanoide" },
+	["creature/golem-de-pedra-menor"] = { patamar = 2, papel = "padrao", arquetipo = "fortaleza", subArquetipo = "construto", temImunidade = true },
+	["creature/urso-de-presas-vermelhas"] = { patamar = 2, papel = "padrao", arquetipo = "bruto", subArquetipo = "besta" },
+	["creature/goblin-batedor"] = { patamar = 1, papel = "lacaio", arquetipo = "agil", subArquetipo = "humanoide" },
+	["creature/lobo-cinzento"] = { patamar = 1, papel = "padrao", arquetipo = "bruto", subArquetipo = "besta" },
+	["creature/treant-anciao"] = { patamar = 3, papel = "chefe", arquetipo = "bruto", subArquetipo = "planta" },
+})
+function R.daCriatura(creatureId)
+	local dados = CRIATURAS[creatureId]
+	return if dados then table.clone(dados) else nil
+end
 return R

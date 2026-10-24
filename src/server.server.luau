@@ -1,5 +1,5 @@
--- Inicializa a mesa assistida e o encontro autônomo J2; o protótipo antigo
--- CombatService continua pausado.
+-- Inicializa a mesa, o mundo e o Modo História (lutas do mundo na arena da mesa, PLANO §13);
+-- o protótipo antigo CombatService continua pausado.
 local Server = script.Parent.Server
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Protocol = require(ReplicatedStorage.Shared.MesaProtocol)
@@ -45,17 +45,16 @@ require(Server.DescansoAcampamentoService).start({
 	end,
 })
 local dojoService
-local encontro
 local missoes = require(Server.MissaoService).start({
 	remote = ReplicatedStorage:WaitForChild(Protocol.REMOTE),
 	registrarHandler = mesa.registrarHandler,
 	consultar = mesa.consultarPerfilPessoal,
 	acao = mesa.acaoMissaoPessoal,
-	emCombate = function() return mesa.emCombate() or (encontro ~= nil and encontro.emEncontroAtivo()) end,
+	emCombate = function() return mesa.emCombate() end,
 	conectado = function(player) return player ~= nil and player.Parent == game:GetService("Players") end,
 	avisar = mesa.avisarPessoal,
 })
--- Modo História (PLANO §13): patrulha -> luta da mesa na arena da região -> volta ao mapa.
+-- Modo História (PLANO §13): toda luta do mundo vai para a arena da mesa e volta ao mapa.
 local arenaCenario = require(Server.Mundo.ArenaCenario)
 task.spawn(arenaCenario.preparar)
 local lutaDoMundo = require(Server.LutaDoMundoServico).start({
@@ -72,49 +71,37 @@ local lutaDoMundo = require(Server.LutaDoMundoServico).start({
 		if runServico then runServico.encerrado(...) end
 	end,
 })
-encontro = require(Server.EncontroAutonomoService).start({
+local function emLuta() return mesa.emCombate() or lutaDoMundo.ativa() end
+local patrulhas = require(Server.PatrulhasDoMundo).start({
 	lutaNaArena = lutaDoMundo.iniciar,
 	lutaNoMarco = lutaDoMundo.iniciarMarco,
-	lutaNaArenaAtiva = lutaDoMundo.ativa,
-	corpoPessoal = mesa.corpoPessoal,
-	consumirItemPessoal = mesa.consumirItemPessoal,
-	recompensarEncontro = function(player, encounterId, moedas, marcoId, pa)
-		local sucesso, total, cumpridas = mesa.recompensarEncontroPessoal(player, encounterId, moedas, marcoId, pa)
-		if sucesso then missoes.notificarConclusoes(player, cumpridas) end
-		return sucesso, total
-	end,
+	lutaAtiva = lutaDoMundo.ativa,
 	emCombate = function() return mesa.emCombate() or missoes.transacaoAtiva() end,
-	aoEncerrar = function(...)
-		if dojoService then dojoService.encerrado(...) end
-		if runServico then runServico.encerrado(...) end
-	end,
-	miniaturas = require(Server.EncontroAutonomoMiniaturas).start(),
-	avatares = require(Server.EncontroAutonomoAvatares).start(),
+	corpoPessoal = mesa.corpoPessoal,
+	avisar = mesa.avisarPessoal,
 })
+patrulhas.criarPatrulhas()
+patrulhas.ligarMarcos()
 dojoService = require(Server.DojoService).start({
 	consultar = mesa.consultarDojoPessoal,
 	atualizar = mesa.atualizarDojoPessoal,
 	emCombate = mesa.emCombate,
-	-- Provação do Hanzo também na arena da mesa (PLANO §13), não no J2.
-	encontro = {
-		emEncontroAtivo = function() return encontro.emEncontroAtivo() or lutaDoMundo.ativa() end,
-		criarProvaDojo = lutaDoMundo.iniciarProvaDojo,
-	},
+	-- Provação do Hanzo na arena da mesa.
+	encontro = { emEncontroAtivo = lutaDoMundo.ativa, criarProvaDojo = lutaDoMundo.iniciarProvaDojo },
 })
 runServico = require(Server.RunServico).start({
-	emEncontro = function() return mesa.emCombate() or encontro.emEncontroAtivo() end,
+	emEncontro = emLuta,
 	corpoPessoal = mesa.fichaParaTestes or mesa.corpoPessoal, -- bônus para os testes dos eventos de viagem (F8); aceita perfil sem árvore
-	-- Luta do guardião da run na arena da mesa (PLANO §13); o fim volta por runServico.encerrado.
+	-- Luta do guardião da run na arena da mesa; o fim volta por runServico.encerrado.
 	iniciarLuta = lutaDoMundo.iniciarChefe,
 	conta = require(Server.ContaServico).start(),
 })
 local cacadas = require(Server.CacadasService).start({
-	runServico = runServico, avisar = mesa.avisarPessoal,
-	emCombate = function() return mesa.emCombate() or encontro.emEncontroAtivo() end,
+	runServico = runServico, avisar = mesa.avisarPessoal, emCombate = emLuta,
 })
-encontro.definirCacadas(cacadas)
+patrulhas.definirCacadas(cacadas)
 lutaDoMundo.definirCacadas(cacadas)
--- A segunda provação abre o rank na mesma ficha e nas cartas J2; só o servidor concede.
+-- A segunda provação abre o rank na mesma ficha; só o servidor concede.
 runServico.observar(function(sessao)
 	if not sessao or not sessao.run or sessao.run.fim then return end
 	for userId, plano in sessao.planos do
@@ -124,17 +111,8 @@ runServico.observar(function(sessao)
 		end
 	end
 end)
--- Defeitos do personagem pronto da run valem no combate J2 (F1): só quem está na run ativa e no modo "pronto".
-encontro.definirProvedorDefeitos(function(userId)
-	local sessao = runServico.sessao()
-	local run = sessao and sessao.run
-	if not run or run.fim or not run.jogadores[userId] then return {} end
-	local plano = sessao.planos[userId]
-	if not plano or plano.modo ~= "pronto" then return {} end
-	return plano.defeitos
-end)
 require(Server.ContaServico).ligarRemote({ entreRuns = function() local s = runServico.sessao(); return not (s and s.run and not s.run.fim) end })
-require(Server.TreinadorServico).start({ runServico = runServico, emCombate = function() return mesa.emCombate() or encontro.emEncontroAtivo() end })
+require(Server.TreinadorServico).start({ runServico = runServico, emCombate = emLuta })
 require(Server.Mundo.Npcs).start({ abrirDojo = dojoService.abrir, abrirLoja = mesa.abrirLoja, abrirMissoes = missoes.abrir })
-require(Server.AparenciaJogador).start({ mesa = mesa, encontro = encontro })
+require(Server.AparenciaJogador).start({ mesa = mesa, emLuta = lutaDoMundo.ativa })
 ReplicatedStorage:SetAttribute(Protocol.READY_ATTRIBUTE, true)

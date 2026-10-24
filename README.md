@@ -4,9 +4,9 @@ Direção do Pedro (13/10/2026): **exploração de mundo aberto e combate por tu
 
 Para trabalhar: leia [arquitetura atual](docs/ARQUITETURA.md), consulte a tarefa em [TAREFAS](docs/TAREFAS.md) e localize o comportamento em [MANUTENCAO](docs/MANUTENCAO.md). Consulte histórico somente quando necessário; confirme entregas antes de refazê-las.
 
-**Estado atual (17/10/2026):** exploração a pé com combate por turnos e **runs cooperativas** (1–4 jogadores): vila, acampamento, Floresta Sombria e Ruínas pela passagem das montanhas. W1b substitui viagem por painel por eventos de caminho, relógio de 8 minutos/dia, caçadas na praça e patrulhas por região; segunda árvore aprendida integra a ficha J2. Verificação local e limites de Studio em [TESTES](docs/TESTES.md); estado das entregas em [TAREFAS](docs/TAREFAS.md). Ferramentas de mesa continuam no mesmo núcleo. **23/10:** a patrulha que encosta leva o grupo à Luta da mesa numa arena com o cenário da região (cidade, campo, floresta e ruínas; [PLANO §13](docs/PLANO.md)) e devolve todos ao ponto do contato.
+**Estado atual (17/10/2026):** exploração a pé com combate por turnos e **runs cooperativas** (1–4 jogadores): vila, acampamento, Floresta Sombria e Ruínas pela passagem das montanhas. W1b substitui viagem por painel por eventos de caminho, relógio de 8 minutos/dia, caçadas na praça e patrulhas por região; segunda árvore aprendida integra a ficha. Verificação local e limites de Studio em [TESTES](docs/TESTES.md); estado das entregas em [TAREFAS](docs/TAREFAS.md). Ferramentas de mesa continuam no mesmo núcleo. **23/10:** a patrulha que encosta leva o grupo à Luta da mesa numa arena com o cenário da região (cidade, campo, floresta e ruínas; [PLANO §13](docs/PLANO.md)) e devolve todos ao ponto do contato. O mesmo vale para marcos, guardião da run e dojo; o combate J2 antigo foi apagado.
 
-**Protótipo pausado:** o combate clássico de Espada/Magia/Defender segue desativado e não é uma opção jogável nesta versão. A integração CLEG foi revertida; o combate animado J2 de exploração continua sendo a referência atual para patrulhas e chefes. A recuperação e suas verificações estão em [TAREFAS](docs/TAREFAS.md) e [TESTES](docs/TESTES.md).
+**Protótipo pausado:** o combate clássico de Espada/Magia/Defender segue desativado e não é uma opção jogável nesta versão. A integração CLEG foi revertida; as lutas do mundo usam a Luta da mesa na arena da região. A recuperação e suas verificações estão em [TAREFAS](docs/TAREFAS.md) e [TESTES](docs/TESTES.md).
 
 ## Jogar
 
@@ -34,7 +34,7 @@ No lobby atual, o primeiro participante é mestre e pode transferir o posto pelo
 
 ## Protótipo clássico pausado
 
-A integração CLEG de 19/10 foi revertida após a revisão do fluxo. O protótipo clássico permanece pausado e não há posto ou instrução de acesso no jogo. O combate J2 segue como combate atual de exploração. A recuperação e as verificações em andamento estão registradas em [TAREFAS](docs/TAREFAS.md) e [TESTES](docs/TESTES.md).
+A integração CLEG de 19/10 foi revertida após a revisão do fluxo. O protótipo clássico permanece pausado e não há posto ou instrução de acesso no jogo. O combate de exploração é a Luta da mesa na arena da região. A recuperação e as verificações em andamento estão registradas em [TAREFAS](docs/TAREFAS.md) e [TESTES](docs/TESTES.md).
 
 ## Como trabalhar nesta pasta
 

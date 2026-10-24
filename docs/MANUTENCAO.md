@@ -12,6 +12,7 @@ Patrulha encosta → Luta da mesa (motor da sala) no tabuleiro com o cenário da
 | Luz da arena (segue a região e a hora da run, não a noite da sala) | `client/AmbienteMundo.pontoDaArena` lê `Mesa.ArenaRegional` e usa `ArenasDados.pontoDoMundo` |
 | Tela de resultado só com "Continuar" | evento `encontro` com `mundo = true`; `client/ResultadoView` |
 | Recompensa (Apêndice G da criatura) | `Regras/RecompensaEncontro.daCriatura` + `gerar` |
+| HUD do mundo some durante a luta (objetivo, seta, relógio, atalhos, diálogo de NPC) | snapshot `encontro.mundo` (`EncontroService.publico`) → `client/InterfaceCombate` liga o atributo local `InterfaceCombate`, que essas telas já observam |
 
 | Marcos do mundo (segurar E) | `PatrulhasDoMundo.ligarMarcos` → `LutaDoMundoServico.iniciarMarco` (elenco de `EncontrosPorZona.elegivel`, arena por `ArenasDados.daMarco`) |
 | Guardião da run | `RunServico` (deps.iniciarLuta) → `LutaDoMundoServico.iniciarChefe` (composição de `EncontrosPorZona.paraRun`, papel do Apêndice G repassado à mesa); o fim volta por `runServico.encerrado` com o mesmo encounterId |
@@ -60,7 +61,7 @@ No celular, `ExtraCombate.faixa` usa ícones de 28 px, rótulos de uma linha de 
 
 `client/ToqueContraste`, inicializado por Hud, acrescenta aro claro/sombra ao `JumpButton` quando existe e é ImageButton. Localização conforme o [exemplo público do Roblox](https://create.roblox.com/docs/building-and-visuals/ui/positioning-and-sizing-guiobjects). Não altera imagem/tamanho/eventos/PlayerModule. Joystick preservado: variantes DynamicThumbstick/Classic/Tap to Move não oferecem contrato público uniforme de peças para decoração sem depender de detalhes internos. Aro e toque real não verificados; sem Studio na U7.
 
-ScreenGuis com painéis V2 usam `ZIndexBehavior.Sibling` (no modo Global o z do painel escondia filhos de z menor). UIStroke em botão/rótulo precisa de `ApplyStrokeMode.Border`, senão contorna o texto. `UI/Avisos` ignora aviso idêntico consecutivo. `UITemaDados.faixasAviso` fornece topo/altura do banner e início do estado da provação com 12 px de intervalo; `ProvacoesView` e `UI/Avisos` consomem a mesma geometria. Ícones ficam em `FONTE_ICONE` (Garamond).
+ScreenGuis com painéis V2 usam `ZIndexBehavior.Sibling` (no modo Global o z do painel escondia filhos de z menor). UIStroke em botão/rótulo precisa de `ApplyStrokeMode.Border`, senão contorna o texto. `UI/Avisos` ignora aviso idêntico consecutivo. `UITemaDados.faixasAviso` fornece topo/altura do banner (abaixo do HUD do mundo: `TOPO_AVISO` celular/médio/desktop) e início do estado da provação com 12 px de intervalo; `ProvacoesView` e `UI/Avisos` consomem a mesma geometria. Ícones ficam em `FONTE_ICONE` (Garamond).
 
 U6 (17/10): `UI/ExtraCombate` separa nome, alvo/efeito e custo em faixas exclusivas das cartas (84 px na U7), sem desenhar o custo duas vezes; observa mudanças de texto/Active para preservar seleções e espera. Fuga/rendição continuam acessíveis no submenu; nenhuma elegibilidade, intenção, mira ou regra mudou.
 
@@ -70,7 +71,7 @@ Regressões locais: fixture U3 verifica retângulos de texto/custo, atualizaçã
 
 ## Interface V2 — base U1
 
-`client/UI/Tema` expõe tokens de `shared/UITemaDados` (puro/testável), fontes e `arvore = Estilo.arvore`. Paleta, raios, espessuras, transparências, espaçamentos e tamanhos ficam ali; não copiar nas telas. `Componentes` cria Instances somente no cliente; `Avisos` mantém a fila privada por destino. Telas U2/A3 usam a base; U3/U4 integram seus arquivos próprios.
+`client/UI/Tema` expõe tokens de `shared/UITemaDados` (puro/testável), fontes e `arvore = Estilo.arvore`. Paleta, raios, espessuras, transparências, espaçamentos e tamanhos ficam ali; não copiar nas telas. `Componentes` cria Instances somente no cliente; `Avisos` mantém uma fila única para todas as telas (banners nunca se sobrepõem) e converte o topo de `faixasAviso` (abaixo da faixa do Roblox) para telas com `IgnoreGuiInset`. Telas U2/A3 usam a base; U3/U4 integram seus arquivos próprios.
 
 U1b (16/10): títulos Bodoni 30 em caixa alta com espaço fino; subtítulos Garamond 22 (`texto{subtitulo=true}`), corpo Merriweather 19/itálico, rótulos SourceSansPro SemiBold 20, números Oswald 22, legenda 15. `Tema.fontes.reserva` permanece exposta como Garamond. `Tema.ICONES` mapeia nomes para glifos; `Tema.icone(nomeOuGlifo)` aceita ambos. Todo ícone/ornamento tem TextLabel separado com `Tema.FONTE_ICONE = Font.fromEnum(Enum.Font.Garamond)`. Girar à direita usa ▶: ↻ não tem confirmação. Evidência externa fornecida por Pedro: `evidencias/ui-v1/91-teste-glifos-fontes.jpg`; esta revisão não executou Studio.
 
@@ -160,7 +161,7 @@ Fonte de verdade do jogo: `src/`. Não edite o place gerado. Reserve os arquivos
 | Contexto sentado, checklist e hierarquia da preparação | `client/SalaPreparacaoView` |
 | Selo PRONTO confirmado e ação de cancelar no prompt | `client/SalaView`, `client/SalaInteracoes` |
 | Suspender/restaurar controles táteis durante consultas do lobby | `client/SalaView`, `suspenderToque` |
-| Árvore de progressão de ficha v2 (botão próprio; T continua entregando a ficha; rank/compra no servidor) | `client/ArvoresView`, iniciado em `client.client`; validação em `server/ProgressaoService` e `shared/Regras/Progressao` |
+| Árvore de progressão de ficha v2 (botão próprio abaixo do cartão de objetivo; T continua entregando a ficha; rank/compra no servidor) | `client/ArvoresView`, iniciado em `client.client`; validação em `server/ProgressaoService` e `shared/Regras/Progressao` |
 | Entrada do tabuleiro não disputa atalhos do lobby/digitação | `client/BoardView`, callback de `InputBegan` |
 | Retorno da entrega restaura impressão e rolagem da ficha | `client/SalaPaginas`, `VoltarFicha`/ramo físico de `render` |
 | Pegada mantida, contorno e cancelamento de confirmação tardia | `src/client/SalaPegada.luau` |

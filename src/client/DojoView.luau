@@ -55,6 +55,11 @@ function View.start()
 			mensagem.Text = string.format("Provação concluída. PA travado: %d · PA livre registrado: %d · Marca: %s", dado.ganho.travados, dado.ganho.livre, if dado.ganho.marca then "sim" else "não")
 		elseif dado.iniciada then
 			gui.Enabled = false
+		elseif dado.arvore == nil and not dado.podeEscolher then
+			-- Primeira run (P2): ainda sem caminho; o dojo só treina quem já aprendeu um.
+			mensagem.Text = "Você ainda não aprendeu um caminho.\nFale com um treinador da vila (siga o marcador do objetivo) e passe na provação dele. Depois volte para treinar no dojo."
+			iniciar.Visible = false
+			for _, b in portas do b.Visible = false end
 		elseif dado.podeEscolher then
 			mensagem.Text = "Escolha uma das portas do Dilema. A segunda provação da Marca só oferece PA livre."
 			iniciar.Visible = false

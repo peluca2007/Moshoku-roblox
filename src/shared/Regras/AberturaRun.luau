@@ -16,9 +16,12 @@ function Abertura.modo(conta, solicitado)
 	return "semArvore"
 end
 
+Abertura.RECUO_PORTAO = 16
+
 function Abertura.nascimento()
-	-- Dentro da entrada, afastado das folhas do portão. Olhar para o sul (-Z).
-	return { x = 0, y = 3.5, z = Povoamento.PORTAO_NORTE - 6 }
+	-- Dentro da entrada, longe o bastante do telhado do portão para a câmera do mundo (que fica
+	-- ao norte, no alto) enxergar o personagem desde o primeiro quadro. Olhar para o sul (-Z).
+	return { x = 0, y = 3.5, z = Povoamento.PORTAO_NORTE - Abertura.RECUO_PORTAO }
 end
 
 return Abertura

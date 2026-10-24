@@ -28,7 +28,8 @@ function V.start(remote,fechar)
   local vp=workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or gui.AbsoluteSize
   local estreito=vp.Y*.4<270
   painel.AnchorPoint=Vector2.new(1,0)
-  painel.Position=UDim2.new(1,-12,0,if vp.X<700 then T.faixasAviso(vp.X,false).painelTopo else 124) -- (celular: abaixo da faixa de atalhos e do banner) abaixo dos atalhos e do banner de aviso (que cobria o título)
+  -- Abaixo do banner de aviso, que fica sob o HUD do mundo; no desktop também desce do cartão de PV.
+  painel.Position=UDim2.new(1,-12,0,T.faixasAviso(vp.X,false).painelTopo)
   painel.Size=UDim2.new(1,if estreito then -148 else -24,0,144)
   titulo.TextSize=T.tamanhos.subtitulo
  end

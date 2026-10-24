@@ -48,10 +48,11 @@ return {
 		C.texto({ parent=gui, texto="Subtítulo", subtitulo=true })
 		for _, tipo in { "sucesso", "perigo", "alerta", "info" } do
 			local canal = Instance.new("Frame"); canal.Parent=gui
-			C.aviso({ parent=canal, tipo=tipo, destaque=true, duracao=20 })
+			local cancelar = C.aviso({ parent=canal, tipo=tipo, destaque=true, duracao=20 })
 			local banner = canal.AvisoUIV2
 			t.eq(banner.UISizeConstraint.MaxSize.X, 520)
 			t.eq(banner.Banner.Conteudo.CirculoIcone.Icone.FontFace, T.FONTE_ICONE)
+			cancelar() -- fila única: o próximo canal só mostra depois deste
 		end
 		for _, obj in gui:GetDescendants() do
 			if obj:IsA("TextLabel") or obj:IsA("TextButton") then
@@ -104,6 +105,11 @@ return {
 		cancelar(); cancelar(); task.wait(0.15); t.eq(contar(),0)
 		C.aviso({ parent=gui, duracao=0.01 }); task.wait(0.3); t.eq(contar(),0)
 		for _, tipo in { "info", "sucesso", "perigo", "alerta" } do C.aviso({ parent=gui, tipo=tipo, duracao=20 }) end
+		t.eq(contar(),1)
+		-- Outra tela espera a vez: banners de telas diferentes não se sobrepõem.
+		local outra = Instance.new("Frame"); outra.Parent = gui
+		C.aviso({ parent=outra, titulo="Outra tela", duracao=20 })
+		t.eq(outra:FindFirstChild("AvisoUIV2"), nil)
 		t.eq(contar(),1) -- fixture destrói também aviso ativo e fila pendente.
 	end) end,
 }

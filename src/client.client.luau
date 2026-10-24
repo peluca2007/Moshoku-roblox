@@ -47,4 +47,5 @@ require(Client.ReacaoView).start(MesaState)
 -- Quadro de desenho da Magia Teórica (A19).
 require(Client.FormulaView).start(MesaState)
 require(Client.SalaMonstrosView).start(MesaState)
+require(Client.InterfaceCombate).start(MesaState) -- esconde o HUD do mundo durante a luta da arena
 MesaState.ready()

@@ -1,19 +1,22 @@
 -- Implementação privada da fila de Componentes.aviso; nunca cria ScreenGui.
+-- Uma fila só para todas as telas: banners de telas diferentes (objetivo, provação, avisos)
+-- ocupam a mesma faixa e, com filas separadas, apareciam um por cima do outro.
+local GuiService = game:GetService("GuiService")
 local T = require(script.Parent.Tema)
 return function(C, criar, animador)
-	local filas = setmetatable({}, { __mode = "k" })
+	local fila = { itens = {}, ativo = nil }
+	local vigiados = setmetatable({}, { __mode = "k" })
 	return function(p)
 		assert(p.parent, "parent obrigatório")
 		local parent = p.parent
-		local fila = filas[parent]
-		if not fila then
-			fila = { itens = {}, ativo = nil, vivo = true }
-			filas[parent] = fila
+		if not vigiados[parent] then
+			vigiados[parent] = true
+			-- Tela destruída leva junto os banners dela (ativo e pendentes); as outras seguem.
 			parent.Destroying:Once(function()
-				fila.vivo = false
-				if fila.ativo then fila.ativo.cancelar() end
-				table.clear(fila.itens)
-				filas[parent] = nil
+				for _, outro in table.clone(fila.itens) do
+					if outro.parent == parent then outro.cancelar() end
+				end
+				if fila.ativo and fila.ativo.parent == parent then fila.ativo.cancelar() end
 			end)
 		end
 		-- Repetição idêntica (mesmo título/detalhe) do aviso ativo ou do último da fila é ignorada:
@@ -21,17 +24,21 @@ return function(C, criar, animador)
 		local chave = tostring(p.tipo) .. "|" .. tostring(p.titulo) .. "|" .. tostring(p.detalhe)
 		local ultimo = fila.itens[#fila.itens] or fila.ativo
 		if ultimo and not ultimo.cancelado and ultimo.chave == chave then return ultimo.cancelar end
-		local item = { cancelado = false, chave = chave }
+		local item = { cancelado = false, chave = chave, parent = parent }
 		local proximo
 		local function terminar()
 			if item.cancelado then return end
 			item.cancelado = true
+			if fila.ativo ~= item then
+				local i = table.find(fila.itens, item)
+				if i then table.remove(fila.itens, i) end
+			end
 			if item.raiz then item.raiz:Destroy() end
 			if fila.ativo == item then fila.ativo = nil; proximo() end
 		end
 		item.cancelar = terminar
 		proximo = function()
-			if not fila.vivo or fila.ativo then return end
+			if fila.ativo then return end
 			local seguinte = table.remove(fila.itens, 1)
 			if not seguinte then return end
 			if seguinte.cancelado then proximo(); return end
@@ -44,7 +51,9 @@ return function(C, criar, animador)
 			local faixas = T.faixasAviso(parent.AbsoluteSize.X, grande)
 			local altura = faixas.altura
 			-- Celular (largura < 700): a faixa de atalhos ocupa o alto; o banner desce abaixo dela.
-			local topo = faixas.topo
+			-- `topo` vale abaixo da faixa do Roblox; tela com IgnoreGuiInset soma a faixa.
+			local tela = if parent:IsA("ScreenGui") then parent else parent:FindFirstAncestorOfClass("ScreenGui")
+			local topo = faixas.topo + (if tela and tela.IgnoreGuiInset then GuiService:GetGuiInset().Y else 0)
 			local icones = { sucesso = "confirmar", perigo = "fechar", alerta = "mapa", info = "run" }
 			local grupo = criar("CanvasGroup", { Name = "AvisoUIV2", BackgroundTransparency = 1,
 				Size = UDim2.new(1, -32, 0, altura), Position = UDim2.new(0.5, 0, 0, -altura-24),
@@ -78,7 +87,7 @@ return function(C, criar, animador)
 			local animar = animador(grupo)
 			animar({ Position = UDim2.new(0.5, 0, 0, topo), GroupTransparency = 0 })
 			task.delay(math.max(0, p.duracao or T.avisoDuracao) + T.tween, function()
-				if item.cancelado or not fila.vivo then return end
+				if item.cancelado then return end
 				animar({ Position = UDim2.new(0.5, 0, 0, -altura-24), GroupTransparency = 1 })
 				task.delay(T.tween, terminar)
 			end)

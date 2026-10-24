@@ -7,6 +7,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Estilo = require(Shared:WaitForChild("Estilo"))
@@ -110,9 +111,19 @@ function ArvoresView.start(state, mostrarAtalhosDeCombate: boolean?)
 	local atalhoGui = new("ScreenGui", player.PlayerGui, { Name = "ArvoresAtalho", ResetOnSpawn = false, DisplayOrder = 4 })
 	local atalho = botao(atalhoGui, "ÁRVORES", Estilo.DESTAQUE_FUNDO, function()
 		gui.Enabled = not gui.Enabled
-	end, 132)
+	end, 120)
 	atalho.Name = "AbrirArvores"
-	atalho.Position = UDim2.fromOffset(176, 14)
+	-- Logo abaixo do cartão de objetivo (ObjetivoView: topo pela largura, 106 de altura); a antiga
+	-- posição fixa (176, 14) caía em cima do cartão. Este ScreenGui não ignora a faixa do Roblox.
+	local function posicionarAtalho()
+		local camera = workspace.CurrentCamera
+		if not camera then return end
+		local inset = GuiService:GetGuiInset().Y
+		local topoObjetivo = if camera.ViewportSize.X < 700 then math.max(90, inset + 80) else inset + 12
+		atalho.Position = UDim2.fromOffset(12, topoObjetivo - inset + 106 + 8)
+	end
+	posicionarAtalho()
+	if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(posicionarAtalho) end
 	atalho.FontFace = Estilo.GRITO
 	atalho.TextSize = 16
 	if mostrarAtalhosDeCombate == true then

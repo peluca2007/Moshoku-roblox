@@ -43,6 +43,8 @@ return {
    for _,grande in {false,true} do
     local f=T.faixasAviso(largura,grande)
     t.ok(f.painelTopo >= f.topo+f.altura+12)
+    -- Desktop/médio: o banner nasce abaixo do cartão de objetivo (12+106) e do relógio.
+    if largura >= 700 then t.ok(f.topo >= 118) end
    end
   end
  end,

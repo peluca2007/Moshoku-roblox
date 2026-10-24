@@ -17,7 +17,8 @@ return {
 		t.eq(v.regiao, "vila")
 		t.eq(next(sessao.votos), nil)
 		local p = Abertura.nascimento()
-		t.eq(p.x, 0); t.eq(p.z, Povoamento.PORTAO_NORTE - 6)
+		t.eq(p.x, 0); t.eq(p.z, Povoamento.PORTAO_NORTE - Abertura.RECUO_PORTAO)
+		t.ok(Abertura.RECUO_PORTAO >= 14) -- câmera do mundo passa por cima do telhado do portão
 		local objetivo = Objetivos.atual({run=v,posicao=p,treinadores={{id="vila-1",disponivel=true,posicao={x=65,y=0,z=-252}}}})
 		t.eq(objetivo.titulo, "Fale com um mestre da vila")
 	end,

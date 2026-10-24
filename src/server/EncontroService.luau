@@ -555,7 +555,7 @@ function EncontroService.start(deps)
 		if not estado.ativo then
 			return nil
 		end
-		return { modo = estado.modo, prazoFim = estado.prazoFim, prazoId = estado.prazoId,
+		return { modo = estado.modo, mundo = estado.mundo ~= nil, prazoFim = estado.prazoFim, prazoId = estado.prazoId,
 			nivel = nivelAtual, equipes = table.clone(equipesAtuais), chefe = chefes.publico(chefeAtual) }
 	end
 

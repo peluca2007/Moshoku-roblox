@@ -42,9 +42,14 @@ end
 function T.alturaToque(escala: number): number
 	return math.ceil(T.toqueMinimo / math.clamp(escala, 0.01, 1))
 end
--- Coordenadas compartilhadas pelo banner e pelo painel de estado abaixo dele.
+-- Coordenadas compartilhadas pelo banner e pelo painel de estado abaixo dele, abaixo da faixa
+-- superior do Roblox (ScreenGui sem IgnoreGuiInset). O banner fica sob o HUD do mundo: celular,
+-- abaixo dos atalhos; 700-1099, abaixo do relógio (que desce sob o objetivo); desktop, abaixo do
+-- cartão de objetivo (12+106) e do relógio (8+72), sem cobrir nenhum dos dois.
+T.TOPO_AVISO = { celular = 84, medio = 204, desktop = 126 }
 function T.faixasAviso(largura, grande)
- local topo = if largura > 0 and largura < 700 then 84 else 12
+ local topo = if largura > 0 and largura < 700 then T.TOPO_AVISO.celular
+  elseif largura > 0 and largura < 1100 then T.TOPO_AVISO.medio else T.TOPO_AVISO.desktop
  local altura = if grande then 144 else 104
  return { topo = topo, altura = altura, painelTopo = topo + altura + 12 }
 end

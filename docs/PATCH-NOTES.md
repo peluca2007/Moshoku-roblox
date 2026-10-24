@@ -2,6 +2,31 @@
 
 Notas por versão, em linguagem de jogador, com uma seção técnica curta no fim de cada uma. Versões ainda não publicadas: tudo roda no Studio (Play), sem publicação.
 
+## 0.3.0 — Começo jogável (24/10/2026)
+
+O começo do jogo foi jogado de ponta a ponta no Studio e é considerado jogável (Pedro, 24/10): abertura → criação → vila → treinador → provação → primeira luta → vitória → de volta ao mapa.
+
+### Novidades
+- **Lutas em arena por região.** Encostar numa patrulha leva o grupo a uma arena com o cenário do lugar (cidade, campo, floresta ou ruínas), com o combate por turnos da mesa e todas as árvores. No fim, todos voltam ao ponto do mapa onde a luta começou. Marcos, guardião da run e provação do dojo usam o mesmo esquema.
+- **Ouro na tela de vitória.** Depois de vencer, aparece quanto ouro (e PA de aprimoramento, nas caçadas) você ganhou e o total.
+
+### Correções
+- Você não nasce mais escondido sob o telhado do portão da vila: a câmera mostra o personagem desde o primeiro instante.
+- A tela de combate aparece na hora, mesmo quando você age primeiro (antes ficava parado na arena sem botões).
+- Durante a luta, objetivo, seta do marcador e botões do canto somem; o relógio sobe para o topo e não cobre mais a fila de turnos nem a linha da rodada.
+- Avisos aparecem um por vez, abaixo do relógio e do objetivo, sem se sobrepor; o painel da provação fica abaixo deles.
+- O botão **ÁRVORES** fica abaixo do cartão de objetivo, sem cobri-lo.
+- Mestre Hanzo explica a quem ainda não tem caminho que deve aprender o primeiro com um treinador da vila.
+
+### Limitações conhecidas
+- Patrulhas ignoram quem ainda não aprendeu um caminho (de propósito: a primeira provação vem antes da primeira luta).
+- Não testado em celular, em telas médias (700–1099 px), com dois jogadores reais nem no jogo publicado.
+
+### Técnico
+- Combate J2 apagado; patrulhas/marcos em `server/PatrulhasDoMundo`, ponte em `server/LutaDoMundoServico`, arenas em `shared/Mundo/ArenasDados` e `server/Mundo/ArenaCenario`.
+- Cliente: `InterfaceCombate` (HUD do mundo fora da luta), fila única de avisos em `UI/Avisos`, evento `recompensaMundo`.
+- Testes: suíte local `RESULTADO: tudo ok`; Studio 1.665/0 no servidor e 6/0 de UI no cliente. Evidências em [TESTES](TESTES.md) (INICIO1, INICIO2).
+
 ## 0.2.0 — Vila viva, Ruínas do Vale e a run completa (16/10/2026)
 
 ### Novidades

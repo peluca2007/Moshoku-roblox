@@ -482,6 +482,9 @@ function EncontroService.start(deps)
 		for _, p in grupo do fila[p.UserId] = nil end
 		handlers.combatStart(solicitante, { entries = ordenarIniciativa(entradas) }, true)
 		deps.logAll("Encontro: " .. tostring(opcoes and opcoes.nome or "inimigos no caminho") .. ". Os inimigos agem sozinhos.", "sistema")
+		-- Sem remoto não há o envio do despachante: sem isto o cliente só via a luta quando
+		-- algo mais mandava um snapshot (a jogada do inimigo), e ficava preso se o jogador começasse.
+		deps.mudou()
 		vigiar()
 		return nil
 	end

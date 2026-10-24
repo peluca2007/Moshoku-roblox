@@ -37,7 +37,9 @@ function View.start()
 		local inset = game:GetService("GuiService"):GetGuiInset()
 		local topoObjetivo = if largura < 700 then math.max(90,inset.Y+80) else inset.Y+12
 		local combate = Players.LocalPlayer:GetAttribute("InterfaceCombate") == true
-		local topo = if combate then 76 elseif largura < 1100 then topoObjetivo+112-inset.Y else 8
+		-- Na luta o objetivo e os atalhos somem e a faixa do alto fica livre; a fila de turnos
+		-- (Hud, y 82) e a linha "Rodada · N na ordem" (y 134) ocupam o meio, onde o relógio encostava.
+		local topo = if combate or largura >= 1100 then 8 else topoObjetivo+112-inset.Y
 		painel.Position = UDim2.new(.5,0,0,topo)
 	end
 	for _, nome in {"RunDia","RunPeriodo","RunFracaoDia","RunDiasRestantes","RunRelogioPausado"} do RS:GetAttributeChangedSignal(nome):Connect(atualizar) end

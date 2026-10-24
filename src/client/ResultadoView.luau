@@ -53,7 +53,10 @@ function View.start(state, inicio, sala)
 	local detalhe = rotulo("Detalhe", 56, 20, 3)
 	local recursos = rotulo("Recuperacao", 40, 18, 4)
 	recursos.Text, recursos.TextColor3 = "♥ Grupo recuperado", T.cores.secundario
-	local proximo = rotulo("ProximoObjetivo", 56, 18, 5)
+	-- Ouro da luta do mundo: chega logo depois do fim (o servidor paga após avisar o resultado).
+	local ganho = rotulo("Ganho", 28, 20, 5)
+	ganho.TextColor3, ganho.Visible = T.cores.ouro, false
+	local proximo = rotulo("ProximoObjetivo", 56, 18, 6)
 	proximo.TextColor3 = T.cores.alerta
 	local function botao(nome, texto, ordem, cor, fn)
 		local b = Instance.new("TextButton")
@@ -70,11 +73,11 @@ function View.start(state, inicio, sala)
 		end)
 	end
 	local mundo = false -- luta do Modo História na arena regional: o servidor já devolveu o grupo ao mapa
-	botao("Proxima", "Escolher próxima partida", 6, T.cores.ouro, function()
+	botao("Proxima", "Escolher próxima partida", 7, T.cores.ouro, function()
 		if mundo then return end
 		if sala and state.snapshot() and state.snapshot().salaConceitual then sala.abrirPreparacao() else inicio.abrirJogar() end
 	end)
-	botao("Campo", "Continuar", 7, T.cores.painel, function() end)
+	botao("Campo", "Continuar", 8, T.cores.painel, function() end)
 	local ultimoRun
 	local atualizar
 	local conexaoRun = ReplicatedStorage:WaitForChild("RunJogo").OnClientEvent:Connect(function(tipo, dado)
@@ -109,8 +112,17 @@ function View.start(state, inicio, sala)
 		local r = Apresentacao.resumir(dados)
 		if not r then return end
 		mundo = type(dados) == "table" and dados.mundo == true
+		ganho.Visible, ganho.Text = false, ""
 		state.setMira(nil)
 		resultado.receber(r);atualizar(state.snapshot())
+	end)
+	state.onRecompensaMundo(function(r)
+		if destruido or type(r.ouro) ~= "number" then return end
+		-- ♦ (mesmo bloco do ♥ acima): a fonte de corpo não desenha ✦.
+		local partes = { string.format("♦ +%d de ouro", r.ouro) }
+		if type(r.pa) == "number" and r.pa > 0 then table.insert(partes, string.format("+%d PA de aprimoramento", r.pa)) end
+		ganho.Text = table.concat(partes, " · ") .. (if type(r.total) == "number" then string.format("  (total: %d)", r.total) else "")
+		ganho.Visible = true
 	end)
 	state.onSnapshot(function(s)
 		if destruido then return end

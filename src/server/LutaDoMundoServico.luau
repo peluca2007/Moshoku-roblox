@@ -27,7 +27,8 @@ local function raiz(player)
 end
 
 -- deps: iniciarLuta(grupo, criaturas, opcoes) -> erro?, corpoPessoal(player), recompensar(player, id, moedas, marco, pa),
--- cenario { aplicar(arenaId?) }, jogadores(), aoEncerrar(encontro, estado), rng(), limiteGrupo()
+-- cenario { aplicar(arenaId?) }, jogadores(), aoEncerrar(encontro, estado), rng(), limiteGrupo(),
+-- avisarRecompensa(player, { ouro, pa, total? }) depois de creditar a vitória
 function LutaDoMundo.start(deps)
 	local jogadores = deps.jogadores or function() return Players:GetPlayers() end
 	local rng = deps.rng or function() return math.random() end
@@ -117,9 +118,13 @@ function LutaDoMundo.start(deps)
 			local bonus, pa = 0, 0
 			local patrulhaId = luta.patrulhaId
 			if cacadas and patrulhaId then bonus, pa = cacadas.bonus(p, patrulhaId) end
-			local ok, sucesso = pcall(deps.recompensar, p, luta.encounterId, moedas + bonus, luta.marco, pa)
+			local ok, sucesso, total = pcall(deps.recompensar, p, luta.encounterId, moedas + bonus, luta.marco, pa)
 			if ok and sucesso and cacadas and patrulhaId and bonus > 0 then
 				cacadas.concluir(p, patrulhaId, luta.encounterId)
+			end
+			-- A tela de vitória já abriu (o fim da luta chega antes do pagamento); o ouro vem depois.
+			if ok and sucesso and deps.avisarRecompensa then
+				pcall(deps.avisarRecompensa, p, { ouro = moedas + bonus, pa = pa, total = if type(total) == "number" then total else nil })
 			end
 		end
 	end

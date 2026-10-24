@@ -9,8 +9,9 @@ local function mesa()
 	local d = { handlers = {}, tokens = {}, combat = { active = false }, random = Random.new(7),
 		remote = { FireClient = function() end, FireAllClients = function() end },
 		jogadores = function() return { p, outro } end,
-		avancarVez = function() end, mudou = function() end, logAll = function() end,
+		avancarVez = function() end, mudancas = 0, logAll = function() end,
 		currentTurnId = function() return nil end, desligarTreino = function() end }
+	function d.mudou() d.mudancas += 1 end
 	local seq, inicio, limpezas = 0, nil, 0
 	local function novo(tabela)
 		seq += 1
@@ -47,7 +48,7 @@ end
 
 local function ponte(jogadores, opcoes)
 	opcoes = opcoes or {}
-	local registro = { lutas = {}, pagos = {}, cenarios = {}, encerrados = {} }
+	local registro = { lutas = {}, pagos = {}, cenarios = {}, encerrados = {}, avisos = {} }
 	local relogio = 0
 	local api = LutaDoMundo.start({
 		jogadores = function() return jogadores end,
@@ -62,6 +63,7 @@ local function ponte(jogadores, opcoes)
 			table.insert(registro.pagos, { player = player, id = id, moedas = moedas, marco = marco, pa = pa })
 			return true, moedas
 		end,
+		avisarRecompensa = function(player, recompensa) table.insert(registro.avisos, { player = player, recompensa = recompensa }) end,
 		cenario = { aplicar = function(arena) table.insert(registro.cenarios, arena or "livro") end },
 		aoEncerrar = function(encontro, estado) table.insert(registro.encerrados, { encontro = encontro, estado = estado }) end,
 	})
@@ -80,6 +82,7 @@ return {
 		t.eq(d.handlers.escolherPersonagem(p, { id = "mago-de-fogo" }), nil)
 		t.eq(api.iniciarLutaDoMundo({ p }, { "creature/rato-gigante", "creature/rato-gigante" }, { nome = "Ratos" }), nil)
 		t.ok(d.combat.active)
+		t.ok(d.mudancas > 0, "o início envia o snapshot: sem remoto, o cliente não veria a luta")
 		local jogador, inimigos = nil, 0
 		for _, token in d.tokens do
 			if token.kind == "jogador" then jogador = token else inimigos += 1; t.eq(token.ia, true) end
@@ -132,6 +135,11 @@ return {
 		t.eq(#registro.pagos, 2)
 		t.ok(registro.pagos[1].moedas > 0)
 		t.eq(registro.pagos[1].marco, "region/encounter/clearing")
+		-- Cada jogador recebe o ouro creditado para a tela de vitória.
+		t.eq(#registro.avisos, 2)
+		t.eq(registro.avisos[1].player, registro.pagos[1].player)
+		t.eq(registro.avisos[1].recompensa.ouro, registro.pagos[1].moedas)
+		t.eq(registro.avisos[1].recompensa.total, registro.pagos[1].moedas)
 		t.eq(registro.cenarios[#registro.cenarios], "livro")
 		t.eq(registro.encerrados[1].estado.phase, "victory")
 		t.ok(registro.encerrados[1].encontro.atoresPorJogador[1] and registro.encerrados[1].encontro.atoresPorJogador[2])
@@ -144,6 +152,7 @@ return {
 		t.eq(api.iniciar(a, patrulha, CELEIRO), true)
 		registro.lutas[1].info.aoTerminar("derrota")
 		t.eq(#registro.pagos, 0)
+		t.eq(#registro.avisos, 0, "derrota não anuncia ouro")
 		t.eq(patrulha.derrotas, 0)
 		t.eq(registro.encerrados[1].estado.phase, "defeat")
 		t.eq(api.iniciar(a, patrulha, CELEIRO), false, "trégua logo após a luta")
@@ -226,6 +235,7 @@ return {
 		t.eq(registro.lutas[1].criaturas[1], "creature/lobo-cinzento")
 		registro.lutas[1].info.aoTerminar("vitoria")
 		t.eq(#registro.pagos, 0, "o dojo dá a própria recompensa")
+		t.eq(#registro.avisos, 0)
 		local fim = registro.encerrados[1]
 		local atorId = fim.encontro.ordemInicial[1]
 		t.eq(fim.encontro.atoresPorId[atorId].userId, 7)

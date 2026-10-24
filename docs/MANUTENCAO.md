@@ -10,7 +10,8 @@ Patrulha encosta → Luta da mesa (motor da sala) no tabuleiro com o cenário da
 | Patrulha → arena e layout de cada arena (props, criaturas espreitando, moradores, ponto do mapa para a luz) | `shared/Mundo/ArenasDados.luau`: `daPatrulha` (`definicao.arena` > id > zona). Cidade = ratos do celeiro/horta; campo = goblin do campo, passagem e patrulha antiga da clareira; floresta = Floresta Sombria; ruínas = Ruínas do Vale. Nova arena: acrescentar layout em `LAYOUTS` e o mapeamento. |
 | Montagem e troca do cenário em volta do tabuleiro | `server/Mundo/ArenaCenario.luau` (`preparar` monta as quatro arenas no início do servidor, uma por quadro; `aplicar(arenaId | nil)`); moradores usam `Mundo/Npcs.criarCorpo` |
 | Luz da arena (segue a região e a hora da run, não a noite da sala) | `client/AmbienteMundo.pontoDaArena` lê `Mesa.ArenaRegional` e usa `ArenasDados.pontoDoMundo` |
-| Tela de resultado só com "Continuar" | evento `encontro` com `mundo = true`; `client/ResultadoView` |
+| Tela de resultado só com "Continuar" e o ouro ganho | evento `encontro` com `mundo = true`; ouro/PA chegam depois em `recompensaMundo` (`LutaDoMundoServico.pagar` → `deps.avisarRecompensa`, ligado em `server.server`); `client/ResultadoView` |
+| Snapshot ao começar a luta (sem remoto, o despachante não envia) | `deps.mudou()` em `EncontroService.iniciarLutaDoMundo` |
 | Recompensa (Apêndice G da criatura) | `Regras/RecompensaEncontro.daCriatura` + `gerar` |
 | HUD do mundo some durante a luta (objetivo, seta, relógio, atalhos, diálogo de NPC) | snapshot `encontro.mundo` (`EncontroService.publico`) → `client/InterfaceCombate` liga o atributo local `InterfaceCombate`, que essas telas já observam |
 

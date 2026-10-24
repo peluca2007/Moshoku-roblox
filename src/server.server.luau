@@ -66,6 +66,10 @@ local lutaDoMundo = require(Server.LutaDoMundoServico).start({
 		return sucesso, total
 	end,
 	cenario = arenaCenario,
+	-- Ouro e PA creditados aparecem na tela de vitória (ResultadoView).
+	avisarRecompensa = function(player, recompensa)
+		ReplicatedStorage:WaitForChild(Protocol.REMOTE):FireClient(player, "recompensaMundo", recompensa)
+	end,
 	aoEncerrar = function(...)
 		if dojoService then dojoService.encerrado(...) end
 		if runServico then runServico.encerrado(...) end

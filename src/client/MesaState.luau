@@ -30,6 +30,7 @@ local listeners = {
 	fichaDetalhe = {},
 	efeito = {},
 	encontro = {},
+	recompensaMundo = {},
 	mira = {},
 }
 -- Mira de habilidade (A1): { tokenId, habilidadeId, tipo, alcanceCasas?, raioCasas? } ou nil.
@@ -75,6 +76,8 @@ function MesaState.start()
 			emit("efeito", data)
 		elseif kind == "encontro" and type(data) == "table" then
 			emit("encontro", data)
+		elseif kind == "recompensaMundo" and type(data) == "table" then
+			emit("recompensaMundo", data)
 		elseif kind == "fichaUpload" and type(data) == "table" then
 			emit("fichaUpload", data)
 		elseif kind == "personagemPessoal" then
@@ -330,6 +333,11 @@ end
 -- Fim de um encontro do Modo Luta: { resultado = "vitoria" | "derrota" }.
 function MesaState.onEncontro(callback: (any) -> ())
 	table.insert(listeners.encontro, callback)
+end
+
+-- Ouro/PA creditados depois de vencer uma luta do mundo: { ouro, pa, total? }.
+function MesaState.onRecompensaMundo(callback: (any) -> ())
+	table.insert(listeners.recompensaMundo, callback)
 end
 
 -- Recibo de um efeito resolvido pelo servidor (só apresentação: animar).

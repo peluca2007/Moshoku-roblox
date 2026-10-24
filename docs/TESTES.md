@@ -1,3 +1,12 @@
+## Luta do mundo: tela que não aparecia, relógio e ouro — INICIO2 (Claude, 24/10/2026)
+
+- Defeito novo achado no replay: quando o jogador tem a primeira vez, a luta começava no servidor mas o cliente não recebia o snapshot (`iniciarLutaDoMundo` é chamado pelo servidor, fora do despachante que envia o estado). O jogador ficava ancorado na arena sem interface até outro envio (a jogada de um inimigo). Corrigido com `deps.mudou()` no início; `LutaDoMundo.spec` verifica o envio.
+- Relógio em combate passou para o topo (y 8–80), livre na luta; antes ficava em 76–148 sobre a fila de turnos (82–134) e a linha "Rodada · N na ordem" (134–156).
+- Tela de vitória mostra o ouro (e o PA, se houver) creditado: `LutaDoMundoServico.pagar` → `avisarRecompensa` → evento `recompensaMundo` → `ResultadoView`. Derrota e dojo não anunciam ouro (spec).
+- Local: **RESULTADO: tudo ok (fora do Studio)**. Studio (memória, sem salvar/publicar): servidor **1665 ok, 0 falha(s)**.
+- Replay no Studio: criação → provação (bot, 35 s) → rato. Observando só o estado do cliente, sem pedir snapshot: interface de combate **0,2 s** depois da âncora, com o jogador agindo primeiro (o caso que travava); relógio em y 8–80 sem cruzar a fila nem a rodada, "Rodada 1 • 2 na ordem" inteiro. Vitória: "♦ +5 de ouro (total: 5)" (o ✦ saía como quadrado na fonte de corpo). Output sem erro de script.
+- Não verificado: celular e larguras médias; multiplayer (cada jogador recebe o próprio aviso, coberto só pelo spec); caçada com bônus/PA na tela.
+
 ## Começo jogável — INICIO1 (Claude, 24/10/2026)
 
 - Playtest real antes das correções (MoshokuRPGMesa, persistência em memória, sem salvar/publicar), jogando como jogador por cliques/teclas pelo MCP: cena de abertura → criação (Humano, nome sorteado) → nascimento no portão → Mestre Hanzo → treinador Ladino → provação (bot `mundo_ladino_ate_passar.py`, aprovada na 1ª tentativa, 67 s) → objetivo "Faça uma caçada" → rato do celeiro → arena da cidade → vitória por Disparo (comandos reais do remoto) → tela de vitória → volta ao ponto do contato. Output sem erro de script.

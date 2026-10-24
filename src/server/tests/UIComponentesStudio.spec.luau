@@ -67,7 +67,8 @@ return {
 		t.ok(p.FioInterno:FindFirstChildOfClass("UIStroke")); t.ok(p.Sombra); t.ok(p.Losango4)
 		t.ok(p.Conteudo:FindFirstChildOfClass("UIPadding"))
 		t.ok(C.cartao({ parent = gui }).Conteudo)
-		local titulo = C.titulo({ parent = p.Conteudo, texto = "Teste", ornamento = true })
+		-- A faixa ornamentada só existe no título principal (ordem 1).
+		local titulo = C.titulo({ parent = p.Conteudo, texto = "Teste", ornamento = true, ordem = 1 })
 		t.ok(not string.find(titulo.Text, "✦", 1, true)); t.eq(titulo.FaixaCabecalho.Ornamento.FontFace, T.FONTE_ICONE)
 		t.eq(p.Losango4.Size, UDim2.fromOffset(10, 10)); t.ok(p.UIStroke:FindFirstChildOfClass("UIGradient"))
 		local txt = C.texto({ parent = p.Conteudo, texto = "Corpo" }); t.ok(txt.TextWrapped); t.eq(txt.AutomaticSize, Enum.AutomaticSize.Y)

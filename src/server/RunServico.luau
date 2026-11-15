@@ -75,7 +75,9 @@ end
 --          historiaDaSemente, area, objetivo = expedição gerada (ver RunSessao); mundoAberto fica sempre falso,
 --          portaPerto = function(player) -> bool   (avatar a até ~20 studs da porta; lido no servidor),
 --          pontoDaPorta = function() -> Vector3|nil  (onde reunir o grupo ao entrar na área),
---          restaurarDescanso = function(player) -> ok, erro   (recupera PV/PM/PT da ficha pessoal; mesmo caminho do descanso da mesa),
+--          restaurarDescanso = function(player) -> ok, erro   (acampamento: PV/PM/PT/PP cheios na ficha pessoal),
+--          gravarRecursos = function(player, { pv, pm, pt?, pp? }) -> ok, resultado|motivo   (fim da luta da expedição:
+--                           grava na ficha pessoal o que sobrou; PersonagemSessao.gravarRecursosDaLuta),
 --          recompensarArea = function(player, idPagamento, ouro, areaId) -> ok   (crédito idempotente por idPagamento) }
 function Servico.start(deps)
 	deps = deps or {}
@@ -533,7 +535,32 @@ function Servico.start(deps)
 			local ehChefe = noDaLuta ~= nil and noDaLuta.tipo == "chefe"
 			-- `lutaAtiva` fica até o desfecho ser aplicado: se um salvamento estiver em curso (`ocupada`/`processando`),
 			-- espera e repete em vez de perder a vitória. Enquanto isso "lutar"/"abandonar" seguem recusados.
+			-- Vida e mana seguem para a próxima sala (decisão de 15/11): grava os recursos do fim desta luta na
+			-- ficha pessoal de cada participante (RecursosEntreSalas: 0 PV volta com 1 PV). Só a luta da run chega aqui.
+			local recursos = if type(estado.recursos) == "table" then estado.recursos else {}
+			local participantes = {}
+			for userId in encontro.atoresPorJogador or {} do
+				local fim = recursos[userId]
+				if type(fim) == "table" then participantes[userId] = { luta = fim, caiu = not (type(fim.pv) == "number" and fim.pv > 0) } end
+			end
+			local function gravarRecursos()
+				if not deps.gravarRecursos then return end
+				for userId, p in participantes do
+					local jogador = Players:GetPlayerByUserId(userId)
+					if jogador then
+						local gravou, motivo
+						for _ = 1, 5 do
+							local chamou, ok, m = pcall(deps.gravarRecursos, jogador, p.luta)
+							gravou, motivo = chamou and ok, if chamou then m else ok
+							if gravou then break end
+							task.wait(0.5)
+						end
+						if not gravou then warn("[Run] Recursos da luta não gravados para " .. tostring(userId) .. ": " .. tostring(motivo)) end
+					end
+				end
+			end
 			task.spawn(function()
+				gravarRecursos()
 				local aplicou = false
 				for tentativa = 1, 10 do
 					local espera = os.clock()

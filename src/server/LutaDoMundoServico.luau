@@ -145,7 +145,9 @@ function LutaDoMundo.start(deps)
 		return { atoresPorJogador = porJogador, ordemInicial = ordem, atoresPorId = porId }
 	end
 
-	local function terminar(luta, resultado)
+	-- `recursos` = { [userId] = { pv, pm, pt?, pp? } } lidos da mesa no fim (EncontroService), repassados a quem
+	-- encerra: só a run da expedição os grava na ficha pessoal.
+	local function terminar(luta, resultado, recursos)
 		if ativa ~= luta then return end
 		ativa = nil
 		for _, p in luta.grupo do treguaAte[p.UserId] = agora() + LutaDoMundo.TREGUA_SEGUNDOS end
@@ -158,7 +160,8 @@ function LutaDoMundo.start(deps)
 		if luta.patrulha then luta.patrulha.ocupar(false) end
 		if deps.aoEncerrar then
 			local fase = if resultado == "vitoria" then "victory" elseif resultado == "derrota" then "defeat" else "fled"
-			pcall(deps.aoEncerrar, encontroDoFim(luta), { phase = fase, encounterId = luta.encounterId })
+			pcall(deps.aoEncerrar, encontroDoFim(luta), { phase = fase, encounterId = luta.encounterId,
+				recursos = if type(recursos) == "table" then recursos else nil })
 		end
 	end
 
@@ -177,7 +180,7 @@ function LutaDoMundo.start(deps)
 		if deps.cenario then pcall(deps.cenario.aplicar, info.arena) end
 		local erro = deps.iniciarLuta(grupo, criaturas, {
 			nome = info.nome,
-			aoTerminar = function(resultado) terminar(luta, resultado) end,
+			aoTerminar = function(resultado, recursos) terminar(luta, resultado, recursos) end,
 		})
 		if erro then
 			warn("[Luta do mundo] Início recusado: " .. tostring(erro))

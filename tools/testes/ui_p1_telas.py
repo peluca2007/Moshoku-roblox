@@ -35,7 +35,8 @@ assert 'ModeloAparencia.criar' in editor
 nomes = read("src/shared/ApresentacaoAbertura.luau")
 assert 'Catalogo' not in nomes and 'Historia' not in nomes
 ajuda = read("src/shared/AjudaConteudo.luau")
-assert "portão norte" in ajuda and "fale com um mestre" in ajuda  # P2: primeiros passos do fluxo novo
+assert "Crie seu aventureiro" in ajuda and "porta do esgoto" in ajuda  # primeiros passos do jogo atual (cidade + expedição)
+assert "8 minutos" not in ajuda and "relógio" not in ajuda and "trilha" not in ajuda  # texto do mundo aberto antigo
 assert 'dica = "Toque em AJUDA para abrir o guia"' in ajuda
 
 resultado = read("src/client/ResultadoView.luau")
@@ -44,6 +45,7 @@ assert 'T.icone("combate")' in resultado
 assert 'Objetivos.atual({ run = ultimoRun' in resultado
 assert 'if fundo.Visible and atualizar then atualizar(state.snapshot()) end' in resultado
 assert "Grupo recuperado" in resultado
+assert "consulte RUN" not in resultado and "Objetivos.textoProximo(objetivo)" in resultado  # sem jargão do jogo antigo
 assert "Dano observado nesta conexão" not in resultado
 assert "Reúna-se e tente outra estratégia" in read("src/shared/ApresentacaoResultado.luau")
 
@@ -51,16 +53,20 @@ criação = read("src/client/CriacaoPersonagemView.luau")
 assert "BorderSizePixel = 0, Text = texto" in criação
 assert "BorderSizePixel=0" in criação
 
+# Barra única de atalhos (substitui a varredura periódica e o fade por botão).
 atalhos = read("src/client/Atalhos.luau")
-assert '"U5BackgroundColor3"' in atalhos and '"U5TextColor3"' in atalhos
+assert "C.painel(" in atalhos and 'Instance.new("UIListLayout")' in atalhos and "AtalhosLayout" in atalhos
+assert "Heartbeat" not in atalhos and atalhos.count("GetDescendants") == 1  # só a varredura inicial
+assert "DescendantAdded" in atalhos and 'GetAttributeChangedSignal("InterfaceCombate")' in atalhos
+assert "function Atalhos.criar(" in atalhos and "function Atalhos.ocultar(" in atalhos and "function Atalhos.livre(" in atalhos
 
 treinador = read("src/client/TreinadorView.luau")
 assert "local function ajustarAltura()" in treinador
 assert "conteudoLayout.AbsoluteContentSize.Y" in treinador
 
-atalho = read("src/client/Atalhos.luau")
-assert 'botao.Visible = true' in atalho and 'item.TextTransparency = item:GetAttribute("U5TextTransparency") or 0' in atalho
-assert atalho.index('item.TextTransparency = item:GetAttribute("U5TextTransparency") or 0') < atalho.index('botao.Visible = true')
+# o MENU e o ÁRVORES nascem na barra; DIÁRIO, CONTA e AJUDA (Extra.atalho) são adotados pelo atributo AtalhoMundo
+assert 'Atalhos.criar({nome="MENU"' in inicio and 'Atalhos.criar({ nome = "AbrirArvores"' in read("src/client/ArvoresView.luau")
+assert 'atalho.Position =' not in read("src/client/AjudaView.luau")
 assert 'lista.ClipsDescendants = true' in read("src/client/UI/ExtraTelas.luau")
 assert 'ClipsDescendants = true' in criação
 assert '"AJUDA"' in read("src/client/AjudaView.luau")

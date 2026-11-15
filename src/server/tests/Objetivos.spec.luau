@@ -214,11 +214,34 @@ return {
 		fim.tipoDoNo = "hub"
 		local f = Objetivos.atual({ run = fim })
 		t.eq(f.chave, "missao-concluida")
-		t.eq(f.linha, "A anomalia foi selada.")
+		t.eq(f.titulo, "A anomalia foi selada.")
+		t.eq(f.linha, "A campanha chegou ao fim.")
 		t.ok(not f.linha:find("Restam", 1, true))
 		for _, o2 in { Objetivos.atual({ run = hub }), l, f } do
 			t.ok(not (o2.titulo .. o2.linha):find("painel da RUN", 1, true))
 		end
+	end,
+	["fim da campanha da expedição: sem área nem contador, nunca o texto do Selo antigo"] = function(t)
+		-- como o servidor entrega o nó final: tipoDoNo "final", sem área e sem totalPassos
+		local fim = run({ tipoDoNo = "final", area = nil, totalPassos = nil, galho = "final-campanha",
+			fim = { motivo = "final", final = "final-campanha" }, opcoes = {} })
+		local o = Objetivos.atual({ run = fim })
+		t.eq(o.chave, "missao-concluida")
+		t.eq(o.titulo, "A anomalia foi selada.")
+		t.eq(o.linha, "A campanha chegou ao fim.")
+		-- só o galho ou só o final do fim também bastam
+		local soGalho = run({ tipoDoNo = "sala", area = nil, galho = "final-campanha", fim = { motivo = "final" }, opcoes = {} })
+		t.eq(Objetivos.atual({ run = soGalho }).titulo, "A anomalia foi selada.")
+		for _, o2 in { o, Objetivos.atual({ run = soGalho }) } do
+			local texto = o2.titulo .. " " .. o2.linha
+			t.ok(not texto:find("Selo", 1, true) and not texto:find("história", 1, true), "texto do jogo antigo: " .. texto)
+		end
+	end,
+	["texto do próximo passo no resultado: sem 'consulte RUN' e some quando não há passo"] = function(t)
+		t.eq(Objetivos.textoProximo({ titulo = "Vá até a porta do esgoto", linha = "Aproxime-se da porta." }), "Próximo: Vá até a porta do esgoto · Aproxime-se da porta.")
+		t.eq(Objetivos.textoProximo({ titulo = "Escolha sua árvore", linha = "" }), "Próximo: Escolha sua árvore")
+		t.eq(Objetivos.textoProximo(nil), nil)
+		t.eq(Objetivos.textoProximo({}), nil)
 	end,
 	["expedição: o começo (mestre) vem antes da porta"] = function(t)
 		local hub = run({ tipoDoNo = "hub", galho = "cidade", plano = { modo = "semArvore" }, opcoes = {} })

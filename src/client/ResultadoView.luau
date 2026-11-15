@@ -94,7 +94,9 @@ function View.start(state, inicio, sala)
 			emblema.Text,emblema.TextColor3=T.icone("combate"),if venceu then T.cores.sucesso else T.cores.perigo
 		end
 		local objetivo = Objetivos.atual({ run = ultimoRun, semRun = ultimoRun == nil, emEncontro = false })
-		proximo.Text = if objetivo then "Próximo: " .. objetivo.titulo .. (if objetivo.linha and objetivo.linha ~= "" then " · " .. objetivo.linha else "") else "Próximo: consulte RUN."
+		-- Sem próximo passo útil a linha some (o diário e a faixa do topo bastam).
+		local textoProximo = Objetivos.textoProximo(objetivo)
+		proximo.Text, proximo.Visible = textoProximo or "", textoProximo ~= nil
 		painel.Campo.Visible=not mundo
 		painel.Campo.Text=if s and s.salaConceitual then "Voltar à sala" else "Voltar ao campo"
 		painel.Proxima.Text=if mundo then "Continuar" elseif s and s.salaConceitual then "Preparar próxima partida" else "Escolher próxima partida"

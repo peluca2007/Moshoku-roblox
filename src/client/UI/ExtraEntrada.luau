@@ -4,10 +4,11 @@ local C = require(script.Parent.Componentes)
 local E = {}
 E.T = T
 E.C = C
+E.PISO_TEXTO = 14 -- menor corpo de texto legível; acima disso vale o tamanho pedido por quem criou
 function E.estilizar(obj, fonte)
 	if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
 		obj.FontFace = fonte or T.fontes.rotulo
-		obj.TextSize = math.max(T.tamanhos.corpo, obj.TextSize)
+		obj.TextSize = math.max(E.PISO_TEXTO, obj.TextSize)
 	end
 	if obj:IsA("TextButton") or obj:IsA("TextBox") then
 		local limite = Instance.new("UISizeConstraint")

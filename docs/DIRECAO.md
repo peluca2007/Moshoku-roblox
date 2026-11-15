@@ -62,8 +62,8 @@ arte, personagens ou fases.
   repetir eventos; no máximo alguns combates (onde haveria 4, a volta tem 2 e a
   retomada tem 1). **Esses combates reduzidos ainda não foram implementados.**
 - Grupo inteiro caído: volta para a cidade pagando os dias da distância, sem
-  perder ouro; a campanha continua. (Leitura do Claude de uma resposta por voz;
-  confirmar.)
+  perder ouro e mantendo o progresso da área; a campanha continua (confirmado
+  pelo Pedro em 15/11/2026).
 - Descanso e exaustão: o grupo escolhe quando descansar, sem limite fixo. Cada
   luta sem descanso depois dá 1 nível de Exaustão do livro; descansar (meio dia)
   zera. **Ainda não implementado**: hoje vale o limite provisório de 2 por área.
@@ -81,6 +81,20 @@ arte, personagens ou fases.
 - Telas (14/11): criação de personagem com o personagem em 3D no centro, painel
   de escolhas à direita e etapas embaixo; menu principal como menu de pausa
   central (tela escurecida, painel estreito, poucos botões grandes).
+
+### Decisões do Pedro (15/11/2026)
+
+- Vida e mana entre salas: o que foi gasto numa luta segue para a próxima sala.
+  Descansar no acampamento (meio dia) recupera tudo e zera a exaustão.
+  **Ainda não implementado** (pacote P5 em `TAREFAS.md`): hoje toda sala começa
+  com a vida do último descanso.
+- Grupo: só participa quem confirmou no início. Quem chega depois pode pedir
+  para entrar quando o grupo está na cidade, com personagem novo e sem classe;
+  nunca no meio de uma área. **Ainda não implementado**: hoje a campanha pega
+  todo o servidor e quem chega depois só assiste.
+- Fim da campanha enquanto só o esgoto existe: com o fragmento do chefe, a
+  cidade oferece "Selar a anomalia", que encerra com o final bom. Provisório;
+  sai quando houver mais áreas e a luta final do dia 30.
 
 ### Decisões em aberto (perguntar ao Pedro com opções e recomendação)
 

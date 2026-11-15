@@ -1,0 +1,28 @@
+# Fontes dos kits (MOD2a, 15/11/2026)
+
+Tudo CC0 (domínio público), confirmado na página do pacote e no `License.txt` dentro do zip. Os zips ficam em
+`build/externos/<pacote>/` (fora do git) e são tratados como dados: só lidos pelo Blender, nada executado.
+
+| Pacote | Página (licença lida em 15/11/2026) | Download usado | Usado em |
+| --- | --- | --- | --- |
+| Kenney Mini Dungeon 2.0 | https://kenney.nl/assets/mini-dungeon ("Creative Commons CC0"); https://opengameart.org/content/mini-dungeon (CC0) | https://opengameart.org/sites/default/files/kenney_mini-dungeon_2.0.zip | esgoto, taverna (mesa, cadeira), criaturas (orc, humano) |
+| Kenney Fantasy Town Kit 2.0 | https://kenney.nl/assets/fantasy-town-kit (CC0); https://opengameart.org/content/fantasy-town-kit (CC0) | https://opengameart.org/sites/default/files/kenney_fantasy-town-kit_2.0.zip | taverna (banco, banquinho, lampião, poste) |
+| Quaternius LowPoly Medieval Weapons (set/2018) | https://opengameart.org/content/lowpoly-medieval-weapons (CC0, autor quaternius) | https://opengameart.org/sites/default/files/Medieval%20Weapons%20Pack%20-%20Sept%202018.zip | armas |
+| Kenney Furniture Kit | https://opengameart.org/content/furniture-kit (CC0) | https://opengameart.org/sites/default/files/kenney_furniturePack.zip | baixado e REJEITADO (móveis modernos); não entra |
+
+Texto da licença (`License.txt` dos pacotes Kenney): "License: (Creative Commons Zero, CC0)
+http://creativecommons.org/publicdomain/zero/1.0/ - You can use this content for personal, educational, and
+commercial purposes. Support by crediting 'Kenney' or 'www.kenney.nl' (this is not a requirement)".
+Crédito a Kenney e Quaternius fica como cortesia (colocar nos créditos do jogo).
+
+## Não obtido
+
+- Kenney: o botão de download de kenney.nl pede um link assinado gerado por script da página (retornou `forbidden`
+  para requisição direta); não foi contornado. Usado o espelho oficial do mesmo autor no OpenGameArt (CC0), onde
+  existem Mini Dungeon e Fantasy Town Kit. **Retro Fantasy Kit, Weapon Pack e Particle Pack do Kenney: não baixados**
+  (sem espelho direto; o Weapon Pack do OpenGameArt deu "Access denied").
+- Quaternius Fantasy Props MegaKit, Ultimate Monsters e Ultimate RPG: só por Google Drive/Patreon/itch (clique
+  humano). Não baixados. Um humano pode baixá-los em `build/externos/<pacote>/` e acrescentar entradas ao
+  `catalogo.py`.
+- Criaturas do esgoto (rato, slime, morcego, aranha, esqueleto): nenhum pacote direto. Só orc e humano do Mini Dungeon.
+  O rato atual continua o de `tools/blender/criaturas.py`.

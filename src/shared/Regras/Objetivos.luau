@@ -90,9 +90,11 @@ local function calcular(estado)
 		if estado.semRun or type(estado.run) == "table" and estado.run.semRun == true then return objetivo("iniciar-run", "Inicie uma RUN", "Comece uma nova expedição.") end
 		return nil
 	end
-	local expedicao = run.area ~= nil or run.totalPassos ~= nil or run.tipoDoNo == "hub"
+	-- O nó final da campanha ("final-campanha") não tem área nem contador de passos: conta como expedição.
+	local fimDaCampanha = run.tipoDoNo == "final" or run.galho == "final-campanha" or (run.fim ~= nil and run.fim.final == "final-campanha")
+	local expedicao = run.area ~= nil or run.totalPassos ~= nil or run.tipoDoNo == "hub" or fimDaCampanha
 	if run.fim then
-		if run.fim.motivo == "final" and expedicao then return objetivo("missao-concluida", "Missão concluída", "A anomalia foi selada.") end
+		if run.fim.motivo == "final" and expedicao then return objetivo("missao-concluida", "A anomalia foi selada.", "A campanha chegou ao fim.") end
 		if run.fim.motivo == "final" then return objetivo("final-concluido", "O Selo voltou para casa", "A história foi concluída.") end
 		return objetivo("run-encerrada", "Expedição encerrada", "O grupo caiu ou o prazo acabou. Comece outra expedição.")
 	end
@@ -154,6 +156,13 @@ local function calcular(estado)
 		return objetivo("ir-a-porta-do-esgoto", "Vá até a porta do esgoto", "Aproxime-se da porta e acione-a para escolher a expedição.", alvo("destino", "porta-esgoto"))
 	end
 	return objetivoHistoria(run, estado)
+end
+
+-- Texto da linha "Próximo: ..." do resultado de uma luta; nil quando não há próximo passo útil.
+function Objetivos.textoProximo(objetivoAtual)
+	if type(objetivoAtual) ~= "table" or type(objetivoAtual.titulo) ~= "string" then return nil end
+	local linha = objetivoAtual.linha
+	return "Próximo: " .. objetivoAtual.titulo .. (if type(linha) == "string" and linha ~= "" then " · " .. linha else "")
 end
 
 function Objetivos.atual(estado)

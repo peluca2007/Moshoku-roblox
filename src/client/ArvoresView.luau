@@ -7,7 +7,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local GuiService = game:GetService("GuiService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Estilo = require(Shared:WaitForChild("Estilo"))
@@ -17,6 +16,8 @@ local Regras = require(Shared:WaitForChild("Livro"):WaitForChild("Regras"))
 local Progressao = require(Shared:WaitForChild("Regras"):WaitForChild("Progressao"))
 local Execucao = require(Shared:WaitForChild("Regras"):WaitForChild("Execucao"))
 local Planos = require(Shared:WaitForChild("PlanosArvores"))
+
+local Atalhos = require(script.Parent.Atalhos)
 
 local ArvoresView = {}
 
@@ -107,27 +108,16 @@ function ArvoresView.start(state, mostrarAtalhosDeCombate: boolean?)
 		Name = "Arvores", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 8, Enabled = false,
 	})
 
-	-- Botão no canto para abrir.
-	local atalhoGui = new("ScreenGui", player.PlayerGui, { Name = "ArvoresAtalho", ResetOnSpawn = false, DisplayOrder = 4 })
-	local atalho = botao(atalhoGui, "ÁRVORES", Estilo.DESTAQUE_FUNDO, function()
+	-- Atalho ÁRVORES: vive na barra única de atalhos (client/Atalhos), na ordem MENU, DIÁRIO, ÁRVORES, CONTA, AJUDA.
+	-- Só aparece com uma ficha sua do livro (ver onSnapshot); a barra some enquanto a tela das árvores está aberta.
+	local atalho = Atalhos.criar({ nome = "AbrirArvores", rotulo = "ÁRVORES", icone = "estrela", aoClicar = function()
 		gui.Enabled = not gui.Enabled
-	end, 120)
-	atalho.Name = "AbrirArvores"
-	-- Logo abaixo do cartão de objetivo (ObjetivoView: topo pela largura, 106 de altura); a antiga
-	-- posição fixa (176, 14) caía em cima do cartão. Este ScreenGui não ignora a faixa do Roblox.
-	local function posicionarAtalho()
-		local camera = workspace.CurrentCamera
-		if not camera then return end
-		local inset = GuiService:GetGuiInset().Y
-		local topoObjetivo = if camera.ViewportSize.X < 700 then math.max(90, inset + 80) else inset + 12
-		atalho.Position = UDim2.fromOffset(12, topoObjetivo - inset + 106 + 8)
-	end
-	posicionarAtalho()
-	if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(posicionarAtalho) end
-	atalho.FontFace = Estilo.GRITO
-	atalho.TextSize = 16
+	end })
+	atalho.Visible = false
+	gui:GetPropertyChangedSignal("Enabled"):Connect(function() Atalhos.ocultar("arvores", gui.Enabled) end)
 	if mostrarAtalhosDeCombate == true then
 		-- Atalhos legados opcionais; reabrir a árvore não deve iniciar encontros.
+		local atalhoGui = new("ScreenGui", player.PlayerGui, { Name = "ArvoresAtalho", ResetOnSpawn = false, DisplayOrder = 4 })
 		local treino = botao(atalhoGui, "TREINO", Estilo.PERIGO_FUNDO, function()
 			state.send("iniciarTreino", {})
 		end, 110)

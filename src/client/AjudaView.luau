@@ -18,9 +18,9 @@ function View.start()
 	local gui = Instance.new("ScreenGui")
 	gui.Name, gui.ResetOnSpawn, gui.DisplayOrder = "AjudaJogo", false, 60
 	gui.ZIndexBehavior, gui.Parent = Enum.ZIndexBehavior.Sibling, playerGui
+	-- A posição do atalho é da barra única (client/Atalhos), que adota este botão pelo atributo AtalhoMundo.
 	local atalho = Extra.atalho(gui, "AtalhoAjuda", "?", "?", 1, "AJUDA")
-	atalho.Position = UDim2.new(1, -84, 0, 164)
-	local painel = Extra.painel(gui, "Painel", Vector2.new(760, 760), UDim2.fromScale(.94, .9))
+	local painel = Extra.painel(gui, "Painel", Vector2.new(720, 700), UDim2.fromScale(.94, .9))
 	local titulo = Extra.tituloPainel(painel.Conteudo, "AJUDA · Moshoku", 1)
 	titulo.Position, titulo.Size = UDim2.fromOffset(0, 0), UDim2.new(1, -100, 0, 42)
 	local fechar = Extra.fechar(painel.Conteudo, painel, 2)
@@ -40,6 +40,18 @@ function View.start()
 	texto.Parent = painel.Conteudo
 	local layout = Instance.new("UIListLayout")
 	layout.Padding, layout.SortOrder, layout.Parent = UDim.new(0, T.espacamentos.medio), Enum.SortOrder.LayoutOrder, texto
+	-- A altura do painel acompanha o texto da aba (sem bloco vazio embaixo); limitada pela tela.
+	local ALTURA_CABECALHO, ALTURA_MARGEM = 160, 2 * 16 + 14
+	local function ajustarAltura()
+		local camera = workspace.CurrentCamera
+		local escala = painel:FindFirstChildOfClass("UIScale")
+		local fator = if escala and escala.Scale > 0 then escala.Scale else 1 -- medidas absolutas já vêm escaladas
+		local tela = (camera and camera.ViewportSize.Y or 1080) * .9 / fator
+		local desejada = ALTURA_CABECALHO + layout.AbsoluteContentSize.Y / fator + ALTURA_MARGEM
+		painel.Size = UDim2.new(.94, 0, 0, math.clamp(desejada, 320, math.max(320, tela)))
+	end
+	layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(ajustarAltura)
+	if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(ajustarAltura) end
 	local function selecionar(indice)
 		selecionado = indice
 		for i, b in botoes do
@@ -61,6 +73,7 @@ function View.start()
 				end })
 		end
 		texto.CanvasPosition = Vector2.zero
+		task.defer(ajustarAltura)
 	end
 	for i, aba in Conteudo.abas do
 		local b = C.botao({ parent = abaContainer, nome = aba.id, texto = aba.titulo, ordem = i, variante = "secundario", tamanho = UDim2.new(.5, -6, 0, 48) }) -- tamanho fixo: o rótulo muda ao selecionar e redimensionaria o botão

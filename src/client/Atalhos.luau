@@ -1,160 +1,206 @@
--- Esconde os botões de atalho do canto (RUN, CONTA, VIAGEM, ?) enquanto um painel grande
--- está aberto. Em tela estreita (celular) eles ficavam por cima do botão "Fechar" dos
--- painéis. Desacoplado de propósito: só observa o PlayerGui, sem exigir mudança nas views.
--- Só apresentação local.
+-- Barra única de atalhos do canto superior direito: MENU, DIÁRIO, ÁRVORES, CONTA, AJUDA (ordem e medidas
+-- em Regras/AtalhosLayout, com spec). Um painel do kit (C.painel) com UIListLayout; os botões ficam
+-- lado a lado sem sobreposição.
+--
+-- Registro explícito, sem varredura periódica:
+--   * Atalhos.criar{...}: cria o botão direto na barra (MENU em InicioView, ÁRVORES em ArvoresView);
+--   * botões de outras views (Extra.atalho marca `AtalhoMundo`) são adotados uma vez ao iniciar e, depois,
+--     pelo evento PlayerGui.DescendantAdded; o nome da Instance (AtalhoRun, AtalhoAjuda, AtalhoConta...)
+--     não muda, só o pai passa a ser a barra.
+-- A barra reorganiza apenas por eventos (Visible dos atalhos, tela, painéis grandes, atributo
+-- `InterfaceCombate`). Fica escondida na luta, com painel grande aberto ou por pedido de uma view
+-- (Atalhos.ocultar). Só apresentação local.
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local C = require(script.Parent.UI.Componentes)
-local GuiService = game:GetService("GuiService")
+local L = require(ReplicatedStorage.Shared.Regras.AtalhosLayout)
+
 local Atalhos = {}
 
-local ROTULOS = { ["MENU"] = true, ["RUN"] = true, ["CONTA"] = true, ["?"] = true }
-local FRACAO_X, FRACAO_Y = 0.6, 0.5 -- um quadro desse tamanho conta como painel aberto
-local INTERVALO = 0.2
-local TweenService = game:GetService("TweenService")
-local FADE = TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local FRACAO_X, FRACAO_Y = 0.6, 0.5 -- um painel desse tamanho conta como "painel grande aberto"
+
+local jogador = Players.LocalPlayer
+local gui: ScreenGui?, barra: Frame?, conteudo: Frame?
+local registrados: { [GuiButton]: string } = {}
+local paineis: { [Frame]: boolean } = {}
+local guisObservadas: { [Instance]: boolean } = {}
+local motivos: { [string]: boolean } = {} -- pedidos de ocultar vindos das views (menu, árvores...)
 
 local function guiVisivel(objeto: GuiObject): boolean
 	local atual: Instance? = objeto
 	while atual do
-		if atual:IsA("GuiObject") and not atual.Visible then
-			return false
-		end
-		if atual:IsA("ScreenGui") then
-			return atual.Enabled
-		end
+		if atual:IsA("GuiObject") and not atual.Visible then return false end
+		if atual:IsA("ScreenGui") then return atual.Enabled end
 		atual = atual.Parent
 	end
 	return false
 end
 
--- Atalhos = botões de texto com o rótulo da lista dentro de um ScreenGui que não é o painel.
-local function coletarAtalhos(playerGui: PlayerGui): { TextButton }
-	local lista = {}
-	for _, gui in ipairs(playerGui:GetChildren()) do
-		if gui:IsA("ScreenGui") then
-			for _, item in ipairs(gui:GetDescendants()) do
-				if item:IsA("TextButton") and (item:GetAttribute("AtalhoMundo") or (ROTULOS[item.Text] and item.Size.X.Offset <= 140)) then
-					table.insert(lista, item)
-				end
-			end
-		end
-	end
-	return lista
+local function larguraTela(): number
+	local camera = workspace.CurrentCamera
+	local daTela = if gui and gui.AbsoluteSize.X > 0 then gui.AbsoluteSize.X else (camera and camera.ViewportSize.X or 1920)
+	return daTela
 end
 
-local function painelAberto(playerGui: PlayerGui, atalhos: { [Instance]: boolean }): boolean
+local function painelGrandeAberto(): boolean
 	local camera = workspace.CurrentCamera
 	local tela = camera and camera.ViewportSize or Vector2.new(1920, 1080)
-	for _, gui in ipairs(playerGui:GetChildren()) do
-		if gui:IsA("ScreenGui") and gui.Enabled and gui.Name ~= "Carregamento" then
-			for _, item in ipairs(gui:GetDescendants()) do
-				if item:IsA("Frame") and item.AbsoluteSize.X >= tela.X * FRACAO_X and item.AbsoluteSize.Y >= tela.Y * FRACAO_Y
-					and not atalhos[item] and guiVisivel(item)
-					and (item.BackgroundTransparency < 0.95 or item:GetAttribute("PainelUIV2") == true) then -- painel de arte tem fundo transparente
-					return true
-				end
-			end
+	for painel in paineis do
+		if painel.AbsoluteSize.X >= tela.X * FRACAO_X and painel.AbsoluteSize.Y >= tela.Y * FRACAO_Y and guiVisivel(painel) then
+			return true
 		end
 	end
 	return false
 end
 
-function Atalhos.start()
-	local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
-	local grupoGui = Instance.new("ScreenGui")
-	grupoGui.Name, grupoGui.ResetOnSpawn, grupoGui.DisplayOrder = "AtalhosMundo", false, -1
-	grupoGui.Parent = playerGui
-	local grupo = C.painel({ parent = grupoGui, nome = "GrupoAtalhos", padding = 0, sombra = false,
-		tamanho = UDim2.fromOffset(360, 72), posicao = UDim2.new(1, -8, 0, 8), ancora = Vector2.new(1, 0) })
-	local indices = { MENU = 1, RUN = 2, CONTA = 3, ["?"] = 4 }
-	local function organizar()
-		local algum = false
-		for _, b in coletarAtalhos(playerGui) do
-			local rotulo = b:GetAttribute("AtalhoMundo") or b.Text
-			if not indices[rotulo] then continue end
-			if not b:GetAttribute("AtalhoMundo") then
-				-- MENU pertence ao fluxo de início: preserva a própria Instance e suas conexões.
-				b:SetAttribute("AtalhoMundo", rotulo)
-				local visual = C.iconeBotao({ parent = b, nome = "VisualV2", icone = "≡", rotulo = rotulo,
-					tamanho = UDim2.fromScale(1, 1) })
-				visual.Interactable, visual.Selectable = false, false
-				visual.Rotulo.Position, visual.Rotulo.Size = UDim2.new(0, 1, .6, 0), UDim2.new(1, -2, .35, 0)
-				visual.Rotulo.TextWrapped, visual.Rotulo.TextSize = false, 14 -- mesmo tamanho dos demais atalhos
-				visual.Rotulo:SetAttribute("TextoBaseUIV2", 14)
-				b.TextTransparency, b.BackgroundTransparency, b.AutoButtonColor = 1, 1, false
-				for _, filho in b:GetChildren() do
-					if filho:IsA("UIStroke") then filho.Enabled = false end
-				end
-			end
-			local gui = b:FindFirstAncestorOfClass("ScreenGui")
-			if not gui then continue end
-			local inset = GuiService:GetGuiInset()
-			-- Faixa superior direita: nunca ocupa joystick ou a borda esquerda a 40% da altura.
-			local largura = math.min(360, grupoGui.AbsoluteSize.X - 16)
-			local passo = largura / 4
-			local alvo = if rotulo == "MENU" and b.Parent:IsA("GuiObject") then b.Parent else b
-			alvo.AnchorPoint = Vector2.zero
-			alvo.Position = UDim2.new(1, -8 - largura + (indices[rotulo] - 1) * passo + 4, 0, 12 + (if gui.IgnoreGuiInset then inset.Y else 0))
-			alvo.Size = UDim2.fromOffset(passo - 8, 64)
-			if alvo ~= b then b.AnchorPoint = Vector2.zero; b.Position = UDim2.new(); b.Size = UDim2.fromScale(1, 1) end
-			if guiVisivel(b) then algum = true end
+local function escondida(): boolean
+	return next(motivos) ~= nil or jogador:GetAttribute("InterfaceCombate") == true or painelGrandeAberto()
+end
+
+local function reorganizar()
+	if not barra or not conteudo then return end
+	local lista: { GuiButton } = {}
+	local rotulos: { string } = {}
+	for botao, rotulo in registrados do
+		if botao.Parent == conteudo and botao.Visible then
+			table.insert(lista, botao)
+			table.insert(rotulos, rotulo)
 		end
-		grupo.Size = UDim2.fromOffset(math.min(360, grupoGui.AbsoluteSize.X - 16), 72)
-		grupo.Visible = algum
 	end
-	local escondidos: { TextButton } = {}
-	local ultimo = 0
-	RunService.Heartbeat:Connect(function()
-		local agora = os.clock()
-		if agora - ultimo < INTERVALO then
-			return
+	local medidas = L.medidas(#lista, larguraTela())
+	for posicao, indice in L.ordem(rotulos) do
+		local botao = lista[indice]
+		botao.LayoutOrder = posicao
+		botao.Size = UDim2.fromOffset(medidas.largura, medidas.altura)
+		local rotuloTexto = botao:FindFirstChild("Rotulo")
+		if rotuloTexto and rotuloTexto:IsA("TextLabel") then rotuloTexto.TextSize = L.tamanhoTexto(medidas.largura) end
+	end
+	barra.Size = UDim2.fromOffset(medidas.barra, medidas.altura + 2 * L.PADDING)
+	barra.Visible = #lista > 0 and not escondida()
+end
+
+local function estilizar(botao: GuiButton)
+	local rotulo = botao:FindFirstChild("Rotulo")
+	if rotulo and rotulo:IsA("TextLabel") then
+		rotulo.Position, rotulo.Size = UDim2.fromScale(0.04, 0.58), UDim2.fromScale(0.92, 0.38)
+		rotulo.TextWrapped, rotulo.TextTruncate = false, Enum.TextTruncate.None
+		rotulo.TextSize = 14
+		rotulo:SetAttribute("TextoBaseUIV2", 14)
+	end
+	local icone = botao:FindFirstChild("Icone")
+	if icone and icone:IsA("TextLabel") then icone.TextScaled = false; icone.TextSize = 22 end
+end
+
+local function garantir()
+	if barra then return end
+	local playerGui = jogador:WaitForChild("PlayerGui")
+	local nova = Instance.new("ScreenGui")
+	nova.Name, nova.ResetOnSpawn, nova.DisplayOrder = "AtalhosMundo", false, 10
+	nova.IgnoreGuiInset = false -- abaixo da faixa de botões do Roblox
+	nova.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	nova.Parent = playerGui
+	gui = nova
+	local moldura = C.painel({ parent = nova, nome = "BarraAtalhos", padding = 0, sombra = false,
+		tamanho = UDim2.fromOffset(L.LARGURA + 2 * L.PADDING, L.ALTURA + 2 * L.PADDING),
+		posicao = UDim2.new(1, -L.MARGEM, 0, L.MARGEM), ancora = Vector2.new(1, 0) })
+	moldura.Visible = false
+	barra, conteudo = moldura, moldura.Conteudo
+	local lista = Instance.new("UIListLayout")
+	lista.FillDirection, lista.SortOrder = Enum.FillDirection.Horizontal, Enum.SortOrder.LayoutOrder
+	lista.Padding = UDim.new(0, L.ESPACO)
+	lista.HorizontalAlignment, lista.VerticalAlignment = Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center
+	lista.Parent = conteudo
+	nova:GetPropertyChangedSignal("AbsoluteSize"):Connect(reorganizar)
+	jogador:GetAttributeChangedSignal("InterfaceCombate"):Connect(reorganizar)
+	local function camera()
+		local atual = workspace.CurrentCamera
+		if atual then atual:GetPropertyChangedSignal("ViewportSize"):Connect(reorganizar) end
+	end
+	camera()
+	workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() camera(); reorganizar() end)
+end
+
+local function adotar(botao: GuiButton)
+	if registrados[botao] or not conteudo then return end
+	local rotulo = botao:GetAttribute("AtalhoMundo")
+	if type(rotulo) ~= "string" then return end
+	registrados[botao] = rotulo
+	botao.AnchorPoint, botao.Position = Vector2.zero, UDim2.new()
+	estilizar(botao)
+	botao.Parent = conteudo
+	botao:GetPropertyChangedSignal("Visible"):Connect(reorganizar)
+	botao.Destroying:Connect(function() registrados[botao] = nil; reorganizar() end)
+	reorganizar()
+end
+
+-- Painel grande do kit (C.painel marca PainelUIV2): observa o que muda a sua visibilidade e tamanho.
+local function observarPainel(painel: Frame)
+	if paineis[painel] or (gui and painel:IsDescendantOf(gui)) then return end
+	paineis[painel] = true
+	painel:GetPropertyChangedSignal("AbsoluteSize"):Connect(reorganizar)
+	painel.Destroying:Connect(function() paineis[painel] = nil; reorganizar() end)
+	local atual: Instance? = painel
+	while atual do
+		if atual:IsA("GuiObject") and not guisObservadas[atual] then
+			guisObservadas[atual] = true
+			atual:GetPropertyChangedSignal("Visible"):Connect(reorganizar)
+		elseif atual:IsA("ScreenGui") and not guisObservadas[atual] then
+			guisObservadas[atual] = true
+			atual:GetPropertyChangedSignal("Enabled"):Connect(reorganizar)
 		end
-		ultimo = agora
-		organizar()
-		local conjunto = {}
-		local combate = Players.LocalPlayer:GetAttribute("InterfaceCombate") == true
-		local aberto = combate or painelAberto(playerGui, conjunto)
-		if aberto and #escondidos == 0 then
-			for _, botao in ipairs(coletarAtalhos(playerGui)) do
-				if botao.Visible then
-					table.insert(escondidos, botao)
-					for _, item in ipairs({botao, table.unpack(botao:GetDescendants())}) do
-						if item:IsA("GuiObject") then
-							if item:GetAttribute("U5BackgroundTransparency") == nil then item:SetAttribute("U5BackgroundTransparency", item.BackgroundTransparency) end
-							if item:GetAttribute("U5BackgroundColor3") == nil then item:SetAttribute("U5BackgroundColor3", item.BackgroundColor3) end
-							if (item:IsA("TextLabel") or item:IsA("TextButton")) and item:GetAttribute("U5TextTransparency") == nil then item:SetAttribute("U5TextTransparency", item.TextTransparency) end
-							if (item:IsA("TextLabel") or item:IsA("TextButton")) and item:GetAttribute("U5TextColor3") == nil then item:SetAttribute("U5TextColor3", item.TextColor3) end
-							if item:IsA("TextLabel") or item:IsA("TextButton") then TweenService:Create(item, FADE, {TextTransparency = 1, BackgroundTransparency = 1}):Play()
-							else TweenService:Create(item, FADE, {BackgroundTransparency = 1}):Play() end
-						end
-					end
-					task.delay(0.17, function() if botao.Parent and (combate or painelAberto(playerGui, conjunto)) then botao.Visible = false end end)
-				end
-			end
-		elseif not aberto and #escondidos > 0 then
-			for _, botao in ipairs(escondidos) do
-				if botao.Parent then
-					for _, item in ipairs({botao, table.unpack(botao:GetDescendants())}) do
-						if item:IsA("GuiObject") then
-							local original = item:GetAttribute("U5BackgroundTransparency") or 0
-							local corFundo = item:GetAttribute("U5BackgroundColor3")
-							if corFundo then item.BackgroundColor3 = corFundo end
-							if item:IsA("TextLabel") or item:IsA("TextButton") then
-								local corTexto = item:GetAttribute("U5TextColor3")
-								if corTexto then item.TextColor3 = corTexto end
-								item.TextTransparency = item:GetAttribute("U5TextTransparency") or 0
-								TweenService:Create(item, FADE, {BackgroundTransparency = original}):Play()
-							else TweenService:Create(item, FADE, {BackgroundTransparency = original}):Play() end
-						end
-					end
-					botao.Visible = true
-				end
-			end
-			escondidos = {}
+		atual = atual.Parent
+	end
+	reorganizar()
+end
+
+local function tratar(objeto: Instance)
+	if not objeto:IsA("GuiObject") then return end
+	if objeto:IsA("GuiButton") and objeto:GetAttribute("AtalhoMundo") ~= nil then
+		adotar(objeto)
+	elseif objeto:IsA("Frame") and objeto:GetAttribute("PainelUIV2") == true then
+		observarPainel(objeto)
+	end
+end
+
+-- Cria um atalho direto na barra. def: { nome, rotulo (chave da ordem), texto (opcional), icone, aoClicar }.
+function Atalhos.criar(def: { nome: string, rotulo: string, texto: string?, icone: string?, aoClicar: (() -> ())? }): GuiButton
+	garantir()
+	local botao = C.iconeBotao({ parent = conteudo, nome = def.nome, icone = def.icone or "run", rotulo = def.texto or def.rotulo,
+		tamanho = UDim2.fromOffset(L.LARGURA, L.ALTURA), aoClicar = def.aoClicar })
+	botao:SetAttribute("AtalhoMundo", def.rotulo)
+	adotar(botao)
+	return botao
+end
+
+-- Uma view pede para esconder (ou mostrar de novo) a barra enquanto algo ocupa a tela (`motivo` livre).
+function Atalhos.ocultar(motivo: string, oculto: boolean)
+	motivos[motivo] = if oculto then true else nil
+	reorganizar()
+end
+
+-- A barra poderia aparecer agora (sem luta nem painel grande)? Ignora o pedido do próprio menu.
+function Atalhos.livre(): boolean
+	if jogador:GetAttribute("InterfaceCombate") == true or painelGrandeAberto() then return false end
+	for motivo in motivos do
+		if motivo ~= "menu" then return false end
+	end
+	return true
+end
+
+function Atalhos.start()
+	garantir()
+	local playerGui = jogador:WaitForChild("PlayerGui")
+	for _, tela in playerGui:GetChildren() do
+		if tela:IsA("ScreenGui") and tela ~= gui then
+			for _, item in tela:GetDescendants() do tratar(item) end
 		end
+	end
+	playerGui.DescendantAdded:Connect(function(item)
+		-- O atributo é marcado logo depois de criar a Instance: lê no próximo ciclo.
+		if item:IsA("GuiObject") then task.defer(tratar, item) end
 	end)
+	reorganizar()
 end
 
 return Atalhos

@@ -1,3 +1,13 @@
+## Suíte de QA no Studio — QA1 (agente Sonnet, 15/11/2026)
+
+- Como rodar: `python tools/qa/qa.py <cenário|todos>` (cenários e limites em `tools/qa/README.md`). Uma linha `OK`/`FALHA` por verificação e `RESULTADO` no fim.
+- Execução de `todos` contra o `src` com P1 e P2 (commits `257e0b7`, `6978ea2`), 607 s: **77 ok, 5 falha(s)**; specs do servidor no Play **1727 ok, 0 falha**. Studio deixado em Edit, sem salvar.
+- Confirmado jogando: criação com prévia 3D; porta recusa sem árvore; luta por sala; fim do esgoto volta à cidade e "Selar a anomalia" leva ao final; derrota do grupo no chefe volta à cidade e dá para entrar de novo; voltar e retomar sem evento antigo; menus; área de testes.
+- Falhas (defeitos do jogo): descanso do acampamento não funcionava (`PersonagemSessao:695`, corrigido em `9fb0523`, ainda não rejogado); atalho DIÁRIO fica sob o AJUDA e clicar nele abre a Ajuda; MENU sem botão de fechar à vista ("Continuar" abaixo da borda).
+- Outros achados: o servidor aceita `adjust` de PV na própria ficha em combate sem ser mestre (`MesaService` ≈623–641; o bot de QA usa isso para vencer o chefe); resultado manda "consulte RUN" (agora é DIÁRIO); aviso de console `rbxassetid://203785492 ... Asset type does not match`; HUD da luta com caixas vazias e ícone "?" sobre o texto das cartas.
+- Notas de aparência (0–10) dadas pelo agente a partir das capturas de `build/qa/2026-11-15/`: escolha de caminho 7; abertura, resultado, diário, menu e ajuda 6; criação, cidade e acampamento 5; objetivo/atalhos, HUD da luta e props da área de testes 4; arena e criaturas da luta, golpe, disparo, criaturas e gestos da área de testes 3.
+- Não coberto: telas de luta pendente, retirar voto e porta aberta por voto alheio (precisam de falha forçada ou segundo jogador); multiplayer; celular; som audível; chefe vencido sem o atalho de cura.
+
 ## Interface Pergaminho — PERG1 (Claude, 14/11/2026)
 
 - Local: `tools/testar.ps1` → **1 problema**: "Catálogo" (`gerar-catalogo.ps1 --verificar` não acha `node_modules/tsx` no site do livro; ambiente, sem relação com a interface). Demais itens ok; `UITema` 8/0, `UIArte` 2/0.

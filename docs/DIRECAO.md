@@ -50,14 +50,27 @@ arte, personagens ou fases.
     ficam; muda a apresentação (modelos, animação, câmera, feedback, HUD).
 13. **Menu de status** dentro do jogo: está ruim e precisa de retrabalho.
 
+### Decisões do Pedro (14/11/2026)
+
+- Prazo da missão principal: cerca de 30 dias (provisório).
+- Custos: entrar numa área 1 dia; avançar de sala grátis; descansar meio dia;
+  treinar como já está.
+- Voltar à cidade custa mais quanto mais fundo o grupo está (uma área de 8 dias,
+  deixada no 7º, custa perto disso). O ouro ganho fica: voltar serve para
+  entregar missão, vender e comprar na loja.
+- O progresso da área é mantido. Retomar gasta os dias de ir até onde parou, sem
+  repetir eventos; no máximo alguns combates (onde haveria 4, a volta tem 2 e a
+  retomada tem 1). **Esses combates reduzidos ainda não foram implementados.**
+- Grupo inteiro caído: volta para a cidade pagando os dias da distância, sem
+  perder ouro; a campanha continua. (Leitura do Claude de uma resposta por voz;
+  confirmar.)
+- Descanso: o grupo escolhe quando descansar; haverá mecânica de exaustão
+  (a desenhar). Enquanto isso vale o limite provisório de 2 por área.
+
 ### Decisões em aberto (perguntar ao Pedro, não inventar)
 
-- Prazo da missão principal: cerca de 30 dias (Pedro, 14/11/2026; valor
-  provisório). Falta definir quanto custa cada ação (avançar um passo, voltar à
-  cidade, descansar, treinar).
-- O que acontece quando o prazo acaba ou o grupo inteiro cai.
-- Sair da área no meio: o progresso do contador é mantido ao voltar?
-- O descanso (máximo 2) é por acampamento ou por área?
+- O que acontece quando o prazo acaba.
+- Como funciona a exaustão.
 - As prints do documento do Pedro não foram vistas pelo agente (só o texto);
   pedir as imagens antes de desenhar as telas de acampamento e de escolhas.
 

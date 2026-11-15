@@ -1,6 +1,7 @@
 -- Bot de luta da QA (cliente, via remoto Mesa). Joga até o encontro acabar ou TEMPO s: Disparo no inimigo mais
 -- próximo (<=12 casas), senão anda até ele; ataque básico ao lado; encerra o turno ao acabar as Ações.
--- Devolve "fase=vitoria|derrota|ativa ..." em uma linha.
+-- Abaixo de 60% dos PV, na própria vez, cura até 20 PV pelo caminho só de Studio "QALutaTeste" (ver EncontroService).
+-- Devolve "fase=vitoria|derrota|ativa ... curas=N" em uma linha.
 local TEMPO = @TEMPO@
 local remote = game.ReplicatedStorage:WaitForChild("Mesa", 5)
 if not remote then return "fase=erro sem remoto Mesa" end
@@ -28,9 +29,12 @@ while os.clock() - inicio < TEMPO and resultado == nil do
 	task.wait(0.55)
 	local h = eu()
 	if snap and snap.combat and snap.combat.active and h and snap.combat.turnId == h.id then
-		if (h.pv or 0) < (h.pvMax or 0) * 0.6 then -- atalho de teste: o servidor aceita "adjust" na própria ficha (defeito relatado)
-			curas += 1
-			remote:FireServer("adjust", { id = h.id, field = "pv", delta = math.min(20, h.pvMax - h.pv) })
+		-- Atalho só de teste: cura pela API do servidor exposta apenas no Studio (EncontroService, "QALutaTeste");
+		-- o "adjust" da Mesa agora é recusado na luta sem mestre e não existe atalho no jogo publicado.
+		local qa = game.ReplicatedStorage:FindFirstChild("QALutaTeste")
+		if qa and (h.pv or 0) < (h.pvMax or 0) * 0.6 then
+			local ok, curou = pcall(function() return qa:InvokeServer("curar") end)
+			if ok and curou then curas += 1 end
 			task.wait(0.4)
 		end
 		local alvo, dist = alvoPerto(h)

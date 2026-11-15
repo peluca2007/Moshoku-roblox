@@ -30,6 +30,7 @@ local FichaPersonagemProprio = require(ReplicatedStorage.Shared.Regras.FichaPers
 local PersonagemSessao = require(script.Parent.PersonagemSessao)
 local PersonagemPersistencia = require(script.Parent.PersonagemPersistencia)
 local Roles = require(script.Parent.MesaRoles)
+local AjusteManual = require(ReplicatedStorage.Shared.Regras.AjusteManual)
 local World = require(script.Parent.MesaWorld)
 local VozesNPCs = require(ReplicatedStorage.Shared.VozesNPCs)
 
@@ -628,6 +629,10 @@ function MesaService.start(rng: Random?)
 		if not master and token.ownerUserId ~= player.UserId then
 			return "Você só pode alterar a sua ficha."
 		end
+		-- Encontro de jogo sem mestre (luta do mundo, PvP): o servidor decide PV/mana; o ajuste manual seria trapaça.
+		local permitido, motivoAjuste = AjusteManual.permitido({ mestre = master, admin = Roles.isAdmin(player),
+			encontro = if encontro then encontro.publico() else nil })
+		if not permitido then return motivoAjuste end
 		local field = payload.field
 		if field ~= "pv" and field ~= "mana" then
 			return "Campo inválido."

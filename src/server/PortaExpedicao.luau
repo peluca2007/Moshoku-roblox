@@ -68,6 +68,14 @@ end
 
 local ponto -- { x, z, y } do marco criado
 local parte
+local prompt
+local ativa = true -- o prompt aparece? (definido pelo servidor da run; vale também antes de start())
+
+-- Liga/desliga o ProximityPrompt da porta (o servidor chama ao transmitir a run: só no hub ou sem run ativa).
+function Porta.definirAtiva(valor)
+	ativa = valor == true
+	if prompt then prompt.Enabled = ativa end
+end
 
 -- Posição (Vector3) da porta; nil antes de start().
 function Porta.ponto()
@@ -95,7 +103,8 @@ function Porta.start(deps)
 	parte.Material = Enum.Material.Slate
 	parte.Color = Color3.fromRGB(58, 62, 58)
 	parte:SetAttribute("Area", Porta.AREA)
-	local prompt = Instance.new("ProximityPrompt")
+	prompt = Instance.new("ProximityPrompt")
+	prompt.Enabled = ativa
 	prompt.Name = "Entrar no esgoto"
 	prompt.ActionText = "Entrar no esgoto"
 	prompt.ObjectText = "Esgoto da cidade"

@@ -11,7 +11,6 @@ local Conta = require(Shared.Regras.RunConta)
 local Prontos = require(Shared.PersonagensProntos)
 local RestricaoDeCriacao = require(Shared.Regras.RestricaoDeCriacao)
 local Abertura = require(Shared.Regras.AberturaRun)
-local EventosV1 = require(Shared.Mundo.ViagemEventosV1)
 local CatalogoAparencia = require(Shared.Aparencia.Catalogo)
 
 local Servico = {}
@@ -38,7 +37,11 @@ function Servico.payloadValido(pedido)
 		end
 		if pedido.modo ~= nil and not ok then return false end
 	elseif pedido.acao == "lutar" then
-		-- sem campos: reinicia a luta pendente
+		-- sem campos: começa (ou tenta de novo) a luta pendente
+	elseif pedido.acao == "abandonar" then
+		-- sem campos: desiste da luta pendente que não começou e volta à cidade (custa dias)
+	elseif pedido.acao == "retirarVoto" then
+		-- sem campos: desfaz o próprio voto em aberto
 	elseif pedido.acao == "descansar" then
 		-- sem campos: descanso do acampamento da área (o servidor decide custo, limite e recuperação)
 	elseif pedido.acao == "escolherArvore" then
@@ -88,7 +91,8 @@ function Servico.start(deps)
 		return Sessao.new({
 			rng = Random.new(), guardar = guardar, carregar = carregar, mundoAberto = false,
 			historiaDaSemente = deps.historiaDaSemente, area = deps.area, objetivo = deps.objetivo,
-			ehExplorador = deps.ehExplorador, prontos = Prontos, eventos = EventosV1,
+			-- Sem `eventos`: a expedição não tem eventos de viagem (o catálogo antigo trazia eventos ao voltar/retomar).
+			ehExplorador = deps.ehExplorador, prontos = Prontos,
    fichaDe = function(userId)
     local player = Players:GetPlayerByUserId(userId)
     return player and deps.corpoPessoal and deps.corpoPessoal(player) or nil
@@ -156,6 +160,14 @@ function Servico.start(deps)
 		for _, p in Players:GetPlayers() do enviar(p, visaoPara(p)) end
 	end
 	local function recusa(player, motivo) enviar(player, { erro = motivo }) end
+	-- Operação fora do remoto (entrada/saída de jogador, fim de luta): espera a vez e segura `processando`.
+	local function exclusivo(fn)
+		while processando or (sessao and sessao.ocupada) do task.wait() end
+		processando = true
+		local ok, erro = pcall(fn)
+		processando = false
+		if not ok then warn("[Run] " .. tostring(erro)) end
+	end
 	-- Fim da run (final ou queda): paga a conta de cada jogador UMA vez (marca antes de pagar: um servidor
 	-- reiniciado nunca paga duas vezes; se o pagamento falhar, fica o aviso no log).
 	local function fecharConta()
@@ -173,57 +185,110 @@ function Servico.start(deps)
 		end
 	end
 
-	-- Luta pendente do nó atual e ainda sem encontro: o servidor monta o J2 com todos os membros presentes e vivos
-	-- (sem checar distância: o grupo já está dentro da área).
+	-- Luta pendente do nó atual e ainda sem encontro: o servidor monta o J2 com os membros presentes prontos
+	-- (sem checar distância: o grupo já está dentro da área). Quem não está pronto fica de fora com aviso; se
+	-- ninguém estiver pronto ou a mesa recusar, o motivo vai a TODOS os presentes, ao Output e a `visao.lutaErro`
+	-- (o grupo pode tentar de novo com "lutar" ou desistir com "abandonar").
+	local function avisarGrupo(texto)
+		for userId, membro in sessao.run.jogadores do
+			local jogador = Players:GetPlayerByUserId(userId)
+			if jogador and membro.presente then recusa(jogador, texto) end
+		end
+	end
 	local function iniciarLutaPendente(solicitante)
 		local luta = sessao and sessao:lutaPendente()
 		if not luta or lutaAtiva then return end
+		if solicitante and not sessao.run.jogadores[solicitante.UserId] then recusa(solicitante, "Você não está nesta run."); return end
+		local function falhar(motivo)
+			sessao:definirErroDaLuta(motivo)
+			warn("[Run] Luta de " .. tostring(luta.no) .. " não começou: " .. motivo)
+			avisarGrupo(motivo)
+		end
 		local function apto(player)
-			local membro = sessao.run.jogadores[player.UserId]
 			local raiz = raizDe(player)
 			local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-			return membro ~= nil and membro.presente and not membro.caido and raiz ~= nil and hum ~= nil and hum.Health > 0
+			if not raiz or not hum then return false, "seu personagem não está no mapa." end
+			if hum.Health <= 0 then return false, "seu personagem está caído." end
+			if deps.prontoParaLutar then
+				local pronto, motivo = deps.prontoParaLutar(player)
+				if not pronto then return false, motivo or "sua ficha não está pronta para lutar." end
+			end
+			return true
 		end
-		if solicitante and not apto(solicitante) then recusa(solicitante, "Você não pode lutar agora."); return end
-		if not deps.iniciarLuta then
-			if solicitante then recusa(solicitante, "A luta ainda não está disponível neste servidor.") end
-			return
-		end
-		local grupo = {}
-		for userId in sessao.run.jogadores do
+		if not deps.iniciarLuta then falhar("A luta ainda não está disponível neste servidor."); return end
+		local grupo, fora = {}, {}
+		for userId, membro in sessao.run.jogadores do
 			local jogador = Players:GetPlayerByUserId(userId)
-			if jogador and apto(jogador) then table.insert(grupo, jogador) end
+			if jogador and membro.presente and not membro.caido then
+				local pronto, motivo = apto(jogador)
+				if pronto then table.insert(grupo, jogador) else table.insert(fora, { jogador = jogador, motivo = motivo }) end
+			end
 		end
 		table.sort(grupo, function(a, b) return a.UserId < b.UserId end)
-		if #grupo == 0 then return end
-		local id, motivo = deps.iniciarLuta(grupo, luta)
-		if not id then
-			if solicitante then recusa(solicitante, motivo or "Não foi possível começar a luta.") end
+		table.sort(fora, function(a, b) return a.jogador.UserId < b.jogador.UserId end)
+		if #grupo == 0 then
+			local motivos = {}
+			for _, f in fora do table.insert(motivos, f.jogador.DisplayName .. ": " .. f.motivo) end
+			falhar("Ninguém do grupo pode lutar agora" .. (if #motivos > 0 then " (" .. table.concat(motivos, " ") .. ")" else ".") )
 			return
 		end
+		local chamou, id, motivo = pcall(deps.iniciarLuta, grupo, luta)
+		if not chamou then id, motivo = nil, tostring(id) end
+		if not id then falhar(motivo or "Não foi possível começar a luta."); return end
 		lutaAtiva = id
+		sessao:definirErroDaLuta(nil)
+		for _, f in fora do recusa(f.jogador, "Você ficou fora desta luta: " .. f.motivo) end
+	end
+	-- Tenta a luta e retransmite se o erro exposto na visão mudou (a visão do avanço já foi enviada antes).
+	local function tentarLuta(solicitante)
+		local antes = sessao and sessao.lutaErro
+		iniciarLutaPendente(solicitante)
+		if sessao and sessao.lutaErro ~= antes then transmitir() end
 	end
 
-	-- Área concluída (flag do gerador): ouro da área a cada membro presente UMA vez por run
-	-- (idempotente pelo id de pagamento, que a ficha guarda) e aviso ao cliente.
-	local pagosDaArea = {} -- idPagamento/userId
+	-- Área concluída (flag do gerador, marcada ao voltar ao hub com a recompensa): ouro da área a cada membro
+	-- presente UMA vez por run (crédito idempotente pelo id de pagamento, que a ficha guarda) e aviso ao cliente.
+	-- O que já foi pago/avisado fica em flag da run (`Sessao:marcarAreaPaga`): servidor reiniciado não reenvia.
+	local avisadosDaArea = {} -- reserva em memória se a flag não puder ser salva
 	local function concluirArea()
 		local area = deps.area
-		if not (area and sessao and sessao.run and sessao.run.flags["expedicao/" .. area.id .. "/concluida"]) then return end
+		if not (area and deps.recompensarArea and sessao and sessao.run and sessao.run.flags["expedicao/" .. area.id .. "/concluida"]) then return end
 		local idPagamento = "expedicao-" .. area.id .. "-" .. tostring(sessao.run.semente)
-		for userId, membro in sessao.run.jogadores do
-			local chave = idPagamento .. "/" .. userId
+		local ids = {}
+		for userId in sessao.run.jogadores do table.insert(ids, userId) end
+		table.sort(ids, function(a, b) return tostring(a) < tostring(b) end)
+		for _, userId in ids do
+			local membro = sessao.run.jogadores[userId]
+			local chave = idPagamento .. "/" .. tostring(userId)
 			local jogador = Players:GetPlayerByUserId(userId)
-			if jogador and membro.presente and not pagosDaArea[chave] and deps.recompensarArea then
+			if jogador and membro.presente and not avisadosDaArea[chave] and not sessao:areaPaga(area.id, userId) then
 				local ok, pago = pcall(deps.recompensarArea, jogador, idPagamento, area.recompensa.ouro, area.id)
 				if ok and pago then
-					pagosDaArea[chave] = true
+					avisadosDaArea[chave] = true
+					local marcou, falha = sessao:marcarAreaPaga(area.id, userId)
+					if not marcou then warn("[Run] Pagamento da área não registrado na run para " .. tostring(userId) .. ": " .. tostring(falha)) end
 					remote:FireClient(jogador, "expedicaoConcluida", { area = area.id, ouro = area.recompensa.ouro })
 				else
 					warn("[Run] Recompensa da área não creditada para " .. tostring(userId) .. ": " .. tostring(pago))
 				end
 			end
 		end
+	end
+
+	-- Sem sessão: tenta retomar a run de qualquer jogador presente (ponteiro por membro ou a chave de quem
+	-- iniciou). Mesma lista de jogadores não relê o DataStore antes de 10 s.
+	local ultimaRetomada = { assinatura = nil, instante = -math.huge }
+	local function tentarRetomar()
+		local ids = {}
+		for _, p in Players:GetPlayers() do table.insert(ids, p.UserId) end
+		table.sort(ids)
+		local assinatura = table.concat(ids, ",")
+		if assinatura == ultimaRetomada.assinatura and os.clock() - ultimaRetomada.instante < 10 then return end
+		ultimaRetomada.assinatura, ultimaRetomada.instante = assinatura, os.clock()
+		local tentativa = novaSessao()
+		local ok, _, avisos = tentativa:retomarDeMembros(ids, function(id) return "u" .. id end)
+		for _, aviso in avisos or {} do warn("[Run] Save ignorado (" .. aviso .. ")") end
+		if ok then sessao = tentativa; transmitir() end
 	end
 
 	-- Com a run ativa, o personagem pessoal só nasce com a árvore que a run deu (PersonagemSessao consulta isto).
@@ -246,17 +311,21 @@ function Servico.start(deps)
 	local function processar(player, pedido)
 		if not Servico.payloadValido(pedido) then return end
 		local agora = os.clock()
-		if ultimo[player.UserId] and agora - ultimo[player.UserId] < INTERVALO then return end
+		if ultimo[player.UserId] and agora - ultimo[player.UserId] < INTERVALO then
+			-- Nada some em silêncio: consulta reenvia a visão; o resto recebe recusa curta.
+			if pedido.acao == "consultar" then enviar(player, visaoPara(player)) else recusa(player, "Aguarde um instante.") end
+			return
+		end
 		ultimo[player.UserId] = agora
-		if deps.emEncontro and deps.emEncontro() and pedido.acao ~= "consultar" then
+		-- "abandonar" e "retirarVoto" não mexem na mesa: valem mesmo com ela ocupada por outro modo (item N);
+		-- a luta da própria run em curso é recusada por `lutaAtiva` em abandonarLuta.
+		local livreDaMesa = pedido.acao == "consultar" or pedido.acao == "abandonar" or pedido.acao == "retirarVoto"
+		if deps.emEncontro and deps.emEncontro() and not livreDaMesa then
 			recusa(player, "Termine o encontro antes de mexer na run.")
 			return
 		end
 		if pedido.acao == "consultar" then
-			if not sessao then
-				local tentativa = novaSessao()
-				if tentativa:retomar("u" .. player.UserId) then sessao = tentativa; transmitir() end
-			end
+			if not sessao then tentarRetomar() end
 			enviar(player, visaoPara(player))
 			concluirArea()
 		elseif pedido.acao == "iniciar" then
@@ -280,6 +349,7 @@ function Servico.start(deps)
 			local ok, motivo = nova:iniciar("u" .. player.UserId, lista, modos, liberadas)
 			if not ok then recusa(player, motivo); return end
 			sessao = nova
+			nova:gravarPonteiros() -- qualquer membro retoma esta run depois (não só quem iniciou)
 			transmitir()
 			-- A expedição começa na entrada norte da vila, com o objetivo "Fale com um mestre".
 			local nascimento = Abertura.nascimento()
@@ -293,26 +363,54 @@ function Servico.start(deps)
 		elseif not sessao then
 			recusa(player, "Não há run em andamento.")
 		elseif pedido.acao == "lutar" then
+			-- Também é o "tentar de novo" depois de `lutaErro` (ex.: mesa ocupada por outro modo).
+			if not sessao:lutaPendente() then recusa(player, "Não há luta pendente."); return end
+			if lutaAtiva then recusa(player, "A luta já começou."); return end
 			iniciarLutaPendente(player)
+			transmitir()
+		elseif pedido.acao == "abandonar" then
+			local ok, motivo = sessao:abandonarLuta(player.UserId, lutaAtiva ~= nil)
+			if not ok then recusa(player, motivo); return end
+			-- Fora da área: solta o grupo já, mesmo se outra luta ocupa a mesa (transmitir pularia a sincronização).
+			pcall(sincronizarAncoras)
+			transmitir()
+		elseif pedido.acao == "retirarVoto" then
+			local ok, motivo = sessao:retirarVoto(player.UserId)
+			if not ok then recusa(player, motivo); return end
 			transmitir()
 		elseif pedido.acao == "escolherArvore" then
 			local ok, motivo = sessao:escolherArvore(player.UserId, pedido.arvore)
 			if not ok then recusa(player, motivo); return end
 			transmitir()
 		elseif pedido.acao == "descansar" then
-			local ok, motivo = sessao:descansarNoAcampamento(player.UserId)
-			if not ok then recusa(player, motivo or "Descanso indisponível."); return end
-			-- A ficha de cada presente recupera PV/PM/PT pelo mesmo caminho do descanso da mesa.
+			local pode, motivoPode = sessao:podeDescansarNoAcampamento(player.UserId)
+			if not pode then recusa(player, motivoPode or "Descanso indisponível."); return end
+			-- Primeiro a ficha de cada presente recupera PV/PM/PT (mesmo caminho do descanso da mesa); só então
+			-- o dia é gasto. Se ninguém recuperar, o descanso é recusado sem gastar nada.
 			if deps.restaurarDescanso then
+				local restaurados, ultimoErro = 0, nil
 				for userId, membro in sessao.run.jogadores do
 					local jogador = Players:GetPlayerByUserId(userId)
 					if jogador and membro.presente and not membro.caido then
 						local chamou, restaurou, erro = pcall(deps.restaurarDescanso, jogador)
-						if not (chamou and restaurou) then
-							warn("[Run] Descanso não restaurou a ficha de " .. tostring(userId) .. ": " .. tostring(if chamou then erro else restaurou))
+						if chamou and restaurou then
+							restaurados += 1
+						else
+							ultimoErro = tostring(if chamou then erro else restaurou)
+							warn("[Run] Descanso não restaurou a ficha de " .. tostring(userId) .. ": " .. ultimoErro)
 						end
 					end
 				end
+				if restaurados == 0 then
+					recusa(player, "Ninguém conseguiu descansar; o dia não foi gasto." .. (if ultimoErro and ultimoErro ~= "nil" then " (" .. ultimoErro .. ")" else ""))
+					return
+				end
+			end
+			local ok, motivo = sessao:descansarNoAcampamento(player.UserId)
+			if not ok then
+				warn("[Run] Descanso restaurou as fichas, mas o dia não foi registrado: " .. tostring(motivo))
+				recusa(player, motivo or "Descanso indisponível.")
+				return
 			end
 			transmitir()
 		elseif pedido.acao == "votar" then
@@ -338,7 +436,7 @@ function Servico.start(deps)
 			local ok, resultado = sessao:votar(player.UserId, pedido.opcao)
 			if not ok then recusa(player, resultado); return end
 			transmitir()
-			iniciarLutaPendente(player)
+			tentarLuta(player)
 			fecharConta()
 			concluirArea()
 		end
@@ -352,19 +450,30 @@ function Servico.start(deps)
 	end)
 
 	Players.PlayerRemoving:Connect(function(player)
-		while processando or (sessao and sessao.ocupada) do task.wait() end
-		ultimo[player.UserId] = nil
-		if sessao and sessao.run and sessao.run.jogadores[player.UserId] and not sessao.run.fim then
-			sessao:ausentar(player.UserId)
-			transmitir()
-		end
+		exclusivo(function()
+			ultimo[player.UserId] = nil
+			if sessao and sessao.run and sessao.run.jogadores[player.UserId] and not sessao.run.fim then
+				-- A saída pode ser o que faltava para o grupo decidir: o avanço segue como num voto.
+				local ok, resultado = sessao:ausentar(player.UserId)
+				transmitir()
+				if ok and type(resultado) == "table" and resultado.avancou then
+					tentarLuta(nil)
+					fecharConta()
+					concluirArea()
+				end
+			end
+		end)
 	end)
 	Players.PlayerAdded:Connect(function(player)
-		while processando or (sessao and sessao.ocupada) do task.wait() end
-		if sessao and sessao.run and sessao.run.jogadores[player.UserId] and not sessao.run.fim then
-			sessao:retornar(player.UserId)
-		end
-		if sessao then enviar(player, visaoPara(player)) end
+		exclusivo(function()
+			if sessao and sessao.run and sessao.run.jogadores[player.UserId] and not sessao.run.fim then
+				sessao:retornar(player.UserId)
+			end
+			if sessao then
+				transmitir()
+				concluirArea() -- quem faltou na volta com a recompensa recebe agora
+			end
+		end)
 	end)
 
  -- Checkpoint de save a cada 15 s (protege contra queda do servidor entre votos).
@@ -412,27 +521,47 @@ function Servico.start(deps)
   end,
 		ocupado = function() return processando or (sessao and sessao.ocupada) end,
 		observar = function(fn) table.insert(observadores, fn); fn(sessao) end,
-		-- Chamado quando QUALQUER encontro J2 termina; só interessa o da luta do chefe da run.
+		-- Chamado quando QUALQUER encontro J2 termina; só interessa o da luta pendente da run (sala ou chefe).
+		-- Encontros comuns (provação do dojo, testes) não mexem na run: perder um deles não derruba ninguém.
 		encerrado = function(encontro, estado)
 			if not sessao or not sessao.run or sessao.run.fim or type(estado) ~= "table" then return end
-			if not lutaAtiva or estado.encounterId ~= lutaAtiva then
-				-- Encontro comum (patrulha, marco) durante a run: derrota derruba quem lutou; o grupo todo caído encerra a run.
-				if estado.phase == "defeat" and type(encontro) == "table" and type(encontro.atoresPorJogador) == "table" then
-					for userId in encontro.atoresPorJogador do
-						if sessao.run.jogadores[userId] then sessao:cair(userId, true) end
-					end
-					transmitir()
-					fecharConta()
-				end
-				return
-			end
-			local fonteLoot = lutaAtiva
-			lutaAtiva = nil
+			if not lutaAtiva or estado.encounterId ~= lutaAtiva then return end
+			local fonteLoot, s = lutaAtiva, sessao
 			local fase = estado.phase
 			local resultado = if fase == "victory" then "victory" elseif fase == "defeat" then "defeat" else "fled"
-			local ok, motivo = sessao:lutaTerminou(resultado)
-			if not ok then warn("[Run] Desfecho da luta não aplicado: " .. tostring(motivo)) end
-			if ok and fase == "victory" and deps.conta and deps.conta.registrarLootChefe then
+			local noDaLuta = s.luta and s.historia.nos[s.luta]
+			local ehChefe = noDaLuta ~= nil and noDaLuta.tipo == "chefe"
+			-- `lutaAtiva` fica até o desfecho ser aplicado: se um salvamento estiver em curso (`ocupada`/`processando`),
+			-- espera e repete em vez de perder a vitória. Enquanto isso "lutar"/"abandonar" seguem recusados.
+			task.spawn(function()
+				local aplicou = false
+				for tentativa = 1, 10 do
+					local espera = os.clock()
+					while (processando or s.ocupada) and os.clock() - espera < 30 do task.wait(0.1) end
+					if sessao ~= s or lutaAtiva ~= fonteLoot or not s.luta then break end
+					if not (processando or s.ocupada) then
+						processando = true
+						local chamou, ok, motivo = pcall(s.lutaTerminou, s, resultado)
+						processando = false
+						if chamou and ok then aplicou = true; break end
+						warn("[Run] Desfecho da luta não aplicado (tentativa " .. tentativa .. "): " .. tostring(if chamou then motivo else ok))
+					end
+					task.wait(1)
+				end
+				if lutaAtiva == fonteLoot then lutaAtiva = nil end
+				if sessao ~= s then return end
+				if not aplicou then
+					s:definirErroDaLuta("O resultado da luta não foi registrado. Lute de novo ou abandone.")
+					exclusivo(function() pcall(sincronizarAncoras); transmitir() end)
+					return
+				end
+				exclusivo(function()
+					-- A luta já acabou: solta/ancora conforme o nó (transmitir pula a sincronização se o encontro ainda consta ativo).
+					pcall(sincronizarAncoras)
+					transmitir()
+					fecharConta()
+				end)
+				if not (fase == "victory" and ehChefe and deps.conta and deps.conta.registrarLootChefe) then return end
 				-- Só participantes da luta; observadores não recebem uma rolagem.
 				local premiados = {}
 				for userId, atorId in encontro.atoresPorJogador or {} do
@@ -451,11 +580,7 @@ function Servico.start(deps)
 						end
 					end
 				end)
-			end
-			-- A luta já acabou: solta/ancora conforme o nó (transmitir pula a sincronização se o encontro ainda consta ativo).
-			pcall(sincronizarAncoras)
-			transmitir()
-			fecharConta()
+			end)
 		end,
 	}
 end

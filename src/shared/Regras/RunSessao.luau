@@ -11,8 +11,10 @@
 --   prontos,                          -- PersonagensProntos, para o modo "pronto"
 --   historiaDaSemente = function(semente) -> historia,  -- expedição gerada pela semente (iniciar sorteia antes;
 --                                     retomar regenera por run.semente). Sem ela: HistoriaV1. `area` = dados da área.
---   eventos,                        -- catálogo de eventos de viagem (RunViagem); sem ele não há eventos
+--   eventos,                        -- catálogo de eventos de viagem (RunViagem); sem ele não há eventos.
+--                                     Com `area` (expedição) nunca há evento de viagem, mesmo com catálogo.
 -- }
+-- Chaves no armazenamento: "run/<grupoId>" (o save) e "membro/<userId>" (ponteiro: grupoId da última run do jogador).
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Run = require(Shared.Regras.Run)
 local Votacao = require(Shared.Regras.RunVotacao)
@@ -33,6 +35,7 @@ local Sessao = {}
 Sessao.__index = Sessao
 
 local function chaveDaRun(grupoId) return "run/" .. grupoId end
+local function chaveDoMembro(userId) return "membro/" .. tostring(userId) end
 
 -- Somente servidor usa este contexto para aplicar kit na criação J1.
 function Sessao.contextoCriacao(userId)
@@ -98,7 +101,53 @@ function Sessao:iniciar(grupoId, jogadores, modos, liberadas)
 	return true
 end
 
+-- Ponteiro por membro para a run (qualquer membro retoma, não só quem iniciou). O servidor chama depois de
+-- iniciar; retomarDeMembros regrava. Melhor esforço: falha não desfaz nada.
+function Sessao:gravarPonteiros()
+	if not self.run or not self.grupoId then return end
+	self.ocupada = true
+	for id in self.run.jogadores do pcall(self.deps.guardar, chaveDoMembro(id), self.grupoId) end
+	self.ocupada = false
+end
+
+function Sessao:_limpar()
+	self.run, self.planos, self.grupoId, self.votos, self.evento, self.luta, self.viagem = nil, {}, nil, {}, nil, nil, nil
+	self.lutaErro, self.contaRegistrada, self.treinadores = nil, false, nil
+	if ativa == self then ativa = nil end
+end
+
+-- Retoma a run de algum dos jogadores (servidor reiniciou ou o grupo voltou): para cada userId, na ordem dada,
+-- tenta o ponteiro "membro/<id>" e depois `grupoPadrao(id)` (saves anteriores ao ponteiro). Prefere a primeira
+-- run em andamento; sem nenhuma, a primeira encerrada. Devolve (ok, grupoId|motivo, avisos) — avisos lista os
+-- saves ignorados por incompatibilidade (para o servidor registrar).
+function Sessao:retomarDeMembros(userIds, grupoPadrao)
+	if self.run then return false, "Já existe uma run.", {} end
+	local candidatos, vistos, avisos = {}, {}, {}
+	local function incluir(g)
+		if type(g) == "string" and g ~= "" and #g <= 64 and not vistos[g] then vistos[g] = true; table.insert(candidatos, g) end
+	end
+	for _, id in userIds or {} do
+		local ok, g = pcall(self.deps.carregar, chaveDoMembro(id))
+		if ok then incluir(g) end
+		if grupoPadrao then incluir(grupoPadrao(id)) end
+	end
+	local encerrada
+	for _, g in candidatos do
+		local ok, _, detalhe = self:retomar(g)
+		if detalhe then table.insert(avisos, g .. ": " .. detalhe) end
+		if ok then
+			if not self.run.fim then self:gravarPonteiros(); return true, g, avisos end
+			encerrada = encerrada or g
+			self:_limpar()
+		end
+	end
+	if encerrada and self:retomar(encerrada) then return true, encerrada, avisos end
+	return false, "Nenhuma run salva.", avisos
+end
+
 -- Retoma uma run salva (servidor reiniciou ou o grupo voltou). Votos em aberto não são salvos: recomeçam.
+-- Com história gerada (`historiaDaSemente`), save que não cabe nela (galho inexistente ou outro objetivo) conta
+-- como "nenhuma run salva"; o terceiro retorno explica, para o servidor registrar.
 function Sessao:retomar(grupoId)
 	if self.run then return false, "Já existe uma run." end
 	local ok, dado = pcall(self.deps.carregar, chaveDaRun(grupoId))
@@ -106,7 +155,17 @@ function Sessao:retomar(grupoId)
 	if dado == nil then return false, "Nenhuma run salva." end
 	local run, planos, extras = Save.restaurar(dado)
 	if not run then return false, planos end
-	if self.deps.historiaDaSemente then self.historia = self.deps.historiaDaSemente(run.semente) end
+	local historia = self.historia
+	if self.deps.historiaDaSemente then
+		historia = self.deps.historiaDaSemente(run.semente)
+		if type(historia) ~= "table" or type(historia.nos) ~= "table" or not historia.nos[run.galho] then
+			return false, "Nenhuma run salva.", "save incompatível: galho " .. tostring(run.galho) .. " não existe na história atual"
+		end
+		if run.objetivo.id ~= self.objetivo.id then
+			return false, "Nenhuma run salva.", "save incompatível: objetivo " .. tostring(run.objetivo.id) .. " difere de " .. tostring(self.objetivo.id)
+		end
+	end
+	self.historia = historia
 	local treinadores
 	if extras.treinadoresVila ~= nil then
 		if type(extras.treinadoresVila) ~= "string" then return false, "Treinadores salvos inválidos." end
@@ -152,23 +211,25 @@ function Sessao:retomar(grupoId)
 	end
 	self.treinadores = treinadores
 	local evento
-	if extras.eventoPendente ~= nil then
+	-- Expedição não tem evento de viagem: um evento salvo por versão antiga é descartado, sem travar a retomada.
+	if extras.eventoPendente ~= nil and not self.deps.area then
 		for _, e in self.deps.eventos or {} do
 			if e.id == extras.eventoPendente then evento = e end
 		end
 		if not evento then return false, "Evento salvo desconhecido." end
 	end
+	-- Valida antes de assumir o estado: uma falha aqui não deixa a sessão meio retomada.
+	if extras.lutaPendente ~= nil then
+		local no = self.historia.nos[extras.lutaPendente]
+		if not no or not no.luta then return false, "Luta salva desconhecida." end
+	end
 	self.run, self.planos, self.grupoId, self.votos, self.evento = run, planos, grupoId, {}, evento
+	self.lutaErro = nil
 	self.contaRegistrada = extras.contaRegistrada == true
 	self.viagem = if evento and type(extras.viagemOrigem) == "string" and type(extras.viagemDestino) == "string"
 		then { origem = extras.viagemOrigem, destino = extras.viagemDestino } else nil
 	if self.deps.mundoAberto then self.viagem = nil end
-	self.luta = nil
-	if extras.lutaPendente ~= nil then
-		local no = self.historia.nos[extras.lutaPendente]
-		if not no or not no.luta then return false, "Luta salva desconhecida." end
-		self.luta = extras.lutaPendente
-	end
+	self.luta = extras.lutaPendente
 	ativa = self
 	return true
 end
@@ -229,7 +290,7 @@ function Sessao:_opcoes(userId)
 		end
 		return lista
 	end
-	local opcoes = Historia.opcoes(self.historia, self.run)
+	local opcoes = self:_semOcultas(Historia.opcoes(self.historia, self.run))
 	if not self.deps.mundoAberto then return self:_filtrarRetomadas(opcoes) end
  local locais = {}
  for _, o in opcoes do
@@ -240,6 +301,25 @@ function Sessao:_opcoes(userId)
   end
  end
  return locais
+end
+
+-- Opção do nó atual como foi definida na história (com os campos extras do gerador: `ocultaCom`, `marcas`).
+function Sessao:_opcaoDoNo(galho, opcaoId)
+	local no = self.historia.nos[galho]
+	for _, o in (no and no.opcoes) or {} do
+		if o.id == opcaoId then return o end
+	end
+	return nil
+end
+
+-- Tira da lista as opções cuja flag `ocultaCom` já está marcada (ex.: entrar/retomar uma área concluída).
+function Sessao:_semOcultas(opcoes)
+	local lista = {}
+	for _, o in opcoes do
+		local def = self:_opcaoDoNo(self.run.galho, o.id)
+		if not (def and def.ocultaCom and self.run.flags[def.ocultaCom]) then table.insert(lista, o) end
+	end
+	return lista
 end
 
 -- No hub só aparecem entrar e a retomada liberada mais funda (as outras retomadas ficam fora da lista).
@@ -312,7 +392,11 @@ function Sessao:treinar(userId, npcId, arvore, requestId)
 	end
 	local membro = self.run.jogadores[userId]
 	if not membro or not membro.presente or membro.caido then return false, "Jogador indisponível na run." end
-	if self.run.regiao ~= "vila" or self.evento or self.luta or next(self.votos) ~= nil then return false, "Volte à vila e conclua as decisões antes de treinar." end
+	if self.run.regiao ~= "vila" or self.evento or self.luta then return false, "Volte à vila e conclua as decisões antes de treinar." end
+	-- Treinar gasta dias, o que mudaria a escolha já votada: com voto em aberto, recusa com motivo claro
+	-- (o próprio voto sai com "retirarVoto"; o de outro jogador, pedindo a ele ou esperando a decisão).
+	if self.votos[userId] ~= nil then return false, "Retire seu voto antes de treinar." end
+	if next(self.votos) ~= nil then return false, "Há votos em aberto no grupo: decidam o caminho ou retirem os votos antes de treinar." end
 	local encontrado = false
 	for _, npc in Treinadores.listar(self.treinadores) do
 		if npc.id == npcId and npc.arvore == arvore then encontrado = true end
@@ -345,6 +429,15 @@ function Sessao:votar(userId, opcaoId)
 	if not valida then return false, "Opção indisponível." end
 	self.votos[userId] = opcaoId
 	return self:_fechar()
+end
+
+-- Desfaz o voto do jogador enquanto o grupo ainda não decidiu (votos não são salvos: nada a gravar).
+function Sessao:retirarVoto(userId)
+	if self.ocupada then return false, "Aguarde o salvamento da run." end
+	if not self.run or Run.encerrada(self.run) then return false, "Sem run ativa." end
+	if self.votos[userId] == nil then return false, "Você não tem voto para retirar." end
+	self.votos[userId] = nil
+	return true
 end
 
 -- Maior bônus entre presentes aptos à opção (independe de quem votou nela).
@@ -411,16 +504,23 @@ function Sessao:_fechar()
    expirou = false
   else
    nova, expirou, erro = Historia.avancar(self.historia, anterior, resultado.vencedora)
+   -- Flags extras da opção (gerador da expedição): RunHistoria só aplica a `marca` única.
+   local def = nova and self:_opcaoDoNo(anterior.galho, resultado.vencedora)
+   for _, flag in (def and def.marcas) or {} do
+    nova, erro = Run.definirFlag(nova, flag)
+    if not nova then break end
+   end
   end
 	end
 	if not nova then return false, erro end
 	self.run, self.evento, self.votos = nova, nil, {}
 	-- Mudou de região (e a run segue): a viagem traz um evento para o grupo decidir.
-	local lutaAnterior = self.luta
+	local lutaAnterior, lutaErroAnterior = self.luta, self.lutaErro
 	local no = self.historia.nos[nova.galho]
 	if not eventoAnterior and not Run.encerrada(nova) and no and no.luta
-		and not nova.flags["vencido/" .. nova.galho] then self.luta = nova.galho end
-	if not self.deps.mundoAberto and not eventoAnterior and not self.luta and not Run.encerrada(nova) and nova.regiao ~= anterior.regiao then
+		and not nova.flags["vencido/" .. nova.galho] then self.luta, self.lutaErro = nova.galho, nil end
+	-- Expedição (`area`) não sorteia evento de viagem: voltar à cidade ou retomar não traz evento antigo.
+	if not self.deps.mundoAberto and not self.deps.area and not eventoAnterior and not self.luta and not Run.encerrada(nova) and nova.regiao ~= anterior.regiao then
 		self.evento = self:_sortearEvento(nova.regiao)
 	end
 	local viagemAnterior = self.viagem
@@ -430,7 +530,11 @@ function Sessao:_fechar()
 		self.viagem = nil
 	end
 	local ok, falha = self:_salvar()
-	if not ok then self.run, self.evento, self.luta, self.viagem, self.votos = anterior, eventoAnterior, lutaAnterior, viagemAnterior, votosAnteriores; return false, falha end
+	if not ok then
+		self.run, self.evento, self.luta, self.viagem, self.votos = anterior, eventoAnterior, lutaAnterior, viagemAnterior, votosAnteriores
+		self.lutaErro = lutaErroAnterior
+		return false, falha
+	end
  self.resolucaoEvento = nil
 	return true, { avancou = true, opcao = resultado.vencedora, dado = resultado.dado, expirou = expirou, run = nova,
 		evento = self.evento and self.evento.id or nil, luta = self.luta, ultimoEvento = nova.ultimoEvento }
@@ -469,10 +573,8 @@ function Sessao:lutaTerminou(resultado)
 	elseif resultado == "defeat" and self.historia.nos[self.luta].area and self.deps.area then
 		-- Derrota em expedição não encerra a campanha: o grupo volta à cidade pagando o mesmo que "voltar-a-cidade".
 		local no = self.historia.nos[self.luta]
-		local gasta, _, erro = Run.gastarDias(self.run, math.max(1, no.passo * self.deps.area.custos.voltarPorPasso))
-		if not gasta then return false, erro end
-		local movida, motivo = Run.moverPara(gasta, "vila", "cidade")
-		if not movida then return false, motivo end
+		local movida, erro = self:_voltarAoHub(math.max(1, no.passo * self.deps.area.custos.voltarPorPasso))
+		if not movida then return false, erro end
 		self.run, self.luta = movida, nil
 	elseif resultado == "defeat" then
 		local nova = self.run
@@ -486,9 +588,66 @@ function Sessao:lutaTerminou(resultado)
 		return false, "Resultado de luta inválido."
 	end
 	self.votos = {}
+	local erroAnterior = self.lutaErro
+	self.lutaErro = nil
 	local ok, falha = self:_salvar()
-	if not ok then self.run, self.luta = anterior, lutaAnterior; return false, falha end
+	if not ok then self.run, self.luta, self.lutaErro = anterior, lutaAnterior, erroAnterior; return false, falha end
 	return true
+end
+
+-- Run movida para o hub da expedição (início da história) depois de gastar `dias`. Devolve (run) ou (nil, motivo).
+function Sessao:_voltarAoHub(dias)
+	local gasta, _, erro = Run.gastarDias(self.run, dias)
+	if not gasta then return nil, erro end
+	local hub = self.historia.nos[self.historia.inicio]
+	return Run.moverPara(gasta, hub and hub.regiao or "vila", self.historia.inicio)
+end
+
+-- Motivo de a luta pendente não ter começado (o servidor informa; nil limpa). Some da visão quando a luta acaba.
+function Sessao:definirErroDaLuta(motivo)
+	self.lutaErro = if self.luta and type(motivo) == "string" then motivo else nil
+end
+
+-- Desiste da luta pendente da expedição (ex.: a mesa não pôde montá-la): volta à cidade pagando
+-- max(1, (passo - 1) * voltarPorPasso) dias — o passo atual ainda não foi vencido. Recusa com encontro em curso.
+function Sessao:abandonarLuta(userId, encontroAtivo)
+	if self.ocupada then return false, "Aguarde o salvamento da run." end
+	if not self.run or Run.encerrada(self.run) then return false, "Sem run ativa." end
+	local membro = self.run.jogadores[userId]
+	if not membro or not membro.presente then return false, "Você não está nesta run." end
+	if not self.luta then return false, "Não há luta pendente." end
+	if encontroAtivo then return false, "A luta já começou." end
+	local no, area = self.historia.nos[self.luta], self.deps.area
+	if not (no and no.area and area) then return false, "Esta luta não pode ser abandonada." end
+	local anterior, lutaAnterior, erroAnterior, votosAnteriores = self.run, self.luta, self.lutaErro, self.votos
+	local movida, erro = self:_voltarAoHub(math.max(1, ((no.passo or 1) - 1) * area.custos.voltarPorPasso))
+	if not movida then return false, erro end
+	self.run, self.luta, self.lutaErro, self.votos = movida, nil, nil, {}
+	local ok, falha = self:_salvar()
+	if not ok then
+		self.run, self.luta, self.lutaErro, self.votos = anterior, lutaAnterior, erroAnterior, votosAnteriores
+		return false, falha
+	end
+	return true
+end
+
+-- Ouro da área concluída já entregue (e avisado) a este membro? Persistido em flag da run: um servidor
+-- reiniciado não reenvia o aviso.
+local function flagAreaPaga(areaId, userId) return "expedicao/" .. areaId .. "/paga/" .. tostring(userId) end
+
+function Sessao:areaPaga(areaId, userId)
+	return self.run ~= nil and self.run.flags[flagAreaPaga(areaId, userId)] == true
+end
+
+function Sessao:marcarAreaPaga(areaId, userId)
+	if self.ocupada then return false, "Aguarde o salvamento da run." end
+	if not self.run or not self.run.jogadores[userId] then return false, "Jogador fora da run." end
+	if self:areaPaga(areaId, userId) then return true end
+	local anterior = self.run
+	self.run = Run.definirFlag(anterior, flagAreaPaga(areaId, userId))
+	local ok, falha = self:_salvar()
+	if not ok then self.run = anterior end
+	return ok, falha
 end
 
 -- Resumo da run para a conta (RunConta.registrarRun); nil enquanto a run não terminou.
@@ -598,15 +757,23 @@ function Sessao:_fase()
 	return nil
 end
 
-function Sessao:descansarNoAcampamento(userId)
+-- Confere tudo do descanso do acampamento sem gastar nada (o servidor restaura as fichas antes de gastar o dia).
+function Sessao:podeDescansarNoAcampamento(userId)
 	local area = self.deps.area
 	if self.ocupada then return false, "Aguarde o salvamento da run." end
 	if not self.run or self.run.fim or not area then return false, "Run indisponível." end
 	local j = self.run.jogadores[userId]
 	if not j or not j.presente or j.caido then return false, "Jogador indisponível." end
 	if self:_fase() ~= "acampamento" then return false, "Só é possível descansar no acampamento." end
+	if self:_descansosUsados(area.id) >= area.descansosMax then return false, "Sem descansos restantes nesta área." end
+	return true
+end
+
+function Sessao:descansarNoAcampamento(userId)
+	local pode, motivoPode = self:podeDescansarNoAcampamento(userId)
+	if not pode then return false, motivoPode end
+	local area = self.deps.area
 	local usados = self:_descansosUsados(area.id)
-	if usados >= area.descansosMax then return false, "Sem descansos restantes nesta área." end
 	local anterior = self.run
 	local nova, _, erro = Run.gastarDias(anterior, area.custos.descanso)
 	if not nova then return false, erro end
@@ -675,6 +842,7 @@ function Sessao:visao(userId)
 		galho = r.galho, regiao = r.regiao, regiaoTitulo = self:_rotuloDaRegiao(r.regiao), opcoes = self:_opcoes(userId),
 		evento = self.evento and { id = self.evento.id, titulo = self.evento.titulo } or nil,
 		luta = self.luta and { titulo = no and no.titulo } or nil,
+		lutaErro = if self.luta then self.lutaErro else nil, -- por que a luta pendente não começou (string) ou nil
 		fim = r.fim and table.clone(r.fim) or nil, aguardando = pendentes, votei = self.votos[userId],
 		plano = self.planos[userId], viagem = self.viagem and table.clone(self.viagem) or nil, contagem = contagem,
 	}

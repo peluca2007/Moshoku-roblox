@@ -94,8 +94,10 @@ runServico = require(Server.RunServico).start({
 	iniciarLuta = lutaDoMundo.iniciarChefe,
 	-- A porta só abre para quem já tem ficha de luta (árvore aprendida e PV acima de zero).
 	prontoParaLutar = function(player)
-		local ok, corpo = pcall(mesa.corpoPessoal, player)
-		if not ok or not corpo then return false, "aprenda um caminho com um mestre da vila." end
+		-- O motivo real de corpoPessoal (ficha carregando, erro de carga, sem personagem) chega ao jogador.
+		local ok, corpo, motivo = pcall(mesa.corpoPessoal, player)
+		if not ok then return false, "falha ao ler a ficha (" .. tostring(corpo) .. ")." end
+		if not corpo then return false, if type(motivo) == "string" then motivo else "aprenda um caminho com um mestre da vila." end
 		local atual = corpo.session and corpo.session.current
 		if atual and atual.pv and atual.pv <= 0 then return false, "recupere seus PV antes de descer." end
 		return true
@@ -120,6 +122,14 @@ Porta.start({
 	temRun = function() local s = runServico.sessao(); return s ~= nil and s.run ~= nil and not s.run.fim end,
 	avisar = mesa.avisarPessoal,
 })
+-- A porta só oferece o prompt com a run no hub (dentro da área o grupo já está lá); sem run ativa ele fica
+-- ligado para o aviso "Inicie a campanha". Chamado a cada transmissão da run.
+runServico.observar(function(sessao)
+	local run = sessao and sessao.run
+	if not run or run.fim then Porta.definirAtiva(true); return end
+	local no = sessao.historia.nos[run.galho]
+	Porta.definirAtiva(no ~= nil and no.tipo == "hub")
+end)
 -- A segunda provação abre o rank na mesma ficha; só o servidor concede.
 runServico.observar(function(sessao)
 	if not sessao or not sessao.run or sessao.run.fim then return end

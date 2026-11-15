@@ -19,6 +19,18 @@ return {
 		t.eq(Servico.payloadValido({ acao = "votar", opcao = 5 }), false)
 		t.eq(Servico.payloadValido({ acao = "votar", opcao = "x", extra = 1 }), false)
 	end,
+	["acoes abandonar e retirarVoto: sem campos extras"] = function(t)
+		t.eq(Servico.payloadValido({ acao = "abandonar" }), true)
+		t.eq(Servico.payloadValido({ acao = "retirarVoto" }), true)
+		t.eq(Servico.payloadValido({ acao = "abandonar", dias = 0 }), false)
+		t.eq(Servico.payloadValido({ acao = "retirarVoto", opcao = "entrar-esgoto" }), false)
+		t.eq(Servico.payloadValido({ acao = "retirarvoto" }), false)
+	end,
+	["porta: definirAtiva antes de start nao falha"] = function(t)
+		Porta.definirAtiva(false)
+		Porta.definirAtiva(true)
+		t.ok(true)
+	end,
 	["porta do esgoto fica na praca e livre de construcoes"] = function(t)
 		local ponto = Porta.escolherPonto()
 		t.ok(ponto ~= nil, "sem ponto livre")

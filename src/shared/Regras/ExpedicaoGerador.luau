@@ -1,6 +1,11 @@
--- Gera a história de uma expedição (DIRECAO §4): cidade → N salas com escolha de caminho → chefe → volta.
+-- Gera a história de uma expedição (DIRECAO §4): cidade → N salas com escolha de caminho → chefe → volta à cidade.
 -- Pura e determinística: mesma semente = mesma história (gerador congruente próprio, sem Random).
--- Nós: "cidade", "<id>-1", "<id>-<i>a"/"<id>-<i>b" (i = 2..passos), "<id>-chefe", "final-<id>".
+-- Nós: "cidade", "<id>-1", "<id>-<i>a"/"<id>-<i>b" (i = 2..passos), "<id>-chefe", "final-campanha".
+-- Fim da área NÃO encerra a campanha (DIRECAO §1): "voltar-com-a-recompensa" leva à cidade e marca
+-- `expedicao/<id>/concluida` e `fragmento/<id>`; depois disso entrar/retomar somem do hub (`ocultaCom`,
+-- aplicado por RunSessao) e só o fragmento abre "selar-a-anomalia" → "final-campanha".
+-- Campos de opção além de RunHistoria: `marcas` (flags extras, aplicadas por RunSessao junto com `marca`)
+-- e `ocultaCom` (flag que tira a opção da lista do hub).
 local Gerador = {}
 
 Gerador.OBJETIVO = table.freeze({ id = "limpar-o-esgoto", prazoDias = 30 })
@@ -41,8 +46,12 @@ function Gerador.gerar(area, semente)
 		return lista
 	end
 
+	local concluida, fragmento = "expedicao/" .. id .. "/concluida", "fragmento/" .. id
 	nos["cidade"] = { tipo = "hub", regiao = "vila", titulo = "A cidade", opcoes = {
-		{ id = "entrar-" .. id, texto = "Descer ao " .. string.lower(string.sub(area.titulo, 1, 1)) .. string.sub(area.titulo, 2), para = id .. "-1", dias = c.entrar },
+		{ id = "entrar-" .. id, texto = "Descer ao " .. string.lower(string.sub(area.titulo, 1, 1)) .. string.sub(area.titulo, 2), para = id .. "-1", dias = c.entrar,
+			ocultaCom = concluida },
+		-- PROVISÓRIO: a luta final forçada do dia 30 (DIRECAO §1) é outra tarefa; por ora o fragmento sela a anomalia direto.
+		{ id = "selar-a-anomalia", texto = "Selar a anomalia (encerrar a campanha)", para = "final-campanha", exige = { flag = fragmento } },
 	} }
 
 	local primeiro = area.encontros[sorte(#area.encontros)]
@@ -67,19 +76,20 @@ function Gerador.gerar(area, semente)
 	end
 	nos[idChefe] = { tipo = "chefe", regiao = area.regiao, titulo = area.chefe.titulo, passo = n, total = n, area = id,
 		luta = { criaturas = area.chefe.criaturas, areaId = area.areaId }, opcoes = {
-			{ id = "voltar-com-a-recompensa", texto = "Voltar com a recompensa", para = "final-" .. id,
-				exige = { flag = "vencido/" .. idChefe }, marca = "expedicao/" .. id .. "/concluida" },
+			-- Volta como "voltar-a-cidade" do último passo (custa pela profundidade) e o prazo continua.
+			{ id = "voltar-com-a-recompensa", texto = "Voltar com a recompensa", para = "cidade", dias = diasDeVoltar(n),
+				exige = { flag = "vencido/" .. idChefe }, marca = concluida, marcas = { fragmento } },
 		} }
 	-- Retomada: da cidade direto a uma sala já vencida (progresso mantido).
 	-- TODO: combates reduzidos no caminho de volta/retomada (adiado).
 	for idNo, no in nos do
 		if no.tipo == "sala" then
 			table.insert(nos["cidade"].opcoes, { id = "retomar-" .. id .. "-" .. idNo, texto = "Retomar no passo " .. no.passo .. " (" .. idNo .. ")",
-				para = idNo, dias = c.entrar + no.passo * c.voltarPorPasso, exige = { flag = "vencido/" .. idNo } })
+				para = idNo, dias = c.entrar + no.passo * c.voltarPorPasso, exige = { flag = "vencido/" .. idNo }, ocultaCom = concluida })
 		end
 	end
 	table.sort(nos["cidade"].opcoes, function(a, b) return a.id < b.id end)
-	nos["final-" .. id] = { tipo = "final", regiao = "vila", titulo = "De volta à cidade", cumpreObjetivo = true }
+	nos["final-campanha"] = { tipo = "final", regiao = "vila", titulo = "A anomalia selada", cumpreObjetivo = true }
 
 	return { id = "expedicao-" .. id, inicio = "cidade", nos = nos }
 end

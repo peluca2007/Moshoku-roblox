@@ -43,11 +43,15 @@ function LutaDoMundo.start(deps)
 
 	-- A trégua só segura as patrulhas (início automático); chefe, marco e dojo são pedidos do jogador.
 	local function emTregua(player) return (treguaAte[player.UserId] or 0) > agora() end
+	-- Devolve (true) ou (false, motivo real): ficha carregando/ausente/inválida vem de corpoPessoal; PV zerado é outro caso.
 	local function temFicha(player)
-		if not deps.corpoPessoal then return false end
-		local ok, corpo = pcall(deps.corpoPessoal, player)
-		local atual = ok and corpo and corpo.session and corpo.session.current
-		return ok and corpo ~= nil and (not atual or not atual.pv or atual.pv > 0)
+		if not deps.corpoPessoal then return false, "A ficha pessoal não está disponível neste servidor." end
+		local ok, corpo, motivo = pcall(deps.corpoPessoal, player)
+		if not ok then return false, "Falha ao ler a ficha: " .. tostring(corpo) end
+		if corpo == nil then return false, if type(motivo) == "string" then motivo else "Sua ficha precisa estar carregada." end
+		local atual = corpo.session and corpo.session.current
+		if atual and atual.pv and atual.pv <= 0 then return false, "Está sem PV na ficha pessoal." end
+		return true
 	end
 
 	local function montarGrupo(player, automatico)
@@ -205,7 +209,8 @@ function LutaDoMundo.start(deps)
 	-- Marco do mundo (ProximityPrompt já validado pelo serviço de encontros): elenco do marco para o grupo próximo.
 	function api.iniciarMarco(player, areaId)
 		if ativa then return false, "Já há uma luta em andamento." end
-		if not temFicha(player) then return false, "Sua ficha precisa estar carregada e de pé." end
+		local pronto, motivo = temFicha(player)
+		if not pronto then return false, motivo end
 		local grupo = montarGrupo(player)
 		if not grupo then return false, "Seu personagem precisa estar no mapa." end
 		local zona = EncontrosPorZona.elegivel(areaId, math.min(#grupo, 4))
@@ -214,12 +219,14 @@ function LutaDoMundo.start(deps)
 		return id ~= nil, erro
 	end
 
-	-- Luta do guardião da run (RunServico escolhe o grupo perto do guardião). Devolve encounterId ou nil, erro.
+	-- Luta pendente da run (sala ou chefe; RunServico escolhe o grupo). luta = { no, titulo, criaturas, areaId }.
+	-- Devolve encounterId ou nil, erro (com o nome de quem impede e o motivo real).
 	function api.iniciarChefe(grupo, luta)
 		if type(grupo) ~= "table" or #grupo == 0 or #grupo > 4 then return nil, "O grupo da run é inválido." end
 		for _, p in grupo do
-			if not raiz(p) then return nil, "Todos os jogadores precisam estar vivos e com avatar carregado." end
-			if not temFicha(p) then return nil, "Um personagem da run está sem PV na ficha pessoal." end
+			if not raiz(p) then return nil, p.DisplayName .. " precisa estar vivo e com o avatar carregado." end
+			local pronto, motivo = temFicha(p)
+			if not pronto then return nil, p.DisplayName .. ": " .. motivo end
 		end
 		local composicao, erro = EncontrosPorZona.paraRun(luta, #grupo)
 		if not composicao then return nil, erro end
@@ -227,7 +234,8 @@ function LutaDoMundo.start(deps)
 		for i, id in composicao.elenco do
 			table.insert(criaturas, if composicao.papeis[i] then { id = id, papel = composicao.papeis[i] } else id)
 		end
-		return comecar(grupo, criaturas, { arena = Arenas.daMarco(luta.areaId), nome = "Guardião da run", marco = luta.areaId })
+		local nome = if type(luta.titulo) == "string" and luta.titulo ~= "" then luta.titulo else "Guardião da run"
+		return comecar(grupo, criaturas, { arena = Arenas.daMarco(luta.areaId), nome = nome, marco = luta.areaId })
 	end
 
 	-- Provação do dojo do Hanzo (vila): um lobo cinzento, sem ouro; o dojo dá a própria recompensa.

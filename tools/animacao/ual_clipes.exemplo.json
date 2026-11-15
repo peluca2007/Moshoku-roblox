@@ -1,0 +1,6 @@
+{
+  "_nota": "EXEMPLO não verificado: os nomes das ações abaixo são palpites (a UAL não foi baixada; ver FONTES.md). Depois de baixar, rode o exportador com --ual; ele imprime as ações disponíveis quando um nome não existe. Copie para ual_clipes.json e corrija. Clipe que não estiver aqui continua posado por script. 'inicio'/'fim' em quadros da ação; 'marcos' em segundos do clipe recortado.",
+  "ReacaoGolpe": { "acao": "Hit_Chest", "marcos": { "impacto": 0.0 } },
+  "Queda": { "acao": "Death01", "segurar": true, "marcos": { "chao": 0.8 } },
+  "Esquiva": { "acao": "Roll", "marcos": { "desvio": 0.2 } }
+}

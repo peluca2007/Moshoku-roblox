@@ -247,6 +247,24 @@ impacto e custo.
     sem armature nem textura. Antes de investir, confirmar na documentação da
     Open Cloud se o upload aceita modelo com rig.
 
+**Caminho das animações (pesquisa de 15/11/2026, decisão do coordenador).**
+Animação de outro dono não toca na nossa experiência (toda animação é
+restrita desde 07/2025) e a Open Cloud só aceita animação em `.rbxm` binário,
+sem garantia. Por isso:
+
+1. Flecha e efeitos primeiro, só código e uma malha: voo em arco, rastro,
+   cravar no alvo, faíscas por flipbook (texturas CC0 do Kenney).
+2. Tocador próprio no cliente (`Motor6D.Transform` em `PreSimulation`, que
+   prevalece sobre o Animator), dirigido por clipes em tabela Luau. Os dados
+   vêm da Universal Animation Library do Quaternius (CC0), redirecionados para
+   o R15 no Blender por script; o que faltar (arco, conjurar) é posado por
+   script. Não depende de envio nem de permissão.
+3. Criaturas animadas no cliente com o mesmo tocador (peças rígidas e pivôs);
+   o servidor manda só o estado.
+4. Depois, teste isolado: os mesmos dados como `KeyframeSequence` em `.rbxm`
+   pela Open Cloud. Esqueleto e skin nas criaturas só se um teste provar que
+   os ossos sobrevivem ao envio.
+
 Preservar: tabela `ESPEC` de gestos por técnica (`Gestos.luau`), linha do tempo
 cancelável, prévia de área compartilhada (`AreaHabilidade`), sons, dublagem,
 Reações e modo de efeitos reduzidos.

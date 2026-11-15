@@ -202,7 +202,46 @@ Reações e modo de efeitos reduzidos.
 - Áudios originais (`audios/`, `assets/sons/gerados`) se perderam; os IDs já
   enviados continuam em `assets/vozes-npcs/ids_roblox.json`.
 
-## 7. O que ler
+## 7. Plano de execução (14/11/2026)
+
+Pedido do Pedro: plano único juntando a direção acima e as melhorias que ele
+trouxe (área de testes, sons gratuitos, conferência de modelos do Blender).
+Estado de cada item fica em `TAREFAS.md`; aqui só a ordem e quem faz.
+
+**Modelos (Pedro, 14/11).** Alternar para não esgotar o limite de um só:
+Haiku (`economico`) em buscas, documentação e correções pequenas; Sonnet
+(`implementador`) no grosso de cada pacote delimitado; Opus em pacotes com
+várias responsabilidades, diagnóstico difícil e revisão de entrega alheia;
+Fable coordena, revisa a integração, joga no Studio (há um Studio só) e pega
+o que os outros não resolverem. No máximo dois agentes por vez, com arquivos
+exclusivos. Só ferramentas gratuitas.
+
+**Toda entrega:** `tools/testar.ps1`, conferência no Studio pelo coordenador
+quando mexe em runtime, registro em `TESTES.md` e um commit local por assunto.
+
+| Fase | Entrega | Quem |
+|---|---|---|
+| 1. Esgoto jogável | EXP3 servidor (porta, missão, luta por sala, recompensa) e EXP4 cliente (faixa de dias, acampamento, escolha, "Viajando") | Sonnet ×2 |
+| | EXP5: integração, playtest da fatia inteira no Studio, luta e resultado no tema Pergaminho | Fable |
+| 2. Área de testes | TESTER1: sala fora do mapa, aberta pelo menu (só Studio e administradores). Estandes: criaturas e props com animações; gestos e efeitos de combate por técnica; sons e vozes com botão de tocar; arenas; peças da interface | Sonnet (dados e sala) + Sonnet (painel); Opus revisa |
+| 3. Sons gratuitos | SOM1a: gerador local em Python puro (interface, moedas, passos, golpes, impactos, magia simples), 3 variações por som | Sonnet |
+| | SOM1b: busca no Openverse (sem chave), só CC0/CC-BY, autor e licença em `SONS.md` | Haiku |
+| | SOM1c: grupos de volume (voz > efeitos do jogador > efeitos inimigos > música > ambiente), música por estado (cidade, área, luta, chefe, vitória, derrota) | Sonnet |
+| 4. Combate: apresentação (§5) | 4a criaturas com modelo na arena; 4c câmera; 4d leitura de acerto e erro; 4e HUD de luta no tema | Sonnet, um por vez |
+| | 4b fila de apresentação (segurar PV e números até o impacto); 4f movimento casa a casa no cliente | Opus |
+| | 4g efeitos com texturas; 4h armas modeladas | Sonnet |
+| | 4i pesquisa: upload de modelo com rig pela Open Cloud; depois rig e ~12 animações | Opus pesquisa; Fable decide |
+| 5. Modelos | MOD1: validar no Blender 5.4 os scripts de conferência do `WildCake/roblox-blender-modelling` (MIT) e ligar triângulos/UV/peças móveis em `tools/blender` | Sonnet |
+| | MOD2: modelos das criaturas do esgoto que faltarem e cenário próprio do esgoto, com luz por arena | Sonnet; Fable confere no Studio |
+| 6. Campanha | Interior da taverna e cena nova; lobby em modo expedição (`SalaView`); menu de status refeito; acampamento completo (dividir itens, inventário); evento do homem estranho; combates reduzidos na volta e na retomada; segunda área (floresta); lobby mostrando o que já aconteceu | Opus nos que cruzam servidor e cliente; Sonnet no resto |
+| 7. Limpeza | Apagar o mundo aberto antigo (§3) num commit só de remoção; atualizar ARQUITETURA, MANUTENCAO e README | Sonnet remove, Opus revisa, Haiku documenta |
+
+Ordem: 1 → 2 (o Pedro quer ver o jogo) → 3 e 4 em paralelo → 5 → 6 → 7. A fase
+7 pode subir se o código morto atrapalhar. Dependem de resposta do Pedro: o
+que acontece quando o prazo acaba, como funciona a exaustão e as imagens das
+telas de acampamento e de escolhas (§1).
+
+## 8. O que ler
 
 Primeiro: este arquivo, `TAREFAS.md` (topo), `MANUTENCAO.md`, `ARQUITETURA.md`,
 `COLABORACAO.md`. Por tema: `MESA.md`, `FIDELIDADE.md`, `CONTRATOS.md`,

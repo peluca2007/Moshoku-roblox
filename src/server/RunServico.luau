@@ -568,7 +568,10 @@ function Servico.start(deps)
 					if sessao ~= s or lutaAtiva ~= fonteLoot or not s.luta then break end
 					if not (processando or s.ocupada) then
 						processando = true
-						local chamou, ok, motivo = pcall(s.lutaTerminou, s, resultado)
+						-- Quem lutou e quem caiu: a run conta a Exaustão (ExaustaoRun) em qualquer desfecho.
+						local desfecho = {}
+						for userId, p in participantes do desfecho[userId] = { caiu = p.caiu } end
+						local chamou, ok, motivo = pcall(s.lutaTerminou, s, resultado, desfecho)
 						processando = false
 						if chamou and ok then aplicou = true; break end
 						warn("[Run] Desfecho da luta não aplicado (tentativa " .. tentativa .. "): " .. tostring(if chamou then motivo else ok))

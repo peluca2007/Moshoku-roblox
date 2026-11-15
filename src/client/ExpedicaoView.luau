@@ -4,7 +4,7 @@
 -- { acao = "abandonar" }, { acao = "consultar" }. O servidor decide tudo.
 -- Instances (para playtest): ScreenGui "ExpedicaoJogo" > Faixa | Palco > PainelExpedicao | Viajando.
 -- PainelExpedicao é recriado a cada tela; dentro dele: Escolher_<id>, VoltarCidade, RetirarVoto, Cancelar/AgoraNao,
--- Descansar, LevantarAcampamento (barra inferior), EntrarNaLuta, AbandonarLuta.
+-- Descansar, LevantarAcampamento, Exaustao (texto; barra inferior), EntrarNaLuta, AbandonarLuta.
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GuiService = game:GetService("GuiService")
@@ -217,6 +217,12 @@ function View.start()
 			raiz, c = novoPainel("acampamento", { tamanho = UDim2.new(1, -32, 0, 0), ancora = Vector2.new(0.5, 1),
 				posicao = UDim2.new(0.5, 0, 1, -16), larguraMax = 760 })
 			if #decisao.grupo > 0 then texto("Acampamento · grupo: " .. table.concat(decisao.grupo, ", "), true) end
+			-- Nível de Exaustão do jogador, junto ao descanso (descansar zera).
+			if decisao.exaustao then
+				local e = texto(decisao.exaustao .. " · descansar zera")
+				e.Name = "Exaustao"
+				e.TextColor3 = T.cores.perigo
+			end
 			local l = linha()
 			if decisao.descansar then
 				botaoEm(l, "Descansar", decisao.descansar.texto, "secundario", decisao.descansar.desabilitado, function() enviar({ acao = "descansar" }) end)

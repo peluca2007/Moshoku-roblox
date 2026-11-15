@@ -157,6 +157,12 @@ local function lutaPendente(visao, estado, faixa)
 	}
 end
 
+-- Nível de Exaustão do jogador (visao.exaustao) em texto curto: "Exaustão 2"; nil sem exaustão.
+function ExpedicaoTela.textoExaustao(nivel)
+	if type(nivel) ~= "number" or nivel <= 0 then return nil end
+	return string.format("Exaustão %d", math.floor(nivel))
+end
+
 function ExpedicaoTela.decidir(visao, estado, nomeDe)
 	estado = estado or {}
 	local faixa = ExpedicaoTela.faixa(visao)
@@ -203,6 +209,7 @@ function ExpedicaoTela.decidir(visao, estado, nomeDe)
 				desabilitado = comTeto and d.usados >= d.max,
 			}
 		end
+		saida.exaustao = ExpedicaoTela.textoExaustao(visao.exaustao)
 		saida.levantar = { texto = "Pronto" }
 		return saida
 	end
@@ -235,6 +242,7 @@ function ExpedicaoTela.diario(visao, nomeDe)
 	elseif ehHub(visao) then
 		d.lugar = "Na cidade"
 	end
+	d.exaustao = ExpedicaoTela.textoExaustao(visao.exaustao)
 	if visao.descansos then
 		local u, m = visao.descansos.usados, visao.descansos.max
 		d.descansos = if type(m) == "number" then string.format("Descansos usados: %d/%d", u, m) else string.format("Descansos nesta área: %d", u)

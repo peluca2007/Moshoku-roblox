@@ -790,7 +790,9 @@ function PersonagemSessao.start(ctx)
 		enviarPerfil(player)
 		return true, resultado
 	end
-	instancia = api
+	-- Só a instância ligada ao remoto real (a da Mesa) vira a ativa: specs rodados no meio do Play usam remoto
+	-- falso e não roubam a gravação do jogo.
+	if typeof(ctx.remote) == "Instance" then instancia = api end
 	return api
 end
 

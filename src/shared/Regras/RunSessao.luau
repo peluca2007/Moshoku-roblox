@@ -29,6 +29,7 @@ local HistoriaV1 = require(Shared.Mundo.HistoriaV1)
 local Defeitos = require(Shared.Regras.RunDefeitos)
 
 local Treinadores = require(Shared.Regras.RunTreinadores)
+local Exaustao = require(Shared.Regras.ExaustaoRun)
 
 local ativa
 local Sessao = {}
@@ -51,6 +52,7 @@ function Sessao.new(deps)
 		historia = deps.historia or HistoriaV1.HISTORIA,
 		objetivo = deps.objetivo or HistoriaV1.OBJETIVO,
 		run = nil, planos = {}, grupoId = nil, votos = {}, evento = nil, luta = nil, contaRegistrada = false, viagem = nil,
+		exaustao = {}, -- ExaustaoRun: nível e lutas seguidas por personagem (salvo nos extras)
 	}, Sessao)
 end
 
@@ -60,7 +62,8 @@ function Sessao:_salvar()
 		lutaPendente = self.luta,
 		treinadoresVila = self.treinadores and table.concat(self.treinadores.vila, ",") or nil,
 		treinadorTaverna = self.treinadores and self.treinadores.taverna or nil,
-		viagemOrigem = self.viagem and self.viagem.origem or nil, viagemDestino = self.viagem and self.viagem.destino or nil })
+		viagemOrigem = self.viagem and self.viagem.origem or nil, viagemDestino = self.viagem and self.viagem.destino or nil,
+		exaustao = Exaustao.serializar(self.exaustao) })
 	if not dado then return false, motivo end
 	self.ocupada = true
 	local ok, erro = pcall(self.deps.guardar, chaveDaRun(self.grupoId), dado)
@@ -113,6 +116,7 @@ end
 function Sessao:_limpar()
 	self.run, self.planos, self.grupoId, self.votos, self.evento, self.luta, self.viagem = nil, {}, nil, {}, nil, nil, nil
 	self.lutaErro, self.contaRegistrada, self.treinadores = nil, false, nil
+	self.exaustao = {}
 	if ativa == self then ativa = nil end
 end
 
@@ -223,6 +227,9 @@ function Sessao:retomar(grupoId)
 		local no = self.historia.nos[extras.lutaPendente]
 		if not no or not no.luta then return false, "Luta salva desconhecida." end
 	end
+	local exaustao, falhaExaustao = Exaustao.restaurar(extras.exaustao, run.jogadores)
+	if not exaustao then return false, falhaExaustao end
+	self.exaustao = exaustao
 	self.run, self.planos, self.grupoId, self.votos, self.evento = run, planos, grupoId, {}, evento
 	self.lutaErro = nil
 	self.contaRegistrada = extras.contaRegistrada == true
@@ -517,6 +524,10 @@ function Sessao:_fechar()
 	-- Mudou de região (e a run segue): a viagem traz um evento para o grupo decidir.
 	local lutaAnterior, lutaErroAnterior = self.luta, self.lutaErro
 	local no = self.historia.nos[nova.galho]
+	-- Entrar na área ou voltar dela recomeça a contagem de lutas seguidas da Exaustão (o nível fica).
+	local exaustaoAnterior = self.exaustao
+	local noAnterior = self.historia.nos[anterior.galho]
+	if (no and no.area) ~= (noAnterior and noAnterior.area) then self.exaustao = Exaustao.zerarSequencia(self.exaustao) end
 	if not eventoAnterior and not Run.encerrada(nova) and no and no.luta
 		and not nova.flags["vencido/" .. nova.galho] then self.luta, self.lutaErro = nova.galho, nil end
 	-- Expedição (`area`) não sorteia evento de viagem: voltar à cidade ou retomar não traz evento antigo.
@@ -532,7 +543,7 @@ function Sessao:_fechar()
 	local ok, falha = self:_salvar()
 	if not ok then
 		self.run, self.evento, self.luta, self.viagem, self.votos = anterior, eventoAnterior, lutaAnterior, viagemAnterior, votosAnteriores
-		self.lutaErro = lutaErroAnterior
+		self.lutaErro, self.exaustao = lutaErroAnterior, exaustaoAnterior
 		return false, falha
 	end
  self.resolucaoEvento = nil
@@ -558,15 +569,31 @@ end
 function Sessao:lutaPendente()
 	if not self.luta or not self.run or Run.encerrada(self.run) then return nil end
 	local no = self.historia.nos[self.luta]
-	return { no = self.luta, titulo = no.titulo, criaturas = no.luta.criaturas, areaId = no.luta.areaId }
+	-- exaustao = { [userId] = nível > 0 }: o servidor aplica os efeitos no início da luta (EncontroService).
+	local exaustao = {}
+	for id in self.run.jogadores do
+		local n = Exaustao.nivel(self.exaustao, id)
+		if n > 0 then exaustao[id] = n end
+	end
+	return { no = self.luta, titulo = no.titulo, criaturas = no.luta.criaturas, areaId = no.luta.areaId, exaustao = exaustao }
 end
 
 -- O servidor informa o desfecho do encontro J2 do chefe: "victory" libera a história (flag `vencido/<no>`),
 -- "defeat" derruba todo o grupo presente (a run termina), "fled" mantém a luta pendente para nova tentativa.
-function Sessao:lutaTerminou(resultado)
+-- `participantes` (opcional, expedição) = { [userId] = { caiu = bool } }: quem lutou e quem terminou a 0 PV,
+-- para a Exaustão (ExaustaoRun.aoFimDaLuta) em qualquer desfecho, inclusive fuga.
+function Sessao:lutaTerminou(resultado, participantes)
 	if self.ocupada then return false, "Aguarde o salvamento da run." end
 	if not self.luta then return false, "Não há luta pendente." end
-	local anterior, lutaAnterior = self.run, self.luta
+	if resultado ~= "victory" and resultado ~= "defeat" and resultado ~= "fled" then return false, "Resultado de luta inválido." end
+	local anterior, lutaAnterior, exaustaoAnterior = self.run, self.luta, self.exaustao
+	if self.deps.area and type(participantes) == "table" then
+		local membros = {}
+		for id, p in participantes do
+			if self.run.jogadores[id] then membros[id] = p end
+		end
+		self.exaustao = Exaustao.aoFimDaLuta(self.exaustao, membros)
+	end
 	if resultado == "victory" then
 		local nova = Run.definirFlag(self.run, "vencido/" .. self.luta)
 		self.run, self.luta = nova, nil
@@ -574,8 +601,9 @@ function Sessao:lutaTerminou(resultado)
 		-- Derrota em expedição não encerra a campanha: o grupo volta à cidade pagando o mesmo que "voltar-a-cidade".
 		local no = self.historia.nos[self.luta]
 		local movida, erro = self:_voltarAoHub(math.max(1, no.passo * self.deps.area.custos.voltarPorPasso))
-		if not movida then return false, erro end
+		if not movida then self.exaustao = exaustaoAnterior; return false, erro end
 		self.run, self.luta = movida, nil
+		self.exaustao = Exaustao.zerarSequencia(self.exaustao)
 	elseif resultado == "defeat" then
 		local nova = self.run
 		for id, j in nova.jogadores do
@@ -583,15 +611,20 @@ function Sessao:lutaTerminou(resultado)
 		end
 		self.run, self.luta = Run.encerrarPorQueda(nova), nil
 	elseif resultado == "fled" then
+		-- A luta continua pendente; só a Exaustão (se mudou) precisa ser salva.
+		if self.exaustao == exaustaoAnterior then return true end
+		local ok, falha = self:_salvar()
+		if not ok then self.exaustao = exaustaoAnterior; return false, falha end
 		return true
-	else
-		return false, "Resultado de luta inválido."
 	end
 	self.votos = {}
 	local erroAnterior = self.lutaErro
 	self.lutaErro = nil
 	local ok, falha = self:_salvar()
-	if not ok then self.run, self.luta, self.lutaErro = anterior, lutaAnterior, erroAnterior; return false, falha end
+	if not ok then
+		self.run, self.luta, self.lutaErro, self.exaustao = anterior, lutaAnterior, erroAnterior, exaustaoAnterior
+		return false, falha
+	end
 	return true
 end
 
@@ -622,10 +655,13 @@ function Sessao:abandonarLuta(userId, encontroAtivo)
 	local anterior, lutaAnterior, erroAnterior, votosAnteriores = self.run, self.luta, self.lutaErro, self.votos
 	local movida, erro = self:_voltarAoHub(math.max(1, ((no.passo or 1) - 1) * area.custos.voltarPorPasso))
 	if not movida then return false, erro end
+	local exaustaoAnterior = self.exaustao
 	self.run, self.luta, self.lutaErro, self.votos = movida, nil, nil, {}
+	self.exaustao = Exaustao.zerarSequencia(self.exaustao)
 	local ok, falha = self:_salvar()
 	if not ok then
 		self.run, self.luta, self.lutaErro, self.votos = anterior, lutaAnterior, erroAnterior, votosAnteriores
+		self.exaustao = exaustaoAnterior
 		return false, falha
 	end
 	return true
@@ -729,12 +765,14 @@ end
 function Sessao:descansar(userId,tipo)
  local pode, motivo = self:podeDescansar(userId)
  if not pode then return false,motivo end
- local anterior = self.run
+ local anterior, exaustaoAnterior = self.run, self.exaustao
  local nova, erro = Relogio.descansar(anterior, tipo)
  if not nova then return false, erro end
  self.run = nova
+ -- ADAPTAÇÃO (ver ExaustaoRun): o descanso da cidade também zera a Exaustão de quem descansou.
+ self.exaustao = Exaustao.descansar(self.exaustao, { userId })
  local ok, motivo = self:_salvar()
- if not ok then self.run = anterior end
+ if not ok then self.run, self.exaustao = anterior, exaustaoAnterior end
  return ok, motivo
 end
 
@@ -775,12 +813,18 @@ function Sessao:descansarNoAcampamento(userId)
 	if not pode then return false, motivoPode end
 	local area = self.deps.area
 	local usados = self:_descansosUsados(area.id)
-	local anterior = self.run
+	local anterior, exaustaoAnterior = self.run, self.exaustao
 	local nova, _, erro = Run.gastarDias(anterior, area.custos.descanso)
 	if not nova then return false, erro end
 	self.run = Run.definirFlag(nova, "descanso/" .. area.id .. "/" .. (usados + 1))
+	-- Descansar zera a Exaustão (decisão de 14/11) de quem está no acampamento.
+	local presentes = {}
+	for id, j in self.run.jogadores do
+		if j.presente and not j.caido then table.insert(presentes, id) end
+	end
+	self.exaustao = Exaustao.descansar(self.exaustao, presentes)
 	local ok, motivo = self:_salvar()
-	if not ok then self.run = anterior end
+	if not ok then self.run, self.exaustao = anterior, exaustaoAnterior end
 	return ok, motivo
 end
 
@@ -833,7 +877,9 @@ function Sessao:visao(userId)
 	table.sort(grupo, function(a, b) return tostring(a.userId) < tostring(b.userId) end)
 	return {
 		passo = no and no.passo, totalPassos = no and no.total, area = no and no.area, fase = self:_fase(),
+		-- max = nil: sem limite fixo de descansos (só existe se a área definir `descansosMax`).
 		descansos = if no and no.area and self.deps.area then { usados = self:_descansosUsados(no.area), max = self.deps.area.descansosMax } else nil,
+		exaustao = Exaustao.nivel(self.exaustao, userId), -- nível de Exaustão do próprio jogador (0 = nenhum)
 		seloObtido = r.flags["selo-obtido"] == true,
   relogio = Relogio.visao(r, self.relogioPausado), mundoAberto = self.deps.mundoAberto == true,
 		dia = r.dia, diasRestantes = Run.diasRestantes(r), objetivo = table.clone(r.objetivo),

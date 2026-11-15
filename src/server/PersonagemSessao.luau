@@ -692,7 +692,7 @@ function PersonagemSessao.start(ctx)
 			for _, rankId in perfil.construcao.unlockedRankIds or {} do
 				local rank = ctx.catalogo.POR_ID[rankId]
 				if rank and type(rank.data) == "table" and type(rank.data.rank) == "string" then
-					maiorBonus = math.max(maiorBonus, RegrasLivro.bonusDeRank(rank.data.rank) or 1)
+					maiorBonus = math.max(maiorBonus, RegrasLivro.bonusDeRank[rank.data.rank] or 1)
 				end
 			end
 			local resultado, erro = DescansoAcampamento.resolver({ tipo = tipo, maximos = maximos,

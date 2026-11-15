@@ -738,7 +738,8 @@ function Sessao:descansar(userId,tipo)
  return ok, motivo
 end
 
--- Descanso de acampamento (só com a sala/chefe vencido): gasta dias, no máximo `area.descansosMax` por área na run.
+-- Descanso de acampamento (só com a sala/chefe vencido): gasta `area.custos.descanso` dias. Sem limite fixo
+-- (decisão de 14/11); `area.descansosMax`, se houver, ainda limita por área na run. As flags contam os usados.
 function Sessao:_descansosUsados(areaId)
 	local prefixo = "descanso/" .. areaId .. "/"
 	local usados = 0
@@ -765,7 +766,7 @@ function Sessao:podeDescansarNoAcampamento(userId)
 	local j = self.run.jogadores[userId]
 	if not j or not j.presente or j.caido then return false, "Jogador indisponível." end
 	if self:_fase() ~= "acampamento" then return false, "Só é possível descansar no acampamento." end
-	if self:_descansosUsados(area.id) >= area.descansosMax then return false, "Sem descansos restantes nesta área." end
+	if area.descansosMax ~= nil and self:_descansosUsados(area.id) >= area.descansosMax then return false, "Sem descansos restantes nesta área." end
 	return true
 end
 

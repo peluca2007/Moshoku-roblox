@@ -43,7 +43,7 @@ function Servico.payloadValido(pedido)
 	elseif pedido.acao == "retirarVoto" then
 		-- sem campos: desfaz o próprio voto em aberto
 	elseif pedido.acao == "descansar" then
-		-- sem campos: descanso do acampamento da área (o servidor decide custo, limite e recuperação)
+		-- sem campos: descanso do acampamento da área (o servidor decide custo e recuperação; sem limite fixo)
 	elseif pedido.acao == "escolherArvore" then
 		permitidos.arvore = true
 		if type(pedido.arvore) ~= "string" or #pedido.arvore > 64 then return false end
@@ -387,7 +387,7 @@ function Servico.start(deps)
 		elseif pedido.acao == "descansar" then
 			local pode, motivoPode = sessao:podeDescansarNoAcampamento(player.UserId)
 			if not pode then recusa(player, motivoPode or "Descanso indisponível."); return end
-			-- Primeiro a ficha de cada presente recupera PV/PM/PT (mesmo caminho do descanso da mesa); só então
+			-- Primeiro a ficha de cada presente recupera tudo (PV/PM/PT/PP cheios); só então
 			-- o dia é gasto. Se ninguém recuperar, o descanso é recusado sem gastar nada.
 			if deps.restaurarDescanso then
 				local restaurados, ultimoErro = 0, nil

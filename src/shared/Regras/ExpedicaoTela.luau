@@ -194,9 +194,14 @@ function ExpedicaoTela.decidir(visao, estado, nomeDe)
 	if visao.fase == "acampamento" and estado.levantadoEm ~= visao.galho then
 		saida.tela = "acampamento"
 		saida.grupo = membros(visao, nomeDe)
+		-- Sem limite fixo (decisão de 14/11); `max` só existe se a área ainda tiver teto.
 		local d = visao.descansos
 		if d then
-			saida.descansar = { texto = string.format("Descansar · meio dia · %d/%d", d.usados, d.max), desabilitado = d.usados >= d.max }
+			local comTeto = type(d.max) == "number"
+			saida.descansar = {
+				texto = if comTeto then string.format("Descansar · meio dia · %d/%d", d.usados, d.max) else "Descansar · meio dia",
+				desabilitado = comTeto and d.usados >= d.max,
+			}
 		end
 		saida.levantar = { texto = "Pronto" }
 		return saida
@@ -230,7 +235,10 @@ function ExpedicaoTela.diario(visao, nomeDe)
 	elseif ehHub(visao) then
 		d.lugar = "Na cidade"
 	end
-	if visao.descansos then d.descansos = string.format("Descansos usados: %d/%d", visao.descansos.usados, visao.descansos.max) end
+	if visao.descansos then
+		local u, m = visao.descansos.usados, visao.descansos.max
+		d.descansos = if type(m) == "number" then string.format("Descansos usados: %d/%d", u, m) else string.format("Descansos nesta área: %d", u)
+	end
 	if ehHub(visao) then
 		for _, op in visao.opcoes or {} do
 			if op.id == "selar-a-anomalia" and op.liberada == true then d.concluida = "Esgoto concluído · fragmento obtido" end

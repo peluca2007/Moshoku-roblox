@@ -8,6 +8,8 @@
 --   imagem? (asset autorizado pelo chamador), desabilitado?, aoClicar?; atributo Desabilitado reativo.
 --   sobreEscuro? (só fantasma): em repouso não há papel atrás, então o rótulo usa a tinta clara.
 -- barra: rotulo?, valor? [0..1], numero?, destaque?; retorna raiz, atualizar(valor, numero?).
+-- barraCompacta: barra de recurso (rotulo?, destaque? fixo, posicao, tamanho 38 px); retorna raiz,
+--   atualizar(atual, maximo) que mostra "a / m" e esconde a barra sem máximo. Raiz acima da arte do painel pai.
 -- lista/grade: horizontal?, espaco?, celula? (grade); filhos precisam de ordem explícita.
 -- dialogoNpc: nomeNpc?, fala?, opcoes={{texto, aoClicar}}; usa painel inferior responsivo.
 -- iconeBotao: icone?/imagem?, rotulo?, aoClicar?, desabilitado?.
@@ -300,6 +302,30 @@ function C.barra(p)
 	end
 	atualizar(p.valor or 0, p.numero)
 	return raiz, atualizar
+end
+function C.barraCompacta(p)
+	local raiz, atualizarBarra = C.barra(p)
+	raiz.ZIndex = 5 -- o painel pai tem arte em ZIndex 2: sem isto a barra some atrás dela (Sibling)
+	raiz.Size = p.tamanho or UDim2.new(1, 0, 0, 38)
+	for _, filho in raiz:GetChildren() do
+		if filho:IsA("TextLabel") then
+			local numero = filho.Name == "Numero"
+			filho.AutomaticSize = Enum.AutomaticSize.None
+			filho.TextSize = T.tamanhos.legenda
+			filho.TextTruncate = Enum.TextTruncate.AtEnd
+			filho.Size = UDim2.new(if numero then 0.75 else 0.25, 0, 0, 20)
+			if numero then filho.Position = UDim2.fromScale(0.25, 0) end
+		end
+	end
+	raiz.Trilho.Position, raiz.Trilho.Size = UDim2.fromOffset(0, 24), UDim2.new(1, 0, 0, 12)
+	return raiz, function(atual: number?, maximo: number?)
+		raiz.Visible = atual ~= nil and maximo ~= nil and maximo > 0
+		if not raiz.Visible then return end
+		local r = math.clamp(atual / maximo, 0, 1)
+		raiz.Trilho.Mascara.Preenchimento.BackgroundColor3 = p.destaque
+			or (if r > 0.5 then T.barras.cheia elseif r > 0.25 then T.barras.media else T.barras.baixa)
+		atualizarBarra(r, string.format("%d / %d", atual, maximo))
+	end
 end
 function C.dialogoNpc(p)
 	local cp = table.clone(p)

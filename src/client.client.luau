@@ -41,7 +41,8 @@ local sala = require(Client.SalaView).start(MesaState)
 require(Client.ResultadoView).start(MesaState, inicio, sala)
 require(Client.AvisosJogo).start(MesaState)
 require(Client.FeedbackCombate).start(MesaState)
-require(Client.RitmoCombate).start(MesaState)
+require(Client.AnuncioLuta).start(MesaState) -- anúncio da luta (substitui a faixa do RitmoCombate)
+require(Client.BarrasLuta).start(MesaState)
 -- Pergunta de Reação (A14): Aparar, Guarda do Corpo, Couraça, Parede, Escudo, Interpor.
 require(Client.ReacaoView).start(MesaState)
 -- Quadro de desenho da Magia Teórica (A19).

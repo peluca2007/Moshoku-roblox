@@ -1,6 +1,6 @@
 -- Consulta local da carta. Não seleciona alvos nem envia pedidos.
 local UserInputService = game:GetService("UserInputService")
-local Estilo = require(game:GetService("ReplicatedStorage").Shared.Estilo)
+local T = require(script.Parent.UI.Tema)
 local Detalhe = {}
 
 local function new(class, parent, props)
@@ -13,26 +13,26 @@ end
 function Detalhe.start(parent)
 	local fundo = new("TextButton", parent, {
 		Name = "DetalheAcao", Size = UDim2.fromScale(1, 1), Text = "", AutoButtonColor = false,
-		BackgroundColor3 = Estilo.SOBRE_COR, BackgroundTransparency = .25, BorderSizePixel = 0,
+		BackgroundColor3 = T.cores.fundoTela, BackgroundTransparency = .25, BorderSizePixel = 0,
 		Visible = false, ZIndex = 10, Modal = true,
 	})
 	local painel = new("Frame", fundo, {
 		Name = "Painel", AnchorPoint = Vector2.new(.5, .5), Position = UDim2.fromScale(.5, .5),
-		Size = UDim2.fromScale(.92, .8), BackgroundColor3 = Estilo.PAPEL, BorderSizePixel = 0, Active = true, ZIndex = 11,
+		Size = UDim2.fromScale(.92, .8), BackgroundColor3 = T.cores.painel, BorderSizePixel = 0, Active = true, ZIndex = 11,
 	})
 	new("UISizeConstraint", painel, { MaxSize = Vector2.new(560, 500) })
 	new("UICorner", painel, { CornerRadius = UDim.new(0, 10) })
-	new("UIStroke", painel, { Color = Estilo.DESTAQUE, Thickness = 2 })
+	new("UIStroke", painel, { Color = T.cores.borda, Thickness = 2 })
 	local function rotulo(nome, props)
 		local t = new("TextLabel", painel, {
-			Name = nome, BackgroundTransparency = 1, FontFace = Estilo.ROTULO, TextSize = 15,
-			TextColor3 = Estilo.TINTA, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12,
+			Name = nome, BackgroundTransparency = 1, FontFace = T.fontes.rotulo, TextSize = 15,
+			TextColor3 = T.cores.texto, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12,
 		})
 		for k, v in props do t[k] = v end
 		return t
 	end
-	local titulo = rotulo("Titulo", { Position = UDim2.fromOffset(16, 10), Size = UDim2.new(1, -80, 0, 52), FontFace = Estilo.GRITO, TextSize = 23 })
-	local custo = rotulo("Custo", { Position = UDim2.fromOffset(16, 66), Size = UDim2.new(1, -32, 0, 38), TextSize = 14, TextColor3 = Estilo.ALERTA })
+	local titulo = rotulo("Titulo", { Position = UDim2.fromOffset(16, 10), Size = UDim2.new(1, -80, 0, 52), FontFace = T.fontes.titulo, TextSize = 23 })
+	local custo = rotulo("Custo", { Position = UDim2.fromOffset(16, 66), Size = UDim2.new(1, -32, 0, 38), TextSize = 14, TextColor3 = T.cores.alerta })
 	local scroll = new("ScrollingFrame", painel, {
 		Name = "Texto", Position = UDim2.fromOffset(16, 112), Size = UDim2.new(1, -32, 1, -218),
 		AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), ScrollingDirection = Enum.ScrollingDirection.Y,
@@ -40,7 +40,7 @@ function Detalhe.start(parent)
 	})
 	local corpo = new("TextLabel", scroll, {
 		Name = "Conteudo", Size = UDim2.new(1, -12, 0, 0), AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1, FontFace = Estilo.ROTULO, TextSize = 16, TextColor3 = Estilo.TINTA,
+		BackgroundTransparency = 1, FontFace = T.fontes.rotulo, TextSize = 16, TextColor3 = T.cores.texto,
 		TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 12,
 	})
 	local situacao = rotulo("Situacao", {
@@ -49,8 +49,8 @@ function Detalhe.start(parent)
 	local function fechar() fundo.Visible = false end
 	local function botao(nome, texto, props)
 		local b = new("TextButton", painel, {
-			Name = nome, Text = texto, FontFace = Estilo.ROTULO_FORTE, TextSize = 16,
-			TextColor3 = Estilo.TINTA, BackgroundColor3 = Estilo.BOTAO, ZIndex = 12,
+			Name = nome, Text = texto, FontFace = T.fontes.rotulo, TextSize = 16,
+			TextColor3 = T.cores.texto, BackgroundColor3 = T.cores.cabecalho, ZIndex = 12,
 		})
 		for k, v in props do b[k] = v end
 		new("UICorner", b, { CornerRadius = UDim.new(0, 6) })
@@ -74,7 +74,7 @@ function Detalhe.start(parent)
 	local function atualizar(dados)
 		titulo.Text, custo.Text, corpo.Text = dados.nome, dados.custo, dados.texto
 		situacao.Text = dados.motivo or "Disponível. Volte às ações para escolher o alvo."
-		situacao.TextColor3 = if dados.motivo then Estilo.ALERTA else Estilo.SUCESSO
+		situacao.TextColor3 = if dados.motivo then T.cores.alerta else T.cores.sucesso
 	end
 	return {
 		abrir = function(id, dados)

@@ -3,6 +3,7 @@
 -- só nesta tela. Nada aqui muda posição, ficha ou colisão do corpo real: o
 -- servidor continua dono de onde cada ficha está.
 local Players = game:GetService("Players")
+local Tocador = require(script.Parent.TocadorClipe)
 
 local Corpo = {}
 
@@ -219,7 +220,7 @@ end
 -- Toca uma animação no fantasma. Sem Animator (miniatura), devolve nil e os gestos
 -- usam a pose por código. Opções: velocidade, repete, prioridade, peso.
 function Corpo.animar(f, nome: string, opcoes: { velocidade: number?, repete: boolean?, prioridade: Enum.AnimationPriority? }?)
-	if not f or not f.viva or not f.animator then
+	if not f or not f.viva or not f.animator or f.clipes then
 		return nil
 	end
 	local o = opcoes or {}
@@ -254,11 +255,32 @@ function Corpo.parar(f, nome: string)
 	end
 end
 
+-- Clipes por dados (LUTA-A) no fantasma R15: devolve o TocadorClipe do fantasma (criado na primeira
+-- chamada) ou nil sem R15. A partir daí as poses por código (braco/tronco) e as animações do Roblox
+-- (animar) deixam de mexer nas juntas: quem manda é o clipe.
+function Corpo.tocador(f)
+	if not f or not f.viva or not f.r15 then
+		return nil
+	end
+	if not f.clipes then
+		local ok, t = pcall(Tocador.novo, f.modelo)
+		if not ok then
+			warn("[Corpo] tocador:", t)
+			return nil
+		end
+		f.clipes = t
+		for _, faixa in f.faixas do
+			faixa:Stop(0)
+		end
+	end
+	return f.clipes
+end
+
 -- Pose do braço (R15): ângulos em radianos. frente > 0 levanta o braço para a
 -- frente do corpo; lado > 0 abre o braço para fora. Sem R15, ignora.
 function Corpo.braco(f, qual: string, frente: number, lado: number?)
 	local j = f.juntas[if qual == "d" then "ombroD" else "ombroE"]
-	if not j or not f.r15 or f.animado then
+	if not j or not f.r15 or f.animado or f.clipes then
 		return
 	end
 	local fora = if qual == "d" then (lado or 0) else -(lado or 0)
@@ -267,7 +289,7 @@ end
 
 function Corpo.tronco(f, inclina: number, gira: number?)
 	local j = f.juntas.cintura
-	if j and not f.animado then
+	if j and not f.animado and not f.clipes then
 		j.Transform = CFrame.Angles(-inclina, gira or 0, 0)
 	end
 end
@@ -305,11 +327,14 @@ local function soldar(a: BasePart, b: BasePart, deslocamento: CFrame)
 	w.Parent = b
 end
 
-local METAL = Color3.fromRGB(168, 176, 190)
+local METAL = Color3.fromRGB(205, 212, 226)
 local MADEIRA = Color3.fromRGB(92, 66, 46)
 
 -- tipo: "espada" | "pesada" | "gelo" | "escudo" | "arco" | "adaga"
+-- Com clipe (f.clipes), a pega é a dos clipes do ANIM1 (tools/animacao/README.md): a lâmina sai do punho
+-- para -Z da mão (perpendicular ao antebraço) e o arco fica vertical na mão esquerda, curvado para a frente.
 function Corpo.arma(f, tipo: string, cor: Color3?)
+	local pegaClipe = f.clipes ~= nil
 	local mao = f.modelo:FindFirstChild("RightHand") or f.modelo:FindFirstChild("Right Arm")
 	local maoE = f.modelo:FindFirstChild("LeftHand") or f.modelo:FindFirstChild("Left Arm")
 	local pecas = {}
@@ -329,6 +354,25 @@ function Corpo.arma(f, tipo: string, cor: Color3?)
 		soldar(disco, borda, CFrame.new(-0.12, 0, 0))
 	elseif tipo == "arco" then
 		if not maoE then return pecas end
+		if pegaClipe then
+			-- Mão fechada no meio do arco; o arco se estende ao longo de Z da mão (vertical com o braço
+			-- estendido) e a curva vai para -Y da mão (para o alvo). A corda é desenhada pelo gesto.
+			local N, meio, curva = 9, 1.7, 0.55
+			local function ponto(a)
+				return Vector3.new(0, -0.15 - math.cos(a) * curva, math.sin(a) * meio)
+			end
+			for i = 1, N do
+				local a0 = ((i - 1) / N - 0.5) * math.pi * 0.9
+				local a1 = (i / N - 0.5) * math.pi * 0.9
+				local p0, p1 = ponto(a0), ponto(a1)
+				local meioSeg = (p0 + p1) / 2
+				local eixo = (p1 - p0).Unit
+				local seg = nova(Vector3.new(0.16, (p1 - p0).Magnitude + 0.05, 0.2), MADEIRA, Enum.Material.Wood)
+				soldar(maoE :: BasePart, seg, CFrame.fromMatrix(meioSeg, Vector3.xAxis, eixo, Vector3.xAxis:Cross(eixo)))
+			end
+			f.pontasArco = { ponto(-math.pi * 0.45), ponto(math.pi * 0.45) }
+			f.maoArco = maoE
+		else
 		local N = 7
 		for i = 1, N do
 			local a = (i - 0.5) / N * math.pi - math.pi / 2
@@ -337,15 +381,16 @@ function Corpo.arma(f, tipo: string, cor: Color3?)
 		end
 		local corda = nova(Vector3.new(0.04, 3.3, 0.04), METAL, Enum.Material.Neon)
 		soldar(maoE :: BasePart, corda, CFrame.new(0, -0.4, 0.2))
+		end
 	elseif mao then
 		local pesada = tipo == "pesada"
 		local punho = nova(Vector3.new(0.22, pesada and 1.4 or 0.9, 0.22), MADEIRA, Enum.Material.Wood)
-		soldar(mao :: BasePart, punho, CFrame.new(0, -0.25, 0))
+		soldar(mao :: BasePart, punho, if pegaClipe then CFrame.new(0, -0.15, 0) * CFrame.Angles(math.rad(90), 0, 0) else CFrame.new(0, -0.25, 0))
 		if tipo == "espada" or tipo == "gelo" then
 			local gelo = tipo == "gelo"
 			local lamina = nova(Vector3.new(0.12, 3.6, 0.42), gelo and Color3.fromRGB(175, 225, 255) or METAL, gelo and Enum.Material.Glass or Enum.Material.Metal)
 			soldar(punho, lamina, CFrame.new(0, -2.15, 0))
-			local fio = nova(Vector3.new(0.05, 3.5, 0.06), cor or Color3.fromRGB(255, 240, 200), Enum.Material.Neon)
+			local fio = nova(Vector3.new(0.07, 3.5, 0.08), cor or Color3.fromRGB(255, 240, 200), Enum.Material.Neon)
 			fio.Transparency = if gelo then 0.3 else 0.2
 			soldar(lamina, fio, CFrame.new(0, 0, -0.22)) -- gume brilhante numa borda só
 			local guarda = nova(Vector3.new(0.22, 0.22, 1.2), Color3.fromRGB(150, 118, 60), Enum.Material.Metal)
@@ -362,6 +407,10 @@ function Corpo.arma(f, tipo: string, cor: Color3?)
 	end
 	return pecas
 end
+
+-- Última arma vista nos recibos de cada personagem (LUTA-A): AnimacaoLuta põe essa arma na mão do avatar
+-- em postura de combate. Chave fraca: some com o personagem.
+Corpo.armasVistas = setmetatable({}, { __mode = "k" }) :: { [Instance]: string }
 
 -- Arma dos golpes: pelo nome da arma do inventário (vem no recibo).
 function Corpo.tipoDeArma(nome: string?): string

@@ -163,11 +163,11 @@ function E.plano(o)
 	local cabe = d <= dMax
 	if not cabe and o.ator then
 		-- Não cabe: fica no limite e segue quem age; puxa para o centro do grupo só uma parte da
-		-- área visível (35%), para quem age ficar perto do meio da área livre.
+		-- área visível (25%), para quem age ficar perto do meio da área livre.
 		d = dMax
 		local ox, oz = cx - o.ator.x, cz - o.ator.z
-		local meiaLargura = tx * d * 0.35
-		local meiaProfundidade = ty * d / math.max(0.3, math.sin(math.rad(pitch))) * 0.35
+		local meiaLargura = tx * d * 0.25
+		local meiaProfundidade = ty * d / math.max(0.3, math.sin(math.rad(pitch))) * 0.25
 		local hx, hz = -math.sin(o.yaw or 0), -math.cos(o.yaw or 0)
 		local lat = math.clamp(ox * direita.x + oz * direita.z, -meiaLargura, meiaLargura)
 		local fun = math.clamp(ox * hx + oz * hz, -meiaProfundidade, meiaProfundidade)

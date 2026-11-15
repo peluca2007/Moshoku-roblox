@@ -452,6 +452,7 @@ function BoardView.start(state)
 	local armas = require(script.Parent.ArmasNoChaoView).start()
 
 	require(script.Parent.VisaoFurtivaView).start(state)
+	require(script.Parent.AnimacaoLuta).start(state) -- postura, queda e vitória dos avatares na luta (LUTA-A)
 
 	local function render(snapshot)
 		-- A mesa legada conserva as peças; a sala social não desenha o combate encerrado.
@@ -812,6 +813,11 @@ function BoardView.start(state)
 		local resumo = hud and hud:FindFirstChild("Resumo")
 		if resumo and visivelNaTela(resumo) then
 			topo = math.max(topo, resumo.AbsolutePosition.Y + inset + resumo.AbsoluteSize.Y + 8)
+		end
+		-- Cartão de quem age (HudJogo.Cartao), colado à direita: a área livre termina antes dele.
+		local cartao = hud and hud:FindFirstChild("Cartao")
+		if cartao and cartao:IsA("GuiObject") and visivelNaTela(cartao) and cartao.AbsolutePosition.X > vp.X * 0.6 then
+			direita = math.min(direita, cartao.AbsolutePosition.X - 8)
 		end
 		-- Faixa da expedição (dia/sala) no alto. AbsolutePosition vem abaixo da barra do Roblox mesmo com
 		-- IgnoreGuiInset (observado no Studio: o Palco dessa tela fica em Y = -inset), então soma o inset.

@@ -16,7 +16,11 @@
 --       segurar = boolean?,             -- fica no último quadro até parar() (padrão: campo `segurar` do clipe)
 --       aoMarco = function(nome) end,   -- chamado (task.spawn) ao cruzar cada marco: "impacto", "soltar", ...
 --       aoFim = function() end,         -- chamado quando a camada sai de cena (fim natural ou parar)
+--       manual = boolean?,              -- LUTA-A: o tempo não anda sozinho; quem toca chama c:em(t) a cada
+--                                       -- quadro (ex.: relógio da cena da Coreografia, que respeita
+--                                       -- CenaTempoFixo e a câmera lenta). Fades e marcos seguem esse tempo.
 --   })
+--   c:em(t)          -- (manual) põe a camada no instante t do clipe (segundos do clipe, já com a velocidade)
 --   c:parar(fade?)   -- tira esta camada com fade (padrão: fadeSaida)
 --   c.terminou       -- true depois que a camada saiu de cena
 --   t:parar(fade?)   -- para todas as camadas
@@ -94,6 +98,8 @@ function Tocador:tocar(nomeOuClipe: any, opcoes: { [string]: any }?)
 		segurar = if o.segurar ~= nil then o.segurar else clipe.segurar == true,
 		aoMarco = o.aoMarco,
 		aoFim = o.aoFim,
+		manual = o.manual == true,
+		alvoTempo = 0,
 		terminou = false,
 		parandoEm = nil :: number?,
 		fadeParada = 0,
@@ -115,6 +121,10 @@ function Tocador:tocar(nomeOuClipe: any, opcoes: { [string]: any }?)
 		end)
 	end
 	return c
+end
+
+function Controle:em(t: number)
+	self.alvoTempo = t
 end
 
 function Controle:parar(fade: number?)
@@ -155,8 +165,16 @@ function Tocador:_passo(dt: number)
 	local vivas = {}
 	for _, c in self.camadas do
 		local antes = c.tempo
-		c.tempo += dt * c.velocidade
-		c.decorrido += dt
+		if c.manual then
+			-- relógio externo: o "decorrido" (fades) acompanha o tempo do clipe, não o do quadro
+			local passo = math.max(0, c.alvoTempo - c.tempo)
+			c.tempo = c.alvoTempo
+			-- parando: o fade de saída anda no relógio real (o dono pode já ter parado de chamar em())
+			c.decorrido += if c.parandoEm then dt else passo / math.max(c.velocidade, 1e-3)
+		else
+			c.tempo += dt * c.velocidade
+			c.decorrido += dt
+		end
 		local clipe = c.clipe
 		local limite = if clipe.laco or c.segurar then c.tempo else math.min(c.tempo, clipe.duracao)
 		for _, nome in Amostra.marcosEntre(clipe, antes, limite) do

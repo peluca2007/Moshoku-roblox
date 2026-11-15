@@ -251,10 +251,21 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
 				Efeitos.tremer(math.min(0.45, cena.perfil.peso * (if alvo.critico then 0.5 else 0.2)), 0.2)
 				Efeitos.aproximar(if alvo.critico then 0.14 else 0.08, if alvo.critico then 0.55 else 0.4)
+			elseif not acertou then
+				Gestos.reacao(kit, cena, alvo.id, ponto - de, 0.3, "esquiva")
+			elseif alvo.dano == 0 and not alvo.passou then
+				Gestos.reacao(kit, cena, alvo.id, ponto - de, 0.3, "bloqueio") -- acertou sem dano: aparou
 			end
 		end)
 	end
 
+	-- Relógio da cena (segundos desde o início), com CenaTempoFixo e EscalaDeTempoDasCenas.
+	local function tempoDe(cena)
+		local fixo = workspace:GetAttribute("CenaTempoFixo")
+		return if type(fixo) == "number" then fixo
+			else (os.clock() - cena.inicio) / math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+	end
+	kit.agora = tempoDe
 	kit.animar, kit.evento, kit.peca, kit.segmento, kit.arco = animar, evento, peca, segmento, arco
 	kit.chao = chao
 	kit.celula = function(c) return Protocol.cellCenter(c[1], c[2]) end
@@ -264,9 +275,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 			local cena = cenas[i]
 			-- Só para inspeção: atributo CenaTempoFixo do Workspace congela as cenas num instante
 			-- (quadro parado); EscalaDeTempoDasCenas > 1 deixa tudo em câmera lenta.
-			local fixo = workspace:GetAttribute("CenaTempoFixo")
-			local tempo = if type(fixo) == "number" then fixo
-				else (os.clock() - cena.inicio) / math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+			local tempo = tempoDe(cena)
 			if not cena.modelo.Parent or tempo > cena.fim then
 				destruir(cena); table.remove(cenas, i)
 			else

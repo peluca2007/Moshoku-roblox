@@ -7,6 +7,30 @@ local Gestos = {}
 
 local Y = Vector3.yAxis
 local Corpo = require(script.Parent.Corpo)
+local Catalogo = require(game:GetService("ReplicatedStorage").Shared.Animacoes.Catalogo)
+
+-- LUTA-A: clipe por dados num fantasma, dirigido pelo relógio da cena (K.animar), para respeitar
+-- CenaTempoFixo/câmera lenta e casar o marco do clipe com o instante que a Coreografia usa para som e
+-- números. `inicio` = instante da cena em que começa; `t0` = instante do clipe nesse momento.
+local function clipeNaCena(K, cena, f, nome: string, inicio: number, duracao: number, velocidade: number, t0: number?, o: { [string]: any }?)
+	local tocador = f and Corpo.tocador(f)
+	if not tocador then
+		return
+	end
+	local c
+	K.animar(cena, inicio, duracao, function(t)
+		if not f.viva then
+			return
+		end
+		if not c then
+			c = tocador:tocar(nome, {
+				manual = true, velocidade = velocidade, camada = o and o.camada,
+				fadeEntrada = (o and o.fade) or 0.08, segurar = o and o.segurar,
+			})
+		end
+		c:em((t0 or 0) + t * duracao * velocidade)
+	end)
+end
 
 local function plano(v: Vector3): Vector3
 	return Vector3.new(v.X, 0, v.Z)
@@ -77,9 +101,10 @@ function Gestos.especificar(id: string, mec, arvore: string?)
 	return nil
 end
 
--- Reação do corpo atingido: só para personagens (as miniaturas já recuam por
--- Efeitos.reagir). O fantasma é jogado para trás, inclina e volta.
-function Gestos.reacao(K, cena, alvoId: string, direcao: Vector3, forca: number)
+-- Reação do corpo atingido: só para personagens (as miniaturas já recuam por Efeitos.reagir).
+-- tipo: "golpe" (padrão) | "esquiva" (errou) | "bloqueio" (acertou sem dano). Com R15, o fantasma toca o
+-- clipe ReacaoGolpe/Esquiva/Bloqueio a partir de agora (o marco cai no impacto); sem R15, a pose antiga.
+function Gestos.reacao(K, cena, alvoId: string, direcao: Vector3, forca: number, tipo: string?)
 	local modelo, avatar = Corpo.modeloDe(K.state, alvoId)
 	if not modelo or not avatar then
 		return
@@ -101,7 +126,34 @@ function Gestos.reacao(K, cena, alvoId: string, direcao: Vector3, forca: number)
 	local base = modelo:GetPivot().Position
 	local dir = unit(direcao)
 	Corpo.por(f, base, -dir)
-	K.animar(cena, 0, 0.5, function(t)
+	local agora = if K.agora then K.agora(cena) else 0
+	local tocador = Corpo.tocador(f)
+	if tocador then
+		-- a arma da postura não vai no clone (Archivable = false em AnimacaoLuta): põe de novo no fantasma
+		Corpo.arma(f, Corpo.armasVistas[modelo] or "espada")
+		local nome = if tipo == "esquiva" then "Esquiva" elseif tipo == "bloqueio" then "Bloqueio" else "ReacaoGolpe"
+		local clipe = Catalogo.CLIPES[nome]
+		local marco = clipe.marcos.impacto or clipe.marcos.desvio or 0
+		local t0 = math.max(0, marco - 0.1) -- o corpo já está reagindo quando o golpe chega
+		local dur = clipe.duracao - t0
+		clipeNaCena(K, cena, f, "PosturaCombate", agora, dur, 1, 0, { camada = "base", fade = 0 })
+		clipeNaCena(K, cena, f, nome, agora, dur, 1, t0, { fade = 0.04 })
+		K.animar(cena, agora, dur, function(t)
+			if not f.viva then
+				return
+			end
+			if tipo == nil or tipo == "golpe" then
+				-- tranco curto para trás, além do que o clipe faz no lugar
+				local curva = math.sin(math.min(t * 3, 1) * math.pi * 0.5) * (1 - t)
+				Corpo.por(f, base + dir * curva * 0.9 * math.clamp(forca, 0.3, 2), -dir)
+			end
+			if t >= 1 then
+				revelar()
+			end
+		end)
+		return
+	end
+	K.animar(cena, agora, 0.5, function(t)
 		if not f.viva then
 			return
 		end
@@ -128,6 +180,9 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 	local primeiro = alvos[1]
 	local alvoPos = primeiro and K.posicaoDe(state, primeiro.id, primeiro.casa) or nil
 	local modelo = Corpo.modeloDe(state, casterId)
+	if modelo and recibo.arma then
+		Corpo.armasVistas[modelo] = Corpo.tipoDeArma(recibo.arma)
+	end
 
 	-- Fantasma do conjurador: esconde o corpo real até o gesto acabar.
 	local f
@@ -199,7 +254,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 	-- Efeitos de impacto reutilizáveis ----------------------------------------
 	local function talho(centro: Vector3, dir: Vector3, grau: number, raio: number, quando: number, dur: number?, tom: Color3?)
 		dur = dur or 0.24
-		raio *= 1.35
+		raio *= 0.9 -- LUTA-A: câmera perto; o corte não pode cobrir os dois corpos
 		local r = dir:Cross(Y)
 		r = if r.Magnitude > 1e-3 then r.Unit else Vector3.xAxis
 		local u = r:Cross(dir)
@@ -240,7 +295,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		for i = 1, n do
 			local p = K.peca(cena, "fio", tom or cor)
 			local ang = i * math.pi * 2 / n + (i % 2) * 0.3
-			local v = (r * math.cos(ang) + u * math.sin(ang) + dir * 0.5).Unit * ((alcance or 3.6) * (0.7 + (i % 3) * 0.25))
+			local v = (r * math.cos(ang) + u * math.sin(ang) + dir * 0.5).Unit * ((alcance or 3.6) * 0.6 * (0.7 + (i % 3) * 0.25))
 			K.animar(cena, quando, 0.34, function(t)
 				local a = ponto + v * suave(t * 0.6)
 				local b = ponto + v * suave(t) * 1.2
@@ -255,12 +310,12 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		K.animar(cena, quando, 0.2, function(t)
 			if bola then
 				bola.Position = ponto
-				bola.Size = Vector3.one * ((tamanho or 3) * (0.4 + t))
+				bola.Size = Vector3.one * ((tamanho or 3) * 0.45 * (0.4 + t))
 				bola.Transparency = 0.1 + t * 0.9
 			end
 			if anel then
 				anel.Position = ponto
-				anel.Size = Vector3.one * ((tamanho or 3) * (0.8 + 2 * t))
+				anel.Size = Vector3.one * ((tamanho or 3) * 0.45 * (0.8 + 1.6 * t))
 				anel.Transparency = 0.5 + t * 0.5
 			end
 		end)
@@ -380,12 +435,35 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		local W = spec.preparo or (if tipoDaArma() == "pesada" then .34 else .26)
 		local cortes = spec.cortes or { { 0, 40 } }
 		if g == "giro" then cortes = { { 0, 0 } } end
+		-- LUTA-A: com R15, o golpe é um clipe por dados e o instante do golpe é o marco `impacto` dele.
+		local nomeClipe, vel
+		if g == "golpe" and ok and Corpo.tocador(f) then
+			local tipoArma = spec.prop or tipoDaArma()
+			nomeClipe = if tipoArma == "adaga" or spec.semArma then "Estocada"
+				elseif tipoArma == "pesada" or (spec.peso or 0) >= 0.5 then "CortePesado" else "CorteLeve"
+			vel = if #cortes > 1 then 1.7 elseif nomeClipe == "CortePesado" then 1.3 else 1.2
+			W = Catalogo.CLIPES[nomeClipe].marcos.impacto / vel
+		end
 		local ultimo = cortes[#cortes][1]
 		local golpeFim = W + ultimo
 		local total = golpeFim + 0.1 + 0.28 + 0.2
+		if nomeClipe then
+			local clipe = Catalogo.CLIPES[nomeClipe]
+			total = math.max(total, golpeFim + (clipe.duracao - clipe.marcos.impacto) / vel)
+			clipeNaCena(K, cena, f, "PosturaCombate", 0, total, 1, 0, { camada = "base", fade = 0 })
+			for i, c in cortes do
+				-- cada corte é uma camada; a seguinte começa logo depois do impacto da anterior,
+				-- já no meio do preparo, para o impacto cair em W + c[1]
+				local comeca = if i == 1 then 0 else W + cortes[i - 1][1]
+				local t0 = clipe.marcos.impacto - (W + c[1] - comeca) * vel
+				local fim = if i == #cortes then total else W + cortes[i + 1][1] + 0.05
+				clipeNaCena(K, cena, f, nomeClipe, comeca, fim - comeca, vel, math.max(0, t0), { fade = if i == 1 then 0.06 else 0.05 })
+			end
+		end
 		local ponto = alvoPos - dir * 1.1
 		if ok then
 			local tipo = spec.prop or tipoDaArma()
+			if spec.semArma then tipo = nil end
 			if g == "escudada" then
 				arma("escudo")
 			elseif g == "cabecada" or spec.semArma then
@@ -470,10 +548,11 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 			for i, c in cortes do
 				local quando = W + c[1]
 				local raio = if spec.baixo then 4.4 else 3.8
-				talho(alvoPos - dir * 0.6 + (if spec.baixo then Vector3.new(0, -1.2, 0) else Vector3.zero), dir, c[2], raio, quando + 0.01, 0.2, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
+				local marca = if nomeClipe then 0.02 else 0.07 -- com clipe, o contato é o marco `impacto`
+				talho(alvoPos - dir * 0.6 + (if spec.baixo then Vector3.new(0, -1.2, 0) else Vector3.zero), dir, c[2], raio, quando + (if nomeClipe then -0.03 else 0.01), 0.2, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
 				if acertouPrimeiro then
-					faiscas(ponto, dir, quando + 0.07, if i == #cortes then 12 else 8, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
-					clarao(ponto, quando + 0.07, if primeiro.critico then 4.2 elseif i == #cortes then 3.4 else 2.4, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
+					faiscas(ponto, dir, quando + marca, if i == #cortes then 12 else 8, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
+					clarao(ponto, quando + marca, if primeiro.critico then 4.2 elseif i == #cortes then 3.4 else 2.4, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
 				end
 				if spec.gelo then
 					K.evento(cena, quando + 0.07, function() K.Efeitos.floatText(alvoPos + Y * 2.5, "❄", Color3.fromRGB(190, 232, 255)) end)
@@ -484,7 +563,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				-- Corte de Braço: linha fina e clara sobre o membro.
 				talho(alvoPos + Y * 0.4, dir, 62, 2.2, W + 0.02, 0.14, Color3.fromRGB(255, 255, 255))
 			end
-			plan.chegada = golpeFim + 0.07
+			plan.chegada = golpeFim + (if nomeClipe then 0.02 else 0.07)
 		end
 		return plan
 	end
@@ -688,12 +767,45 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 	if g == "disparo" then
 		local ok = abrir()
 		local carga = 0.5
+		local clipeArco = ok and Corpo.tocador(f) ~= nil
+		if clipeArco then
+			-- LUTA-A: DisparoArco; a flecha sai no marco `soltar`.
+			local clipe = Catalogo.CLIPES.DisparoArco
+			local vel = 1.5
+			carga = clipe.marcos.soltar / vel
+			local dur = clipe.duracao / vel
+			clipeNaCena(K, cena, f, "PosturaCombate", 0, dur, 1, 0, { camada = "base", fade = 0 })
+			clipeNaCena(K, cena, f, "DisparoArco", 0, dur, vel, 0, { fade = 0.06 })
+			f.marcosArco = { puxar = clipe.marcos.puxar / vel, soltar = carga, fim = dur }
+		end
 		if ok then
 			local origem = f.base
 			local olho = if alvoPos then unit(alvoPos - origem) else Vector3.zAxis
 			arma("arco")
+			if clipeArco and f.maoArco and f.pontasArco then
+				-- Corda: reta entre as pontas; entre `puxar` e `soltar` vai até a mão direita.
+				local maoD = f.modelo:FindFirstChild("RightHand")
+				local cordas = { K.peca(cena, "fio", Color3.fromRGB(235, 228, 205)), K.peca(cena, "fio", Color3.fromRGB(235, 228, 205)) }
+				local m = f.marcosArco
+				K.animar(cena, 0, m.fim, function(t)
+					if not f.viva or not f.maoArco.Parent then
+						for _, c in cordas do if c then c.Transparency = 1 end end
+						return
+					end
+					local s = t * m.fim
+					local cf = f.maoArco.CFrame
+					local a, b = cf:PointToWorldSpace(f.pontasArco[1]), cf:PointToWorldSpace(f.pontasArco[2])
+					local meio = (a + b) / 2
+					if maoD and s > m.puxar - 0.15 and s < m.soltar then
+						local puxa = math.clamp((s - (m.puxar - 0.15)) / 0.2, 0, 1)
+						meio = meio:Lerp(maoD.Position, puxa)
+					end
+					K.segmento(cordas[1], a, meio, 0.05, 0.1)
+					K.segmento(cordas[2], meio, b, 0.05, 0.1)
+				end)
+			end
 			anim(0, "point", { velocidade = 0.9, prioridade = GOLPE })
-			rodar(carga + 0.45, function(s)
+			rodar(if clipeArco then f.marcosArco.fim else carga + 0.45, function(s)
 				local puxa = suave(s / carga)
 				local solta = if s > carga then suave((s - carga) / 0.08) else 0
 				return {
@@ -771,12 +883,29 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		local carga = cena.perfil.carga
 		local origem = f.base
 		local olho = if alvoPos then unit(alvoPos - origem) else Vector3.new(0, 0, 1)
+		local cargaClipe = nil
+		if Corpo.tocador(f) then
+			-- LUTA-A: Conjurar (apontar/empunhar: o marco `impacto` vira o instante de soltar a magia) ou
+			-- Canalizar em laço (palmas: cura, área, zona, invocação).
+			if spec.pose == "palmas" then
+				clipeNaCena(K, cena, f, "PosturaCombate", 0, carga + 0.6, 1, 0, { camada = "base", fade = 0 })
+				clipeNaCena(K, cena, f, "Canalizar", 0, carga + 0.6, 1.2, 0, { fade = 0.15 })
+			else
+				local clipe = Catalogo.CLIPES.Conjurar
+				local vel = math.clamp(clipe.marcos.impacto / math.max(carga, 0.4), 1, 2.1)
+				cargaClipe = clipe.marcos.impacto / vel
+				local dur = clipe.duracao / vel
+				clipeNaCena(K, cena, f, "PosturaCombate", 0, dur, 1, 0, { camada = "base", fade = 0 })
+				clipeNaCena(K, cena, f, "Conjurar", 0, dur, vel, 0, { fade = 0.08 })
+				carga = cargaClipe
+			end
+		end
 		if spec.prop then arma(spec.prop) end
 		anim(0, if spec.pose == "palmas" then "cheer" elseif spec.pose == "empunhar" then "toolnone" else "point",
 			{ velocidade = 1.2, prioridade = GOLPE })
 		local palmas = spec.pose == "palmas"
 		local empunhar = spec.pose == "empunhar"
-		rodar(carga + 0.5, function(s)
+		rodar(if cargaClipe then Catalogo.CLIPES.Conjurar.duracao * cargaClipe / Catalogo.CLIPES.Conjurar.marcos.impacto else carga + 0.5, function(s)
 			local u = suave(s / math.max(carga, 0.1))
 			local chute = if s > carga then math.sin(math.clamp((s - carga) / 0.2, 0, 1) * math.pi) * 0.4 else 0
 			local flutua = if palmas then 0.5 * u * (1 - suave((s - carga - 0.2) / 0.3)) else 0
@@ -788,7 +917,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				tr = if palmas then -0.15 * u else 0.1 * u,
 			}
 		end)
-		return { carga = nil }
+		return { carga = cargaClipe }
 	end
 	return nil
 end

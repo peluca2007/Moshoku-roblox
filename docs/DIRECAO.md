@@ -141,6 +141,14 @@ Animated Enemy Pack (rato, aranha, cobra, sapo, vespa). Conferir a licença de
 cada um ao integrar. `MDA_Hatchery_CP1.zip` (pacote Unity sem licença
 visível) não será usado.
 
+### Escala do mundo (Pedro, 15/11/2026)
+
+Todas as construções ficam bem maiores em relação ao personagem (corpo R15
+padrão, ≈5 studs): portas com folga acima da cabeça, andares altos, ruas e
+praças largas. Critério provisório do coordenador: porta ≈ 1,6× a altura do
+personagem e pé-direito ≈ 2×; ajustar pelo olho no Studio. **Ainda não
+implementado.**
+
 ### Luta: referência de apresentação (Pedro, 15/11/2026)
 
 Vídeo de referência em `docs/imagens contextos/` (outro jogo; só a estrutura).

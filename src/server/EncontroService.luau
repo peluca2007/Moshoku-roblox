@@ -23,6 +23,7 @@ local Chefes = require(game:GetService("ReplicatedStorage").Shared.Regras.Chefes
 local ChefesService = require(script.Parent.ChefesService)
 local TravaPartida = require(game:GetService("ReplicatedStorage").Shared.TravaPartida)
 local Corpos = require(script.Parent.CorposDeCriatura)
+local RecursosEntreSalas = require(game:GetService("ReplicatedStorage").Shared.Regras.RecursosEntreSalas)
 
 local EncontroService = {}
 
@@ -204,19 +205,35 @@ function EncontroService.start(deps)
 		end
 	end
 
+	-- Recursos da ficha pessoal de cada jogador no fim da luta do mundo, ANTES do descanso automático da mesa:
+	-- { [userId] = { pv, pm, pt?, pp? } }. Quem decide se isso volta para a ficha é o dono da luta (RunServico
+	-- só grava na luta da expedição; dojo e testes ignoram).
+	local function recursosDosJogadores()
+		local recursos = {}
+		for _, t in tokens do
+			if t.kind == "jogador" and not t.ia and not t.boneco and t.ficha2 ~= nil and type(t.ownerUserId) == "number"
+				and recursos[t.ownerUserId] == nil then
+				recursos[t.ownerUserId] = RecursosEntreSalas.doToken(t)
+			end
+		end
+		return recursos
+	end
+
 	local function terminar(resultado: string, vencedor: string?)
 		if not estado.ativo then
 			return
 		end
 		local modo = estado.modo
 		local mundo = estado.mundo
+		local recursos = if mundo then recursosDosJogadores() else nil
 		chefes.limpar(); chefeAtual, nivelAtual = nil, nil
 		table.clear(equipesAtuais)
 		estado.ativo, estado.modo, estado.prazoFim, estado.prazoId, estado.mundo = false, nil, nil, nil, nil
 		handlers.combatEnd(nil, {}, true)
 		if mundo then
-			deps.logAll(if resultado == "vitoria" then "Vitória! O grupo volta ao caminho (PV, PM e PT cheios)."
-				else "Derrota... O grupo recobra os sentidos onde caiu (PV, PM e PT cheios).", "sistema")
+			-- Na expedição o que foi gasto segue para a próxima sala (RunServico grava); fora dela a ficha pessoal não muda.
+			deps.logAll(if resultado == "vitoria" then "Vitória! O grupo volta ao caminho."
+				else "Derrota... O grupo recobra os sentidos.", "sistema")
 		elseif modo == "duelo" then
 			deps.logAll(if vencedor then "Fim do duelo: " .. vencedor .. " venceu! Todos se recuperam." else "Fim do duelo: ninguém ficou de pé.", "sistema")
 		elseif resultado == "vitoria" then
@@ -228,7 +245,7 @@ function EncontroService.start(deps)
 		deps.remote:FireAllClients("encontro", { resultado = resultado, modo = modo, vencedor = vencedor, mundo = mundo ~= nil })
 		deps.mudou()
 		if mundo and mundo.aoTerminar then
-			local ok, erro = pcall(mundo.aoTerminar, resultado)
+			local ok, erro = pcall(mundo.aoTerminar, resultado, recursos)
 			if not ok then warn("[Luta do mundo] Fim: " .. tostring(erro)) end
 		end
 	end
@@ -494,12 +511,13 @@ function EncontroService.start(deps)
 	function api.desligar()
 		geracao += 1
 		local mundo = estado.mundo
+		local recursos = if mundo and estado.ativo then recursosDosJogadores() else nil
 		chefes.limpar(); chefeAtual, nivelAtual = nil, nil
 		table.clear(equipesAtuais)
 		estado.ativo, estado.modo, estado.prazoFim, estado.prazoId, estado.mundo = false, nil, nil, nil, nil
 		-- Mesa limpa no meio da luta do mundo: o grupo não pode ficar preso na arena.
 		if mundo and mundo.aoTerminar then
-			local ok, erro = pcall(mundo.aoTerminar, "cancelada")
+			local ok, erro = pcall(mundo.aoTerminar, "cancelada", recursos)
 			if not ok then warn("[Luta do mundo] Cancelada: " .. tostring(erro)) end
 		end
 	end

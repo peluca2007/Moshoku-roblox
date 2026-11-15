@@ -21,6 +21,10 @@ local RegrasLivro = require(game:GetService("ReplicatedStorage").Shared.Livro.Re
 local RestricaoDeCriacao = require(game:GetService("ReplicatedStorage").Shared.Regras.RestricaoDeCriacao)
 local ArvoresAprendidas = require(game:GetService("ReplicatedStorage").Shared.Regras.ArvoresAprendidas)
 local EncontrosPagos = require(game:GetService("ReplicatedStorage").Shared.Regras.EncontrosPagos)
+local RecursosEntreSalas = require(game:GetService("ReplicatedStorage").Shared.Regras.RecursosEntreSalas)
+-- Instância ativa (a da Mesa): o fim da luta da expedição grava por PersonagemSessao.gravarRecursosDaLuta
+-- sem passar pela Mesa nem por remoto.
+local instancia
 local INTERVALO_NOVA_CARGA = 5
 local LIMITE_PEDIDOS_CRIACAO = 128
 local ITENS_LOJA, ORDEM_ITENS_LOJA = {}, {}
@@ -495,7 +499,7 @@ function PersonagemSessao.start(ctx)
 		return nil
 	end
 
-	return {
+	local api = {
 		sincronizarArvoresRun = function(player, ids)
 			if not ctx.conectado(player) or ctx.emCombate() then return false end
 			local id, perfil = player.UserId, folhas[player.UserId]
@@ -689,16 +693,23 @@ function PersonagemSessao.start(ctx)
 			if gravandoArma[id] then return false, "Aguarde o salvamento atual." end
 			local maximos = perfil.estatisticas.maxima
 			local estado = perfil.descanso or { atuais = copiar(maximos), descansosCurtos = 0 }
-			local maiorBonus = 1
-			for _, rankId in perfil.construcao.unlockedRankIds or {} do
-				local rank = ctx.catalogo.POR_ID[rankId]
-				if rank and type(rank.data) == "table" and type(rank.data.rank) == "string" then
-					maiorBonus = math.max(maiorBonus, RegrasLivro.bonusDeRank[rank.data.rank] or 1)
+			local resultado, erro
+			if tipo == "acampamento" then
+				-- Acampamento da expedição: recupera tudo (RecursosEntreSalas.descansoCompleto; ADAPTAÇÃO registrada lá).
+				local cheios, falha = RecursosEntreSalas.descansoCompleto(maximos)
+				resultado, erro = if cheios then { atuais = cheios, descansosCurtos = estado.descansosCurtos or 0 } else nil, falha
+			else
+				local maiorBonus = 1
+				for _, rankId in perfil.construcao.unlockedRankIds or {} do
+					local rank = ctx.catalogo.POR_ID[rankId]
+					if rank and type(rank.data) == "table" and type(rank.data.rank) == "string" then
+						maiorBonus = math.max(maiorBonus, RegrasLivro.bonusDeRank[rank.data.rank] or 1)
+					end
 				end
+				resultado, erro = DescansoAcampamento.resolver({ tipo = tipo, maximos = maximos,
+					atuais = estado.atuais, descansosCurtos = estado.descansosCurtos,
+					vigor = perfil.atributos.vigor, maiorBonus = maiorBonus })
 			end
-			local resultado, erro = DescansoAcampamento.resolver({ tipo = tipo, maximos = maximos,
-				atuais = estado.atuais, descansosCurtos = estado.descansosCurtos,
-				vigor = perfil.atributos.vigor, maiorBonus = maiorBonus })
 			if not resultado then return false, erro end
 			local atualizado = copiar(perfil)
 			atualizado.descanso = { atuais = resultado.atuais, descansosCurtos = resultado.descansosCurtos }
@@ -756,6 +767,37 @@ function PersonagemSessao.start(ctx)
 			pedidosCriacao[player.UserId] = nil
 		end,
 	}
+	-- API interna (sem remoto): fim de uma luta DA EXPEDIÇÃO. `luta` = { pv, pm, pt?, pp? } lidos da ficha na mesa;
+	-- RecursosEntreSalas limita aos máximos e levanta quem caiu com 1 PV. Grava em perfil.descanso.atuais
+	-- (a próxima luta começa daí). Devolve (true, { atuais, caiu }) ou (false, motivo).
+	api.gravarRecursosDaLuta = function(player, luta)
+		if player == nil or not ctx.conectado(player) or type(luta) ~= "table" then return false, "Pedido inválido." end
+		local id, perfil = player.UserId, folhas[player.UserId]
+		if not perfil then return false, "Ficha pessoal indisponível." end
+		if gravandoArma[id] then return false, "Aguarde o salvamento atual." end
+		local maximos = perfil.estatisticas.maxima
+		local estado = perfil.descanso or { atuais = copiar(maximos), descansosCurtos = 0 }
+		local resultado, erro = RecursosEntreSalas.resolver({ luta = luta, anteriores = estado.atuais, maximos = maximos })
+		if not resultado then return false, erro end
+		local atualizado = copiar(perfil)
+		atualizado.descanso = { atuais = resultado.atuais, descansosCurtos = estado.descansosCurtos or 0 }
+		gravandoArma[id] = true
+		local salvo, revisaoOuErro = salvar(player, atualizado)
+		gravandoArma[id] = nil
+		if not salvo then return false, revisaoOuErro end
+		if not ctx.conectado(player) or folhas[id] ~= perfil then return false, "Sessão mudou durante o salvamento." end
+		revisoes[id], folhas[id] = revisaoOuErro or revisoes[id], atualizado
+		enviarPerfil(player)
+		return true, resultado
+	end
+	instancia = api
+	return api
+end
+
+-- Ver api.gravarRecursosDaLuta. Ligado em server.server.luau ao fim da luta da expedição (RunServico).
+function PersonagemSessao.gravarRecursosDaLuta(player, luta)
+	if not instancia then return false, "Sessão pessoal não iniciada." end
+	return instancia.gravarRecursosDaLuta(player, luta)
 end
 
 return PersonagemSessao

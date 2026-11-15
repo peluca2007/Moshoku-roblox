@@ -99,7 +99,7 @@ runServico = require(Server.RunServico).start({
 		if not ok then return false, "falha ao ler a ficha (" .. tostring(corpo) .. ")." end
 		if not corpo then return false, if type(motivo) == "string" then motivo else "aprenda um caminho com um mestre da vila." end
 		local atual = corpo.session and corpo.session.current
-		if atual and atual.pv and atual.pv <= 0 then return false, "recupere seus PV antes de descer." end
+		if atual and atual.pv and atual.pv <= 0 then return false, "está com 0 PV; descanse no acampamento ou na cidade antes de lutar." end
 		return true
 	end,
 	conta = require(Server.ContaServico).start(),
@@ -110,6 +110,8 @@ runServico = require(Server.RunServico).start({
 	pontoDaPorta = Porta.ponto,
 	-- Descanso do acampamento da área: mesmo caminho do descanso da mesa (recupera PV/PM/PT da ficha pessoal).
 	restaurarDescanso = function(player) return mesa.descansarPessoal(player, "longo") end,
+	-- Fim da luta da expedição: o que sobrou de PV/PM/PT/PP volta para a ficha pessoal (próxima sala começa daí).
+	gravarRecursos = require(Server.PersonagemSessao).gravarRecursosDaLuta,
 	-- Ouro da área: o mesmo crédito idempotente das lutas (id de pagamento), que também registra a missão da expedição.
 	recompensarArea = function(player, idPagamento, ouro, areaId)
 		local sucesso, _, cumpridas = mesa.recompensarEncontroPessoal(player, idPagamento, ouro, "expedicao/" .. areaId, 0)

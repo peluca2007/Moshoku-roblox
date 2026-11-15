@@ -51,6 +51,20 @@ local function chao(p)
 	return Vector3.new(p.X, Protocol.BOARD.origin.Y + 0.22, p.Z)
 end
 local function suave(t) return 1 - (1 - t) ^ 3 end
+-- Ponto na frente do corpo do alvo (modelo de criatura), visto de `de`: o projétil crava na superfície,
+-- não no centro (senão a flecha some dentro do corpo).
+local function meioDoCorpo(id, de)
+	local corpos = workspace:FindFirstChild("CorposDeCriatura")
+	local m = corpos and corpos:FindFirstChild(id)
+	if m and m:IsA("Model") then
+		local cf, tam = m:GetBoundingBox()
+		local centro = cf.Position + Vector3.new(0, tam.Y * 0.05, 0)
+		local plano = Vector3.new(centro.X - de.X, 0, centro.Z - de.Z)
+		if plano.Magnitude < 1e-3 then return centro end
+		return centro - plano.Unit * math.min(tam.X, tam.Z) * 0.4
+	end
+	return nil
+end
 
 function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 	local chao = chaoDe or chao
@@ -186,25 +200,138 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		end
 		arco(cena, chao(ponto), 4, inicio + 0.12, 0.55, false, math.pi * 2, 0)
 	end
-	local function flecha(cena, de, para, inicio, duracao, familia)
-		local p = peca(cena, if familia == "corrente" then "gota" else "fio", nil, if familia == "pedra" then Enum.Material.Slate else nil)
-		if not p then return end
-		local a, b = Instance.new("Attachment"), Instance.new("Attachment")
-		a.Position, b.Position = Vector3.new(0, 0.2, 0), Vector3.new(0, -0.2, 0)
-		a.Parent, b.Parent = p, p
+	-- Projéteis (LUTA-A): cada família tem forma, velocidade, arco e rastro próprios. Voo em bezier
+	-- quadrática (altura = ARCO x distância), alinhado à tangente. A flecha crava no alvo (ou no chão, se
+	-- errou), fica ~1,5 s e some; as magias somem no impacto (os efeitos de `impacto` assumem dali).
+	local VOO = {
+		flecha = { vel = 60, arco = 0.15, rastro = 0.12, largura = 0.12 },
+		corrente = { vel = 38, arco = 0.22, rastro = 0.22, largura = 0.45 },
+		pedra = { vel = 46, arco = 0.12, rastro = 0.2, largura = 0.5 },
+		vento = { vel = 58, arco = 0.03, rastro = 0.18, largura = 0.6 },
+		chama = { vel = 34, arco = 0.1, rastro = 0.25, largura = 0.7 },
+		padrao = { vel = 40, arco = 0.12, rastro = 0.2, largura = 0.4 },
+	}
+	local function voo(familia) return VOO[familia] or VOO.padrao end
+	local function duracaoDoVoo(familia, distancia)
+		return math.clamp(distancia / voo(familia).vel, 0.1, 0.9)
+	end
+	-- Peças da forma de cada família, em volta de um quadro que olha para a frente (-Z).
+	local MADEIRA, PENA, ACO = Color3.fromRGB(120, 84, 52), Color3.fromRGB(236, 230, 214), Color3.fromRGB(215, 220, 232)
+	local function forma(cena, familia)
+		local partes = {}
+		local function por(p, tamanho, desloc, transp)
+			if not p then return nil end
+			p.Size = tamanho
+			table.insert(partes, { p = p, d = desloc, transp = transp or 0 })
+			return p
+		end
+		if familia == "flecha" then
+			por(peca(cena, "haste", MADEIRA, Enum.Material.Wood), Vector3.new(0.12, 0.12, 2.7), CFrame.identity)
+			por(peca(cena, "ponta", ACO, Enum.Material.Metal), Vector3.new(0.24, 0.24, 0.42), CFrame.new(0, 0, -1.5) * CFrame.Angles(0, 0, math.rad(45)))
+			for i = 0, 2 do
+				local giro = CFrame.Angles(0, 0, i * math.pi * 2 / 3)
+				por(peca(cena, "cunha", if i == 0 then Color3.fromRGB(196, 64, 52) else PENA, Enum.Material.SmoothPlastic),
+					Vector3.new(0.04, 0.3, 0.62), giro * CFrame.new(0, 0.2, 1.05) * CFrame.Angles(0, math.pi, 0))
+			end
+		elseif familia == "corrente" then
+			local gota = por(peca(cena, "gota", cena.cor, Enum.Material.Glass), Vector3.new(0.7, 0.7, 0.7), CFrame.identity, 0.15)
+			if gota then
+				local m = Instance.new("SpecialMesh"); m.MeshType = Enum.MeshType.Sphere; m.Scale = Vector3.new(1, 1, 1.9); m.Parent = gota
+			end
+			por(peca(cena, "gota", Color3.fromRGB(230, 248, 255)), Vector3.new(0.32, 0.32, 0.32), CFrame.new(0, 0, -0.15))
+		elseif familia == "pedra" then
+			por(peca(cena, "bloco", Estilo.misturar(cena.cor, Color3.fromRGB(110, 96, 80), 0.55), Enum.Material.Slate), Vector3.new(0.75, 0.75, 1.0), CFrame.Angles(0.4, 0.3, 0.2))
+			por(peca(cena, "cunha", Color3.fromRGB(140, 124, 104), Enum.Material.Slate), Vector3.new(0.6, 0.5, 0.9), CFrame.new(0, 0, -0.75) * CFrame.Angles(math.pi / 2, 0, 0))
+		elseif familia == "vento" then
+			local disco = por(peca(cena, "disco", cena.cor), Vector3.new(0.08, 1.8, 1.8), CFrame.Angles(0, 0, math.pi / 2), 0.35)
+			if disco then disco.Shape = Enum.PartType.Cylinder end
+		else
+			por(peca(cena, "gota", Color3.fromRGB(255, 244, 214)), Vector3.new(0.55, 0.55, 0.55), CFrame.identity)
+			por(peca(cena, "gota", cena.cor), Vector3.new(1.1, 1.1, 1.1), CFrame.identity, 0.45)
+		end
+		return partes
+	end
+	local function estilhacos(cena, ponto, dir, quando, cor, n, poeira)
+		for i = 1, n do
+			local p = peca(cena, if poeira then "gota" else "fio", cor, if poeira then Enum.Material.SmoothPlastic else nil)
+			if p then
+				local ang = i * math.pi * 2 / n
+				local lado = dir:Cross(Y)
+				lado = if lado.Magnitude > 1e-3 then lado.Unit else Vector3.xAxis
+				local v = (-dir * 0.7 + lado * math.cos(ang) + Y * (0.6 + math.sin(ang) * 0.5)).Unit * (if poeira then 1.6 else 2.2)
+				animar(cena, quando, if poeira then 0.5 else 0.25, function(t)
+					if poeira then
+						p.Position = ponto + v * suave(t)
+						p.Size = Vector3.one * (0.3 + t * 0.8)
+						p.Transparency = 0.4 + t * 0.6
+					else
+						segmento(p, ponto + v * suave(t) * 0.5, ponto + v * suave(t), 0.1 - 0.06 * t, 0.05 + t ^ 2 * 0.95)
+					end
+				end)
+			end
+		end
+	end
+	-- de/para: pontos do mundo; origem(): ponto de saída na hora do disparo (mão), se houver.
+	local function flecha(cena, de, para, inicio, duracao, familia, acertou, origem)
+		local v = voo(familia)
+		local partes = forma(cena, familia)
+		if #partes == 0 then return end
+		local principal = partes[1].p
+		local a0, a1 = Instance.new("Attachment"), Instance.new("Attachment")
+		a0.Position, a1.Position = Vector3.new(0, v.largura / 2, 0.4), Vector3.new(0, -v.largura / 2, 0.4)
+		a0.Parent, a1.Parent = principal, principal
 		local rastro = Instance.new("Trail")
-		rastro.Attachment0, rastro.Attachment1, rastro.FaceCamera = a, b, true
-		rastro.Color = ColorSequence.new(cena.cor, Estilo.TINTA)
-		rastro.Transparency = NumberSequence.new(0.15, 1)
-		rastro.Lifetime, rastro.LightEmission, rastro.Enabled = 0.18, 0.8, false
-		rastro.Parent = p
+		rastro.Attachment0, rastro.Attachment1, rastro.FaceCamera = a0, a1, true
+		rastro.Color = if familia == "flecha" then ColorSequence.new(Color3.fromRGB(255, 246, 220)) else ColorSequence.new(cena.cor, Estilo.TINTA)
+		rastro.Transparency = NumberSequence.new(if familia == "flecha" then 0.45 else 0.15, 1)
+		rastro.Lifetime, rastro.LightEmission, rastro.Enabled = v.rastro, 0.7, false
+		rastro.Parent = principal
+		local saida, controle
+		local ultimo = CFrame.new(para)
+		local function posar(cf, transpExtra)
+			for _, q in partes do
+				q.p.CFrame = cf * q.d
+				q.p.Transparency = math.clamp(q.transp + (transpExtra or 0), 0, 1)
+			end
+		end
 		animar(cena, inicio, duracao, function(t)
-			local ponto = de:Lerp(para, t) + Y * math.sin(math.pi * t) * (if familia == "corrente" then 2.2 else 0.35)
-			p.CFrame = CFrame.lookAt(ponto, ponto + direcao(de, para))
-			p.Size = if familia == "pedra" then Vector3.new(1.1, 1.1, 2) elseif familia == "corrente" then Vector3.new(0.8, 0.8, 1.8) else Vector3.new(0.16, 0.16, 3)
-			p.Transparency = if t >= 1 then 1 else 0.05
+			if not saida then
+				saida = if origem then (origem() or de) else de
+				local d = (para - saida).Magnitude
+				controle = (saida + para) / 2 + Y * (2 * math.min(v.arco * d, 3)) -- teto: câmera perto
+			end
+			local u = 1 - t
+			local ponto = saida * u * u + controle * 2 * u * t + para * t * t
+			local tangente = (controle - saida) * 2 * u + (para - controle) * 2 * t
+			if tangente.Magnitude < 1e-3 then tangente = direcao(saida, para) end
+			local giro = if familia == "pedra" or familia == "vento" then CFrame.Angles(0, 0, t * 14) else CFrame.identity
+			ultimo = CFrame.lookAt(ponto, ponto + tangente.Unit)
+			posar(ultimo * giro)
 			rastro.Enabled = t < 1
+			if t >= 1 and familia ~= "flecha" then posar(ultimo, 1) end
 		end)
+		if familia == "flecha" then
+			-- crava: entra ~0,9 stud na direção do voo, treme de leve, fica 1,5 s e some
+			local fim = inicio + duracao
+			animar(cena, fim, 1.8, function(t)
+				local s = t * 1.8
+				local tremor = math.sin(s * 60) * math.max(0, 0.25 - s) * 0.25
+				posar(ultimo * CFrame.new(0, 0, -0.55) * CFrame.Angles(tremor, tremor * 0.6, 0), math.clamp((s - 1.5) / 0.3, 0, 1))
+			end)
+			evento(cena, fim, function()
+				local ponta = ultimo.Position + ultimo.LookVector * 0.6
+				if acertou then
+					estilhacos(cena, ponta, ultimo.LookVector, fim, Color3.fromRGB(255, 226, 150), 7)
+					Efeitos.tremer(0.18, 0.14)
+				else
+					estilhacos(cena, ponta, ultimo.LookVector, fim, Color3.fromRGB(150, 132, 108), 6, true)
+				end
+			end)
+		elseif familia == "pedra" then
+			evento(cena, inicio + duracao, function()
+				estilhacos(cena, para, direcao(de, para), inicio + duracao, Color3.fromRGB(150, 132, 108), 7, true)
+			end)
+		end
 	end
 	local function escudo(cena, ponto, inicio)
 		arco(cena, ponto, 3.3, inicio, 0.9, true, math.pi * 2, 0)
@@ -236,6 +363,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		elseif familia == "vento" or familia == "corte" or familia == "astucia" then
 			arco(cena, ponto, if familia == "corte" then 4 else 3, inicio, 0.36, true, math.pi * 1.4, 0.7)
 			if familia == "vento" then arco(cena, ponto + Y * 0.8, 2.5, inicio + 0.08, 0.38, false, math.pi * 1.6, 2) end
+		elseif familia == "flecha" then -- a própria flecha crava e solta as lascas (função flecha)
 		elseif familia == "alquimia" then espiral(cena, ponto, inicio, cena.cor)
 		elseif familia == "geometria" then
 			for j = 1, 2 do arco(cena, ponto, 2.4 + j, inicio + j * 0.05, 0.55, j == 1, math.pi * 1.6, j) end
@@ -310,6 +438,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		-- Gesto do corpo (A5): define quando o golpe chega e o que o corpo faz.
 		local plano = nil
 		local spec = Gestos.especificar(id, mec, arv)
+		if spec and spec.g == "disparo" then familia = "flecha" end -- arco de qualquer árvore: flecha de verdade
 		if spec and de then
 			local ok, resultado = pcall(Gestos.tocar, kit, cena, recibo, spec, de, mec)
 			if ok then plano = resultado else warn("[Gestos]", id, resultado) end
@@ -347,11 +476,28 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 			local offset = (plano.carga or perfil.carga) + (i - 1) * 0.075
 			local tiros = alvo.disparos or { alvo }
 			for n, tiro in tiros do
-				local destino = if tiro.acertou == false then p + Vector3.new(2.8, 0.5, 1.3) else p
+				local errou = tiro.acertou == false
+				local destino = if errou then p + Vector3.new(2.8, 0.5, 1.3) else p
 				local lancamento = offset + (n - 1) * 0.18
 				local viaja = de ~= nil and recibo.casterId ~= alvo.id and not mec.corpoACorpo and mec.tipo ~= "invocacao" and mec.tipo ~= "cura" and not mec.puxar and not plano.semViagem
-				if viaja then flecha(cena, origem, destino, lancamento, perfil.viagem, familia) end
-				local quando = if plano.chegada then plano.chegada + (i - 1) * 0.04 else lancamento + (if viaja then perfil.viagem else 0)
+				local viagem = perfil.viagem
+				if viaja then
+					local ponto = destino
+					if familia == "flecha" then
+						if errou then
+							-- passa ao lado e crava no chão um pouco além do alvo
+							local d = direcao(Vector3.new(origem.X, 0, origem.Z), Vector3.new(p.X, 0, p.Z))
+							ponto = chao(p + d * 3.2 + d:Cross(Y) * 1.4) - Y * 0.1
+						else
+							ponto = meioDoCorpo(alvo.id, origem) or p
+						end
+					elseif not errou then
+						ponto = meioDoCorpo(alvo.id, origem) or p
+					end
+					viagem = duracaoDoVoo(familia, (ponto - origem).Magnitude)
+					flecha(cena, origem, ponto, lancamento, viagem, familia, not errou, plano.origem)
+				end
+				local quando = if plano.chegada then plano.chegada + (i - 1) * 0.04 else lancamento + (if viaja then viagem else 0)
 				local resultado = if #tiros > 1 then tiro else alvo
 				local somImpacto = Sons.impacto(id, arv, spec, resultado)
 				if somImpacto then

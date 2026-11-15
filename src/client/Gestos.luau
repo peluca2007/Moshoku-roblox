@@ -786,6 +786,8 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				-- Corda: reta entre as pontas; entre `puxar` e `soltar` vai até a mão direita.
 				local maoD = f.modelo:FindFirstChild("RightHand")
 				local cordas = { K.peca(cena, "fio", Color3.fromRGB(235, 228, 205)), K.peca(cena, "fio", Color3.fromRGB(235, 228, 205)) }
+				-- flecha encaixada na corda enquanto puxa (some no `soltar`, quando a de voo sai)
+				local encaixe = K.peca(cena, "haste", Color3.fromRGB(120, 84, 52), Enum.Material.Wood)
 				local m = f.marcosArco
 				K.animar(cena, 0, m.fim, function(t)
 					if not f.viva or not f.maoArco.Parent then
@@ -802,6 +804,16 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 					end
 					K.segmento(cordas[1], a, meio, 0.05, 0.1)
 					K.segmento(cordas[2], meio, b, 0.05, 0.1)
+					if encaixe then
+						if maoD and s > m.puxar - 0.2 and s < m.soltar then
+							local punho = cf.Position
+							local frente = punho - meio
+							frente = if frente.Magnitude > 1e-3 then frente.Unit else cf.LookVector
+							K.segmento(encaixe, meio - frente * 0.1, punho + frente * 0.9, 0.11, 0)
+						else
+							encaixe.Transparency = 1
+						end
+					end
 				end)
 			end
 			anim(0, "point", { velocidade = 0.9, prioridade = GOLPE })
@@ -816,6 +828,13 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 			end)
 		end
 		local res = { semCirculo = true, carga = carga }
+		if clipeArco and f.maoArco then
+			-- a flecha de voo nasce na mão do arco, na hora do `soltar`
+			local mao = f.maoArco
+			res.origem = function()
+				return if mao.Parent then mao.Position else nil
+			end
+		end
 		if spec.prende then
 			res.impactoExtra = function(ponto, quando)
 				K.arco(cena, K.chao(ponto), 2.6, quando, 0.6, false, math.pi * 2, 0, cor)
@@ -917,7 +936,10 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				tr = if palmas then -0.15 * u else 0.1 * u,
 			}
 		end)
-		return { carga = cargaClipe }
+		local maoD = f.modelo:FindFirstChild("RightHand")
+		return { carga = cargaClipe, origem = if cargaClipe and maoD then function()
+			return if maoD.Parent then maoD.Position - maoD.CFrame.UpVector * 0.6 else nil
+		end else nil }
 	end
 	return nil
 end

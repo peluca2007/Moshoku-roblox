@@ -40,7 +40,9 @@ GERAL1 — agente Opus, **concluída (15/11/2026)**. Auditoria somente leitura (
 
 CAMP1 — **na fila** (Pedro, 15/11). Acampamento como mapa pequeno e aberto onde o grupo anda; quem o grupo conheceu numa escolha ou missão aparece lá e conversa. Botões "Pronto (n/N)" e "Mostrar" (inventário em três colunas), conforme [DIRECAO §1](DIRECAO.md). Hoje é um painel com o grupo parado junto à porta.
 
-ANIM1 — agente Opus (coordenação Claude), **em andamento (15/11/2026)**. Clipes de animação por dados ([DIRECAO §5](DIRECAO.md), caminho das animações): `tools/animacao/` e `tools/blender/anim_exportar.py` (novos), `src/shared/Animacoes/**`, `src/client/TocadorClipe.luau`, spec `Animacoes`. Sem Studio: confere por render do Blender. Não toca em `Gestos` nem `Coreografia` (integração é o passo seguinte, com Studio).
+ANIM1 — agente Opus (coordenação Claude), **pronta para revisão (15/11/2026)**, commit `1c8d97e`. Animações de combate por dados: 12 clipes em `src/shared/Animacoes/Clipes` (poses-chave escritas por script no Blender), `Amostra` pura, `Catalogo`, `client/TocadorClipe`, pipeline `tools/blender/anim_*.py`, `tools/animacao/{README,FONTES}.md`, spec `Animacoes` 9/0. Local: só "Catálogo" falha. Prévias em `build/anim/previa/<Clipe>.png` (notas do agente: 5 a 7; o coordenador viu CorteLeve e DisparoArco e concorda com 6). **Nada rodou no Studio e nada está ligado ao jogo ainda** (`Gestos`/`Coreografia` intocados). Riscos da integração: a espada tem de ser soldada com a lâmina em -Z da mão; avatares com C0/C1 girados; ordem com o `Animator`; pé deslizando. A biblioteca do Quaternius (CC0) não foi baixada: o site pede um clique humano (ver Pendências para o Pedro); o caminho `--ual` só foi testado num esqueleto sintético.
+
+MOD2a — agente Sonnet (coordenação Claude), **em andamento (15/11/2026)**. Preparar modelos de kits CC0 (esgoto, armas, taverna) no Blender, com prévias renderizadas e licenças registradas: `tools/blender/kits/**` (novo), `build/externos/**` e `build/kits/**` (fora do git). Sem Studio e sem envio; o envio e a montagem da arena ficam para o passo seguinte.
 
 APRES1 — **na fila, prioridade do Pedro (15/11)**: animações e modelos primeiro (fase 4 de [DIRECAO §7](DIRECAO.md)); o Pedro acha todas as animações de hoje muito feias (a da flecha foi o exemplo): o pacote refaz a apresentação dos golpes em geral, começando pelos disparos. Começa quando a QA1 liberar o Studio.
 
@@ -159,6 +161,7 @@ V1 — Codex, reserva aberta e encerrada em 16/10; pronta para revisão. Criados
 ## Pendências
 
 **Para o Pedro (julgamento humano)**
+- Baixar a Universal Animation Library do Quaternius (CC0, grátis: em quaternius.com o botão leva ao itch.io, que pede um clique em "No thanks, just take me to the downloads") e deixar o zip em `build/externos/ual/`. Com ela os clipes de combate passam a vir de captura de movimento em vez de poses escritas por script.
 - Avaliar o visual (vila, floresta, Ruínas, telas), a câmera de cima do encontro e salvar o place (Ctrl+S). Dizer o que quer trocar.
 - Aprovar as adaptações reversíveis: provação do dojo = vencer o lobo; PA livre/travado só registrado; espólio vendido a 100%; missões 30/80 PO provisórias; Explorador = árvore Navegação e Liderança; guardião das Ruínas = bando de goblins; passagem das Ruínas abre por escolha (1 dia); conta paga uma vez no fim da run.
 - Testar com dois clientes reais (isolamento de encontros, N4) e em celular/controle.

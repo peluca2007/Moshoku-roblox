@@ -180,6 +180,7 @@ function LutaDoMundo.start(deps)
 		if deps.cenario then pcall(deps.cenario.aplicar, info.arena) end
 		local erro = deps.iniciarLuta(grupo, criaturas, {
 			nome = info.nome,
+			exaustao = info.exaustao, -- { [userId] = nível } da run (só expedição); a mesa aplica os efeitos
 			aoTerminar = function(resultado, recursos) terminar(luta, resultado, recursos) end,
 		})
 		if erro then
@@ -222,7 +223,7 @@ function LutaDoMundo.start(deps)
 		return id ~= nil, erro
 	end
 
-	-- Luta pendente da run (sala ou chefe; RunServico escolhe o grupo). luta = { no, titulo, criaturas, areaId }.
+	-- Luta pendente da run (sala ou chefe; RunServico escolhe o grupo). luta = { no, titulo, criaturas, areaId, exaustao? }.
 	-- Devolve encounterId ou nil, erro (com o nome de quem impede e o motivo real).
 	function api.iniciarChefe(grupo, luta)
 		if type(grupo) ~= "table" or #grupo == 0 or #grupo > 4 then return nil, "O grupo da run é inválido." end
@@ -238,7 +239,8 @@ function LutaDoMundo.start(deps)
 			table.insert(criaturas, if composicao.papeis[i] then { id = id, papel = composicao.papeis[i] } else id)
 		end
 		local nome = if type(luta.titulo) == "string" and luta.titulo ~= "" then luta.titulo else "Guardião da run"
-		return comecar(grupo, criaturas, { arena = Arenas.daMarco(luta.areaId), nome = nome, marco = luta.areaId })
+		return comecar(grupo, criaturas, { arena = Arenas.daMarco(luta.areaId), nome = nome, marco = luta.areaId,
+			exaustao = if type(luta.exaustao) == "table" then luta.exaustao else nil })
 	end
 
 	-- Provação do dojo do Hanzo (vila): um lobo cinzento, sem ouro; o dojo dá a própria recompensa.

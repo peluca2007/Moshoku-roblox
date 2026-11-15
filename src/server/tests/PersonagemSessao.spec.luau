@@ -683,7 +683,7 @@ return {
 		ok, r = x.api.gravarRecursosDaLuta(A, { pv = 0, pm = 0 })
 		t.eq(ok, true); t.eq(r.caiu, true)
 		t.eq(x.api.consultar(A).descanso.atuais.pv, 1)
-		t.eq((PersonagemSessao.gravarRecursosDaLuta(A, { pv = 2 })), true) -- porta do módulo usa a instância ativa
+		t.eq((x.api.gravarRecursosDaLuta(A, { pv = 2 })), true)
 		t.eq(x.api.consultar(A).descanso.atuais.pv, 2)
 		local descansou = x.api.descansar(A, "acampamento")
 		t.eq(descansou, true)

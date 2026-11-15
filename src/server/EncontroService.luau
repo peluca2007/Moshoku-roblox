@@ -24,6 +24,9 @@ local ChefesService = require(script.Parent.ChefesService)
 local TravaPartida = require(game:GetService("ReplicatedStorage").Shared.TravaPartida)
 local Corpos = require(script.Parent.CorposDeCriatura)
 local RecursosEntreSalas = require(game:GetService("ReplicatedStorage").Shared.Regras.RecursosEntreSalas)
+local ExaustaoRun = require(game:GetService("ReplicatedStorage").Shared.Regras.ExaustaoRun)
+local CondicaoRules = require(game:GetService("ReplicatedStorage").Shared.CondicaoRules)
+local Condicoes = require(game:GetService("ReplicatedStorage").Shared.Condicoes)
 
 local EncontroService = {}
 
@@ -217,6 +220,20 @@ function EncontroService.start(deps)
 			end
 		end
 		return recursos
+	end
+
+	-- Única porta dos efeitos da Exaustão na luta (ExaustaoRun.efeitosNaLuta): aplica as condições que a mesa
+	-- conhece ("exausto" no nível 3+) e registra no log o resto.
+	-- PENDENTE: efeitos do livro por nível (Cap. 4, §9) sem representação na mesa; ver ExaustaoRun.
+	local function aplicarExaustao(token, nivel)
+		local efeitos = ExaustaoRun.efeitosNaLuta(nivel)
+		for _, id in efeitos.condicoes do
+			local lista = CondicaoRules.add(token.conditions or {}, Condicoes, id, 1, "Exaustão da expedição")
+			if lista then token.conditions = lista end
+		end
+		token.version += 1
+		deps.logAll(string.format("%s entra com Exaustão %d (livro: %s) A mesa ainda só aplica a marca Exausto, do nível 3 em diante.",
+			token.name, efeitos.nivel, table.concat(efeitos.pendentes, " ")), "sistema")
 	end
 
 	local function terminar(resultado: string, vencedor: string?)
@@ -484,6 +501,14 @@ function EncontroService.start(deps)
 		forcarPessoal = false
 		if not ok then return tostring(erro) end
 		if erro then return erro end
+		-- Exaustão da expedição (opcoes.exaustao = { [userId] = nível }, vinda da run): ver aplicarExaustao.
+		if opcoes and type(opcoes.exaustao) == "table" then
+			for _, e in entradas do
+				local t = tokens[e.id]
+				local nivel = t and opcoes.exaustao[t.ownerUserId]
+				if type(nivel) == "number" and nivel > 0 then aplicarExaustao(t, nivel) end
+			end
+		end
 		for i, criatura in criaturas do
 			local casa = CASAS_INIMIGAS[i]
 			-- Entrada simples (ID) ou { id, papel } quando a composição muda o papel do Apêndice G.

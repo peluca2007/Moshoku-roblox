@@ -720,6 +720,21 @@ function BoardView.start(state)
 	local vezAnterior = nil
 	local saltar = true -- primeiro quadro do combate: sem transição do foco
 	local PASSO_GIRO = math.rad(45)
+	-- LUTA-C: câmera de ombro (padrão em combate) x vista tática (andar/mirar, grade visível).
+	local giroOmbro = 0 -- Q/E em ombro
+	local mistura = 1 -- 0 = ombro, 1 = tática (suavizado)
+	local ombroPos, ombroOlhar: Vector3? = nil, nil
+	local gradeFolder: Instance? = nil
+	local gradeAlfa = -1
+	local function mostrarGrade(alfa: number)
+		if math.abs(alfa - gradeAlfa) < 0.02 then return end
+		gradeAlfa = alfa
+		if not gradeFolder or not gradeFolder.Parent then gradeFolder = workspace:FindFirstChild("Grade", true) end
+		if not gradeFolder then gradeAlfa = -1; return end
+		for _, linha in gradeFolder:GetChildren() do
+			if linha:IsA("BasePart") then linha.LocalTransparencyModifier = 1 - alfa end
+		end
+	end
 	local function horizontal(): (Vector3, Vector3)
 		local frente = Vector3.new(-math.sin(yaw), 0, -math.cos(yaw))
 		return frente, Vector3.new(-frente.Z, 0, frente.X)
@@ -757,12 +772,18 @@ function BoardView.start(state)
 		local ativo = snap ~= nil and snap.combat.active
 		if ativo and not combateAnterior then
 			saltar, zoomUsuario, panUsuario = true, 1, Vector3.zero
+			giroOmbro, mistura = 0, 1
 			-- Começa olhando de lado para a linha grupo x inimigos (ninguém escondido atrás de ninguém).
 			local aliados, inimigos = {}, {}
 			for _, p in Enquadramento.vivos(snap.tokens, snap.combat.order, board) do
 				table.insert(if p.inimigo then inimigos else aliados, p)
 			end
 			yawAlvo = Enquadramento.yawLateral(aliados, inimigos)
+		end
+		-- Em luta os rótulos/barras do BoardView ficam escondidos (a HUD nova mostra nome e vida).
+		for _, v in views do
+			local bb = v.model and v.model:FindFirstChildOfClass("BillboardGui")
+			if bb then bb.Enabled = not ativo end
 		end
 		local vez = if ativo then snap.combat.turnId else nil
 		if vez ~= vezAnterior then panUsuario = Vector3.zero end
@@ -804,20 +825,17 @@ function BoardView.start(state)
 				base = math.min(base, painel.AbsolutePosition.Y + inset - 8)
 			end
 		end
-		local acoes = pg and pg:FindFirstChild("AcoesDoTurno")
-		local barra = acoes and acoes:FindFirstChild("Barra")
-		if barra and barra:IsA("GuiObject") and visivelNaTela(barra) then
-			base = math.min(base, barra.AbsolutePosition.Y + inset - 8)
-		end
+		-- HUD da luta (LUTA-B): cartões no canto inferior direito (HudJogo.Cartoes) e faixa do anúncio no
+		-- topo (AnuncioLuta). O menu de ações (AcoesDoTurno.Menu) flutua junto do personagem e não é reservado.
 		local hud = pg and pg:FindFirstChild("HudJogo")
-		local resumo = hud and hud:FindFirstChild("Resumo")
-		if resumo and visivelNaTela(resumo) then
-			topo = math.max(topo, resumo.AbsolutePosition.Y + inset + resumo.AbsoluteSize.Y + 8)
+		local cartoes = hud and hud:FindFirstChild("Cartoes")
+		if cartoes and cartoes:IsA("GuiObject") and visivelNaTela(cartoes) and cartoes.AbsolutePosition.X > vp.X * 0.6 then
+			direita = math.min(direita, cartoes.AbsolutePosition.X - 8)
 		end
-		-- Cartão de quem age (HudJogo.Cartao), colado à direita: a área livre termina antes dele.
-		local cartao = hud and hud:FindFirstChild("Cartao")
-		if cartao and cartao:IsA("GuiObject") and visivelNaTela(cartao) and cartao.AbsolutePosition.X > vp.X * 0.6 then
-			direita = math.min(direita, cartao.AbsolutePosition.X - 8)
+		local anuncioGui = pg and pg:FindFirstChild("AnuncioLuta")
+		local anuncio = anuncioGui and anuncioGui:FindFirstChild("Anuncio")
+		if anuncio and anuncio:IsA("GuiObject") and visivelNaTela(anuncio) then
+			topo = math.max(topo, anuncio.AbsolutePosition.Y + inset + anuncio.AbsoluteSize.Y + 8)
 		end
 		-- Faixa da expedição (dia/sala) no alto. AbsolutePosition vem abaixo da barra do Roblox mesmo com
 		-- IgnoreGuiInset (observado no Studio: o Palco dessa tela fica em Y = -inset), então soma o inset.
@@ -852,6 +870,7 @@ function BoardView.start(state)
 		if snapAtual and snapAtual.salaConceitual and not snapAtual.combat.active then return end
 		if not state.tableView() then
 			saltar = true
+			mostrarGrade(1)
 			return
 		end
 		local vp = camera.ViewportSize
@@ -901,6 +920,35 @@ function BoardView.start(state)
 			local porPixel = 2 * d * math.tan(math.rad(camera.FieldOfView / 2)) / math.max(vp.Y, 1)
 			target = target * CFrame.new(-deslocamento.X * porPixel, deslocamento.Y * porPixel, 0)
 		end
+		-- Câmera de ombro (LUTA-C): em combate, quem age no terço inferior olhando para o alvo; andar/mirar
+		-- (state.mira()) sobe para a vista tática acima, com a grade no chão.
+		local ombro = nil
+		if snapAtual and snapAtual.combat.active then
+			local pontos = Enquadramento.vivos(snapAtual.tokens, snapAtual.combat.order, board)
+			local ator
+			for _, p in pontos do if p.id == snapAtual.combat.turnId then ator = p end end
+			local alvo = ator and Enquadramento.alvoDoOmbro(pontos, ator)
+			if ator and alvo then
+				ombro = Enquadramento.ombro({ ator = ator, alvo = alvo, inimigoAgindo = ator.inimigo, giro = giroOmbro, zoom = zoomUsuario * Efeitos.fatorAproximacao() })
+			end
+		end
+		local meta = if ombro and not state.mira() then 0 else 1
+		mistura += (meta - mistura) * (1 - math.exp(-dt * 3.5))
+		if ombro then
+			local pos = board.origin + Vector3.new(ombro.posicao.x, ombro.posicao.y, ombro.posicao.z)
+			local olhar = board.origin + Vector3.new(ombro.olhar.x, ombro.olhar.y, ombro.olhar.z)
+			if not ombroPos or not ombroOlhar then
+				-- primeiro quadro: sem suavização do ombro (a mistura cuida da transição)
+				ombroPos, ombroOlhar = pos, olhar
+			else
+				local k = 1 - math.exp(-dt * 4)
+				ombroPos, ombroOlhar = ombroPos:Lerp(pos, k), ombroOlhar:Lerp(olhar, k)
+			end
+			target = CFrame.lookAt(ombroPos, ombroOlhar):Lerp(target, ease(math.clamp(mistura, 0, 1)))
+		else
+			ombroPos, ombroOlhar = nil, nil
+		end
+		mostrarGrade(if snapAtual and snapAtual.combat.active then math.clamp((mistura - 0.35) / 0.65, 0, 1) else 1)
 		-- Transição suave da câmera do avatar para a Visão da mesa.
 		local t = if blendFrom then (os.clock() - blendStart) / CAMERA_BLEND else 1
 		if blendFrom and t < 1 then
@@ -1056,8 +1104,10 @@ function BoardView.start(state)
 			end
 		elseif input.KeyCode == Enum.KeyCode.Q and not state.mira() and not state.selectedToken() then
 			yawAlvo -= PASSO_GIRO -- Q sem nada a cancelar: gira a câmera para a esquerda
+			giroOmbro -= PASSO_GIRO
 		elseif input.KeyCode == Enum.KeyCode.E then
 			yawAlvo += PASSO_GIRO
+			giroOmbro += PASSO_GIRO
 		elseif input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.Q or input.KeyCode == Enum.KeyCode.ButtonB then
 			if state.mira() then
 				state.setMira(nil)

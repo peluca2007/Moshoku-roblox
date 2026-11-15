@@ -69,4 +69,24 @@ return {
 		end
 		t.eq(E.yawLateral({}, { { x = 1, z = 1 } }), 0)
 	end,
+	["ombro: aliado fica atrás do ator, olhando para o alvo, e o alvo está à frente"] = function(t)
+		local ator, alvo = { x = 0, z = 0 }, { x = 0, z = -20 }
+		local c = E.ombro({ ator = ator, alvo = alvo, inimigoAgindo = false })
+		t.ok(c.posicao.z > 5, "câmera atrás do ator") -- alvo em -Z, câmera em +Z
+		t.ok(c.olhar.z < ator.z, "olha para o alvo")
+		t.ok(c.posicao.y > 5 and c.posicao.y < 9, "câmera baixa")
+		local g = E.ombro({ ator = ator, alvo = alvo, giro = math.pi, inimigoAgindo = false })
+		t.ok(g.posicao.z < -5, "giro de 180 passa para o outro lado")
+	end,
+	["ombro: vez do inimigo mostra os dois de lado"] = function(t)
+		local c = E.ombro({ ator = { x = 0, z = -20 }, alvo = { x = 0, z = 0 }, inimigoAgindo = true })
+		t.ok(math.abs(c.posicao.x) > 10, "câmera ao lado da linha")
+		t.eq(c.olhar.z, -10)
+	end,
+	["alvo do ombro: oponente vivo mais próximo"] = function(t)
+		local ps = { { id = "a", x = 0, z = 0 }, { id = "b", x = 0, z = -5, inimigo = true }, { id = "c", x = 0, z = -30, inimigo = true }, { id = "d", x = 1, z = 0 } }
+		t.eq(E.alvoDoOmbro(ps, ps[1]).id, "b")
+		t.eq(E.alvoDoOmbro(ps, ps[2]).id, "a")
+		t.eq(E.alvoDoOmbro({ ps[1], ps[4] }, ps[1]), nil)
+	end,
 }

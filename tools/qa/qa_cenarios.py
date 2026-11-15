@@ -100,6 +100,7 @@ def esgoto_sala1(q):
 
 # ---------------------------------------------------------------- luta
 def luta(q):
+    q.verificar("barra de atalhos escondida durante a luta", combate(q) and barra_visivel(q) == "false", barra_visivel(q), foto=True)
     a = acao_luta(q, "disparo")
     q.foto("disparo", "luta_disparo")
     q.verificar("disparo enviado na luta", a == "disparo", a)
@@ -272,18 +273,39 @@ def voltar_e_retomar(q):
 
 
 # ---------------------------------------------------------------- menu
+BARRA = "AtalhosMundo.BarraAtalhos"  # barra única: Conteudo.<MENU|AtalhoRun|AbrirArvores|AtalhoConta|AtalhoAjuda>
+ATALHOS = ("MENU", "AtalhoRun", "AbrirArvores", "AtalhoConta", "AtalhoAjuda")
+
+
+def barra_visivel(q):
+    return q.lua_cliente("""local g=game.Players.LocalPlayer.PlayerGui:FindFirstChild('AtalhosMundo') local b=g and g:FindFirstChild('BarraAtalhos')
+return tostring(b ~= nil and g.Enabled and b.Visible)""")
+
+
+def menu_visivel(q):
+    return q.lua_cliente("""local g=game.Players.LocalPlayer.PlayerGui:FindFirstChild('InicioJogo') local f=g and g:FindFirstChild('MenuInicial')
+return tostring(f ~= nil and g.Enabled and f.Visible)""")
+
+
 def menu(q):
-    sob = q.lua_cliente("""local pg=game.Players.LocalPlayer.PlayerGui local r={}
-for _,p in {{'InicioJogo','MENU'},{'RunJogo','AtalhoRun'},{'ContaJogo','AtalhoConta'},{'AjudaJogo','AtalhoAjuda'}} do local d=pg[p[1]]:FindFirstChild(p[2],true) if d then table.insert(r,{p[2],d.AbsolutePosition,d.AbsoluteSize}) end end
-local o={} for i=1,#r do for j=i+1,#r do local a,b=r[i],r[j]
- if a[2].X<b[2].X+b[3].X and b[2].X<a[2].X+a[3].X and a[2].Y<b[2].Y+b[3].Y and b[2].Y<a[2].Y+a[3].Y then table.insert(o,a[1]..'x'..b[1]) end end end
-return table.concat(o,',')""")
+    # posições dos atalhos visíveis na barra (a barra some com painel aberto/luta: aqui o mundo está livre)
+    q.verificar("barra de atalhos visível no mundo", barra_visivel(q) == "true", barra_visivel(q), foto=True)
+    r = q.lua_cliente("""local b=game.Players.LocalPlayer.PlayerGui.AtalhosMundo.BarraAtalhos.Conteudo local r={}
+for _,n in {'MENU','AtalhoRun','AbrirArvores','AtalhoConta','AtalhoAjuda'} do local d=b:FindFirstChild(n) if d and d.Visible then table.insert(r,{n,d.AbsolutePosition,d.AbsoluteSize}) end end
+local o={} for i=1,#r do for j=i+1,#r do local a,c=r[i],r[j]
+ if a[2].X<c[2].X+c[3].X and c[2].X<a[2].X+a[3].X and a[2].Y<c[2].Y+c[3].Y and c[2].Y<a[2].Y+a[3].Y then table.insert(o,a[1]..'x'..c[1]) end end end
+local ordem,tam={}, {} for _,d in r do table.insert(ordem,d[1]) tam[d[3].X..'x'..d[3].Y]=true end local n=0 for _ in tam do n+=1 end
+return table.concat(o,',')..'|'..table.concat(ordem,',')..'|'..n""")
+    sob, ordem, tamanhos = (r.split("|") + ["", "", ""])[:3]
     q.verificar("atalhos do topo não se sobrepõem", sob == "", "sobrepostos: " + sob, foto=bool(sob))
-    # (nome, ScreenGui, botão do atalho, foto estável)
+    esperada = [n for n in ATALHOS if n in ordem.split(",")]
+    q.verificar("atalhos na ordem MENU, DIÁRIO, ÁRVORES, CONTA, AJUDA", ordem.split(",") == esperada, ordem)
+    q.verificar("todos os atalhos têm o mesmo tamanho", tamanhos == "1", tamanhos)
+    # (nome, ScreenGui do painel, botão do atalho na barra, foto estável)
     for nome, gui, atalho, estavel in [("MENU", "InicioJogo", "MENU", "menu"), ("DIÁRIO", "RunJogo", "AtalhoRun", "diario"),
                                        ("CONTA", "ContaJogo", "AtalhoConta", "conta"), ("AJUDA", "AjudaJogo", "AtalhoAjuda", "ajuda")]:
-        b = q.achar(atalho, gui, "GuiButton")
-        q.verificar("%s: atalho existe" % nome, bool(b))
+        b = q.achar(atalho, "AtalhosMundo", "GuiButton")
+        q.verificar("%s: atalho existe na barra" % nome, bool(b))
         if not b:
             continue
         outros = lambda: " ".join(tela_de(q, g, 900) for g in ("InicioJogo", "RunJogo", "ContaJogo", "AjudaJogo") if g != gui)
@@ -293,32 +315,40 @@ return table.concat(o,',')""")
         aberto = tela_de(q, gui, 900)
         ok = aberto != antes_g
         det = "%d -> %d chars; texto dos outros painéis %s" % (len(antes_g), len(aberto), "mudou (abriu OUTRO painel)" if outros() != antes_o else "igual")
-        q.verificar("%s abre" % nome, ok, det, foto=not ok)
-        if not ok and nome == "DIÁRIO":
-            q.clicar_nome("Fechar", "AjudaJogo")
-            # contorno só do teste: afasta o atalho para o clique não cair no vizinho e conseguir ver o painel
-            q.lua_cliente("local b=game.Players.LocalPlayer.PlayerGui.RunJogo:FindFirstChild('AtalhoRun',true) b.Position=UDim2.fromOffset(1130,14) return 'ok'")
-            b = q.achar(atalho, gui, "GuiButton")
-            q.clique(b, 800)
-            q.esperar(lambda: tela_de(q, gui, 900) != antes_g, 4, 0.8)
-            aberto = tela_de(q, gui, 900)
+        q.verificar("%s abre" % nome, ok and outros() == antes_o, det, foto=not ok)
         time.sleep(1)
         q.foto("menu_" + nome.lower(), estavel)
-        if gui == "InicioJogo":  # o menu só fecha por "Continuar", no fim da lista: observa se está visível sem rolar
-            fora = q.lua_cliente("""local c=game.Players.LocalPlayer.PlayerGui.InicioJogo:FindFirstChild('Continuar',true) local v=workspace.CurrentCamera.ViewportSize
-return tostring(c ~= nil and (c.AbsolutePosition.Y + c.AbsoluteSize.Y > v.Y))""")
-            q.verificar("MENU: botão de fechar visível sem rolar", fora == "false", "Continuar fica abaixo da borda; sem X nem atalho visível")
-            q.lua_cliente("""for _,d in game.Players.LocalPlayer.PlayerGui.InicioJogo:GetDescendants() do if d:IsA('ScrollingFrame') and d.Visible and d.AbsoluteSize.X>100 then d.CanvasPosition=Vector2.new(0,d.AbsoluteCanvasSize.Y) end end return 'ok'""")
-            time.sleep(1)
-            q.clicar_nome("Continuar", gui)
+        if gui == "InicioJogo":
+            # menu de pausa central: Continuar e o X visíveis sem rolar, painel dentro da tela e abaixo da faixa do Roblox
+            vis = q.lua_cliente("""local pg=game.Players.LocalPlayer.PlayerGui.InicioJogo local v=workspace.CurrentCamera.ViewportSize
+local function dentro(n) local c=pg:FindFirstChild(n,true) return c ~= nil and c.Visible and c.AbsolutePosition.Y >= 0 and c.AbsolutePosition.Y + c.AbsoluteSize.Y <= v.Y end
+local e=pg.MenuInicial:FindFirstChild('Entrada')
+local topo=game:GetService('GuiService').TopbarInset.Max.Y
+return tostring(dentro('Continuar'))..','..tostring(dentro('Fechar'))..','..tostring(e ~= nil and e.AbsolutePosition.Y >= topo - 1)""")
+            cont, fechar, sob_faixa = (vis.split(",") + ["", "", ""])[:3]
+            q.verificar("MENU: Continuar visível sem rolar", cont == "true", vis)
+            q.verificar("MENU: botão de fechar (X) visível sem rolar", fechar == "true", vis)
+            q.verificar("MENU: painel abaixo da faixa de botões do Roblox", sob_faixa == "true", vis)
+            q.verificar("MENU: barra de atalhos some com o menu aberto", barra_visivel(q) == "false", barra_visivel(q))
+            # Esc fecha o menu
+            q.tecla("Escape", 150, 900)
+            fechou_esc = q.esperar(lambda: menu_visivel(q) == "false", 4, 0.8)
+            q.verificar("MENU: Esc fecha o menu", bool(fechou_esc), menu_visivel(q), foto=not fechou_esc)
+            if not fechou_esc:
+                q.clicar_nome("Fechar", gui)
+            # Esc também abre; fecha de novo pelo X
+            q.tecla("Escape", 150, 900)
+            reabriu = q.esperar(lambda: menu_visivel(q) == "true", 4, 0.8)
+            q.verificar("MENU: Esc abre o menu", bool(reabriu), menu_visivel(q))
+            q.clicar_nome("Fechar", gui)
         else:
             q.clicar_nome("Fechar", gui) or q.clique(b, 800)
         fechou = q.esperar(lambda: tela_de(q, gui, 900) == antes_g, 5, 0.8)
         q.verificar("%s fecha" % nome, bool(fechou) or aberto == antes_g, "%d chars" % len(tela_de(q, gui, 900)))
-    q.verificar("nada preso por cima", not combate(q) and tela_de(q, "AjudaJogo", 900).count("fechar") == 0 and not tela_de(q, "ContaJogo", 900).startswith("fechar"))
+        q.verificar("%s: barra volta ao fechar" % nome, bool(q.esperar(lambda: barra_visivel(q) == "true", 4, 0.5)), barra_visivel(q))
+    q.verificar("nada preso por cima", not combate(q) and tela_de(q, "AjudaJogo", 900).count("fechar") == 0 and not tela_de(q, "ContaJogo", 900).startswith("fecha"))
 
 
-# ---------------------------------------------------------------- area_de_testes
 def area_de_testes(q):
     # estado limpo: fora da sala e painel fechado (sobra de execução anterior)
     if q.lua_servidor("return tostring(game.Players:GetPlayers()[1]:GetAttribute('NaAreaDeTestes'))") == "true":

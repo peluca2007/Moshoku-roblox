@@ -1,13 +1,13 @@
-local T = require(script.Parent.UI.Tema)
+local Tema = require(script.Parent.UI.Tema)
 local TextService = game:GetService("TextService")
 local T = {}
 function T.start(gui, aoFechar)
 	local frame = Instance.new("Frame")
 	frame.Name, frame.Visible, frame.ZIndex = "TooltipAcao", false, 15
-	frame.BackgroundColor3, frame.BorderSizePixel = T.cores.painel, 0
+	frame.BackgroundColor3, frame.BorderSizePixel = Tema.cores.painel, 0
 	frame.Parent = gui
 	local corner = Instance.new("UICorner", frame); corner.CornerRadius = UDim.new(0, 8)
-	local stroke = Instance.new("UIStroke", frame); stroke.Color = T.cores.borda
+	local stroke = Instance.new("UIStroke", frame); stroke.Color = Tema.cores.borda
 	local scroll = Instance.new("ScrollingFrame", frame)
 	scroll.Name, scroll.BackgroundTransparency, scroll.BorderSizePixel, scroll.ZIndex = "Conteudo", 1, 0, 16
 	scroll.Position, scroll.Size = UDim2.fromOffset(12, 10), UDim2.new(1, -24, 1, -20)
@@ -15,7 +15,7 @@ function T.start(gui, aoFechar)
 	local label = Instance.new("TextLabel", scroll)
 	label.Name, label.BackgroundTransparency, label.ZIndex = "Texto", 1, 17
 	label.Size = UDim2.new(1, -8, 0, 0)
-	label.TextWrapped, label.TextSize, label.FontFace, label.TextColor3 = true, 15, T.fontes.rotulo, T.cores.texto
+	label.TextWrapped, label.TextSize, label.FontFace, label.TextColor3 = true, 15, Tema.fontes.rotulo, Tema.cores.texto
 	label.TextXAlignment, label.TextYAlignment = Enum.TextXAlignment.Left, Enum.TextYAlignment.Top
 	local id, serial, dentro, ancora = nil, 0, false, nil
 	local medicao, alturaTexto = 0, 0

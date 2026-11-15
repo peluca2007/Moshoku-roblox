@@ -126,4 +126,5 @@ require(Server.ContaServico).ligarRemote({ entreRuns = function() local s = runS
 require(Server.TreinadorServico).start({ runServico = runServico, emCombate = emLuta })
 require(Server.Mundo.Npcs).start({ abrirDojo = dojoService.abrir, abrirLoja = mesa.abrirLoja, abrirMissoes = missoes.abrir })
 require(Server.AparenciaJogador).start({ mesa = mesa, emLuta = lutaDoMundo.ativa })
+require(Server.AreaDeTestes).start({ isAdmin = require(Server.MesaRoles).isAdmin, emLuta = emLuta, arenaCenario = arenaCenario }) -- sala de testes (só Studio, admin)
 ReplicatedStorage:SetAttribute(Protocol.READY_ATTRIBUTE, true)

@@ -24,9 +24,13 @@ EXP5 — Claude, **em andamento (14/11/2026)**. Integração e playtest da fatia
 
 EXP6 — **na fila**. Exaustão do livro por luta no lugar do limite de 2 descansos; fragmento por chefe e luta final no dia 30 (missão da calamidade de mana).
 
-SOM1 — **na fila (14/11/2026)**. Sons só gratuitos (Pedro): gerador local em Python puro (biblioteca padrão, sem numpy) para efeitos de interface e combate, e busca no Openverse (sem chave) baixando só CC0/CC-BY com autor e licença registrados em `docs/SONS.md`. Sem serviço pago.
+SOM1 — sons só gratuitos (Pedro). **SOM1a pronta para revisão (14/11/2026)**: `tools/sons/{sintese,gerar,test_sintese}.py`, Python puro; `python tools/sons/gerar.py` gera 32 sons × 3 variações em `build/sons` (não versionado) com manifesto; 17 testes ok. **Ninguém ouviu ainda**; nada enviado ao Roblox nem ligado ao jogo. Na fila: SOM1b (Openverse, só CC0/CC-BY) e SOM1c (grupos de volume, música por estado).
 
-TESTER1 — **na fila (14/11/2026)**. Área de testes (pedido do Pedro): sala acessível pelo menu para ver modelos, animações, gestos de combate, efeitos, sons, vozes, arenas e peças da interface.
+TESTER1 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. Área de testes: `shared/AreaDeTestesDados`, `server/AreaDeTestes` (sala em x=4000, remoto `AreaDeTestes`), `client/AreaDeTestesView` (F6 ou botão TESTES; abas Criaturas, Props, Arenas, Sons, Vozes, Gestos, Interface), spec `AreaDeTestesDados`. Local ok. **Nada rodou no Studio.** Hoje só existe no Studio; liberar para administradores no jogo publicado ainda falta.
+
+GERAL1 — agente Opus (coordenação Claude), **em andamento (14/11/2026)**. Auditoria somente leitura pedida pelo Pedro ("dá uma geral no código"): bloqueadores do fluxo do esgoto, defeitos gerais, telas feias (criação, menus) e limpeza; vira pacotes de correção.
+
+UI1 — **na fila**. Refazer a tela de criação de personagem e os menus (principal, atalhos, status), pedido do Pedro em 14/11.
 
 PERG1 — Claude, **pronta para revisão (14/11/2026)**. Interface no estilo Pergaminho (escolha do Pedro): 9 PNGs enviados, ids em `shared/UIArte`, paleta de papel em `shared/UITemaDados` (+ `sobreEscuro`, `barras`, `fundoTela`), ajustes em `client/{UI/Componentes,CenaAbertura,MarcadoresMundo,Hud,RelogioRunView,ResultadoView,ViagemView,AparenciaEditor,ToqueContraste,InicioView,Carregamento,CriacaoRapidaView,CriacaoPersonagemView}`, `server/Mundo/NpcVisual`, spec `UITema`. Local: tudo ok **exceto "Catálogo"** (ambiente: o site do livro está sem `node_modules/tsx`). Studio 1667/0 no servidor e 6/0 de UI no cliente; telas conferidas em [TESTES](TESTES.md). **Não verificados:** luta (HUD, fila de turnos, ações), tela de resultado, menu inicial, ajuda, criação avançada, viagem, textos sobre o mundo (a captura do Studio saiu sem o 3D), celular e larguras médias. Sem commit.
 

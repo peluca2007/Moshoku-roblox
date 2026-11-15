@@ -48,4 +48,5 @@ require(Client.ReacaoView).start(MesaState)
 require(Client.FormulaView).start(MesaState)
 require(Client.SalaMonstrosView).start(MesaState)
 require(Client.InterfaceCombate).start(MesaState) -- esconde o HUD do mundo durante a luta da arena
+task.spawn(require(Client.AreaDeTestesView).start) -- F6 / botão TESTES (só admin no Studio)
 MesaState.ready()

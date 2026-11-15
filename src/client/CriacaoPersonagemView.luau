@@ -50,7 +50,7 @@ function CriacaoView.start(state)
 
 	local fundo = Instance.new("Frame")
 	fundo.Name, fundo.Size = "Fundo", UDim2.fromScale(1, 1)
-	fundo.BackgroundColor3, fundo.BackgroundTransparency = T.cores.painel, 0.05
+	fundo.BackgroundColor3, fundo.BackgroundTransparency = T.cores.fundoTela, 0.05
 	fundo.Parent = tela
 	local painel = Instance.new("Frame")
 	painel.Name, painel.AnchorPoint = "Painel", Vector2.new(0.5, 0.5)

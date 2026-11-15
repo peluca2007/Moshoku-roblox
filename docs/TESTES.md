@@ -1,3 +1,10 @@
+## Interface Pergaminho — PERG1 (Claude, 14/11/2026)
+
+- Local: `tools/testar.ps1` → **1 problema**: "Catálogo" (`gerar-catalogo.ps1 --verificar` não acha `node_modules/tsx` no site do livro; ambiente, sem relação com a interface). Demais itens ok; `UITema` 8/0, `UIArte` 2/0.
+- Studio (src sincronizado; sem salvar/publicar): servidor **1667 ok, 0 falha(s)**; `UIComponentesStudio` no cliente (pasta `UIV2Testes`, removida depois) **6 ok, 0 falha(s)**.
+- Capturas em Play, jogando por cliques: cena de abertura (botão Pular claro sobre a barra preta), criação rápida (3 passos), objetivo, relógio, atalhos, aviso de objetivo, conversa com o Ladino, painel do treinador e a vitrine de componentes. Achados corrigidos: Pular ilegível, relógio cortado pela moldura nova (72 → 84 px), distância do objetivo escura sobre o mundo, ícone do botão de perigo.
+- Não verificado: luta, resultado, menu inicial, ajuda, criação avançada, viagem; textos sobre o mundo (as capturas saíram com o 3D preto, embora câmera, luz e Vila estivessem normais); celular e larguras médias.
+
 ## Luta do mundo: tela que não aparecia, relógio e ouro — INICIO2 (Claude, 24/10/2026)
 
 - Defeito novo achado no replay: quando o jogador tem a primeira vez, a luta começava no servidor mas o cliente não recebia o snapshot (`iniciarLutaDoMundo` é chamado pelo servidor, fora do despachante que envia o estado). O jogador ficava ancorado na arena sem interface até outro envio (a jogada de um inimigo). Corrigido com `deps.mudou()` no início; `LutaDoMundo.spec` verifica o envio.

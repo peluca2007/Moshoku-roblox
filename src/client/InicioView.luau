@@ -20,7 +20,7 @@ function Inicio.start(state, escolha, admin, criacao)
 	local function canto(o,r) criar("UICorner",o,{CornerRadius=UDim.new(0,T.raios.botao)}) end
 	local gui=criar("ScreenGui",pg,{Name="InicioJogo",IgnoreGuiInset=true,ResetOnSpawn=false,DisplayOrder=20,ZIndexBehavior=Enum.ZIndexBehavior.Sibling})
 	-- Vinheta transparente: o mundo permanece visível à direita do menu.
-	local fundo=criar("Frame",gui,{Name="MenuInicial",Size=UDim2.fromScale(1,1),BackgroundColor3=T.cores.painel,BackgroundTransparency=.35,BorderSizePixel=0,Active=true})
+	local fundo=criar("Frame",gui,{Name="MenuInicial",Size=UDim2.fromScale(1,1),BackgroundColor3=T.cores.fundoTela,BackgroundTransparency=.35,BorderSizePixel=0,Active=true})
 	criar("UIGradient",fundo,{Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,.85)}),Rotation=0})
 	local moldura=C.painel({parent=fundo,nome="Entrada",losangos=true,padding=16,
 		tamanho=UDim2.new(.48,0,.92,0),posicao=UDim2.new(.05,0,.04,0)})

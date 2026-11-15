@@ -13,7 +13,7 @@ function V.start(gui, playerGui)
   local sombra=Instance.new("UIStroke"); sombra.ApplyStrokeMode=Enum.ApplyStrokeMode.Border
   sombra.Color,sombra.Thickness,sombra.Transparency,sombra.Parent=T.cores.sombra,5,0.15,aro
   local fio=aro:Clone(); fio.Name="FioMoshoku"; fio.Parent=aro
-  local borda=fio:FindFirstChildOfClass("UIStroke"); borda.Color,borda.Thickness,borda.Transparency=T.cores.texto,1.5,0
+  local borda=fio:FindFirstChildOfClass("UIStroke"); borda.Color,borda.Thickness,borda.Transparency=T.sobreEscuro.texto,1.5,0
  end
  for _,b in playerGui:GetDescendants() do decorar(b) end
  local c=playerGui.DescendantAdded:Connect(decorar)

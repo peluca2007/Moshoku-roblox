@@ -52,7 +52,7 @@ local function viewport(pai,a,raceId,foco)
  local fundo=criar("Frame",pai,{Name="FundoPrevia",Size=UDim2.fromScale(1,1),BackgroundColor3=T.cores.gradienteBase,BorderSizePixel=0,ZIndex=5})
  criar("UIGradient",fundo,{Color=ColorSequence.new({ColorSequenceKeypoint.new(0,T.cores.cabecalho),ColorSequenceKeypoint.new(1,T.cores.painel)}),Rotation=90})
  local v=criar("ViewportFrame",pai,{Name="Previa3D",Size=UDim2.fromScale(1,1),BackgroundTransparency=1,ZIndex=6,
-  Ambient=T.cores.texto,LightColor=T.cores.texto,LightDirection=Vector3.new(-1,-1,-1),Active=true})
+  Ambient=T.sobreEscuro.texto,LightColor=T.sobreEscuro.texto,LightDirection=Vector3.new(-1,-1,-1),Active=true})
  local cam=criar("Camera",v,{FieldOfView=38})
  v.CurrentCamera=cam
   local ajustarCamera

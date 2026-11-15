@@ -8,24 +8,25 @@ local M={}
 function M.start(gui)
 	local selos={}
 	local seta=C.texto({parent=gui,nome="DirecaoObjetivo",texto="▶",tamanho=UDim2.fromOffset(36,36)})
-	seta.FontFace,seta.TextColor3,seta.TextSize=T.FONTE_ICONE,T.cores.ouro,32
+	seta.FontFace,seta.TextColor3,seta.TextSize=T.FONTE_ICONE,T.sobreEscuro.ouro,32
 	seta.AnchorPoint=Vector2.new(.5,.5); seta.Visible=false
 	local distancia=C.texto({parent=gui,nome="DistanciaObjetivo",tamanho=UDim2.fromOffset(90,24)})
 	distancia.AnchorPoint=Vector2.new(.5,0); distancia.TextXAlignment=Enum.TextXAlignment.Center; distancia.Visible=false
+	distancia.TextColor3,distancia.TextStrokeColor3,distancia.TextStrokeTransparency=T.sobreEscuro.texto,T.cores.fio,.4 -- direto sobre o mundo
 	local anel=Instance.new("Part")
 	anel.Name="DestinoObjetivoLocal"
 	anel.Size=Vector3.new(5,.05,5); anel.Anchored=true
 	anel.CanCollide,anel.CanTouch,anel.CanQuery=false,false,false
-	anel.Color,anel.Material,anel.Transparency=T.cores.ouro,Enum.Material.Neon,1
+	anel.Color,anel.Material,anel.Transparency=T.sobreEscuro.ouro,Enum.Material.Neon,1
 	anel.Parent=workspace
 	local superficie=Instance.new("SurfaceGui",anel)
 	superficie.Face=Enum.NormalId.Top; superficie.CanvasSize=Vector2.new(128,128); superficie.Enabled=false
 	local aro=Instance.new("Frame",superficie)
 	aro.Size,aro.Position,aro.BackgroundTransparency=UDim2.fromOffset(112,112),UDim2.fromOffset(8,8),1
 	Instance.new("UICorner",aro).CornerRadius=UDim.new(1,0)
-	local fio=Instance.new("UIStroke",aro); fio.Color,fio.Thickness,fio.Transparency=T.cores.ouro,3,.4
+	local fio=Instance.new("UIStroke",aro); fio.Color,fio.Thickness,fio.Transparency=T.sobreEscuro.ouro,3,.4
 	local luz=Instance.new("PointLight",anel)
-	luz.Color,luz.Range,luz.Brightness,luz.Enabled=T.cores.ouro,8,.35,false
+	luz.Color,luz.Range,luz.Brightness,luz.Enabled=T.sobreEscuro.ouro,8,.35,false
 	local api={}
 	function api.atualizar(e,objetivo,mostrar)
 		mostrar=mostrar and FX.orientacao~=false
@@ -39,7 +40,7 @@ function M.start(gui)
 				selo.Size=UDim2.fromOffset(36,48); selo.StudsOffset=Vector3.new(0,6,0)
 				selo.AlwaysOnTop,selo.LightInfluence,selo.MaxDistance=true,0,100
 				local texto=C.texto({parent=selo,nome="Glifo",tamanho=UDim2.fromScale(1,1)})
-				texto.FontFace,texto.TextColor3,texto.TextSize=T.FONTE_ICONE,T.cores.ouro,40
+				texto.FontFace,texto.TextColor3,texto.TextSize=T.FONTE_ICONE,T.sobreEscuro.ouro,40
 				texto.TextXAlignment=Enum.TextXAlignment.Center
 				selo.Parent=gui; selos[npc.modelo]=selo
 			end

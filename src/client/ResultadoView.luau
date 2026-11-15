@@ -61,7 +61,7 @@ function View.start(state, inicio, sala)
 	local function botao(nome, texto, ordem, cor, fn)
 		local b = Instance.new("TextButton")
 		b.Name, b.Text, b.Size, b.LayoutOrder = nome, texto, UDim2.new(1, -4, 0, 48), ordem
-		b.BackgroundColor3, b.TextColor3, b.FontFace, b.TextSize = cor, T.cores.texto, T.fontes.rotulo, 18
+		b.BackgroundColor3, b.TextColor3, b.FontFace, b.TextSize = cor, (if cor == T.cores.ouro then T.cores.textoEscuro else T.cores.texto), T.fontes.rotulo, 18
 		b.TextWrapped, b.AutomaticSize, b.Parent = true, Enum.AutomaticSize.Y, painel
 		local pad = Instance.new("UIPadding")
 		pad.PaddingTop, pad.PaddingBottom, pad.Parent = UDim.new(0, 10), UDim.new(0, 10), b

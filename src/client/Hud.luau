@@ -11,9 +11,9 @@ local OrdemVisivel = require(game:GetService("ReplicatedStorage").Shared:WaitFor
 
 local Hud = {}
 
-local AZUL_PM = T.cores.info
+local AZUL_PM = T.barras.mana
 local function corDaVida(r: number): Color3
-	return if r > 0.5 then T.cores.sucesso elseif r > 0.25 then T.cores.alerta else T.cores.perigo
+	return if r > 0.5 then T.barras.cheia elseif r > 0.25 then T.barras.media else T.barras.baixa
 end
 
 local function new(class: string, parent: Instance?, props: { [string]: any }): any
@@ -64,7 +64,7 @@ local function barra(parent, y: number, rotulo: string, cor: Color3?)
 		raiz.Visible = atual ~= nil and maximo ~= nil and maximo > 0
 		if not raiz.Visible then return end
 		local r = math.clamp(atual / maximo, 0, 1)
-		raiz.Trilho.Preenchimento.BackgroundColor3 = cor or corDaVida(r)
+		raiz.Trilho.Mascara.Preenchimento.BackgroundColor3 = cor or corDaVida(r)
 		atualizar(r, string.format("%d / %d", atual, maximo))
 	end
 end
@@ -88,7 +88,7 @@ function Hud.start(state)
 	local estado = texto(cartao, { Position = UDim2.fromOffset(12, 30), Size = UDim2.new(1, -24, 0, 16), TextSize = 12, TextColor3 = T.cores.secundario })
 	local pv = barra(cartao, 50, "PV")
 	local pm = barra(cartao, 76, "PM", AZUL_PM)
-	local pt = barra(cartao, 102, "PT", T.cores.alerta)
+	local pt = barra(cartao, 102, "PT", T.barras.media)
 	-- No celular, recursos e condições ficam em uma faixa curta e estável entre turnos.
 	local resumo = new("Frame", gui, {
 		Name = "Resumo", Position = UDim2.fromOffset(136, 140), Size = UDim2.new(1, -152, 0, 80),
@@ -103,7 +103,7 @@ function Hud.start(state)
 	new("UISizeConstraint",chefe,{MaxSize=Vector2.new(460,78)})
 	cantos(chefe,8)
 	local chefeNome=texto(chefe,{Name="Nome",Position=UDim2.fromOffset(12,5),Size=UDim2.new(1,-24,0,22),TextSize=18,TextColor3=T.cores.alerta})
-	local chefeVida=barra(chefe,30,"CHEFE",T.cores.perigo)
+	local chefeVida=barra(chefe,30,"CHEFE",T.barras.baixa)
 	local chefeAviso=texto(chefe,{Name="Aviso",Position=UDim2.fromOffset(12,51),Size=UDim2.new(1,-24,0,22),TextSize=12})
 
 	-- Ordem dos turnos (no alto, no centro).
@@ -133,7 +133,7 @@ function Hud.start(state)
 		local fundo = C.barra({ parent = quadro, posicao = UDim2.fromOffset(8, 34), tamanho = UDim2.new(1, -16, 0, 6) })
 		for _, filho in fundo:GetChildren() do if filho:IsA("TextLabel") then filho.Visible = false end end
 		fundo.Trilho.Position, fundo.Trilho.Size = UDim2.new(), UDim2.fromScale(1, 1)
-		local cheio = fundo.Trilho.Preenchimento
+		local cheio = fundo.Trilho.Mascara.Preenchimento
 		f = { quadro = quadro, borda = borda, rotulo = rotulo, papel = papel, fundo = fundo, cheio = cheio }
 		fichas[id] = f
 		return f

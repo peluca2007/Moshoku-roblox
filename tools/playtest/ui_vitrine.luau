@@ -22,7 +22,7 @@ scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y; scroll.CanvasSize = UDim2.new
 local lista = C.lista({ parent=scroll, espaco=24 })
 local painel = C.painel({ parent=lista, ordem=1, tamanho=UDim2.new(1,-24,0,180), losangos=true })
 C.titulo({ parent=painel.Conteudo, texto="MOSHOKU", ornamento=true })
-C.texto({ parent=painel.Conteudo, texto="Interface V2 • escuro com ouro", subtitulo=true, posicao=UDim2.fromOffset(0,54) })
+C.texto({ parent=painel.Conteudo, texto="Interface V2 • pergaminho", subtitulo=true, posicao=UDim2.fromOffset(0,54) })
 C.texto({ parent=painel.Conteudo, texto="Uma jornada começa na vila.", posicao=UDim2.fromOffset(0,88) })
 local legenda = C.texto({ parent=painel.Conteudo, texto="Legenda • 15 px, mínimo físico 14", posicao=UDim2.fromOffset(0,120) }); legenda.TextSize=T.tamanhos.legenda
 local botoes = C.lista({ parent=lista, ordem=2 })

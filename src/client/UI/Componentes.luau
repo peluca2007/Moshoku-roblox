@@ -1,10 +1,12 @@
 -- Base V2, exclusivamente cliente. Nenhuma função cria ScreenGui ou envia remotos.
 -- Props comuns: parent (obrigatório), nome?, tamanho?, posicao?, ancora?, ordem? (=0).
 -- Retorno: Instance raiz; destruir a raiz encerra conexões/tweens associados.
--- painel/cartao: padding?, losangos?, sombra?; conteúdo em raiz.Conteudo.
+-- painel/cartao: padding?; moldura e sombra vêm da arte (raiz.Arte); conteúdo em raiz.Conteudo.
+-- arte: peca (nome em shared/UIArte), sangria?, cor?; retorna holder, ImageLabel.
 -- titulo/texto: texto?, secundario?, ornamento? (titulo), italico? (texto).
 -- botao: texto?, variante? principal/secundario/perigo/fantasma, icone? (nome em Tema.ICONES ou glifo cru),
 --   imagem? (asset autorizado pelo chamador), desabilitado?, aoClicar?; atributo Desabilitado reativo.
+--   sobreEscuro? (só fantasma): em repouso não há papel atrás, então o rótulo usa a tinta clara.
 -- barra: rotulo?, valor? [0..1], numero?, destaque?; retorna raiz, atualizar(valor, numero?).
 -- lista/grade: horizontal?, espaco?, celula? (grade); filhos precisam de ordem explícita.
 -- dialogoNpc: nomeNpc?, fala?, opcoes={{texto, aoClicar}}; usa painel inferior responsivo.
@@ -17,6 +19,7 @@ local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 local TweenService = game:GetService("TweenService")
 local T = require(script.Parent.Tema)
+local UIArte = require(game:GetService("ReplicatedStorage").Shared.UIArte)
 local C = {}
 local cor = T.cores
 local function criar(classe, props, parent)
@@ -49,44 +52,56 @@ local function animador(obj)
 		atual:Play()
 	end
 end
-local function ouroGradiente(obj)
-	if obj:IsA("UIStroke") then obj.Color = cor.gradienteBase end
-	return criar("UIGradient", { Color = ColorSequence.new(cor.ouroClaro, cor.ouroEscuro), Rotation = 90 }, obj)
+-- Arte do kit (shared/UIArte) como ImageLabel 9-slice que ocupa o pai. `sangria` estende a imagem além
+-- do pai (a arte tem margem para a sombra). O SliceScale acompanha o tamanho: bordas nunca se cruzam.
+local function arte(nome, parent, props)
+	local peca = UIArte.peca(nome)
+	assert(peca, "peça de arte inexistente: " .. tostring(nome))
+	local sangria = props and props.sangria or 0
+	local img = criar("ImageLabel", { Name = "Arte", BackgroundTransparency = 1, BorderSizePixel = 0, Active = false,
+		Image = peca.imagem, Position = UDim2.fromOffset(-sangria, -sangria), Size = UDim2.new(1, sangria * 2, 1, sangria * 2),
+		ZIndex = parent:IsA("GuiObject") and parent.ZIndex or 1,
+		ScaleType = if peca.corte then Enum.ScaleType.Slice else Enum.ScaleType.Stretch }, parent)
+	if peca.corte then
+		local x0, y0, x1, y1 = table.unpack(peca.corte)
+		img.SliceCenter = Rect.new(x0, y0, x1, y1)
+		local bordaX, bordaY = x0 + peca.largura - x1, y0 + peca.altura - y1
+		local function escala()
+			local tam = img.AbsoluteSize
+			if tam.X <= 0 or tam.Y <= 0 then img.SliceScale = UIArte.ESCALA; return end
+			img.SliceScale = math.min(UIArte.ESCALA, tam.X / bordaX, tam.Y / bordaY)
+		end
+		img:GetPropertyChangedSignal("AbsoluteSize"):Connect(escala)
+		escala()
+	end
+	for k, v in props or {} do if k ~= "sangria" then img[k] = v end end
+	return img
+end
+-- Público para telas que montam peças próprias (aro do retrato, espaço de equipamento, divisor).
+function C.arte(p)
+	assert(p.parent, "parent obrigatório")
+	local holder = criar("Frame", comum(p, p.nome or "Arte", p.tamanho or UDim2.fromOffset(64, 64)), p.parent)
+	holder.BackgroundTransparency = 1
+	local img = arte(p.peca, holder, { sangria = p.sangria, ImageColor3 = p.cor or Color3.new(1, 1, 1) })
+	img.ZIndex = p.zIndex or holder.ZIndex
+	return holder, img
 end
 function C.painel(p)
 	local props = comum(p, "Painel", UDim2.fromOffset(360, 240))
+	-- Fundo e moldura vêm da arte (ui_kit.py): Frame transparente marcado para quem precisa saber que é
+	-- um painel (Atalhos esconde os atalhos quando um painel grande abre).
 	props.BackgroundColor3 = cor.painel
-	props.BackgroundTransparency = T.transparencias.painel
+	props.BackgroundTransparency = 1
 	props.ZIndex = p.zIndex or 2
 	local raiz = criar("Frame", props, p.parent)
-	canto(raiz, T.raios.painel)
-	ouroGradiente(contorno(raiz, cor.borda, T.espessuras.borda))
-	if p.sombra ~= false then
-		for camada = 1, 4 do
-			local margem = camada * 4
-			local sombra = criar("Frame", { Name = if camada == 1 then "Sombra" else "Sombra" .. camada,
-				Position = UDim2.fromOffset(-margem, -margem + 6), Size = UDim2.new(1, margem*2, 1, margem*2),
-				BackgroundColor3 = cor.sombra, BackgroundTransparency = if camada == 1 then T.transparencias.sombra else 0.82 + camada*0.03,
-				BorderSizePixel = 0, ZIndex = raiz.ZIndex - 1 }, raiz)
-			canto(sombra, T.raios.painel + margem)
-		end
-	end
-	local fio = criar("Frame", { Name = "FioInterno", Position = UDim2.fromOffset(3, 3), Size = UDim2.new(1, -6, 1, -6),
-		BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = raiz.ZIndex }, raiz)
-	canto(fio, T.raios.painel)
-	contorno(fio, cor.fio, T.espessuras.fio)
+	raiz:SetAttribute("PainelUIV2", true)
+	arte("painel", raiz, { sangria = 6, ZIndex = raiz.ZIndex })
 	local conteudo = criar("Frame", { Name = "Conteudo", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1,
 		BorderSizePixel = 0, ZIndex = raiz.ZIndex + 1 }, raiz)
-	local pad = p.padding or T.espacamentos.padrao
+	-- A moldura ocupa ~15 px da borda: o conteúdo começa depois dela.
+	local pad = if p.padding == 0 then 0 else math.max(p.padding or T.espacamentos.padrao, 14)
 	criar("UIPadding", { PaddingTop = UDim.new(0, pad), PaddingBottom = UDim.new(0, pad),
 		PaddingLeft = UDim.new(0, pad), PaddingRight = UDim.new(0, pad) }, conteudo)
-	if p.losangos ~= false and (p.losangos or props.Size.Y.Offset >= 180 or props.Size.Y.Scale > 0) then
-		for i, xy in { Vector2.new(0,0), Vector2.new(1,0), Vector2.new(0,1), Vector2.new(1,1) } do
-			criar("Frame", { Name = "Losango" .. i, Size = UDim2.fromOffset(10, 10), Rotation = 45,
-				Position = UDim2.fromScale(xy.X, xy.Y), AnchorPoint = Vector2.new(0.5, 0.5),
-				BackgroundColor3 = cor.ouro, BorderSizePixel = 0, ZIndex = raiz.ZIndex + 2 }, raiz)
-		end
-	end
 	return raiz
 end
 function C.cartao(p) return C.painel(p) end
@@ -179,19 +194,15 @@ function C.botao(p)
 	props.Text = ""
 	props.AutoButtonColor = false
 	props.BackgroundColor3 = if principal then cor.ouro else cor.painel
-	props.BackgroundTransparency = if variante == "fantasma" then 1 else 0
+	props.BackgroundTransparency = 1 -- fundo e moldura vêm da arte
 	props.ZIndex = 5
 	local b = criar("TextButton", props, p.parent)
 	b:SetAttribute("BotaoUIV2", true)
 	criar("UISizeConstraint", { Name = "ToqueMinimo", MinSize = Vector2.new(44, 44) }, b)
 	ajustarToque(b)
-	canto(b, T.raios.botao)
-	local stroke = contorno(b, if variante == "perigo" then cor.vinho else cor.borda, T.espessuras.botao)
-	if principal then
-		b.BackgroundColor3 = cor.texto
-		ouroGradiente(b)
-	end
-	stroke.Transparency = if variante == "fantasma" then 1 else 0
+	local fundo = arte(if principal then "botao_principal" else "botao", b, { sangria = 3, ZIndex = 5 })
+	-- Perigo: a mesma moldura puxada para o vinho; fantasma: só aparece sob o cursor.
+	local tinta = if variante == "perigo" then Color3.fromRGB(255, 170, 160) else Color3.new(1, 1, 1)
 	local temIcone = p.icone or p.imagem
 	local label = criar("TextLabel", { Name = "Rotulo", BackgroundTransparency = 1,
 		Position = UDim2.fromOffset(if temIcone then 62 else 24, 0), Size = UDim2.new(1, if temIcone then -86 else -48, 1, 0),
@@ -203,25 +214,32 @@ function C.botao(p)
 			b.Size = UDim2.fromOffset(math.max(180, math.ceil(medida.X) + 48 + (if temIcone then 38 else 0)), altura)
 		end)
 	end
+	local icone
 	if temIcone then
-		local icone = criar(if p.imagem then "ImageLabel" else "TextLabel", {
+		icone = criar(if p.imagem then "ImageLabel" else "TextLabel", {
 			Name = "Icone", BackgroundTransparency = 1, Position = UDim2.new(0, 24, 0.5, -13), Size = UDim2.fromOffset(26, 26), ZIndex = 6,
 		}, b)
 		if p.imagem then icone.Image = p.imagem else
-			icone.Text = T.icone(p.icone); icone.FontFace = T.FONTE_ICONE; icone.TextSize = T.tamanhos.subtitulo; icone.TextColor3 = if principal then cor.textoEscuro else cor.ouro
+			icone.Text = T.icone(p.icone); icone.FontFace = T.FONTE_ICONE; icone.TextSize = T.tamanhos.subtitulo; icone.TextColor3 = if principal then cor.textoEscuro elseif variante == "perigo" then cor.texto else cor.ouro
 		end
 	end
 	local hover, pressionado = false, false
-	local animar = animador(b)
+	local animar = animador(fundo)
 	local function estado()
 		local desabilitado = b:GetAttribute("Desabilitado") == true
 		b.Active = not desabilitado
 		b.Selectable = not desabilitado
 		label.TextTransparency = if desabilitado then T.transparencias.desabilitado else 0
-		local base = if principal then cor.texto else cor.painel
-		local alvo = if not desabilitado and (hover or pressionado) then base:Lerp(if principal and not pressionado then cor.gradienteBase elseif principal then cor.ouroEscuro else cor.ouro, if pressionado then 0.16 elseif principal then 0.6 else 0.08) else base
-		animar({ BackgroundColor3 = alvo })
-		stroke.Transparency = if variante == "fantasma" and not hover and not pressionado then 1 else 0
+		local ativo = not desabilitado and (hover or pressionado)
+		if not principal then fundo.Image = UIArte.peca(if ativo then "botao_ativo" else "botao").imagem end
+		if variante == "fantasma" and p.sobreEscuro then
+			label.TextColor3 = if ativo then cor.texto else T.sobreEscuro.texto
+			if icone and icone:IsA("TextLabel") then icone.TextColor3 = if ativo then cor.ouro else T.sobreEscuro.ouro end
+		end
+		-- A arte é a cor plena; repouso um pouco mais apagado, cursor acende e clique afunda.
+		local luz = if pressionado and ativo then 0.78 elseif ativo then 1 else 0.9
+		animar({ ImageColor3 = Color3.new(tinta.R * luz, tinta.G * luz, tinta.B * luz),
+			ImageTransparency = if desabilitado then 0.45 elseif variante == "fantasma" and not ativo then 1 else 0 })
 	end
 	b:SetAttribute("Desabilitado", p.desabilitado == true)
 	b:GetAttributeChangedSignal("Desabilitado"):Connect(estado)
@@ -262,12 +280,17 @@ function C.barra(p)
 	rotulo.TextYAlignment = Enum.TextYAlignment.Center
 	numero.TextYAlignment = Enum.TextYAlignment.Center
 	numero.FontFace = T.fontes.numero; numero.TextSize = T.tamanhos.numero; numero.TextXAlignment = Enum.TextXAlignment.Right
-	local trilho = criar("Frame", { Name = "Trilho", Position = UDim2.fromOffset(0, 26), Size = UDim2.new(1, 0, 0, 10),
-		BackgroundColor3 = cor.fio, BorderSizePixel = 0, ClipsDescendants = true, ZIndex = 4 }, raiz)
-	canto(trilho, T.raios.barra)
+	-- Trilho e preenchimento são arte; o preenchimento segue a própria BackgroundColor3 (quem já
+	-- mudava a cor da barra continua mudando, agora pela tinta da imagem).
+	local trilho = criar("Frame", { Name = "Trilho", Position = UDim2.fromOffset(0, 24), Size = UDim2.new(1, 0, 0, 14),
+		BackgroundColor3 = cor.fio, BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 4 }, raiz)
+	arte("barra_fundo", trilho, { ZIndex = 4 })
+	local mascara = criar("Frame", { Name = "Mascara", Position = UDim2.fromOffset(2, 2), Size = UDim2.new(1, -4, 1, -4),
+		BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true, ZIndex = 5 }, trilho)
 	local preenchimento = criar("Frame", { Name = "Preenchimento", Size = UDim2.fromScale(0, 1),
-		BackgroundColor3 = p.destaque or cor.ouro, BorderSizePixel = 0, ZIndex = 5 }, trilho)
-	canto(preenchimento, T.raios.barra)
+		BackgroundColor3 = p.destaque or cor.ouro, BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 5 }, mascara)
+	local tinta = arte("barra_cheia", preenchimento, { ZIndex = 5, ImageColor3 = preenchimento.BackgroundColor3 })
+	preenchimento:GetPropertyChangedSignal("BackgroundColor3"):Connect(function() tinta.ImageColor3 = preenchimento.BackgroundColor3 end)
 	local animar = animador(preenchimento)
 	local function atualizar(valor, textoNumero)
 		if not raiz.Parent then return end

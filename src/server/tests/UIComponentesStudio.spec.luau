@@ -62,15 +62,17 @@ return {
 		end
 	end) end,
 	["painel cartao titulo e texto criam decoração esperada"] = function(t) fixture(function(gui)
-		local p = C.painel({ parent = gui, losangos = true })
-		t.ok(p:FindFirstChildOfClass("UIStroke")); t.ok(p:FindFirstChildOfClass("UICorner"))
-		t.ok(p.FioInterno:FindFirstChildOfClass("UIStroke")); t.ok(p.Sombra); t.ok(p.Losango4)
+		local p = C.painel({ parent = gui })
+		-- Moldura, fundo e sombra vêm da arte do kit (9-slice), não de UIStroke/Frames.
+		t.ok(p.Arte:IsA("ImageLabel")); t.eq(p.Arte.ScaleType, Enum.ScaleType.Slice)
+		t.ok(string.find(p.Arte.Image, "rbxassetid://", 1, true) ~= nil)
+		t.eq(p.BackgroundTransparency, 1); t.eq(p:GetAttribute("PainelUIV2"), true)
+		t.ok(p.Conteudo.ZIndex > p.Arte.ZIndex)
 		t.ok(p.Conteudo:FindFirstChildOfClass("UIPadding"))
 		t.ok(C.cartao({ parent = gui }).Conteudo)
 		-- A faixa ornamentada só existe no título principal (ordem 1).
 		local titulo = C.titulo({ parent = p.Conteudo, texto = "Teste", ornamento = true, ordem = 1 })
 		t.ok(not string.find(titulo.Text, "✦", 1, true)); t.eq(titulo.FaixaCabecalho.Ornamento.FontFace, T.FONTE_ICONE)
-		t.eq(p.Losango4.Size, UDim2.fromOffset(10, 10)); t.ok(p.UIStroke:FindFirstChildOfClass("UIGradient"))
 		local txt = C.texto({ parent = p.Conteudo, texto = "Corpo" }); t.ok(txt.TextWrapped); t.eq(txt.AutomaticSize, Enum.AutomaticSize.Y)
 	end) end,
 	["variantes ícones desabilitado e escala preservam toque"] = function(t) fixture(function(gui)
@@ -90,7 +92,7 @@ return {
 	end) end,
 	["barra diálogo lista grade e ordem explícita"] = function(t) fixture(function(gui)
 		local barra, atualizar = C.barra({ parent = gui, valor = 0.2 }); atualizar(2, "60s"); task.wait(0.2)
-		t.eq(barra.Trilho.Preenchimento.Size.X.Scale, 1); t.eq(barra.Numero.Text, "60s")
+		t.eq(barra.Trilho.Mascara.Preenchimento.Size.X.Scale, 1); t.ok(barra.Trilho.Arte:IsA("ImageLabel")); t.eq(barra.Numero.Text, "60s")
 		local dialogo = C.dialogoNpc({ parent = gui, nomeNpc = "Hanzo", fala = "Bem-vindo.", opcoes = {{texto="Treinar"},{texto="Sair"}} })
 		local botoes = 0; for _, obj in dialogo:GetDescendants() do if obj:IsA("TextButton") then botoes += 1; t.ok(obj.LayoutOrder >= 3) end end
 		t.eq(botoes, 2)

@@ -15,10 +15,10 @@ function Visual.nome(corpo, nome, titulo)
  local gui = Instance.new("BillboardGui")
  gui.Name, gui.Adornee, gui.Size = "NomeNpc", head, UDim2.fromOffset(230, if titulo then 52 else 30)
  gui.StudsOffset, gui.MaxDistance, gui.LightInfluence = Vector3.new(0, 2.4, 0), 24, 0
- local label = texto(gui, nome, 20, Enum.Font.Bodoni, T.cores.titulo)
+ local label = texto(gui, nome, 20, Enum.Font.Bodoni, T.sobreEscuro.titulo)
  label.Size = UDim2.new(1, 0, 0, 28)
  if titulo then
-  local sub = texto(gui, titulo, 14, Enum.Font.Garamond, T.cores.texto)
+  local sub = texto(gui, titulo, 14, Enum.Font.Garamond, T.sobreEscuro.texto)
   sub.Position, sub.Size = UDim2.fromOffset(0, 28), UDim2.new(1, 0, 0, 22)
  end
  gui.Parent = head

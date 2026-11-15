@@ -62,19 +62,23 @@ return {
 		local c = T.cores.painel
 		local a = T.transparencias.painel
 		local composto = Color3.new(c.R * (1-a) + a, c.G * (1-a) + a, c.B * (1-a) + a)
-		for _, papel in { "texto", "secundario", "titulo", "info", "sucesso", "perigo", "alerta" } do
+		for _, papel in { "texto", "secundario", "titulo", "info", "sucesso", "perigo", "alerta", "ouro", "vinho" } do
 			t.ok(contraste(T.cores[papel], c) >= 4.5, papel)
 			t.ok(contraste(T.cores[papel], composto) >= 4.5, papel .. " sobre mundo claro")
 		end
+		-- Tinta clara só vale sobre fundo escuro; enchimento das barras, sobre o trilho escuro da arte.
+		for nome, tinta in T.sobreEscuro do t.ok(contraste(tinta, T.cores.fio) >= 4.5, "sobreEscuro." .. nome) end
+		for nome, tinta in T.barras do t.ok(contraste(tinta, Color3.fromRGB(96, 72, 46)) >= 3, "barras." .. nome) end
 	end,
-	["texto escuro contrasta com ouro e estados hover e pressionado"] = function(t)
+	["tinta sobre o destaque contrasta com ele e com a arte dos botões"] = function(t)
 		local function misturar(a, b, f) return Color3.new(a.R*(1-f)+b.R*f, a.G*(1-f)+b.G*f, a.B*(1-f)+b.B*f) end
-		for _, ponta in { T.cores.ouroClaro, T.cores.ouroEscuro } do
-			for _, alvo in { T.cores.texto, misturar(T.cores.texto, T.cores.gradienteBase, 0.6), misturar(T.cores.texto, T.cores.ouroEscuro, 0.16) } do
-				local composto = Color3.new(ponta.R*alvo.R, ponta.G*alvo.G, ponta.B*alvo.B)
-				t.ok(contraste(T.cores.textoEscuro, composto) >= 4.5, "gradiente principal")
-			end
+		-- Botão principal da arte (ui_kit.py, centro do PNG) em repouso (luz 0.9), aceso e afundado (0.78).
+		local arte = Color3.fromRGB(166, 57, 48)
+		for _, luz in { 1, 0.9, 0.78 } do
+			t.ok(contraste(T.cores.textoEscuro, misturar(arte, Color3.new(0, 0, 0), 1 - luz)) >= 4.5, "arte do botão principal")
 		end
+		t.ok(contraste(T.cores.texto, Color3.fromRGB(215, 193, 149)) >= 4.5, "arte do botão comum")
+		t.ok(contraste(T.cores.texto, Color3.fromRGB(199, 173, 127)) >= 4.5, "arte do botão ativo")
 		for _, fator in { 0, 0.08, 0.16 } do
 			local o, e = T.cores.ouro, T.cores.textoEscuro
 			local fundo = Color3.new(o.R*(1-fator)+e.R*fator, o.G*(1-fator)+e.G*fator, o.B*(1-fator)+e.B*fator)

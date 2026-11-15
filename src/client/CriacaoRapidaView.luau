@@ -27,7 +27,7 @@ function View.start(opcoes)
 	local sorteio = Random.new()
 	local gui = criar("ScreenGui", { Name = "CriacaoRapida", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 30,
 		Enabled = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, Players.LocalPlayer:WaitForChild("PlayerGui"))
-	local fundo = criar("Frame", { Name = "Fundo", Size = UDim2.fromScale(1, 1), BackgroundColor3 = T.cores.painel,
+	local fundo = criar("Frame", { Name = "Fundo", Size = UDim2.fromScale(1, 1), BackgroundColor3 = T.cores.fundoTela,
 		BackgroundTransparency = 0.12, BorderSizePixel = 0, Active = true }, gui)
 	local moldura = C.painel({ parent = fundo, nome = "Moldura", losangos = true, padding = 16,
 		tamanho = UDim2.fromScale(0.94, 0.94), posicao = UDim2.fromScale(0.5, 0.5), ancora = Vector2.new(0.5, 0.5) })

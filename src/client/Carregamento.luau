@@ -53,7 +53,7 @@ function Carregamento.start()
 	gui.Name, gui.IgnoreGuiInset, gui.ResetOnSpawn, gui.DisplayOrder = "Carregamento", true, false, 1000
 	gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 	local fundo = Instance.new("CanvasGroup")
-	fundo.Size, fundo.BackgroundColor3, fundo.BorderSizePixel = UDim2.fromScale(1,1), T.cores.painel, 0
+	fundo.Size, fundo.BackgroundColor3, fundo.BorderSizePixel = UDim2.fromScale(1,1), T.cores.fundoTela, 0
 	fundo.Active, fundo.Parent = true, gui
 	local painel = C.painel({parent=fundo, nome="Marca", losangos=true, padding=24,
 		tamanho=UDim2.new(.88,0,.8,0), posicao=UDim2.fromScale(.5,.5), ancora=Vector2.new(.5,.5)})

@@ -51,7 +51,8 @@ local function painelAberto(playerGui: PlayerGui, atalhos: { [Instance]: boolean
 		if gui:IsA("ScreenGui") and gui.Enabled and gui.Name ~= "Carregamento" then
 			for _, item in ipairs(gui:GetDescendants()) do
 				if item:IsA("Frame") and item.AbsoluteSize.X >= tela.X * FRACAO_X and item.AbsoluteSize.Y >= tela.Y * FRACAO_Y
-					and not atalhos[item] and guiVisivel(item) and item.BackgroundTransparency < 0.95 then
+					and not atalhos[item] and guiVisivel(item)
+					and (item.BackgroundTransparency < 0.95 or item:GetAttribute("PainelUIV2") == true) then -- painel de arte tem fundo transparente
 					return true
 				end
 			end

@@ -10,7 +10,7 @@ function View.start()
 	-- Sibling (como as demais telas V2): em Global o painel (z 2) cobria o texto (z 1) e o apagava.
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
-	local painel = C.painel({parent=gui, nome="Relogio", tamanho=UDim2.fromOffset(250,72), posicao=UDim2.new(.5,0,0,8), ancora=Vector2.new(.5,0), padding=8, sombra=false})
+	local painel = C.painel({parent=gui, nome="Relogio", tamanho=UDim2.fromOffset(250,84), posicao=UDim2.new(.5,0,0,8), ancora=Vector2.new(.5,0), padding=8, sombra=false})
 	-- Texto e barra vão em `Conteudo`: filhos diretos do painel ficam sob a borda/brilho (texto apagado).
 	local zona = painel:FindFirstChild("Conteudo") or painel
 	local titulo = Instance.new("TextLabel")
@@ -20,8 +20,8 @@ function View.start()
 	prazo.Name, prazo.Position, prazo.TextSize, prazo.Parent = "Prazo", UDim2.fromOffset(0,25), 15, zona
 	prazo.TextColor3 = T.cores.texto
 	local trilho = Instance.new("Frame")
-	trilho.Name, trilho.BorderSizePixel, trilho.BackgroundColor3 = "Dia", 0, T.cores.painel
-	trilho.Position, trilho.Size, trilho.Parent = UDim2.new(0,0,1,-5), UDim2.new(1,0,0,3), zona
+	trilho.Name, trilho.BorderSizePixel, trilho.BackgroundColor3 = "Dia", 0, T.cores.cabecalho
+	trilho.Position, trilho.Size, trilho.Parent = UDim2.new(0,0,1,-4), UDim2.new(1,0,0,3), zona
 	local barra = trilho:Clone()
 	barra.Name, barra.Position, barra.BackgroundColor3, barra.Parent = "Progresso", UDim2.new(), T.cores.titulo, trilho
 	local function atualizar()

@@ -20,7 +20,7 @@ Para trabalho compartilhado entre Codex e Claude, leia também docs/COORDENACAO.
 
 # Colaboração Claude ↔ Codex
 
-Foco atual (Pedro, 13/10/2026): RPG com exploração de mundo aberto e combate por turnos; começar por uma região pequena. Preservar a possibilidade de mestre futuro no mesmo núcleo, sem exigir mestre como objetivo do jogo. O protótipo antigo (CombatService, BattleController) está pausado.
+Foco atual (Pedro, 14/11/2026): leia `docs/DIRECAO.md` antes de tudo; ele substitui o rumo de mundo aberto do `docs/PLANO.md`. Resumo: lobby em primeira pessoa → campanha sem mestre → abertura na taverna → cidade pequena sem combate → portas para áreas feitas de passos (combate, acampamento, escolha de caminho, evento, chefe) → volta à cidade. Combate por turnos fiel ao livro, com apresentação retrabalhada. Preservar a possibilidade de mestre futuro no mesmo núcleo. O protótipo antigo (CombatService, BattleController) está pausado.
 
 - Antes de editar, consulte `docs/TAREFAS.md`: só edite arquivos de tarefas em que você é o dono.
 - Siga `docs/COLABORACAO.md`. Resumo: seja crítico com o trabalho da outra IA e aponte defeitos com evidência. Ao discordar, registre em `docs/DISCUSSOES.md` e tente refutar com argumentos e provas, não com insistência. Se o outro lado estiver certo, aceite a derrota por escrito e siga a posição correta. Após duas rodadas sem acordo, leve a decisão ao Pedro.

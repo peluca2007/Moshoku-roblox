@@ -53,7 +53,7 @@ function View.start()
 		viewport.Name, viewport.LayoutOrder = "Grupo", ordem
 		viewport.ZIndex = 5
 		viewport.Size, viewport.BackgroundColor3 = UDim2.new(1, -8, 0, 180), T.cores.painel
-		viewport.Ambient, viewport.LightColor = T.cores.secundario, T.cores.titulo
+		viewport.Ambient, viewport.LightColor = T.sobreEscuro.secundario, T.sobreEscuro.titulo
 		viewport.LightDirection, viewport.Parent = Vector3.new(-1, -1, -1), lista
 		local mundo = Instance.new("WorldModel", viewport)
 		local camera = Instance.new("Camera", viewport)

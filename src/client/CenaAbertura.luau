@@ -83,7 +83,7 @@ local function construirInterface(gui, vy: number)
 	local tamanhoFala = math.clamp(math.floor(vy * 0.048), 20, 38)
 	ui.fala = criar("TextLabel", { Name = "Legenda", AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1 - ALTURA_BARRA, -vy * 0.03),
 		Size = UDim2.fromScale(0.76, 0), AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1, Text = "",
-		FontFace = T.fontes.italico, TextSize = tamanhoFala, TextColor3 = cor.texto, TextWrapped = true,
+		FontFace = T.fontes.italico, TextSize = tamanhoFala, TextColor3 = T.sobreEscuro.texto, TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Bottom, ZIndex = 25 }, gui)
 	ui.falaContorno = criar("UIStroke", { Color = Color3.new(0, 0, 0), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual,
 		Transparency = 1 }, ui.fala)
@@ -116,7 +116,7 @@ local function construirInterface(gui, vy: number)
 	ui.glifoBase = ornamento(3)
 	ui.subtitulo = criar("TextLabel", { Name = "Subtitulo", Size = UDim2.new(1, 0, 0, math.clamp(math.floor(vy * 0.045), 22, 36)),
 		BackgroundTransparency = 1, Text = Dados.TITULO.subtitulo, FontFace = T.fontes.subtitulo, TextSize = math.clamp(math.floor(vy * 0.04), 20, 32),
-		TextColor3 = cor.titulo, LayoutOrder = 4, ZIndex = 31 }, ui.titulo)
+		TextColor3 = T.sobreEscuro.titulo, LayoutOrder = 4, ZIndex = 31 }, ui.titulo)
 	ui.subtituloContorno = criar("UIStroke", { Color = Color3.new(0, 0, 0), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual }, ui.subtitulo)
 	return ui
 end
@@ -207,12 +207,12 @@ function CenaAbertura.tocar(opcoes)
 	local ui = construirInterface(gui, vy)
 	ui.veu.BackgroundTransparency = 1 - Dados.veuEm(estado.t)
 
-	local botao = Componentes.botao({ parent = gui, nome = "Pular", texto = "Pular", icone = "seta", variante = "fantasma",
+	local botao = Componentes.botao({ parent = gui, nome = "Pular", texto = "Pular", icone = "seta", variante = "fantasma", sobreEscuro = true,
 		ancora = Vector2.new(1, 0.5), posicao = UDim2.new(1, -20, 1 - ALTURA_BARRA / 2, 0), tamanho = UDim2.fromOffset(150, 44), aoClicar = function() CenaAbertura.pular() end })
 	botao.ZIndex = 40
 	local dica = criar("TextLabel", { Name = "DicaPular", AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -(botao.Size.X.Offset + 36), 1 - ALTURA_BARRA / 2, 0),
 		Size = UDim2.fromOffset(math.min(260, camera.ViewportSize.X - 150 - 64), 24), BackgroundTransparency = 1, Text = if UserInputService.TouchEnabled then "ou segure a tela" else "Espaço ou segure a tela",
-		FontFace = T.fontes.corpo, TextSize = T.tamanhos.legenda, TextColor3 = cor.secundario, TextXAlignment = Enum.TextXAlignment.Right, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 40 }, gui)
+		FontFace = T.fontes.corpo, TextSize = T.tamanhos.legenda, TextColor3 = T.sobreEscuro.secundario, TextXAlignment = Enum.TextXAlignment.Right, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 40 }, gui)
 	dica.Visible = dica.Size.X.Offset >= 110
 	ui.botao, ui.dica = botao, dica
 

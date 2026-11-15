@@ -265,6 +265,17 @@ sem garantia. Por isso:
    pela Open Cloud. Esqueleto e skin nas criaturas só se um teste provar que
    os ossos sobrevivem ao envio.
 
+**Fontes gratuitas a usar (pesquisa de 15/11/2026; conferir a licença na
+página de cada pacote e registrar antes de integrar).** Modelos CC0: Kenney
+(Mini Dungeon para o esgoto, Retro Fantasy Kit para a vila) e Quaternius
+(Fantasy Props MegaKit para taverna, barris e armas; monstros low-poly).
+Sons CC0: Kenney Interface Sounds, UI Audio e Impact Sounds. Texturas de
+efeito: Kenney Particle Pack em `ParticleEmitter` com flipbook. Código:
+`luau-lsp analyze` para checar tipos no `testar.ps1` (ainda não adotado).
+Não usar: geradores de IA do MCP do Studio (`generate_mesh`,
+`generate_animation`: custo e licença incertos), Pixabay, plugins de terceiros
+que rodam código no Studio sem revisão.
+
 Preservar: tabela `ESPEC` de gestos por técnica (`Gestos.luau`), linha do tempo
 cancelável, prévia de área compartilhada (`AreaHabilidade`), sons, dublagem,
 Reações e modo de efeitos reduzidos.

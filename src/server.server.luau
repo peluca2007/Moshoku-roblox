@@ -76,16 +76,6 @@ local lutaDoMundo = require(Server.LutaDoMundoServico).start({
 	end,
 })
 local function emLuta() return mesa.emCombate() or lutaDoMundo.ativa() end
-local patrulhas = require(Server.PatrulhasDoMundo).start({
-	lutaNaArena = lutaDoMundo.iniciar,
-	lutaNoMarco = lutaDoMundo.iniciarMarco,
-	lutaAtiva = lutaDoMundo.ativa,
-	emCombate = function() return mesa.emCombate() or missoes.transacaoAtiva() end,
-	corpoPessoal = mesa.corpoPessoal,
-	avisar = mesa.avisarPessoal,
-})
-patrulhas.criarPatrulhas()
-patrulhas.ligarMarcos()
 dojoService = require(Server.DojoService).start({
 	consultar = mesa.consultarDojoPessoal,
 	atualizar = mesa.atualizarDojoPessoal,
@@ -93,18 +83,35 @@ dojoService = require(Server.DojoService).start({
 	-- Provação do Hanzo na arena da mesa.
 	encontro = { emEncontroAtivo = lutaDoMundo.ativa, criarProvaDojo = lutaDoMundo.iniciarProvaDojo },
 })
+-- Expedição do esgoto (DIRECAO §4): sem mundo aberto, patrulhas nem caçadas; a história é gerada pela semente da run.
+local Esgoto = require(ReplicatedStorage.Shared.Mundo.ExpedicaoEsgoto)
+local Gerador = require(ReplicatedStorage.Shared.Regras.ExpedicaoGerador)
+local Porta = require(Server.PortaExpedicao)
 runServico = require(Server.RunServico).start({
 	emEncontro = emLuta,
 	corpoPessoal = mesa.fichaParaTestes or mesa.corpoPessoal, -- bônus para os testes dos eventos de viagem (F8); aceita perfil sem árvore
-	-- Luta do guardião da run na arena da mesa; o fim volta por runServico.encerrado.
+	-- Luta das salas e do chefe na arena da mesa; o fim volta por runServico.encerrado.
 	iniciarLuta = lutaDoMundo.iniciarChefe,
 	conta = require(Server.ContaServico).start(),
+	historiaDaSemente = function(semente) return Gerador.gerar(Esgoto.AREA, semente) end,
+	area = Esgoto.AREA,
+	objetivo = Gerador.OBJETIVO,
+	portaPerto = Porta.pertoDe,
+	pontoDaPorta = Porta.ponto,
+	-- Descanso do acampamento da área: mesmo caminho do descanso da mesa (recupera PV/PM/PT da ficha pessoal).
+	restaurarDescanso = function(player) return mesa.descansarPessoal(player, "longo") end,
+	-- Ouro da área: o mesmo crédito idempotente das lutas (id de pagamento), que também registra a missão da expedição.
+	recompensarArea = function(player, idPagamento, ouro, areaId)
+		local sucesso, _, cumpridas = mesa.recompensarEncontroPessoal(player, idPagamento, ouro, "expedicao/" .. areaId, 0)
+		if sucesso then missoes.notificarConclusoes(player, cumpridas) end
+		return sucesso
+	end,
 })
-local cacadas = require(Server.CacadasService).start({
-	runServico = runServico, avisar = mesa.avisarPessoal, emCombate = emLuta,
+Porta.start({
+	remote = ReplicatedStorage:WaitForChild(require(Server.RunServico).REMOTE),
+	temRun = function() local s = runServico.sessao(); return s ~= nil and s.run ~= nil and not s.run.fim end,
+	avisar = mesa.avisarPessoal,
 })
-patrulhas.definirCacadas(cacadas)
-lutaDoMundo.definirCacadas(cacadas)
 -- A segunda provação abre o rank na mesma ficha; só o servidor concede.
 runServico.observar(function(sessao)
 	if not sessao or not sessao.run or sessao.run.fim then return end

@@ -26,6 +26,7 @@ NpcsDados.LISTA = {
 			"Bem-vindo à Taverna do Caminho! Quem volta do bosque chega sem fôlego e sem mana.",
 			"Quer se recuperar? A fogueira do acampamento, ao norte da estrada, serve para descansar.",
 			"Dois descansos curtos entre cada descanso longo: depois disso, só o sono de verdade.",
+			"O esgoto da praça entupiu! Aceite comigo a missão Esgoto entupido e desça pela porta na praça, em grupo.",
 		},
 	},
 	{

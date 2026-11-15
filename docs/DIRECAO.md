@@ -64,15 +64,24 @@ arte, personagens ou fases.
 - Grupo inteiro caído: volta para a cidade pagando os dias da distância, sem
   perder ouro; a campanha continua. (Leitura do Claude de uma resposta por voz;
   confirmar.)
-- Descanso: o grupo escolhe quando descansar; haverá mecânica de exaustão
-  (a desenhar). Enquanto isso vale o limite provisório de 2 por área.
+- Descanso e exaustão: o grupo escolhe quando descansar, sem limite fixo. Cada
+  luta sem descanso depois dá 1 nível de Exaustão do livro; descansar (meio dia)
+  zera. **Ainda não implementado**: hoje vale o limite provisório de 2 por área.
+- Missão principal: **calamidade de mana**. Uma anomalia no céu cresce a cada
+  dia e estoura no dia 30. O chefe de cada área guarda um fragmento; com eles o
+  grupo sela a anomalia. O prazo fica visível no céu.
+- Fim do prazo: **luta final forçada** no dia 30, mais forte quanto menos áreas
+  concluídas. Vencer dá o final bom; perder, o ruim.
+- Área de testes: aberta só no Studio e para administradores.
+- Só ferramentas gratuitas (sons, modelos, animação). Cinemáticas: câmera
+  `Scriptable` com `TweenService`, barras de cinema, desfoque e campo de visão,
+  animações com marcadores (`GetMarkerReachedSignal`) feitas no editor nativo do
+  Roblox; `client/CenaAbertura` já segue esse caminho e é a base.
 
-### Decisões em aberto (perguntar ao Pedro, não inventar)
+### Decisões em aberto (perguntar ao Pedro com opções e recomendação)
 
-- O que acontece quando o prazo acaba.
-- Como funciona a exaustão.
 - As prints do documento do Pedro não foram vistas pelo agente (só o texto);
-  pedir as imagens antes de desenhar as telas de acampamento e de escolhas.
+  pedir as imagens antes de fechar o visual das telas de acampamento e escolhas.
 
 ## 2. O que já existe e serve
 

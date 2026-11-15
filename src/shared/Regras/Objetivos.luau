@@ -1,7 +1,8 @@
 -- Projeta o próximo passo compreensível a partir do snapshot da run e do mundo.
 -- Módulo puro: não cria Instances nem decide/avança regras da run.
 -- Prioridade: combate -> sem RUN -> fim -> provação ativa -> evento -> pegar/entregar Selo
--- (somente opções liberadas) -> prazo expirado -> árvore zero -> treino sem árvore -> nó/história.
+-- (somente opções liberadas) -> prazo expirado -> árvore zero -> treino sem árvore -> porta da expedição (hub)
+-- -> nó/história. Dentro de uma área de expedição não há cartão.
 local Objetivos = {}
 
 local function alvo(tipo, id, posicao)
@@ -89,10 +90,14 @@ local function calcular(estado)
 		if estado.semRun or type(estado.run) == "table" and estado.run.semRun == true then return objetivo("iniciar-run", "Inicie uma RUN", "Vá ao painel e comece uma RUN.") end
 		return nil
 	end
+	local expedicao = run.area ~= nil or run.totalPassos ~= nil or run.tipoDoNo == "hub"
 	if run.fim then
+		if run.fim.motivo == "final" and expedicao then return objetivo("missao-concluida", "Missão concluída", "A expedição terminou.") end
 		if run.fim.motivo == "final" then return objetivo("final-concluido", "O Selo voltou para casa", "A história foi concluída.") end
 		return objetivo("run-encerrada", "RUN encerrada", "Consulte o painel para ver o resultado.")
 	end
+	-- Dentro da área o cartão some: a faixa do topo da ExpedicaoView basta.
+	if run.area ~= nil and run.tipoDoNo ~= "hub" then return nil end
 	local provacao = estado.provacao
 	if provacao and provacao.estado == "em-curso" then
 		if provacao.npcId == "vila-1" then
@@ -137,6 +142,10 @@ local function calcular(estado)
 				return objetivo("iniciar-provacao", "Faça a provação", "Aceite o desafio para aprender com o treinador.", alvo("treinador", npc.id, npc.posicao))
 			end
 		end
+	end
+	if run.tipoDoNo == "hub" then
+		if estado.expedicaoConcluida == true then return objetivo("missao-concluida", "Missão concluída", "A expedição terminou. Descanse na cidade.") end
+		return objetivo("ir-a-porta-do-esgoto", "Vá até a porta do esgoto", "Aproxime-se da porta e acione-a para escolher a expedição.", alvo("destino", "porta-esgoto"))
 	end
 	return objetivoHistoria(run, estado)
 end

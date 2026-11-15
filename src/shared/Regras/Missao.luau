@@ -1,11 +1,12 @@
 -- Regra pura de missões da vila. Sem Instances nem rede; o estado nunca é alterado no lugar.
--- Missão (dados): { id, nome, npc, texto, objetivo = { tipo = "vencer-encontro", encontroId, quantidade },
---                   recompensa = { ouro = <PO> } }
+-- Missão (dados): { id, nome, npc, texto, objetivo, recompensa = { ouro = <PO> } }
+-- Objetivo "vencer-encontro": { tipo, encontroId, quantidade }; objetivo "concluir-expedicao": { tipo, alvo = <id da área>, quantidade = 1 }
+-- (cumprido quando o servidor registra a conclusão da área; a chave do evento é "expedicao/<alvo>", ver chaveDoObjetivo).
 -- Estado de uma missão para um jogador: { estado = "aceita" | "cumprida" | "entregue", progresso = <n> }
 -- Estado do jogador: { [missaoId] = estadoDaMissao }
 local Missao = {}
 
-Missao.TIPOS = table.freeze({ ["vencer-encontro"] = true })
+Missao.TIPOS = table.freeze({ ["vencer-encontro"] = true, ["concluir-expedicao"] = true })
 Missao.MAX_ATIVAS = 3
 
 local function inteiro(v, minimo)
@@ -22,10 +23,20 @@ local function clonar(estado)
 	return copia
 end
 
+-- Chave do evento que cumpre o objetivo: id do encontro vencido ou "expedicao/<área>" concluída; nil se o objetivo é inválido.
+function Missao.chaveDoObjetivo(objetivo)
+	if type(objetivo) ~= "table" then return nil end
+	if objetivo.tipo == "vencer-encontro" and type(objetivo.encontroId) == "string" then return objetivo.encontroId end
+	if objetivo.tipo == "concluir-expedicao" and type(objetivo.alvo) == "string" and objetivo.alvo ~= "" then
+		return "expedicao/" .. objetivo.alvo
+	end
+	return nil
+end
+
 function Missao.definicaoValida(m)
 	return type(m) == "table" and type(m.id) == "string" and m.id ~= "" and type(m.nome) == "string"
 		and type(m.npc) == "string" and type(m.objetivo) == "table"
-		and Missao.TIPOS[m.objetivo.tipo] == true and type(m.objetivo.encontroId) == "string"
+		and Missao.TIPOS[m.objetivo.tipo] == true and Missao.chaveDoObjetivo(m.objetivo) ~= nil
 		and inteiro(m.objetivo.quantidade, 1) and type(m.recompensa) == "table" and inteiro(m.recompensa.ouro)
 end
 
@@ -64,7 +75,7 @@ function Missao.aceitar(estado, missao)
 	return novo
 end
 
--- Evento "encontro vencido": conta em toda missão aceita cujo objetivo aponta para ele.
+-- Evento "encontro vencido" ou "expedição concluída" (chave "expedicao/<área>"): conta em toda missão aceita cujo objetivo aponta para ele.
 -- Devolve (novoEstado, cumpridas) onde cumpridas = ids que passaram a "cumprida" agora.
 function Missao.registrar(estado, definicoes, encontroId)
 	if not Missao.estadoValido(estado) or type(definicoes) ~= "table" or type(encontroId) ~= "string" then
@@ -73,7 +84,7 @@ function Missao.registrar(estado, definicoes, encontroId)
 	local novo, cumpridas = clonar(estado), {}
 	for id, m in novo do
 		local def = definicoes[id]
-		if m.estado == "aceita" and def and def.objetivo.encontroId == encontroId then
+		if m.estado == "aceita" and def and Missao.chaveDoObjetivo(def.objetivo) == encontroId then
 			m.progresso = math.min(m.progresso + 1, def.objetivo.quantidade)
 			if m.progresso >= def.objetivo.quantidade then
 				m.estado = "cumprida"

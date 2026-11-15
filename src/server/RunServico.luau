@@ -4,7 +4,6 @@
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local Shared = ReplicatedStorage.Shared
 local Sessao = require(Shared.Regras.RunSessao)
 local Criacao = require(Shared.Regras.RunCriacao)
@@ -13,9 +12,6 @@ local Prontos = require(Shared.PersonagensProntos)
 local RestricaoDeCriacao = require(Shared.Regras.RestricaoDeCriacao)
 local Abertura = require(Shared.Regras.AberturaRun)
 local EventosV1 = require(Shared.Mundo.ViagemEventosV1)
-local VilaLayout = require(Shared.Mundo.VilaLayout)
-local FlorestaLayout = require(Shared.Mundo.FlorestaLayout)
-local RuinasLayout = require(Shared.Mundo.RuinasLayout)
 local CatalogoAparencia = require(Shared.Aparencia.Catalogo)
 
 local Servico = {}
@@ -23,9 +19,12 @@ local Servico = {}
 Servico.REMOTE = "RunJogo"
 local INTERVALO = 0.4
 
--- W1b: regiões conectadas a pé; nenhum destino/teleporte na navegação.
 local Relogio = require(Shared.Regras.RunRelogio)
-local Tempo = require(Shared.Mundo.RunTempo)
+
+-- Expedição (DIRECAO §4): quem votar em opção do hub "entrar-*"/"retomar-*" precisa estar perto da porta.
+local function ehOpcaoDePorta(opcao)
+	return string.sub(opcao, 1, 7) == "entrar-" or string.sub(opcao, 1, 8) == "retomar-"
+end
 
 function Servico.payloadValido(pedido)
 	if type(pedido) ~= "table" or getmetatable(pedido) ~= nil or type(pedido.acao) ~= "string" then return false end
@@ -39,7 +38,9 @@ function Servico.payloadValido(pedido)
 		end
 		if pedido.modo ~= nil and not ok then return false end
 	elseif pedido.acao == "lutar" then
-		-- sem campos: reinicia a luta do chefe pendente
+		-- sem campos: reinicia a luta pendente
+	elseif pedido.acao == "descansar" then
+		-- sem campos: descanso do acampamento da área (o servidor decide custo, limite e recuperação)
 	elseif pedido.acao == "escolherArvore" then
 		permitidos.arvore = true
 		if type(pedido.arvore) ~= "string" or #pedido.arvore > 64 then return false end
@@ -67,7 +68,12 @@ end
 
 -- deps = { emEncontro = function() -> bool, ehExplorador = function(userId) -> bool (opcional),
 --          conta = ContaServico (opcional; sem ela o fim da run não paga a conta),
---          iniciarLuta = function(jogadores, luta) -> encounterId | nil, erro   (luta = { no, criaturas, areaId }; monta o encontro J2 do chefe) }
+--          iniciarLuta = function(jogadores, luta) -> encounterId | nil, erro   (luta = { no, criaturas, areaId }; monta o encontro J2 do nó),
+--          historiaDaSemente, area, objetivo = expedição gerada (ver RunSessao); mundoAberto fica sempre falso,
+--          portaPerto = function(player) -> bool   (avatar a até ~20 studs da porta; lido no servidor),
+--          pontoDaPorta = function() -> Vector3|nil  (onde reunir o grupo ao entrar na área),
+--          restaurarDescanso = function(player) -> ok, erro   (recupera PV/PM/PT da ficha pessoal; mesmo caminho do descanso da mesa),
+--          recompensarArea = function(player, idPagamento, ouro, areaId) -> ok   (crédito idempotente por idPagamento) }
 function Servico.start(deps)
 	deps = deps or {}
 	local remote = Instance.new("RemoteEvent")
@@ -80,7 +86,8 @@ function Servico.start(deps)
 	local lutaAtiva -- encounterId do encontro J2 da luta pendente (nil = ainda não começou)
 	local function novaSessao()
 		return Sessao.new({
-			rng = Random.new(), guardar = guardar, carregar = carregar, mundoAberto = true,
+			rng = Random.new(), guardar = guardar, carregar = carregar, mundoAberto = false,
+			historiaDaSemente = deps.historiaDaSemente, area = deps.area, objetivo = deps.objetivo,
 			ehExplorador = deps.ehExplorador, prontos = Prontos, eventos = EventosV1,
    fichaDe = function(userId)
     local player = Players:GetPlayerByUserId(userId)
@@ -99,7 +106,52 @@ function Servico.start(deps)
 		for _, m in v.grupo do m.nome = nomeDe(m.userId) end
 		return v
 	end
+	-- Só dias do prazo (a expedição não tem relógio em tempo real).
+	local function publicarRelogio()
+		if not sessao or not sessao.run then return end
+		local r = sessao.run
+		ReplicatedStorage:SetAttribute("RunDia", Relogio.visao(r, true).dia)
+		ReplicatedStorage:SetAttribute("RunDiasRestantes", math.max(0, r.objetivo.prazoFinal - r.dia))
+	end
+	-- Dentro da área o grupo fica ancorado perto da porta (ninguém passeia pela cidade); no hub e no fim da run, solto.
+	-- Só soltamos o que ancoramos aqui; a luta do mundo guarda/restaura o próprio estado.
+	local ancorados = {} -- userId -> HumanoidRootPart
+	local function raizDe(player)
+		local personagem = player and player.Character
+		local raiz = personagem and personagem:FindFirstChild("HumanoidRootPart")
+		return if raiz and raiz:IsA("BasePart") then raiz else nil
+	end
+	local function sincronizarAncoras()
+		local no = sessao and sessao.run and not sessao.run.fim and sessao.historia.nos[sessao.run.galho]
+		local naArea = no ~= nil and no ~= false and no.area ~= nil
+		local alvo = if naArea and deps.pontoDaPorta then deps.pontoDaPorta() else nil
+		local indice = 0
+		if naArea then
+			for userId, membro in sessao.run.jogadores do
+				local raiz = raizDe(Players:GetPlayerByUserId(userId))
+				if membro.presente and raiz then
+					indice += 1
+					if ancorados[userId] ~= raiz then
+						if alvo then raiz.CFrame = CFrame.new(alvo.X + (indice - 2.5) * 3, 3, alvo.Z + 6) end
+						raiz.Anchored = true
+						ancorados[userId] = raiz
+					elseif not raiz.Anchored then
+						raiz.Anchored = true
+					end
+				end
+			end
+		end
+		for userId, raiz in ancorados do
+			local membro = naArea and sessao.run.jogadores[userId] or nil
+			if not (membro and membro.presente) then
+				if raiz.Parent then raiz.Anchored = false end
+				ancorados[userId] = nil
+			end
+		end
+	end
 	local function transmitir()
+		publicarRelogio()
+		if not (deps.emEncontro and deps.emEncontro()) then pcall(sincronizarAncoras) end
 		for _, fn in observadores do fn(sessao) end
 		for _, p in Players:GetPlayers() do enviar(p, visaoPara(p)) end
 	end
@@ -121,27 +173,26 @@ function Servico.start(deps)
 		end
 	end
 
-	-- Luta do chefe pendente e ainda sem encontro: o servidor monta o J2 com quem está presente e vivo.
+	-- Luta pendente do nó atual e ainda sem encontro: o servidor monta o J2 com todos os membros presentes e vivos
+	-- (sem checar distância: o grupo já está dentro da área).
 	local function iniciarLutaPendente(solicitante)
 		local luta = sessao and sessao:lutaPendente()
 		if not luta or lutaAtiva then return end
-		local alvo = if sessao.run.regiao == "floresta-sombria" then FlorestaLayout.MARCO else RuinasLayout.CAMARA
-		local function proximo(player)
+		local function apto(player)
 			local membro = sessao.run.jogadores[player.UserId]
-			local raiz = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+			local raiz = raizDe(player)
 			local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-			return membro and membro.presente and not membro.caido and raiz and hum and hum.Health > 0
-				and Vector2.new(raiz.Position.X-alvo.x,raiz.Position.Z-alvo.z).Magnitude <= 42
+			return membro ~= nil and membro.presente and not membro.caido and raiz ~= nil and hum ~= nil and hum.Health > 0
 		end
-		if solicitante and not proximo(solicitante) then recusa(solicitante, "Aproxime-se do guardião."); return end
+		if solicitante and not apto(solicitante) then recusa(solicitante, "Você não pode lutar agora."); return end
 		if not deps.iniciarLuta then
-			if solicitante then recusa(solicitante, "A luta do chefe ainda não está disponível neste servidor.") end
+			if solicitante then recusa(solicitante, "A luta ainda não está disponível neste servidor.") end
 			return
 		end
 		local grupo = {}
-		for userId, membro in sessao.run.jogadores do
+		for userId in sessao.run.jogadores do
 			local jogador = Players:GetPlayerByUserId(userId)
-			if jogador and proximo(jogador) then table.insert(grupo, jogador) end
+			if jogador and apto(jogador) then table.insert(grupo, jogador) end
 		end
 		table.sort(grupo, function(a, b) return a.UserId < b.UserId end)
 		if #grupo == 0 then return end
@@ -151,6 +202,28 @@ function Servico.start(deps)
 			return
 		end
 		lutaAtiva = id
+	end
+
+	-- Área concluída (flag do gerador): ouro da área a cada membro presente UMA vez por run
+	-- (idempotente pelo id de pagamento, que a ficha guarda) e aviso ao cliente.
+	local pagosDaArea = {} -- idPagamento/userId
+	local function concluirArea()
+		local area = deps.area
+		if not (area and sessao and sessao.run and sessao.run.flags["expedicao/" .. area.id .. "/concluida"]) then return end
+		local idPagamento = "expedicao-" .. area.id .. "-" .. tostring(sessao.run.semente)
+		for userId, membro in sessao.run.jogadores do
+			local chave = idPagamento .. "/" .. userId
+			local jogador = Players:GetPlayerByUserId(userId)
+			if jogador and membro.presente and not pagosDaArea[chave] and deps.recompensarArea then
+				local ok, pago = pcall(deps.recompensarArea, jogador, idPagamento, area.recompensa.ouro, area.id)
+				if ok and pago then
+					pagosDaArea[chave] = true
+					remote:FireClient(jogador, "expedicaoConcluida", { area = area.id, ouro = area.recompensa.ouro })
+				else
+					warn("[Run] Recompensa da área não creditada para " .. tostring(userId) .. ": " .. tostring(pago))
+				end
+			end
+		end
 	end
 
 	-- Com a run ativa, o personagem pessoal só nasce com a árvore que a run deu (PersonagemSessao consulta isto).
@@ -185,6 +258,7 @@ function Servico.start(deps)
 				if tentativa:retomar("u" .. player.UserId) then sessao = tentativa; transmitir() end
 			end
 			enviar(player, visaoPara(player))
+			concluirArea()
 		elseif pedido.acao == "iniciar" then
 			if sessao and sessao.run and not sessao.run.fim then recusa(player, "Já existe uma run em andamento."); return end
 			local lista, modos = {}, {}
@@ -225,21 +299,34 @@ function Servico.start(deps)
 			local ok, motivo = sessao:escolherArvore(player.UserId, pedido.arvore)
 			if not ok then recusa(player, motivo); return end
 			transmitir()
+		elseif pedido.acao == "descansar" then
+			local ok, motivo = sessao:descansarNoAcampamento(player.UserId)
+			if not ok then recusa(player, motivo or "Descanso indisponível."); return end
+			-- A ficha de cada presente recupera PV/PM/PT pelo mesmo caminho do descanso da mesa.
+			if deps.restaurarDescanso then
+				for userId, membro in sessao.run.jogadores do
+					local jogador = Players:GetPlayerByUserId(userId)
+					if jogador and membro.presente and not membro.caido then
+						local chamou, restaurou, erro = pcall(deps.restaurarDescanso, jogador)
+						if not (chamou and restaurou) then
+							warn("[Run] Descanso não restaurou a ficha de " .. tostring(userId) .. ": " .. tostring(if chamou then erro else restaurou))
+						end
+					end
+				end
+			end
+			transmitir()
 		elseif pedido.acao == "votar" then
-   -- Ações narrativas só perto do marco do capítulo; eventos já foram ativados pela presença.
-   if not sessao.evento then
-    local raiz = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-    local regiao = sessao.run.regiao
-    local alvo = if regiao == "floresta-sombria" then FlorestaLayout.MARCO elseif regiao == "ruinas-do-vale" then RuinasLayout.CAMARA else VilaLayout.PRACA
-    if not raiz or (Vector2.new(raiz.Position.X-alvo.x,raiz.Position.Z-alvo.z)).Magnitude > 42 then
-     recusa(player, "Aproxime-se do local do objetivo."); return
-    end
-   end
-   local ok, resultado = sessao:votar(player.UserId, pedido.opcao)
-   if not ok then recusa(player, resultado); return end
+			-- Entrar/retomar a expedição só vale perto da porta; o resto da votação é livre de lugar.
+			local no = sessao.historia.nos[sessao.run.galho]
+			if ehOpcaoDePorta(pedido.opcao) and no and no.tipo == "hub" and not (deps.portaPerto and deps.portaPerto(player)) then
+				recusa(player, "Chegue perto da porta do esgoto."); return
+			end
+			local ok, resultado = sessao:votar(player.UserId, pedido.opcao)
+			if not ok then recusa(player, resultado); return end
 			transmitir()
 			iniciarLutaPendente(player)
 			fecharConta()
+			concluirArea()
 		end
 	end
 	remote.OnServerEvent:Connect(function(player, pedido)
@@ -266,39 +353,26 @@ function Servico.start(deps)
 		if sessao then enviar(player, visaoPara(player)) end
 	end)
 
- local acumulado, checkpoint = 0, 0
- local function publicarRelogio()
-  if not sessao or not sessao.run then return end
-  local r = sessao.run
-  local v = Relogio.visao(r, sessao.relogioPausado)
-  ReplicatedStorage:SetAttribute("RunDia", v.dia)
-  ReplicatedStorage:SetAttribute("RunFracaoDia", v.fracao)
-  ReplicatedStorage:SetAttribute("RunHora", v.hora)
-  ReplicatedStorage:SetAttribute("RunPeriodo", v.periodo)
-  ReplicatedStorage:SetAttribute("RunRelogioPausado", v.pausado)
-  ReplicatedStorage:SetAttribute("RunDiasRestantes", math.max(0,r.objetivo.prazoFinal-r.dia))
-  ReplicatedStorage:SetAttribute("RunTempoDecorrido", r.dia * Tempo.DIA_SEGUNDOS)
- end
- RunService.Heartbeat:Connect(function(dt)
-  if processando or not sessao or not sessao.run or sessao.ocupada or sessao.run.fim then return end
-  local combate = deps.emEncontro and deps.emEncontro() == true
-  sessao:avancarTempo(dt,combate)
-  acumulado += dt
-  checkpoint += dt
-  if acumulado < 1 then return end
-  acumulado = 0
-  processando = true
-  if not combate then
-   for _, p in Players:GetPlayers() do
-    local raiz = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
-    if raiz then sessao:presencaNoMundo(p.UserId,raiz.Position.X,raiz.Position.Z) end
+ -- Checkpoint de save a cada 15 s (protege contra queda do servidor entre votos).
+ task.spawn(function()
+  while true do
+   task.wait(15)
+   if not processando and sessao and sessao.run and not sessao.run.fim and not sessao.ocupada then
+    processando = true
+    pcall(function() sessao:_salvar() end)
+    processando = false
    end
   end
-  publicarRelogio()
-  if checkpoint >= 15 then sessao:_salvar(); checkpoint = 0 end
-  transmitir()
-  processando = false
  end)
+ -- Respawn do avatar dentro da área: reancora.
+ local function aoNascer(player)
+  player.CharacterAdded:Connect(function()
+   task.wait(1)
+   if not processando and not (deps.emEncontro and deps.emEncontro()) then pcall(sincronizarAncoras) end
+  end)
+ end
+ Players.PlayerAdded:Connect(aoNascer)
+ for _, p in Players:GetPlayers() do aoNascer(p) end
  game:BindToClose(function()
   if sessao and sessao.run and not sessao.ocupada then sessao:_salvar() end
  end)
@@ -364,6 +438,8 @@ function Servico.start(deps)
 					end
 				end)
 			end
+			-- A luta já acabou: solta/ancora conforme o nó (transmitir pula a sincronização se o encontro ainda consta ativo).
+			pcall(sincronizarAncoras)
 			transmitir()
 			fecharConta()
 		end,

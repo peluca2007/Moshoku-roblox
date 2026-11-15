@@ -16,9 +16,17 @@ EXP1 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. R
 
 EXP2 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. Arena `esgoto` e elenco por sala (`EncontrosPorZona.paraRun` repete a lista por jogador): `shared/EncontrosPorZona`, `shared/Mundo/ArenasDados`, specs. Local ok. Não verificado: visual da arena no Studio; sem luz própria.
 
-EXP3 — agente (coordenação Claude), **em andamento (14/11/2026)**. Servidor da expedição: `server.server.luau`, `server/{RunServico,PortaExpedicao,MissaoService,LutaDoMundoServico}`, `shared/{EncontrosPorZona,Mundo/MissoesDados,Mundo/NpcsDados,Regras/Missao}`, specs do servidor.
+EXP3 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. Servidor da expedição: `server.server.luau` (patrulhas e caçadas não iniciam), `server/{RunServico,PortaExpedicao,MissaoService}`, `shared/{Mundo/MissoesDados,Mundo/NpcsDados,Regras/Missao}`, specs `Missao`, `EncontrosPorZona`, `RunServicoExpedicao` (só Studio). Local ok. Não verificado: Studio.
 
-EXP4 — agente (coordenação Claude), **em andamento (14/11/2026)**. Cliente da expedição: `client.client.luau`, `client/{ExpedicaoView,RunView,ObjetivoView,ObjetivoEstado}`, `shared/Regras/Objetivos`, specs e simulações de cliente.
+EXP4 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. Cliente da expedição: `client/{ExpedicaoView,RunView,ObjetivoEstado}`, `client.client.luau` (relógio não inicia), `shared/Regras/{ExpedicaoTela,Objetivos}`, specs `ExpedicaoTela`, `Objetivos`. Local ok. Não verificado: Studio.
+
+EXP5 — Claude, **em andamento (14/11/2026)**. Integração e playtest da fatia no Studio (porta → salas → acampamento → chefe → volta), luta e resultado no tema Pergaminho.
+
+EXP6 — **na fila**. Exaustão do livro por luta no lugar do limite de 2 descansos; fragmento por chefe e luta final no dia 30 (missão da calamidade de mana).
+
+SOM1 — **na fila (14/11/2026)**. Sons só gratuitos (Pedro): gerador local em Python puro (biblioteca padrão, sem numpy) para efeitos de interface e combate, e busca no Openverse (sem chave) baixando só CC0/CC-BY com autor e licença registrados em `docs/SONS.md`. Sem serviço pago.
+
+TESTER1 — **na fila (14/11/2026)**. Área de testes (pedido do Pedro): sala acessível pelo menu para ver modelos, animações, gestos de combate, efeitos, sons, vozes, arenas e peças da interface.
 
 PERG1 — Claude, **pronta para revisão (14/11/2026)**. Interface no estilo Pergaminho (escolha do Pedro): 9 PNGs enviados, ids em `shared/UIArte`, paleta de papel em `shared/UITemaDados` (+ `sobreEscuro`, `barras`, `fundoTela`), ajustes em `client/{UI/Componentes,CenaAbertura,MarcadoresMundo,Hud,RelogioRunView,ResultadoView,ViagemView,AparenciaEditor,ToqueContraste,InicioView,Carregamento,CriacaoRapidaView,CriacaoPersonagemView}`, `server/Mundo/NpcVisual`, spec `UITema`. Local: tudo ok **exceto "Catálogo"** (ambiente: o site do livro está sem `node_modules/tsx`). Studio 1667/0 no servidor e 6/0 de UI no cliente; telas conferidas em [TESTES](TESTES.md). **Não verificados:** luta (HUD, fila de turnos, ações), tela de resultado, menu inicial, ajuda, criação avançada, viagem, textos sobre o mundo (a captura do Studio saiu sem o 3D), celular e larguras médias. Sem commit.
 

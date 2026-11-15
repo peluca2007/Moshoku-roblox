@@ -176,4 +176,24 @@ return {
 		r.regiao = "vila"
 		t.eq(Objetivos.atual({ run = r, destinos = { ["chefe-floresta"] = { x = 10, y = 0, z = 20 } } }).alvo, nil)
 	end,
+	["expedição: porta no hub, nada dentro da área, missão concluída ao voltar"] = function(t)
+		local hub = run({ tipoDoNo = "hub", galho = "cidade", plano = { modo = "pronto" }, opcoes = {
+			{ id = "entrar-esgoto", texto = "Entrar no esgoto", liberada = true } } })
+		local o = Objetivos.atual({ run = hub })
+		t.eq(o.chave, "ir-a-porta-do-esgoto")
+		t.eq(o.titulo, "Vá até a porta do esgoto")
+		t.eq(o.alvo.id, "porta-esgoto")
+		t.eq(o.alvo.posicao, nil)
+		t.eq(Objetivos.atual({ run = hub, expedicaoConcluida = true }).chave, "missao-concluida")
+		local dentro = run({ tipoDoNo = "sala", area = "esgoto", passo = 2, totalPassos = 5, galho = "esgoto-2", plano = { modo = "pronto" },
+			evento = { id = "x" } })
+		t.eq(Objetivos.atual({ run = dentro }), nil)
+		t.eq(Objetivos.atual({ run = run({ tipoDoNo = "final", area = "esgoto", totalPassos = 5, fim = { motivo = "final" } }) }).chave, "missao-concluida")
+	end,
+	["expedição: o começo (mestre) vem antes da porta"] = function(t)
+		local hub = run({ tipoDoNo = "hub", galho = "cidade", plano = { modo = "semArvore" }, opcoes = {} })
+		local o = Objetivos.atual({ run = hub, posicao = { x = 0, y = 0, z = 0 },
+			treinadores = { { id = "vila-1", disponivel = true, posicao = { x = 3, y = 0, z = 0 } } } })
+		t.eq(o.chave, "conversar-treinador")
+	end,
 }

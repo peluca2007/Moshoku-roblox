@@ -91,6 +91,14 @@ function View.start()
 			botao("Nova expedição", true, function() painel.Visible = false; require(script.Parent.AberturaFluxo).novaExpedicao() end)
 			return
 		end
+		-- Na cidade (hub) e dentro de uma área, votação, opções e acampamento são da ExpedicaoView.
+		if dado.area or dado.tipoDoNo == "hub" then
+			if dado.luta then
+				texto("LUTA: " .. tostring(dado.luta.titulo), "perigo")
+				botao("Entrar na luta", true, function() remote:FireServer({ acao = "lutar" }) end)
+			else texto("A expedição segue pela faixa do topo e pelos painéis no centro da tela.", "secundario") end
+			return
+		end
 		if dado.luta then
 			texto("LUTA: " .. tostring(dado.luta.titulo), "perigo")
 			botao("Entrar na luta", true, function() remote:FireServer({ acao = "lutar" }) end)

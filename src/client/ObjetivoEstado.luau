@@ -14,9 +14,10 @@ function E.start(mesa)
 	local function conectar(sinal, fn) table.insert(conexoes, sinal:Connect(fn)) end
 	local remoto = RS:WaitForChild("RunJogo")
 	conectar(remoto.OnClientEvent, function(tipo, dado)
+		if vivo and tipo == "expedicaoConcluida" then e.expedicaoConcluida = true; return end
 		if not vivo or tipo ~= "run" or type(dado) ~= "table" or dado.erro then return end
 		if dado.semRun or (e.run and (e.run.fim and not dado.fim or (dado.dia or 0)<(e.run.dia or 0))) then
-			e.conversados, e.ofertas, e.provacao = {}, {}, nil
+			e.conversados, e.ofertas, e.provacao, e.expedicaoConcluida = {}, {}, nil, nil
 		end
 		e.run = dado
 	end)
@@ -44,6 +45,11 @@ function E.start(mesa)
 		self.destinos={sino=ponto(L.SINO),portao=ponto(L.PORTAO),agua=ponto(L.grade()),
 			["floresta-sombria"]=ponto(F.MARCO),["chefe-floresta"]=ponto(F.MARCO),
 			["chefe-ruinas"]=ponto(R.ARENA),vila={x=0,y=0,z=-175}}
+			-- A porta da expedição é criada pelo servidor; enquanto não existir, o objetivo fica sem marcador.
+			local vilaPorta=workspace:FindFirstChild("Vila")
+			local porta=(vilaPorta and vilaPorta:FindFirstChild("PortaDoEsgoto")) or workspace:FindFirstChild("PortaDoEsgoto")
+			local centro=porta and (if porta:IsA("Model") then porta:GetPivot().Position elseif porta:IsA("BasePart") then porta.Position else nil)
+			if centro then self.destinos["porta-esgoto"]={x=centro.X,y=centro.Y,z=centro.Z} end
 		self.treinadores, self.npcs = {}, {}
 		local vila=workspace:FindFirstChild("Vila")
 		for _, nome in {"TreinadoresRun","Npcs"} do

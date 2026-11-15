@@ -1,6 +1,7 @@
 local M = require(game:GetService("ReplicatedStorage").Shared.Regras.Missao)
 local Dados = require(game:GetService("ReplicatedStorage").Shared.Mundo.MissoesDados)
 local Zonas = require(game:GetService("ReplicatedStorage").Shared.EncontrosPorZona)
+local Esgoto = require(game:GetService("ReplicatedStorage").Shared.Mundo.ExpedicaoEsgoto)
 
 local cacada = {
 	id = "cacada-do-bosque", nome = "Caçada no Bosque", npc = "taverneira", texto = "t",
@@ -84,9 +85,41 @@ return {
 			t.ok(M.definicaoValida(m), m.id)
 			t.eq(ids[m.id], nil, "duplicada " .. m.id)
 			ids[m.id] = true
-			t.ok(Zonas.consultar(m.objetivo.encontroId) ~= nil, m.id .. " encontro desconhecido")
+			if m.objetivo.tipo == "vencer-encontro" then
+				t.ok(Zonas.consultar(m.objetivo.encontroId) ~= nil, m.id .. " encontro desconhecido")
+			else
+				t.eq(m.objetivo.alvo, Esgoto.AREA.id, m.id .. " área desconhecida")
+			end
 			t.ok(#m.texto <= 220, m.id .. " texto longo")
 		end
 		t.eq(Dados.porId()["cacada-do-bosque"].recompensa.ouro, 30)
+	end,
+	["missao Esgoto entupido: concluir a expedicao cumpre, so uma vez, e so a area certa"] = function(t)
+		local def = Dados.porId()["esgoto-entupido"]
+		t.ok(def ~= nil)
+		t.eq(def.objetivo.tipo, "concluir-expedicao")
+		t.eq(M.chaveDoObjetivo(def.objetivo), "expedicao/esgoto")
+		t.eq(M.chaveDoObjetivo(cacada.objetivo), "region/encounter/forest")
+		t.eq(M.chaveDoObjetivo({ tipo = "concluir-expedicao" }), nil)
+		t.eq(M.chaveDoObjetivo({ tipo = "outro", alvo = "x" }), nil)
+		t.eq(M.definicaoValida(def), true)
+		t.eq(M.definicaoValida({ id = "x", nome = "n", npc = "n", objetivo = { tipo = "concluir-expedicao", quantidade = 1 }, recompensa = { ouro = 1 } }), false)
+		local defsExp = { [def.id] = def, [cacada.id] = cacada }
+		local e = M.aceitar(M.novoEstado(), def)
+		local nada, c0 = M.registrar(e, defsExp, "region/encounter/forest")
+		t.eq(nada[def.id].estado, "aceita")
+		t.eq(#c0, 0)
+		local outra, c1 = M.registrar(e, defsExp, "expedicao/ruinas")
+		t.eq(outra[def.id].estado, "aceita")
+		t.eq(#c1, 0)
+		local feita, c2 = M.registrar(e, defsExp, "expedicao/esgoto")
+		t.eq(feita[def.id].estado, "cumprida")
+		t.eq(c2[1], def.id)
+		local _, c3 = M.registrar(feita, defsExp, "expedicao/esgoto")
+		t.eq(#c3, 0)
+		local entregue, premio = M.entregar(feita, def)
+		t.eq(premio.ouro, def.recompensa.ouro)
+		t.eq(entregue[def.id].estado, "entregue")
+		t.ok(M.estadoValido(feita, Dados.porId()))
 	end,
 }

@@ -18,7 +18,7 @@ require(Client.DialogoNpcView).start(MesaState)
 require(Client.NpcsVida).start()
 require(Client.ObjetivoView).start(MesaState)
 require(Client.ContaView).start()
-require(Client.RelogioRunView).start()
+require(Client.ExpedicaoView).start() -- faixa do topo (dia, sala) no lugar do relógio, porta, acampamento e escolhas
 require(Client.AjudaView).start()
 require(Client.Atalhos).start() -- esconde os atalhos do canto enquanto um painel grande está aberto (celular)
 require(Client.LojaView).start(MesaState)

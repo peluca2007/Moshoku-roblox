@@ -16,6 +16,12 @@ MissoesDados.LISTA = {
 		objetivo = { tipo = "vencer-encontro", encontroId = "region/encounter/dark-forest", quantidade = 1 },
 		recompensa = { ouro = 80 },
 	},
+	{
+		id = "esgoto-entupido", nome = "Esgoto entupido", npc = "taverneira",
+		texto = "O esgoto sob a praça entupiu e bichos sobem pelos canos. Desça pela porta na praça, limpe as salas, vença o guardião e volte.",
+		objetivo = { tipo = "concluir-expedicao", alvo = "esgoto", quantidade = 1 },
+		recompensa = { ouro = 40 },
+	},
 }
 
 function MissoesDados.porId()

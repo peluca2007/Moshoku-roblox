@@ -38,6 +38,7 @@ function MissaoService.start(deps)
 				situacao = Missao.situacao(estado, definicao),
 				progresso = progresso and progresso.progresso or 0,
 				objetivo = definicao.objetivo.quantidade,
+				tipo = definicao.objetivo.tipo,
 				recompensa = definicao.recompensa.ouro,
 			})
 		end

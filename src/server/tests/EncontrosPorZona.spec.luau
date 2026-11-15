@@ -35,6 +35,18 @@ return {
 		t.eq(Encontros.paraRun({ areaId = area, criaturas = { "creature/treant-anciao" } }, 1), nil)
 		t.eq(#Encontros.listar(), 4, "esgoto não entra no catálogo de zonas")
 	end,
+	["paraRun do esgoto aceita o chefe golem (padrao patamar 2 = peso 2 por jogador)"] = function(t)
+		local chefe = { no = "esgoto-chefe", areaId = "region/encounter/esgoto", criaturas = { "creature/golem-de-pedra-menor" } }
+		for n = 1, 4 do
+			local r = Encontros.paraRun(chefe, n)
+			t.ok(r ~= nil, "chefe recusado para " .. n)
+			t.eq(#r.elenco, n)
+			t.eq(r.elenco[1], "creature/golem-de-pedra-menor")
+			t.eq(r.peso, 2 * n)
+			t.eq(r.orcamento, n)
+		end
+		t.eq(Encontros.paraRun(chefe, 5), nil)
+	end,
 	["elenco escala por jogadores e nao expoe tabela interna"] = function(t)
 		local um = Encontros.elegivel("region/encounter/clearing", 1)
 		local quatro = Encontros.elegivel("region/encounter/clearing", 4)

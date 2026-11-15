@@ -80,7 +80,7 @@ return {
 		}
 		local o = Objetivos.atual({ run = run({ galho = "vila", plano = { modo = "pronto" }, opcoes = opcoes }) })
 		t.eq(o.chave, "seguir-historia")
-		t.ok(o.linha:find("Abra a RUN e vote: Seguir para as Ruínas do Vale", 1, true) ~= nil)
+		t.ok(o.linha:find("Vote com o grupo: Seguir para as Ruínas do Vale", 1, true) ~= nil)
 		t.ok(o.linha:find("Restam 12.0 dias", 1, true) ~= nil)
 		local floresta = Objetivos.atual({ run = run({ galho = "floresta-sombria", plano = { modo = "pronto" }, opcoes = {
 			{ id = "enfrentar-o-guardiao", texto = "Enfrentar o guardião da floresta", liberada = true },
@@ -128,7 +128,7 @@ return {
 	["história preserva texto de prazo real e instruções de selo"] = function(t)
 		local opcoes = { { id = "pegar-o-selo", texto = "Pegar o Selo e voltar", liberada = true } }
 		local o = Objetivos.atual({ run = run({ galho = "chefe-floresta", plano = {}, opcoes = opcoes }) })
-		t.ok(o.linha:find("Abra a RUN e vote: Pegar o Selo e voltar", 1, true) ~= nil)
+		t.ok(o.linha:find("Vote com o grupo: Pegar o Selo e voltar", 1, true) ~= nil)
 		t.eq(o.alvo, nil)
 		local retorno = Objetivos.atual({ run = run({ galho = "retorno", regiao = "vila", plano = {}, opcoes = {
 			{ id = "entregar-o-selo", texto = "Entregar o Selo na vila", liberada = true },
@@ -162,7 +162,7 @@ return {
 			t.ok(not o.titulo:find(galho, 1, true), "ID vazou no título: " .. galho)
 			t.ok(not o.linha:find(galho, 1, true), "ID vazou na linha: " .. galho)
 			if o.chave ~= "final-concluido" then
-				t.ok(o.linha:find("Abra a RUN e vote:", 1, true) ~= nil, "opção deve indicar voto: " .. galho)
+				t.ok(o.linha:find("Vote com o grupo:", 1, true) ~= nil, "opção deve indicar voto: " .. galho)
 				t.eq(o.alvo, nil, "história por votação não deve criar alvo físico: " .. galho)
 			end
 		end
@@ -184,11 +184,41 @@ return {
 		t.eq(o.titulo, "Vá até a porta do esgoto")
 		t.eq(o.alvo.id, "porta-esgoto")
 		t.eq(o.alvo.posicao, nil)
-		t.eq(Objetivos.atual({ run = hub, expedicaoConcluida = true }).chave, "missao-concluida")
+		t.eq(Objetivos.atual({ run = hub, expedicaoConcluida = true }).chave, "area-concluida")
 		local dentro = run({ tipoDoNo = "sala", area = "esgoto", passo = 2, totalPassos = 5, galho = "esgoto-2", plano = { modo = "pronto" },
 			evento = { id = "x" } })
 		t.eq(Objetivos.atual({ run = dentro }), nil)
 		t.eq(Objetivos.atual({ run = run({ tipoDoNo = "final", area = "esgoto", totalPassos = 5, fim = { motivo = "final" } }) }).chave, "missao-concluida")
+	end,
+	["expedição: hub com a área concluída, luta pendente e nó final"] = function(t)
+		local hub = run({ tipoDoNo = "hub", galho = "cidade", plano = { modo = "pronto" }, opcoes = {
+			{ id = "selar-a-anomalia", texto = "Selar a anomalia (encerrar a campanha)", liberada = true } } })
+		local o = Objetivos.atual({ run = hub })
+		t.eq(o.chave, "area-concluida")
+		t.ok(o.linha:find("Sele a anomalia", 1, true) ~= nil)
+		t.ok(not o.linha:find("RUN", 1, true))
+		hub.opcoes[1].liberada = false
+		t.eq(Objetivos.atual({ run = hub }).chave, "ir-a-porta-do-esgoto")
+		-- luta pendente: com erro vira objetivo; sem erro (caminho normal) a faixa fica quieta
+		local sala = run({ tipoDoNo = "luta", area = "esgoto", passo = 2, totalPassos = 5, galho = "esgoto-2", plano = { modo = "pronto" },
+			luta = { titulo = "Ratos" }, fase = "luta" })
+		t.eq(Objetivos.atual({ run = sala }), nil)
+		sala.lutaErro = "Sem mapa"
+		local l = Objetivos.atual({ run = sala })
+		t.eq(l.chave, "luta-pendente")
+		t.ok(l.linha:find("Entre na luta ou volte à cidade.", 1, true) == 1)
+		t.eq(Objetivos.atual({ run = sala, emEncontro = true }), nil)
+		-- nó final: sem faixa de dias e sem id cru
+		local fim = run({ tipoDoNo = "final", area = nil, galho = "final-campanha", fim = { motivo = "final", final = "final-campanha" },
+			tipo = "final", opcoes = {} })
+		fim.tipoDoNo = "hub"
+		local f = Objetivos.atual({ run = fim })
+		t.eq(f.chave, "missao-concluida")
+		t.eq(f.linha, "A anomalia foi selada.")
+		t.ok(not f.linha:find("Restam", 1, true))
+		for _, o2 in { Objetivos.atual({ run = hub }), l, f } do
+			t.ok(not (o2.titulo .. o2.linha):find("painel da RUN", 1, true))
+		end
 	end,
 	["expedição: o começo (mestre) vem antes da porta"] = function(t)
 		local hub = run({ tipoDoNo = "hub", galho = "cidade", plano = { modo = "semArvore" }, opcoes = {} })

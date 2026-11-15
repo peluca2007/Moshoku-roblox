@@ -1,6 +1,6 @@
 -- Projeta o próximo passo compreensível a partir do snapshot da run e do mundo.
 -- Módulo puro: não cria Instances nem decide/avança regras da run.
--- Prioridade: combate -> sem RUN -> fim -> provação ativa -> evento -> pegar/entregar Selo
+-- Prioridade: combate -> sem RUN -> fim -> luta pendente com erro -> provação ativa -> evento -> pegar/entregar Selo
 -- (somente opções liberadas) -> prazo expirado -> árvore zero -> treino sem árvore -> porta da expedição (hub)
 -- -> nó/história. Dentro de uma área de expedição não há cartão.
 local Objetivos = {}
@@ -39,7 +39,7 @@ local function treinadorProximo(estado)
 end
 
 local function votar(run, op, chave, titulo)
-	return objetivo(chave, titulo, "Abra a RUN e vote: " .. op.texto)
+	return objetivo(chave, titulo, "Vote com o grupo: " .. op.texto)
 end
 
 local function objetivoHistoria(run, estado)
@@ -66,7 +66,7 @@ local function objetivoHistoria(run, estado)
 			local regiaoDoChefe = if run.galho == "chefe-floresta" then "floresta-sombria" else "ruinas-do-vale"
 			local ponto = estado.destinos and estado.destinos[run.galho]
 			local destino = if run.regiao == regiaoDoChefe and ponto then alvo("destino", run.galho, ponto) else nil
-			return objetivo("vencer-guardiao", "Enfrente o guardião", "Abra a RUN e entre na luta.", destino)
+			return objetivo("vencer-guardiao", "Enfrente o guardião", "Entre na luta.", destino)
 		end
 		return nil
 	elseif run.galho == "retorno" then
@@ -87,14 +87,18 @@ local function calcular(estado)
 	local run = estado.run
 	if type(run) == "table" and run.semRun == true then run = nil end
 	if type(run) ~= "table" then
-		if estado.semRun or type(estado.run) == "table" and estado.run.semRun == true then return objetivo("iniciar-run", "Inicie uma RUN", "Vá ao painel e comece uma RUN.") end
+		if estado.semRun or type(estado.run) == "table" and estado.run.semRun == true then return objetivo("iniciar-run", "Inicie uma RUN", "Comece uma nova expedição.") end
 		return nil
 	end
 	local expedicao = run.area ~= nil or run.totalPassos ~= nil or run.tipoDoNo == "hub"
 	if run.fim then
-		if run.fim.motivo == "final" and expedicao then return objetivo("missao-concluida", "Missão concluída", "A expedição terminou.") end
+		if run.fim.motivo == "final" and expedicao then return objetivo("missao-concluida", "Missão concluída", "A anomalia foi selada.") end
 		if run.fim.motivo == "final" then return objetivo("final-concluido", "O Selo voltou para casa", "A história foi concluída.") end
-		return objetivo("run-encerrada", "RUN encerrada", "Consulte o painel para ver o resultado.")
+		return objetivo("run-encerrada", "Expedição encerrada", "O grupo caiu ou o prazo acabou. Comece outra expedição.")
+	end
+	-- Luta pendente que não começou (o servidor deu erro): única saída é tentar de novo ou voltar à cidade.
+	if expedicao and run.luta and run.lutaErro then
+		return objetivo("luta-pendente", "Entre na luta", "Entre na luta ou volte à cidade.")
 	end
 	-- Dentro da área o cartão some: a faixa do topo da ExpedicaoView basta.
 	if run.area ~= nil and run.tipoDoNo ~= "hub" then return nil end
@@ -109,7 +113,7 @@ local function calcular(estado)
 			return objetivo("prova-vila-2", "Conclua a provação", "Faça a água passar pelas três bacias.", alvo("destino", "agua", estado.destinos and estado.destinos.agua))
 		end
 	end
-	if run.evento then return objetivo("resolver-evento", "Resolva o evento", "Escolha uma opção no painel da RUN.") end
+	if run.evento then return objetivo("resolver-evento", "Resolva o evento", "Escolha uma opção com o grupo.") end
 	if run.mundoAberto and run.seloObtido and run.galho ~= "retorno" then
 		return objetivo("voltar-vila", "Leve o Selo à vila", "Volte a pé e entregue o Selo na praça.", alvo("destino", "vila", {x=0,y=0,z=-190}))
 	end
@@ -124,13 +128,13 @@ local function calcular(estado)
 		if op then return votar(run, op, "entregar-selo", "Entregue o Selo") end
 	end
 	if run.objetivo and run.objetivo.status == "expirado" then
-		return objetivo("prazo-esgotado", "O prazo terminou", "Consulte o painel da RUN para ver as opções disponíveis.")
+		return objetivo("prazo-esgotado", "O prazo terminou", "Veja as opções disponíveis.")
 	end
 
 	local plano = run.plano or {}
 	local arvore = estado.arvore or plano.escolhida or plano.arvore
 	if plano.modo == "zero" and not arvore then
-		return objetivo("escolher-arvore", "Escolha sua árvore", "Escolha uma árvore no painel da RUN.")
+		return objetivo("escolher-arvore", "Escolha sua árvore", "Abra o diário e escolha sua árvore inicial.")
 	end
 	if plano.modo == "semArvore" and not arvore and (run.diasRestantes or 0) >= 1 then
 		local npc = treinadorProximo(estado)
@@ -144,7 +148,9 @@ local function calcular(estado)
 		end
 	end
 	if run.tipoDoNo == "hub" then
-		if estado.expedicaoConcluida == true then return objetivo("missao-concluida", "Missão concluída", "A expedição terminou. Descanse na cidade.") end
+		if estado.expedicaoConcluida == true or opLiberada(run, "selar-a-anomalia") then
+			return objetivo("area-concluida", "Área concluída", "Sele a anomalia na porta do esgoto ou aproveite a cidade.", alvo("destino", "porta-esgoto"))
+		end
 		return objetivo("ir-a-porta-do-esgoto", "Vá até a porta do esgoto", "Aproxime-se da porta e acione-a para escolher a expedição.", alvo("destino", "porta-esgoto"))
 	end
 	return objetivoHistoria(run, estado)

@@ -4,6 +4,9 @@
 --   por HumanoidDescription (cor, escala), olhos acesos, anda com animação.
 -- - Bestas: quadrúpede montado com peças (lobo, rato, urso, aranha).
 -- - Monstros (hidras, wyrms...) continuam miniatura por enquanto.
+-- - LUTA-A: criatura com modelo do Blender (Shared.Mundo.ModelosCriaturas) usa o modelo, em
+--   ModelosCriaturas.escalaCombate, animado por Mundo/CriaturaAnimada (respira, anda, tomba). Os
+--   corpos acima ficam só como reserva para quem não tem modelo ou se a montagem falhar.
 -- Como o avatar do jogador (AvatarFichas): o servidor ancora o corpo e o leva
 -- de casa em casa. Ficha secreta (oculta ou na névoa) não tem corpo: a posição de
 -- um modelo replica para todos e entregaria a casa.
@@ -11,6 +14,8 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Visao = require(game.ReplicatedStorage.Shared.VisaoFurtiva)
 local Visual = require(script.Parent.VisualCriaturas)
+local ModelosCriaturas = require(game.ReplicatedStorage.Shared.Mundo.ModelosCriaturas)
+local CriaturaAnimada = require(script.Parent.Mundo.CriaturaAnimada)
 
 local Corpos = {}
 -- O jogo tem uma só mesa. Reutiliza o filtro de névoa já injetado por MesaService
@@ -247,10 +252,26 @@ function Corpos.start(deps)
 	pasta.Name = "CorposDeCriatura"
 	pasta.Parent = workspace
 	local corpos: { [string]: any } = {} -- id da ficha -> { modelo, tipo, x, z, conexao, andar, parado }
+	-- Modelos animados: um só laço, a ~30 Hz (cada passo move todas as peças por BulkMoveTo).
+	local acumulado = 0
+	RunService.Heartbeat:Connect(function(dt)
+		acumulado += dt
+		if acumulado < 1 / 30 then return end
+		local passo = acumulado
+		acumulado = 0
+		for _, c in corpos do
+			if c.animado and c.base and c.modelo.Parent then
+				local olhar = if c.alvoOlhar and not c.andando then deps.centro(c.alvoOlhar[1], c.alvoOlhar[2]) else nil
+				c.animado:atualizar(passo, c.base, c.andando == true, VELOCIDADE, olhar)
+			end
+		end
+	end)
 
 	local function alturaDaRaiz(c): number
 		if c.tipo == "besta" then
 			return 0.06
+		elseif c.tipo == "modelo" then
+			return 0
 		end
 		local h = c.modelo:FindFirstChildOfClass("Humanoid")
 		local raiz = c.modelo.PrimaryPart
@@ -262,7 +283,11 @@ function Corpos.start(deps)
 			then CFrame.lookAt(posicao, Vector3.new(olhando.X, posicao.Y, olhando.Z))
 			else CFrame.new(posicao) * c.rumo
 		c.rumo = cf.Rotation
-		if c.tipo == "besta" then
+		if c.tipo == "modelo" then
+			-- O modelo é posado a cada quadro no laço de animação; aqui só a base e a raiz.
+			c.base, c.andando = cf, passo ~= nil
+			c.modelo.PrimaryPart.CFrame = cf * CFrame.new(0, (c.modelo.PrimaryPart:GetAttribute("Altura") or 4) * 0.6, 0)
+		elseif c.tipo == "besta" then
 			posarBesta(c.modelo, cf, passo)
 		else
 			c.modelo.PrimaryPart.CFrame = cf
@@ -285,7 +310,7 @@ function Corpos.start(deps)
 		end
 		pararCaminhada(c)
 		local raiz = c.modelo.PrimaryPart
-		local inicio = raiz.Position
+		local inicio = if c.base then c.base.Position else raiz.Position
 		local fim = deps.centro(x, z) + Vector3.new(0, alturaDaRaiz(c), 0)
 		c.x, c.z = x, z
 		local distancia = (fim - inicio).Magnitude
@@ -331,6 +356,10 @@ function Corpos.start(deps)
 		if c.parado then
 			c.parado:Stop(0.2)
 		end
+		if c.animado then
+			c.animado:cair()
+			return
+		end
 		local cf0 = if c.tipo == "besta" then CFrame.new(c.modelo.PrimaryPart.Position) * c.rumo else c.modelo.PrimaryPart.CFrame
 		local comeco = os.clock()
 		c.conexao = RunService.Heartbeat:Connect(function()
@@ -357,8 +386,24 @@ function Corpos.start(deps)
 		local entrada = criatura and criatura.catalogId and deps.catalogo.POR_ID[criatura.catalogId]
 		local categoria = criatura and (criatura.categoria or (entrada and entrada.data.categoria))
 		local catalogId = criatura and criatura.catalogId
-		local modelo, tipo
-		if catalogId == "creature/treant-anciao" then
+		local modelo, tipo, animado
+		local info = ModelosCriaturas.escolher(catalogId, ModelosCriaturas.variante(token.id))
+		if info then
+			animado = CriaturaAnimada.montar(info, pasta, CFrame.new(deps.centro(token.x, token.z)), info.escalaCombate)
+		end
+		if animado then
+			modelo, tipo = animado.modelo, "modelo"
+			-- Raiz invisível (a "ficha"): PrimaryPart para BoardView/Corpo e âncora do nome sobre a cabeça.
+			local tam = animado:tamanho()
+			local raiz = Instance.new("Part")
+			raiz.Name = "HumanoidRootPart"
+			raiz.Size = Vector3.new(1, 1, 1)
+			raiz.Transparency = 1
+			raiz.Anchored, raiz.CanCollide, raiz.CanTouch, raiz.CanQuery = true, false, false, false
+			raiz:SetAttribute("Altura", tam.Y)
+			raiz.Parent = modelo
+			modelo.PrimaryPart = raiz
+		elseif catalogId == "creature/treant-anciao" then
 			modelo, tipo = criarTreant(), "besta"
 		elseif BESTAS[catalogId or ""] then
 			modelo, tipo = criarBesta(BESTAS[catalogId]), "besta"
@@ -374,7 +419,7 @@ function Corpos.start(deps)
 			return nil
 		end
 		modelo.Name = token.id
-		local c = { modelo = modelo, tipo = tipo, rumo = CFrame.identity }
+		local c = { modelo = modelo, tipo = tipo, rumo = CFrame.identity, animado = animado }
 		modelo.PrimaryPart.Anchored = true
 		modelo.Parent = pasta
 		local humanoide = modelo:FindFirstChildOfClass("Humanoid")
@@ -422,6 +467,7 @@ function Corpos.start(deps)
 						tombar(c)
 					elseif c.tombado then
 						pararCaminhada(c); c.tombado = false
+						if c.animado then c.animado.quedaDesde = nil end
 						local p = deps.centro(token.x, token.z) + Vector3.new(0, alturaDaRaiz(c), 0)
 						local dx, dz = Visao.direcao(token)
 						colocar(c, p, p + Vector3.new(dx, 0, dz))
@@ -430,7 +476,7 @@ function Corpos.start(deps)
 						andar(c, token.x, token.z)
 					elseif not c.conexao then
 						local dx, dz = Visao.direcao(token)
-						local p = c.modelo.PrimaryPart.Position
+						local p = if c.base then c.base.Position else c.modelo.PrimaryPart.Position
 						colocar(c, p, p + Vector3.new(dx, 0, dz))
 					end
 				end
@@ -459,7 +505,7 @@ function Corpos.start(deps)
 		local c = corpos[token.id]
 		if c then c.alvoOlhar = {x,z} end
 		if c and not c.conexao and not c.tombado then
-			local p = c.modelo.PrimaryPart.Position
+			local p = if c.base then c.base.Position else c.modelo.PrimaryPart.Position
 			colocar(c, p, deps.centro(x, z) + Vector3.new(0, p.Y - deps.centro(x, z).Y, 0))
 		end
 	end

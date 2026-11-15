@@ -96,10 +96,54 @@ arte, personagens ou fases.
   cidade oferece "Selar a anomalia", que encerra com o final bom. Provisório;
   sai quando houver mais áreas e a luta final do dia 30.
 
+### Telas de referência (Pedro, 15/11/2026)
+
+Capturas do jogo de inspiração em `docs/imagens contextos/` (fora do git: são
+de outro jogo). Vale só a estrutura; arte, fonte, nomes e textos são nossos
+(tema Pergaminho).
+
+- **Viajando:** tela cheia escura, só o texto "Viajando..." no centro.
+- **Acampamento:** cena 3D própria (fogueira, tenda, noite, personagem sentado),
+  sem painel no meio. Contador da área no canto superior direito ("Floresta
+  (1/5)"). Embaixo, dois botões: "Pronto (0/1)" (quantos confirmaram / tamanho
+  do grupo) e "Mostrar", que abre o inventário por cima.
+- **Inventário do acampamento:** três colunas. Esquerda, esconderijo do grupo
+  com "Transferir ouro"; centro, inventário pessoal (lista de itens com botões
+  por item, ouro e "Transferir ouro"); direita, equipamento em grade de espaços
+  e lista de atributos. Embaixo, "Pronto" e "Esconder".
+- **Escolha de caminho:** título "Para onde seguir?" e cartões lado a lado
+  (2 ou 3), cada um com nome, imagem, uma frase, "Votos: N" e botões de votar.
+  Embaixo, na mesma linha: "Saquear (N)", o tempo restante da votação e "Pausa
+  curta (restantes) (N)", também decididos por voto.
+- **Luta:** contador da área no canto superior direito; ordem dos turnos numa
+  coluna à esquerda; barras de vida sob cada personagem; embaixo, no centro, as
+  cartas de ação, a barra do personagem (nome, nível, vida e mana) e as abas
+  Lutar / Itens / Fuga.
+- **Lobby:** interior de taverna em primeira pessoa, com os outros jogadores à
+  vista; coluna de ícones à direita. O ícone da espada abre a lista de grupos
+  ("Grupo de Fulano (2/3)") com pesquisa, "Criar grupo" e "Fechar".
+
+Diferenças já decididas em relação à referência: descanso sem limite fixo, com
+exaustão (acima); "Saquear" não existe no nosso desenho.
+
+### Prioridades e ideias do Pedro (15/11/2026, por voz)
+
+- **O mais importante agora: animações e modelos.** Depois cinemáticas, menu e
+  balanceamento. Exemplo dado de coisa muito ruim hoje: o disparo de dardo e
+  flecha (leitura do Claude de uma frase mal transcrita; confirmar qual golpe).
+- **Viajando:** em vez de só o texto, uma animação curta dos personagens do
+  grupo andando. Tem de ser leve (cada área é um mapa próprio). Ideia, não
+  obrigação.
+- **Acampamento como lugar:** um mapa pequeno e aberto onde o grupo anda, como
+  o acampamento de Baldur's Gate 3 (só a estrutura como referência). Quem o
+  grupo conheceu numa escolha ou missão passa a aparecer lá depois, e dá para
+  conversar com ele (exemplo do Pedro: o vampiro de uma missão concluída).
+  **Ainda não implementado**: hoje o acampamento é um painel com o grupo parado
+  junto à porta (pacote CAMP1 em `TAREFAS.md`).
+
 ### Decisões em aberto (perguntar ao Pedro com opções e recomendação)
 
-- As prints do documento do Pedro não foram vistas pelo agente (só o texto);
-  pedir as imagens antes de fechar o visual das telas de acampamento e escolhas.
+- Nenhuma no momento.
 
 ## 2. O que já existe e serve
 

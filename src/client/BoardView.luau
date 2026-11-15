@@ -333,7 +333,7 @@ function BoardView.start(state)
 			end
 			pose(view, cf)
 			view.parts.select.Transparency = if id == selected then 0.25 + math.sin(now * 5) * 0.2 else 1
-			view.parts.turn.Transparency = if isTurn then 0.3 + math.sin(now * 3) * 0.2 else 1
+			view.parts.turn.Transparency = if isTurn then 0.62 + math.sin(now * 3) * 0.12 else 1 -- câmera perto (LUTA-A): disco mais discreto
 			if view.hidden and not view.avatarUserId then
 				local pulse = 0.55 + math.sin(now * 2 + view.seed) * 0.12
 				view.parts.body.Transparency, view.parts.head.Transparency, view.parts.rim.Transparency = pulse, pulse, pulse
@@ -704,14 +704,25 @@ function BoardView.start(state)
 
 	-- Câmera de mesa -----------------------------------------------------------
 
-	local focus = board.origin
-	local height = 148
-	local heightTarget = 148 -- roda e pinça mudam o alvo; a câmera chega suave
+	-- Câmera de luta (LUTA-A): enquadra os combatentes vivos (EnquadramentoMesa.plano), inclinada ~50°,
+	-- segue quem age com transição suave, gira com Q/E e aproxima um pouco no impacto (Efeitos.aproximar).
+	-- Fora do combate a mesa usa o mesmo modelo com distância livre (roda/pinça).
+	local focus = board.origin -- foco atual (suavizado)
+	local distancia = 120
+	local distanciaLivre = 120 -- fora do combate
+	local yaw, yawAlvo = 0, 0
+	local zoomUsuario = 1 -- roda/pinça em combate: multiplica a distância do enquadramento
+	local panUsuario = Vector3.zero -- WASD/arraste; zera quando muda a vez
 	local blendFrom: CFrame? = nil
 	local blendStart = 0
 	local combateAnterior = false
-	local enquadrarAte = 0
-	local enquadrarPendente = false
+	local vezAnterior = nil
+	local saltar = true -- primeiro quadro do combate: sem transição do foco
+	local PASSO_GIRO = math.rad(45)
+	local function horizontal(): (Vector3, Vector3)
+		local frente = Vector3.new(-math.sin(yaw), 0, -math.cos(yaw))
+		return frente, Vector3.new(-frente.Z, 0, frente.X)
+	end
 
 	local function humanoid(): Humanoid?
 		local character = player.Character
@@ -744,13 +755,17 @@ function BoardView.start(state)
 		local snap = state.snapshot()
 		local ativo = snap ~= nil and snap.combat.active
 		if ativo and not combateAnterior then
-			-- O HUD termina seu layout sob o corte escuro; não seguir peças depois.
-			enquadrarAte = os.clock() + .2
-			enquadrarPendente = true
-		elseif not ativo then
-			enquadrarAte = 0
-			enquadrarPendente = false
+			saltar, zoomUsuario, panUsuario = true, 1, Vector3.zero
+			-- Começa olhando de lado para a linha grupo x inimigos (ninguém escondido atrás de ninguém).
+			local aliados, inimigos = {}, {}
+			for _, p in Enquadramento.vivos(snap.tokens, snap.combat.order, board) do
+				table.insert(if p.inimigo then inimigos else aliados, p)
+			end
+			yawAlvo = Enquadramento.yawLateral(aliados, inimigos)
 		end
+		local vez = if ativo then snap.combat.turnId else nil
+		if vez ~= vezAnterior then panUsuario = Vector3.zero end
+		vezAnterior = vez
 		combateAnterior = ativo
 		if snap and snap.salaConceitual and not ativo then
 			state.setMira(nil);state.selectToken(nil);state.setTableView(false)
@@ -798,6 +813,13 @@ function BoardView.start(state)
 		if resumo and visivelNaTela(resumo) then
 			topo = math.max(topo, resumo.AbsolutePosition.Y + inset + resumo.AbsoluteSize.Y + 8)
 		end
+		-- Faixa da expedição (dia/sala) no alto. AbsolutePosition vem abaixo da barra do Roblox mesmo com
+		-- IgnoreGuiInset (observado no Studio: o Palco dessa tela fica em Y = -inset), então soma o inset.
+		local exp = pg and pg:FindFirstChild("ExpedicaoJogo")
+		local faixa = exp and exp:FindFirstChild("Faixa")
+		if faixa and faixa:IsA("GuiObject") and visivelNaTela(faixa) then
+			topo = math.max(topo, faixa.AbsolutePosition.Y + faixa.AbsoluteSize.Y + inset + 8)
+		end
 		local chefe = hud and hud:FindFirstChild("Chefe")
 		if chefe and visivelNaTela(chefe) then
 			topo = math.max(topo, chefe.AbsolutePosition.Y + inset + chefe.AbsoluteSize.Y + 8)
@@ -808,54 +830,69 @@ function BoardView.start(state)
 
 	local halfWidth = board.width * board.cell / 2
 	local halfHeight = board.height * board.cell / 2
+	local function planoDeLuta(snap, vp, area)
+		local pontos = Enquadramento.vivos(snap.tokens, snap.combat.order, board)
+		local ator
+		for _, p in pontos do
+			if p.id == snap.combat.turnId then ator = p end
+		end
+		return Enquadramento.plano({
+			pontos = pontos, ator = ator or pontos[1], yaw = yaw, fov = camera.FieldOfView,
+			viewport = { x = vp.X, y = vp.Y }, area = area,
+		})
+	end
 	RunService.RenderStepped:Connect(function(dt)
 		local snapAtual=state.snapshot()
 		if snapAtual and snapAtual.salaConceitual and not snapAtual.combat.active then return end
 		if not state.tableView() then
+			saltar = true
 			return
 		end
-		if enquadrarPendente or os.clock() < enquadrarAte then
-			local snap = state.snapshot()
-			if snap and snap.combat.active then
-				local limites = Enquadramento.limites(snap.tokens, snap.combat.order, board)
-				local centro, area = areaLivre()
-				local vp = camera.ViewportSize
-				focus = board.origin + Vector3.new(limites.x, 0, limites.z)
-				heightTarget = math.clamp(Enquadramento.altura(limites, { x = vp.X, y = vp.Y }, area, camera.FieldOfView), MIN_HEIGHT, MAX_HEIGHT)
-				height = heightTarget
-				deslocamento = centro - vp / 2
-				enquadrarPendente = false
-			end
-		end
+		local vp = camera.ViewportSize
+		local centroLivre, area = areaLivre()
 		if not UserInputService:GetFocusedTextBox() then
+			local frente, direita = horizontal()
 			local move = Vector3.zero
-			if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-				move -= Vector3.zAxis
-			end
-			if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-				move += Vector3.zAxis
-			end
-			if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-				move -= Vector3.xAxis
-			end
-			if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-				move += Vector3.xAxis
-			end
-			focus += move * PAN_SPEED * dt
-			focus = Vector3.new(
-				math.clamp(focus.X, board.origin.X - halfWidth, board.origin.X + halfWidth),
-				board.origin.Y,
-				math.clamp(focus.Z, board.origin.Z - halfHeight, board.origin.Z + halfHeight)
-			)
+			if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += frente end
+			if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= frente end
+			if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= direita end
+			if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += direita end
+			panUsuario += move * PAN_SPEED * (distancia / 120) * dt
 		end
-		height += (heightTarget - height) * math.min(1, dt * 10)
-		local target = CFrame.lookAt(focus + Vector3.new(0, height, height * Enquadramento.INCLINACAO), focus)
+		local focoAlvo, distAlvo
+		if snapAtual and snapAtual.combat.active then
+			local pl = planoDeLuta(snapAtual, vp, area)
+			focoAlvo = board.origin + Vector3.new(pl.foco.x, pl.foco.y, pl.foco.z)
+			distAlvo = pl.distancia * zoomUsuario
+		else
+			focoAlvo = board.origin
+			distAlvo = distanciaLivre
+		end
+		focoAlvo += panUsuario
+		focoAlvo = Vector3.new(
+			math.clamp(focoAlvo.X, board.origin.X - halfWidth, board.origin.X + halfWidth),
+			focoAlvo.Y,
+			math.clamp(focoAlvo.Z, board.origin.Z - halfHeight, board.origin.Z + halfHeight)
+		)
+		if saltar then
+			focus, distancia, yaw = focoAlvo, distAlvo, yawAlvo
+			deslocamento = centroLivre - vp / 2
+			saltar = false
+		else
+			-- Segue quem age com transição suave (amortecimento exponencial, independente do FPS).
+			focus = focus:Lerp(focoAlvo, 1 - math.exp(-dt * 3.2))
+			distancia += (distAlvo - distancia) * (1 - math.exp(-dt * 3.2))
+			yaw += (yawAlvo - yaw) * (1 - math.exp(-dt * 7))
+		end
+		local pitch = math.rad(Enquadramento.INCLINACAO)
+		local frente = Vector3.new(-math.sin(yaw) * math.cos(pitch), -math.sin(pitch), -math.cos(yaw) * math.cos(pitch))
+		local d = distancia * Efeitos.fatorAproximacao()
+		local target = CFrame.lookAt(focus - frente * d, focus)
 		do
-			local vp = camera.ViewportSize
-			local alvoPx = areaLivre() - vp / 2
+			-- O foco fica no meio da área livre (sem o painel de ações embaixo e os cartões em cima).
+			local alvoPx = centroLivre - vp / 2
 			deslocamento = deslocamento:Lerp(alvoPx, math.min(1, dt * 8))
-			local distancia = (target.Position - focus).Magnitude
-			local porPixel = 2 * distancia * math.tan(math.rad(camera.FieldOfView / 2)) / math.max(vp.Y, 1)
+			local porPixel = 2 * d * math.tan(math.rad(camera.FieldOfView / 2)) / math.max(vp.Y, 1)
 			target = target * CFrame.new(-deslocamento.X * porPixel, deslocamento.Y * porPixel, 0)
 		end
 		-- Transição suave da câmera do avatar para a Visão da mesa.
@@ -1011,6 +1048,10 @@ function BoardView.start(state)
 			else
 				select(camera:ViewportPointToRay(mouse.X, mouse.Y))
 			end
+		elseif input.KeyCode == Enum.KeyCode.Q and not state.mira() and not state.selectedToken() then
+			yawAlvo -= PASSO_GIRO -- Q sem nada a cancelar: gira a câmera para a esquerda
+		elseif input.KeyCode == Enum.KeyCode.E then
+			yawAlvo += PASSO_GIRO
 		elseif input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.Q or input.KeyCode == Enum.KeyCode.ButtonB then
 			if state.mira() then
 				state.setMira(nil)
@@ -1036,7 +1077,12 @@ function BoardView.start(state)
 
 	UserInputService.InputChanged:Connect(function(input, processed)
 		if not processed and state.tableView() and input.UserInputType == Enum.UserInputType.MouseWheel then
-			heightTarget = math.clamp(heightTarget - input.Position.Z * 10, MIN_HEIGHT, MAX_HEIGHT)
+			local snap = state.snapshot()
+			if snap and snap.combat.active then
+				zoomUsuario = math.clamp(zoomUsuario * (1 - input.Position.Z * 0.12), 0.6, 3)
+			else
+				distanciaLivre = math.clamp(distanciaLivre - input.Position.Z * 12, MIN_HEIGHT, MAX_HEIGHT)
+			end
 		end
 	end)
 
@@ -1047,7 +1093,7 @@ function BoardView.start(state)
 	local TAP_TOLERANCE = 12
 
 	local function studsPerPixel(): number
-		local visible = 2 * height * math.tan(math.rad(camera.FieldOfView) / 2)
+		local visible = 2 * distancia * math.tan(math.rad(camera.FieldOfView) / 2)
 		return visible / math.max(camera.ViewportSize.Y, 1)
 	end
 
@@ -1073,7 +1119,7 @@ function BoardView.start(state)
 			end
 		end
 		if not processed and state.tableView() then
-			touches[input] = { start = input.Position, focus = focus, moved = fingers > 1 }
+			touches[input] = { start = input.Position, focus = panUsuario, moved = fingers > 1 } -- focus = pan no início
 		end
 	end)
 
@@ -1091,7 +1137,8 @@ function BoardView.start(state)
 				paintAt(camera:ScreenPointToRay(input.Position.X, input.Position.Y))
 			else
 				local scale = studsPerPixel()
-				focus = touch.focus - Vector3.new(delta.X * scale, 0, delta.Y * scale)
+				local frente, direita = horizontal()
+				panUsuario = touch.focus - direita * delta.X * scale + frente * delta.Y * scale
 			end
 		end
 	end)
@@ -1106,7 +1153,7 @@ function BoardView.start(state)
 		-- Ao sair da pinça, o dedo restante recomeça o arraste daqui, sem salto.
 		for other, remaining in touches do
 			remaining.start = other.Position
-			remaining.focus = focus
+			remaining.focus = panUsuario
 		end
 		if touch and state.brush() then
 			-- Com pincel: toque curto pinta uma casa; arraste já pintou no caminho.
@@ -1120,15 +1167,21 @@ function BoardView.start(state)
 	end)
 
 	-- scale é acumulado desde o início da pinça; parte da altura inicial.
-	local pinchStart = height
+	local pinchStart = 1
 	UserInputService.TouchPinch:Connect(function(_, scale, _, inputState, processed)
 		if processed or not state.tableView() then
 			return
 		end
 		if inputState == Enum.UserInputState.Begin then
-			pinchStart = heightTarget
+			local snap = state.snapshot()
+			pinchStart = if snap and snap.combat.active then zoomUsuario else distanciaLivre
 		elseif inputState == Enum.UserInputState.Change and scale > 0 then
-			heightTarget = math.clamp(pinchStart / scale, MIN_HEIGHT, MAX_HEIGHT)
+			local snap = state.snapshot()
+			if snap and snap.combat.active then
+				zoomUsuario = math.clamp(pinchStart / scale, 0.6, 3)
+			else
+				distanciaLivre = math.clamp(pinchStart / scale, MIN_HEIGHT, MAX_HEIGHT)
+			end
 		end
 	end)
 end

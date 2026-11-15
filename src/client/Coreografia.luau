@@ -250,6 +250,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				Efeitos.reagir(alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
 				Efeitos.tremer(math.min(0.45, cena.perfil.peso * (if alvo.critico then 0.5 else 0.2)), 0.2)
+				Efeitos.aproximar(if alvo.critico then 0.14 else 0.08, if alvo.critico then 0.55 else 0.4)
 			end
 		end)
 	end

@@ -119,6 +119,27 @@ function Efeitos.tremorCFrame(): CFrame
 		* CFrame.Angles(0, 0, math.noise(agora * 30, 4) * f * 0.02)
 end
 
+-- Aproximação curta da câmera de luta no impacto (LUTA-A): o BoardView multiplica a distância por
+-- fatorAproximacao(). Entra rápido (~0,06 s) e volta suave até o fim de `duracao`.
+local aproximacao = { inicio = 0, fim = 0, forca = 0 }
+function Efeitos.aproximar(forca: number, duracao: number?)
+	local agora = os.clock()
+	if agora > aproximacao.fim or forca >= aproximacao.forca then
+		aproximacao.inicio, aproximacao.fim, aproximacao.forca = agora, agora + (duracao or 0.4), math.clamp(forca, 0, 0.3)
+	end
+end
+
+function Efeitos.fatorAproximacao(): number
+	local agora = os.clock()
+	if agora >= aproximacao.fim then
+		return 1
+	end
+	local total = math.max(aproximacao.fim - aproximacao.inicio, 1e-3)
+	local t = (agora - aproximacao.inicio) / total
+	local curva = if t < 0.15 then t / 0.15 else (1 - (t - 0.15) / 0.85) ^ 2
+	return 1 - aproximacao.forca * curva
+end
+
 -- Recuo de quem foi atingido: a miniatura dá um tranco na direção do golpe e volta.
 local reacoes: { [string]: { inicio: number, direcao: Vector3 } } = {}
 function Efeitos.reagir(tokenId: string, direcao: Vector3, forca: number?)

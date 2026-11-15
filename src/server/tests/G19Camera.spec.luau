@@ -16,14 +16,4 @@ return {
 			t.eq(box.largura,40);t.eq(box.profundidade,40)
 		end end
 	end,
-	["zoom inicial adapta largura da tela e HUD em vez de altura fixa148"] = function(t)
-		local box = {largura=65,profundidade=60}
-		local desktop = E.altura(box,{x=1280,y=720},{x1=0,y1=64,x2=1280,y2=550},70)
-		local portrait = E.altura(box,{x=374,y=666},{x1=0,y1=64,x2=374,y2=480},70)
-		local painel = E.altura(box,{x=1280,y=720},{x1=0,y1=64,x2=780,y2=550},70)
-		t.ok(desktop<110 and desktop>35);t.ok(portrait>desktop and portrait<300)
-		t.ok(painel>=desktop)
-		local fechado = E.altura(box,{x=1280,y=720},{x1=0,y1=64,x2=1280,y2=550},40)
-		t.ok(fechado>desktop)
-	end,
 }

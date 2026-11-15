@@ -126,6 +126,16 @@ de outro jogo). Vale só a estrutura; arte, fonte, nomes e textos são nossos
 Diferenças já decididas em relação à referência: descanso sem limite fixo, com
 exaustão (acima); "Saquear" não existe no nosso desenho.
 
+### Luta: referência de apresentação (Pedro, 15/11/2026)
+
+Vídeo de referência em `docs/imagens contextos/` (outro jogo; só a estrutura).
+Decisão: **as regras do livro ficam, com grade, casas, alcance e área**. Muda
+a apresentação: câmera por trás do ombro de quem age, inimigos à frente,
+HUD mínimo (menu de ação curto ao lado do personagem, anúncio "Fulano usa X"
+no topo, barras finas de vida sobre cada combatente, cartão compacto do
+personagem no canto inferior direito) e câmera que acompanha o golpe. A grade
+só aparece no chão ao andar ou mirar.
+
 ### Prioridades e ideias do Pedro (15/11/2026, por voz)
 
 - **O mais importante agora: animações e modelos.** Depois cinemáticas, menu e

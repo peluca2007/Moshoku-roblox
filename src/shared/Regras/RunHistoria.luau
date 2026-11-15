@@ -1,7 +1,7 @@
 -- Esqueleto da história em árvore da run (PLANO §12). Pura: valida e navega por dados, sem rede nem Instances.
 -- historia = { id, inicio = <no>, nos = { [id] = no } }
--- no.luta (só em tipo "chefe") = { criaturas = { id canônico... }, areaId }: ao chegar aqui a run espera a luta.
--- no = { tipo = "vila"|"viagem"|"regiao"|"chefe"|"final", regiao = id|nil, titulo, opcoes = { opcao... } }  (final não tem opções)
+-- no.luta (só em tipo "chefe" ou "sala") = { criaturas = { id canônico... }, areaId }: ao chegar aqui a run espera a luta.
+-- no = { tipo = "vila"|"viagem"|"regiao"|"chefe"|"final"|"sala"|"hub", regiao = id|nil, titulo, opcoes = { opcao... } }  (final não tem opções)
 -- opcao = { id, texto, para = <no>, dias = n|nil, exige = { flag = nome|nil }|nil, marca = flag|nil }
 -- Trancas são flags da run (Run.definirFlag): abertas por item, habilidade de árvore, escolha da história ou
 -- desbloqueio permanente (o jogo decide quem chama definirFlag). Aqui só se verifica se estão abertas.
@@ -9,7 +9,7 @@ local Run = require(game:GetService("ReplicatedStorage").Shared.Regras.Run)
 
 local Historia = {}
 
-local TIPOS = { vila = true, viagem = true, regiao = true, chefe = true, final = true }
+local TIPOS = { vila = true, viagem = true, regiao = true, chefe = true, final = true, sala = true, hub = true }
 
 -- Devolve true ou false + lista de problemas. Garante: início existe, todo destino existe, só `final` não
 -- tem opções, ids de opção únicos por nó, e todo nó é alcançável a partir do início com ao menos um final alcançável.
@@ -21,7 +21,7 @@ function Historia.validar(h)
 	for id, no in h.nos do
 		if type(no) ~= "table" or not TIPOS[no.tipo] then
 			p("Tipo inválido em " .. tostring(id))
-		elseif no.luta ~= nil and (no.tipo ~= "chefe" or type(no.luta) ~= "table" or type(no.luta.criaturas) ~= "table"
+		elseif no.luta ~= nil and ((no.tipo ~= "chefe" and no.tipo ~= "sala") or type(no.luta) ~= "table" or type(no.luta.criaturas) ~= "table"
 			or #no.luta.criaturas < 1 or type(no.luta.areaId) ~= "string") then
 			p("Luta inválida em " .. tostring(id))
 		elseif no.tipo == "final" then
@@ -72,7 +72,7 @@ function Historia.opcoes(h, run)
 		if op.exige and op.exige.flag and not Run.temFlag(run, op.exige.flag) then
 			liberada, motivo = false, "Trancado: " .. op.exige.flag
 		end
-		table.insert(lista, { id = op.id, texto = op.texto, para = op.para, dias = op.dias or 0, liberada = liberada, motivo = motivo })
+		table.insert(lista, { id = op.id, texto = op.texto, para = op.para, dias = op.dias or 0, dica = op.dica, liberada = liberada, motivo = motivo })
 	end
 	return lista
 end

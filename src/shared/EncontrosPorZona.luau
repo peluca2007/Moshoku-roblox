@@ -76,7 +76,48 @@ end
 -- Conteúdo R7b para grupo inicial de patamar 1. Pesos e limite Difícil:
 -- bestiary.ts/pesoNoOrcamento e TEMPERATURAS (Apêndice G).
 -- Preserva um guardião; acompanhantes completam o orçamento em passos de 0,5.
+-- Expedição do esgoto: as salas sorteiam elencos diferentes para a mesma área. A lista recebida é o elenco
+-- para 1 jogador (1 a 4 criaturas do catálogo, sem chefe); o grupo repete esse elenco por jogador, o que
+-- mantém o orçamento proporcional (peso = papel x 2^(patamar-1); lacaio 0,5, padrão 1).
+EncontrosPorZona.AREA_ESGOTO = "region/encounter/esgoto"
+local PESO_PAPEL = { lacaio = 0.5, padrao = 1 }
+local dadosCriaturas
+local function pesoDaCriatura(id)
+	if not dadosCriaturas then
+		dadosCriaturas = {}
+		for _, item in require(game:GetService("ReplicatedStorage").Shared.Livro.Dados.Criaturas) do dadosCriaturas[item.id] = item.data end
+	end
+	local d = type(id) == "string" and dadosCriaturas[id] or nil
+	local papel = d and PESO_PAPEL[d.papel]
+	return papel and papel * 2 ^ ((d.patamar or 1) - 1) or nil
+end
+local function paraEsgoto(luta, quantidade)
+	local base = luta.criaturas
+	if type(base) ~= "table" or #base < 1 or #base > 4 then return nil, "Elenco do esgoto inválido." end
+	for chave in base do
+		if type(chave) ~= "number" or chave < 1 or chave > #base then return nil, "Elenco do esgoto inválido." end
+	end
+	local pesoBase = 0
+	for _, id in base do
+		local p = pesoDaCriatura(id)
+		if not p then return nil, "Criatura sem suporte no esgoto." end
+		pesoBase += p
+	end
+	local elenco = {}
+	for _ = 1, quantidade do
+		for _, id in base do table.insert(elenco, id) end
+	end
+	local peso = pesoBase * quantidade
+	return { elenco = elenco, papeis = {}, peso = peso, orcamento = quantidade, razao = peso / quantidade }
+end
+
 function EncontrosPorZona.paraRun(luta, quantidade)
+	if type(luta) == "table" and luta.areaId == EncontrosPorZona.AREA_ESGOTO then
+		if type(quantidade) ~= "number" or quantidade % 1 ~= 0 or quantidade < 1 or quantidade > 4 then
+			return nil, "Luta da run ou tamanho do grupo inválido."
+		end
+		return paraEsgoto(luta, quantidade)
+	end
 	if type(luta) ~= "table" or type(quantidade) ~= "number" or quantidade % 1 ~= 0
 		or quantidade < 1 or quantidade > 4 or not ZONAS[luta.areaId]
 		or (luta.areaId ~= "region/encounter/forest" and luta.areaId ~= "region/encounter/dark-forest" and luta.areaId ~= "region/encounter/ruinas")

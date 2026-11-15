@@ -21,6 +21,7 @@ local POR_MARCO = table.freeze({
 	["region/encounter/forest"] = "floresta",
 	["region/encounter/dark-forest"] = "floresta",
 	["region/encounter/ruinas"] = "ruinas",
+	["region/encounter/esgoto"] = "esgoto",
 })
 
 function ArenasDados.daMarco(areaId)
@@ -111,9 +112,29 @@ ArenasDados.RUINAS = table.freeze({
 	moradores = {},
 })
 
+-- Esgoto sob a vila (expedição): pedra úmida e escura, muros, barris, lampiões fracos e ratos espreitando.
+-- Sem luz própria por arena: a luz segue `mundo` (ponto da vila); o escuro vem do piso e dos tons.
+ArenasDados.ESGOTO = table.freeze({
+	mundo = { x = 0, z = -150 },
+	piso = { material = "Slate", cor = { 58, 64, 62 } },
+	chao = { material = "Pebble", cor = { 34, 38, 36 } },
+	props = {
+		{ "Muro1", -40, -64, 0 }, { "Muro2", 0, -66, 0 }, { "Muro1", 40, -64, 0 },
+		{ "Muro2", -66, -30, 90 }, { "Muro1", -68, 10, 90 }, { "Muro2", -66, 46, 90 },
+		{ "Muro2", 66, -30, -90 }, { "Muro1", 68, 10, -90 }, { "Muro2", 66, 46, -90 },
+		{ "Muro1", -30, 66, 180 }, { "Muro2", 10, 66, 180 }, { "Muro1", 44, 66, 180 },
+		{ "Coluna1", -58, -58, 0 }, { "Coluna2", 58, -58, 0 }, { "ColunaQuebrada1", -58, 58, 0 }, { "ColunaQuebrada2", 58, 58, 0 },
+		{ "Barril", -58, -42, 0 }, { "Barril", -61, -36, 0 }, { "Caixotes", 60, -44, 30 }, { "Caixotes", 62, 30, -20 },
+		{ "Barril", 58, 62, 0 }, { "Lampiao", -57, 0, 0 }, { "Lampiao", 57, -10, 0 }, { "Lampiao", 0, -58, 0 },
+		{ "Rocha1", -62, 30, 0 }, { "Rocha2", 30, -60, 0 }, { "Lenha", -30, 60, 90 }, { "Tora1", 20, 62, 0 },
+		{ "RatoGigante", -58, -10, 80 }, { "RatoGigante", 60, 12, -100 }, { "RatoGigante", -20, 58, 170 },
+	},
+	moradores = {},
+})
+
 local LAYOUTS = table.freeze({
 	cidade = ArenasDados.CIDADE, campo = ArenasDados.CAMPO,
-	floresta = ArenasDados.FLORESTA, ruinas = ArenasDados.RUINAS,
+	floresta = ArenasDados.FLORESTA, ruinas = ArenasDados.RUINAS, esgoto = ArenasDados.ESGOTO,
 })
 
 function ArenasDados.layout(arenaId)

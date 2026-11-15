@@ -21,7 +21,9 @@ return {
 		t.eq(Arenas.daZona("region/outra"), nil)
 	end,
 	["toda arena tem piso, ponto do mapa e cenario fora da grade"] = function(t)
-		t.eq(#Arenas.ids(), 4)
+		t.eq(#Arenas.ids(), 5)
+		t.eq(Arenas.daMarco("region/encounter/esgoto"), "esgoto")
+		t.eq(#Arenas.layout("esgoto").moradores, 0)
 		for _, id in Arenas.ids() do
 			local arena = Arenas.layout(id)
 			t.ok(arena.piso and arena.chao, id .. " piso")

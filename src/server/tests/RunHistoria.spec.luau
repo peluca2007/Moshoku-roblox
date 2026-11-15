@@ -50,6 +50,20 @@ return {
 		t.eq(com(function(h) h.nos.a.luta.criaturas = {} end), false)
 		t.eq(com(function(h) h.nos.a.luta.areaId = 5 end), false)
 	end,
+	["tipos sala e hub validos; luta em sala; opcoes repassam a dica"] = function(t)
+		local function com(muda)
+			local h = { inicio = "a", nos = { a = { tipo = "hub", opcoes = { { id = "x", para = "b", dica = "um cheiro forte" } } },
+				b = { tipo = "sala", opcoes = { { id = "y", para = "c" } }, luta = { criaturas = { "creature/x" }, areaId = "region/encounter/y" } },
+				c = { tipo = "final" } } }
+			muda(h)
+			return h
+		end
+		t.eq((H.validar(com(function() end))), true)
+		t.eq((H.validar(com(function(h) h.nos.b.luta.criaturas = {} end))), false)
+		t.eq((H.validar(com(function(h) h.nos.a.luta = h.nos.b.luta end))), false) -- hub não luta
+		local run = Run.moverPara(nova(), "vila", "a")
+		t.eq(H.opcoes(com(function() end), run)[1].dica, "um cheiro forte")
+	end,
 	["sem final alcancavel e recusado"] = function(t)
 		local h = { inicio = "a", nos = {
 			a = { tipo = "vila", opcoes = { { id = "x", para = "b" } } },

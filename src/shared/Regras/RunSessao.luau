@@ -9,7 +9,9 @@
 --   ehExplorador = function(userId) -> bool,   -- tem Navegação e Liderança no rank Explorador
 --   historia, objetivo,               -- padrão: HistoriaV1
 --   prontos,                          -- PersonagensProntos, para o modo "pronto"
---   eventos,                          -- catálogo de eventos de viagem (RunViagem); sem ele não há eventos
+--   historiaDaSemente = function(semente) -> historia,  -- expedição gerada pela semente (iniciar sorteia antes;
+--                                     retomar regenera por run.semente). Sem ela: HistoriaV1. `area` = dados da área.
+--   eventos,                        -- catálogo de eventos de viagem (RunViagem); sem ele não há eventos
 -- }
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Run = require(Shared.Regras.Run)
@@ -70,9 +72,11 @@ function Sessao:iniciar(grupoId, jogadores, modos, liberadas)
 	if type(grupoId) ~= "string" or grupoId == "" or type(jogadores) ~= "table" then return false, "Pedido inválido." end
 	local ids = {}
 	for _, j in jogadores do table.insert(ids, j.userId) end
+	local semente = self.deps.rng:NextInteger(0, 2 ^ 30)
+	local historia = if self.deps.historiaDaSemente then self.deps.historiaDaSemente(semente) else self.historia
 	local run, motivo = Run.nova({
-		semente = self.deps.rng:NextInteger(0, 2 ^ 30), jogadores = ids, objetivo = self.objetivo,
-		regiao = self.historia.nos[self.historia.inicio].regiao or "vila", galho = self.historia.inicio,
+		semente = semente, jogadores = ids, objetivo = self.objetivo,
+		regiao = historia.nos[historia.inicio].regiao or "vila", galho = historia.inicio,
 	})
 	if not run then return false, motivo end
 	local planos = {}
@@ -85,9 +89,11 @@ function Sessao:iniciar(grupoId, jogadores, modos, liberadas)
 	local treinadores, falha = Treinadores.sortear(self.deps.rng, { liberadas = liberadas })
 	if not treinadores then return false, falha end
 	self.treinadores = treinadores
+	local historiaAnterior = self.historia
+	self.historia = historia
 	self.run, self.planos, self.grupoId, self.votos = run, planos, grupoId, {}
 	local ok, erro = self:_salvar()
-	if not ok then self.run, self.planos, self.grupoId = nil, {}, nil; return false, erro end
+	if not ok then self.run, self.planos, self.grupoId, self.historia = nil, {}, nil, historiaAnterior; return false, erro end
 	ativa = self
 	return true
 end
@@ -100,6 +106,7 @@ function Sessao:retomar(grupoId)
 	if dado == nil then return false, "Nenhuma run salva." end
 	local run, planos, extras = Save.restaurar(dado)
 	if not run then return false, planos end
+	if self.deps.historiaDaSemente then self.historia = self.deps.historiaDaSemente(run.semente) end
 	local treinadores
 	if extras.treinadoresVila ~= nil then
 		if type(extras.treinadoresVila) ~= "string" then return false, "Treinadores salvos inválidos." end
@@ -223,7 +230,7 @@ function Sessao:_opcoes(userId)
 		return lista
 	end
 	local opcoes = Historia.opcoes(self.historia, self.run)
- if not self.deps.mundoAberto then return opcoes end
+	if not self.deps.mundoAberto then return self:_filtrarRetomadas(opcoes) end
  local locais = {}
  for _, o in opcoes do
   local destino = self.historia.nos[o.para]
@@ -233,6 +240,24 @@ function Sessao:_opcoes(userId)
   end
  end
  return locais
+end
+
+-- No hub só aparecem entrar e a retomada liberada mais funda (as outras retomadas ficam fora da lista).
+function Sessao:_filtrarRetomadas(opcoes)
+	local no = self.historia.nos[self.run.galho]
+	if not no or no.tipo ~= "hub" then return opcoes end
+	local melhor, passoMelhor = nil, -1
+	for _, o in opcoes do
+		local destino = self.historia.nos[o.para]
+		if string.sub(o.id, 1, 8) == "retomar-" and o.liberada and destino and (destino.passo or 0) > passoMelhor then
+			melhor, passoMelhor = o, destino.passo or 0
+		end
+	end
+	local lista = {}
+	for _, o in opcoes do
+		if string.sub(o.id, 1, 8) ~= "retomar-" or o == melhor then table.insert(lista, o) end
+	end
+	return lista
 end
 
 function Sessao:_opcoesLiberadas()
@@ -441,6 +466,14 @@ function Sessao:lutaTerminou(resultado)
 	if resultado == "victory" then
 		local nova = Run.definirFlag(self.run, "vencido/" .. self.luta)
 		self.run, self.luta = nova, nil
+	elseif resultado == "defeat" and self.historia.nos[self.luta].area and self.deps.area then
+		-- Derrota em expedição não encerra a campanha: o grupo volta à cidade pagando o mesmo que "voltar-a-cidade".
+		local no = self.historia.nos[self.luta]
+		local gasta, _, erro = Run.gastarDias(self.run, math.max(1, no.passo * self.deps.area.custos.voltarPorPasso))
+		if not gasta then return false, erro end
+		local movida, motivo = Run.moverPara(gasta, "vila", "cidade")
+		if not movida then return false, motivo end
+		self.run, self.luta = movida, nil
 	elseif resultado == "defeat" then
 		local nova = self.run
 		for id, j in nova.jogadores do
@@ -546,6 +579,43 @@ function Sessao:descansar(userId,tipo)
  return ok, motivo
 end
 
+-- Descanso de acampamento (só com a sala/chefe vencido): gasta dias, no máximo `area.descansosMax` por área na run.
+function Sessao:_descansosUsados(areaId)
+	local prefixo = "descanso/" .. areaId .. "/"
+	local usados = 0
+	for flag in self.run.flags do
+		if string.sub(flag, 1, #prefixo) == prefixo then usados += 1 end
+	end
+	return usados
+end
+
+-- "luta" (luta pendente) | "acampamento" (sala/chefe já vencido) | nil.
+function Sessao:_fase()
+	if not self.run then return nil end
+	if self.luta then return "luta" end
+	local no = self.historia.nos[self.run.galho]
+	if no and (no.tipo == "sala" or no.tipo == "chefe") and self.run.flags["vencido/" .. self.run.galho] then return "acampamento" end
+	return nil
+end
+
+function Sessao:descansarNoAcampamento(userId)
+	local area = self.deps.area
+	if self.ocupada then return false, "Aguarde o salvamento da run." end
+	if not self.run or self.run.fim or not area then return false, "Run indisponível." end
+	local j = self.run.jogadores[userId]
+	if not j or not j.presente or j.caido then return false, "Jogador indisponível." end
+	if self:_fase() ~= "acampamento" then return false, "Só é possível descansar no acampamento." end
+	local usados = self:_descansosUsados(area.id)
+	if usados >= area.descansosMax then return false, "Sem descansos restantes nesta área." end
+	local anterior = self.run
+	local nova, _, erro = Run.gastarDias(anterior, area.custos.descanso)
+	if not nova then return false, erro end
+	self.run = Run.definirFlag(nova, "descanso/" .. area.id .. "/" .. (usados + 1))
+	local ok, motivo = self:_salvar()
+	if not ok then self.run = anterior end
+	return ok, motivo
+end
+
 -- Só recebe coordenadas do avatar lidas pelo servidor, nunca payload remoto.
 function Sessao:presencaNoMundo(userId, x, z)
  if not self.deps.mundoAberto or self.ocupada or not self.run or self.run.fim or self.evento or self.luta then return false end
@@ -594,6 +664,8 @@ function Sessao:visao(userId)
 	end
 	table.sort(grupo, function(a, b) return tostring(a.userId) < tostring(b.userId) end)
 	return {
+		passo = no and no.passo, totalPassos = no and no.total, area = no and no.area, fase = self:_fase(),
+		descansos = if no and no.area and self.deps.area then { usados = self:_descansosUsados(no.area), max = self.deps.area.descansosMax } else nil,
 		seloObtido = r.flags["selo-obtido"] == true,
   relogio = Relogio.visao(r, self.relogioPausado), mundoAberto = self.deps.mundoAberto == true,
 		dia = r.dia, diasRestantes = Run.diasRestantes(r), objetivo = table.clone(r.objetivo),

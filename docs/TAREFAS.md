@@ -12,9 +12,13 @@ Como usar: antes de editar um arquivo, veja se há reserva ativa abaixo; registr
 
 **Fatia do esgoto ([DIRECAO §4](DIRECAO.md), Pedro 14/11/2026).** Claude coordena; agentes executam com arquivos exclusivos. Custos em dias e regras de queda são provisórios até o Pedro responder as decisões em aberto de DIRECAO §1.
 
-EXP1 — agente (coordenação Claude), **em andamento (14/11/2026)**. Regras puras da expedição: `shared/Mundo/ExpedicaoEsgoto`, `shared/Regras/{ExpedicaoGerador,RunHistoria,RunSessao}`, specs `ExpedicaoGerador`, `RunHistoria`, `RunSessao*`.
+EXP1 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. Regras puras da expedição: `shared/Mundo/ExpedicaoEsgoto`, `shared/Regras/{ExpedicaoGerador,RunHistoria,RunSessao}`, specs `ExpedicaoGerador`, `RunHistoria`. Local ok (só "Catálogo" falha, ambiente). Não verificado: Studio; combates reduzidos na volta/retomada não existem ainda.
 
-EXP2 — agente (coordenação Claude), **em andamento (14/11/2026)**. Arena `esgoto` e elenco por área: `shared/EncontrosPorZona`, `shared/Mundo/ArenasDados`, `server/Mundo/ArenaCenario`, specs `ArenasDados`, `EncontrosPorZona*`.
+EXP2 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. Arena `esgoto` e elenco por sala (`EncontrosPorZona.paraRun` repete a lista por jogador): `shared/EncontrosPorZona`, `shared/Mundo/ArenasDados`, specs. Local ok. Não verificado: visual da arena no Studio; sem luz própria.
+
+EXP3 — agente (coordenação Claude), **em andamento (14/11/2026)**. Servidor da expedição: `server.server.luau`, `server/{RunServico,PortaExpedicao,MissaoService,LutaDoMundoServico}`, `shared/{EncontrosPorZona,Mundo/MissoesDados,Mundo/NpcsDados,Regras/Missao}`, specs do servidor.
+
+EXP4 — agente (coordenação Claude), **em andamento (14/11/2026)**. Cliente da expedição: `client.client.luau`, `client/{ExpedicaoView,RunView,ObjetivoView,ObjetivoEstado}`, `shared/Regras/Objetivos`, specs e simulações de cliente.
 
 PERG1 — Claude, **pronta para revisão (14/11/2026)**. Interface no estilo Pergaminho (escolha do Pedro): 9 PNGs enviados, ids em `shared/UIArte`, paleta de papel em `shared/UITemaDados` (+ `sobreEscuro`, `barras`, `fundoTela`), ajustes em `client/{UI/Componentes,CenaAbertura,MarcadoresMundo,Hud,RelogioRunView,ResultadoView,ViagemView,AparenciaEditor,ToqueContraste,InicioView,Carregamento,CriacaoRapidaView,CriacaoPersonagemView}`, `server/Mundo/NpcVisual`, spec `UITema`. Local: tudo ok **exceto "Catálogo"** (ambiente: o site do livro está sem `node_modules/tsx`). Studio 1667/0 no servidor e 6/0 de UI no cliente; telas conferidas em [TESTES](TESTES.md). **Não verificados:** luta (HUD, fila de turnos, ações), tela de resultado, menu inicial, ajuda, criação avançada, viagem, textos sobre o mundo (a captura do Studio saiu sem o 3D), celular e larguras médias. Sem commit.
 

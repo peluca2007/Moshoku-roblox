@@ -16,6 +16,25 @@ return {
 		t.eq(sombria.elenco[1], "creature/lobo-cinzento")
 		t.eq(Encontros.consultar("inventado"), nil)
 	end,
+	["paraRun do esgoto escala qualquer elenco valido de 1 a 4 jogadores"] = function(t)
+		local area = "region/encounter/esgoto"
+		for n = 1, 4 do
+			local r = Encontros.paraRun({ no = "x", areaId = area, criaturas = { "creature/rato-gigante" } }, n)
+			t.eq(#r.elenco, n)
+			t.eq(r.elenco[1], "creature/rato-gigante")
+			t.eq(r.peso, 0.5 * n)
+			t.eq(r.orcamento, n)
+			t.eq(next(r.papeis), nil)
+		end
+		local misto = Encontros.paraRun({ areaId = area, criaturas = { "creature/rato-gigante", "creature/lobo-cinzento" } }, 3)
+		t.eq(#misto.elenco, 6)
+		t.eq(misto.peso, 4.5)
+		t.eq(Encontros.paraRun({ areaId = area, criaturas = { "creature/rato-gigante" } }, 5), nil)
+		t.eq(Encontros.paraRun({ areaId = area, criaturas = {} }, 1), nil)
+		t.eq(Encontros.paraRun({ areaId = area, criaturas = { "creature/inexistente" } }, 1), nil)
+		t.eq(Encontros.paraRun({ areaId = area, criaturas = { "creature/treant-anciao" } }, 1), nil)
+		t.eq(#Encontros.listar(), 4, "esgoto não entra no catálogo de zonas")
+	end,
 	["elenco escala por jogadores e nao expoe tabela interna"] = function(t)
 		local um = Encontros.elegivel("region/encounter/clearing", 1)
 		local quatro = Encontros.elegivel("region/encounter/clearing", 4)

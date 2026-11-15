@@ -40,7 +40,7 @@ GERAL1 — agente Opus, **concluída (15/11/2026)**. Auditoria somente leitura (
 
 CAMP1 — **na fila** (Pedro, 15/11). Acampamento como mapa pequeno e aberto onde o grupo anda; quem o grupo conheceu numa escolha ou missão aparece lá e conversa. Botões "Pronto (n/N)" e "Mostrar" (inventário em três colunas), conforme [DIRECAO §1](DIRECAO.md). Hoje é um painel com o grupo parado junto à porta.
 
-APRES1 — **na fila, prioridade do Pedro (15/11)**: animações e modelos primeiro (fase 4 de [DIRECAO §7](DIRECAO.md)); o disparo de dardo e flecha foi citado como muito ruim (confirmar qual golpe). Começa quando a QA1 liberar o Studio.
+APRES1 — **na fila, prioridade do Pedro (15/11)**: animações e modelos primeiro (fase 4 de [DIRECAO §7](DIRECAO.md)); o Pedro acha todas as animações de hoje muito feias (a da flecha foi o exemplo): o pacote refaz a apresentação dos golpes em geral, começando pelos disparos. Começa quando a QA1 liberar o Studio.
 
 UI1 — telas (Pedro, 14/11). **UI1a pronta para revisão (15/11/2026)**: criação com o personagem 3D no centro, painel à direita e etapas embaixo (`client/{CriacaoRapidaView,CriacaoPrevia}`, `shared/Regras/CriacaoRapidaTela`, spec). Clicar na raça só seleciona: os roteiros precisam de um Avançar a mais. Local ok; **visual não conferido no Studio**. Na fila: UI1b menu de pausa central (`InicioView`), atalhos e status.
 

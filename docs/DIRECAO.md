@@ -129,8 +129,8 @@ exaustão (acima); "Saquear" não existe no nosso desenho.
 ### Prioridades e ideias do Pedro (15/11/2026, por voz)
 
 - **O mais importante agora: animações e modelos.** Depois cinemáticas, menu e
-  balanceamento. Exemplo dado de coisa muito ruim hoje: o disparo de dardo e
-  flecha (leitura do Claude de uma frase mal transcrita; confirmar qual golpe).
+  balanceamento. O Pedro acha **todas** as animações de hoje muito feias, não
+  só um golpe; a da flecha foi o exemplo citado.
 - **Viajando:** em vez de só o texto, uma animação curta dos personagens do
   grupo andando. Tem de ser leve (cada área é um mapa próprio). Ideia, não
   obrigação.

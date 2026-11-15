@@ -126,6 +126,21 @@ de outro jogo). Vale só a estrutura; arte, fonte, nomes e textos são nossos
 Diferenças já decididas em relação à referência: descanso sem limite fixo, com
 exaustão (acima); "Saquear" não existe no nosso desenho.
 
+### Personagem (Pedro, 15/11/2026)
+
+No estilo de Arcane Lineage e Deepwoken (só a estrutura como referência):
+corpo R15 padrão do Roblox, roupa do jogo (o jogador não usa as roupas do
+avatar), cabelo do próprio avatar do Roblox do jogador, cor definida pela raça
+e pelas escolhas da criação, traços de raça (orelha de elfo, barba de anão)
+como acessórios nossos. Substitui o boneco "quadradão" de cubos e a regra
+antiga "avatar Roblox por enquanto". **Ainda não implementado.**
+
+Pacotes gratuitos baixados pelo Pedro em `build/externos/` (fora do git):
+Universal Animation Library e Monster Pack Animated (Quaternius), Easy
+Animated Enemy Pack (rato, aranha, cobra, sapo, vespa). Conferir a licença de
+cada um ao integrar. `MDA_Hatchery_CP1.zip` (pacote Unity sem licença
+visível) não será usado.
+
 ### Luta: referência de apresentação (Pedro, 15/11/2026)
 
 Vídeo de referência em `docs/imagens contextos/` (outro jogo; só a estrutura).

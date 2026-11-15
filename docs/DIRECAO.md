@@ -132,7 +132,7 @@ No estilo de Arcane Lineage e Deepwoken (só a estrutura como referência):
 corpo R15 padrão do Roblox, roupa do jogo (o jogador não usa as roupas do
 avatar), cabelo do próprio avatar do Roblox do jogador, cor definida pela raça
 e pelas escolhas da criação, traços de raça (orelha de elfo, barba de anão)
-como acessórios nossos. Substitui o boneco "quadradão" de cubos e a regra
+como acessórios nossos. Cabelo que não aceita troca de cor é trocado por um cabelo padrão nosso que aceita. Cabeleireiro na cidade: o jogador informa o ID de um cabelo do catálogo do Roblox e passa a usá-lo no jogo (o servidor valida o ID). Substitui o boneco "quadradão" de cubos e a regra
 antiga "avatar Roblox por enquanto". **Ainda não implementado.**
 
 Pacotes gratuitos baixados pelo Pedro em `build/externos/` (fora do git):

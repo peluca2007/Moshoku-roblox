@@ -16,9 +16,10 @@ assert 's.you.personagem' not in inicio
 
 run = read("src/client/RunView.luau")
 assert 'botao("Nova expedição"' in run and "AberturaFluxo" in run  # P2: sem lista de modos crus
-assert 'HistoriaV1.HISTORIA.nos[dado.galho]' in run
+assert 'HistoriaV1' not in run  # diário: sem caminho do mundo aberto antigo
+assert 'Entrar na luta' not in run and '"votar"' not in run  # luta e votação são da ExpedicaoView
 assert 'Apresentacao.nomeArvore(id, Catalogo)' in run
-assert 'Apresentacao.nomeObjetivo(dado.objetivo, HistoriaV1)' in run
+assert 'Tela.diario(dado, nomeDe)' in run and 'Tela.textoFim(dado)' in run
 assert 'Apresentacao.nomePronto(plano.prontoId, PersonagensProntos)' in run
 
 viagem = read("src/client/ViagemView.luau")

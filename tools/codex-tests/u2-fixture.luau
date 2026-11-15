@@ -69,6 +69,7 @@ local function dim(xs, xo, ys, yo) return { X = { Scale = xs or 0, Offset = xo o
 local UDim2 = { new = dim, fromScale = function(x, y) return dim(x, 0, y, 0) end,
 	fromOffset = function(x, y) return dim(0, x, 0, y) end }
 local Vector2 = { new = function(x, y) return { X = x, Y = y } end }
+local UDim = { new = function(scale, offset) return { Scale = scale, Offset = offset } end }
 local Enum = setmetatable({}, { __index = function(self, key)
 	local group = setmetatable({}, { __index = function(_, item) return key .. "." .. item end })
 	rawset(self, key, group); return group
@@ -108,7 +109,7 @@ local livro = object("Folder"); livro.Catalogo = "Catalogo"; shared.Livro = livr
 local mundo = object("Folder"); mundo.HistoriaV1 = "HistoriaV1"; shared.Mundo = mundo
 shared.PersonagensProntos = "PersonagensProntos"
 shared.ApresentacaoAbertura = "ApresentacaoAbertura"
-shared.Regras = { ProvacaoPrompts = "ProvacaoPrompts" }
+shared.Regras = { ProvacaoPrompts = "ProvacaoPrompts", ExpedicaoTela = "ExpedicaoTela" }
 replicated.Shared = shared
 local service = {
 	Players = { LocalPlayer = player }, ReplicatedStorage = replicated,
@@ -143,6 +144,11 @@ local function requireMock(module)
 		nomeObjetivo = function(objetivo) if objetivo and objetivo.id == historia.OBJETIVO.id then return "Levar o Selo do guardião à vila" end; return objetivo and (objetivo.titulo or objetivo.texto) or "Expedição" end,
 		nomePronto = function(id) for _, p in personagensProntos do if p.id == id then return p.nome end end; return "Personagem pronto" end,
 	} end
+	-- O texto do diário tem spec próprio (ExpedicaoTela.spec); aqui só o essencial para a RunView desenhar.
+	if module == "ExpedicaoTela" then return {
+		diario = function(visao) if visao.semRun then return nil end return { dia = "Dia 2", grupo = {}, lugar = "Na cidade" } end,
+		textoFim = function(visao) if visao.fim then return "A anomalia foi selada." end return nil end,
+	} end
 	if module == "ExtraTelas" then return ExtraTelas end
 	if module == "Componentes" then return Componentes end
 	if module == "Tema" then return Tema end
@@ -159,7 +165,7 @@ local require = requireMock
 
 Componentes = {}
 Tema = { cores = { borda = "borda", titulo = "titulo", painel = "painel", alerta = "alerta", perigo = "perigo", sucesso = "sucesso" },
-	espessuras = { destaque = 3 }, arvore = function() return { selo = "ÁGUA", cor = "água" } end }
+	espessuras = { destaque = 3 }, espacamentos = { pequeno = 8, padrao = 16 }, arvore = function() return { selo = "ÁGUA", cor = "água" } end }
 Componentes.dialogoNpc = function(p)
 	local root = Instance.new("Frame"); root.Parent = p.parent
 	local content = Instance.new("Frame"); content.Name = "Conteudo"; content.Parent = root; root.Conteudo = content
@@ -175,6 +181,19 @@ end
 Componentes.botao = function(p)
 	local b = makeButton(p.parent, p.nome, p.texto, p.aoClicar); b.LayoutOrder = p.ordem or 0; return b
 end
+Componentes.painel = function(p)
+	local root = Instance.new("Frame"); root.Name = p.nome or "Painel"; root.Parent = p.parent
+	local content = Instance.new("Frame"); content.Name = "Conteudo"; content.Parent = root; root.Conteudo = content
+	return root
+end
+Componentes.titulo = function(p)
+	local label = Instance.new("TextLabel"); label.Name = p.nome or "Titulo"; label.Text = p.texto or ""; label.LayoutOrder = p.ordem or 0; label.Parent = p.parent; return label
+end
+Componentes.lista = function(p)
+	local list = Instance.new("Frame"); list.Name = p.nome or "Lista"; list.Parent = p.parent
+	return list
+end
+Componentes.aplicarEscala = function() end
 Componentes.aviso = function(p) table.insert(avisos, p); return function() end end
 
 ExtraTelas = {}
@@ -245,11 +264,13 @@ end
 -- P2: sem run a tela oferece só "Nova expedição" (o AberturaFluxo decide o modo); sem lista de modos crus.
 descendantByText(playerGui, "Nova expedição")
 runRemote.OnClientEvent:Fire("run", { dia = 1, diasRestantes = 4, objetivo = { id = "rota", status = "em andamento" },
-	semRun = false, galho = "rota", opcoes = { { id = "bosque", texto = "Bosque", dias = 1, liberada = true } }, grupo = {} })
-local voto = descendantByText(playerGui, "Bosque · 1.00 dia(s)")
-voto.Activated:Fire()
-assertEqual(runRemote.sent[#runRemote.sent].acao, "votar", "Run votar")
-assertEqual(runRemote.sent[#runRemote.sent].opcao, "bosque", "Run payload de voto")
+	semRun = false, galho = "rota", opcoes = { { id = "bosque", texto = "Bosque", dias = 1, liberada = true } }, grupo = {},
+	plano = { modo = "zero", oferta = { "fogo" } } })
+-- Votação e luta pendente saíram do diário (ExpedicaoView); a escolha de árvore inicial continua aqui.
+local arvore = descendantByText(playerGui, "Magia de Fogo")
+arvore.Activated:Fire()
+assertEqual(runRemote.sent[#runRemote.sent].acao, "escolherArvore", "Run escolher árvore")
+assertEqual(runRemote.sent[#runRemote.sent].arvore, "fogo", "Run payload de árvore")
 
 -- Treinador: fala separada e retry reutiliza o mesmo requestId.
 TrainerView.start()

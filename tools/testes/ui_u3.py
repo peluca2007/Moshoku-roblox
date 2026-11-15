@@ -23,7 +23,7 @@ extra = sources["UI/ExtraCombate"]
 for token in ('larguraBotao, 84', '"RotuloCompacto"', '"Habilid."'):
     if token not in extra: errors.append("U7 combate: " + token)
 run = (root / "src/client/RunView.luau").read_text(encoding="utf-8")
-for token in ('painel.AutomaticSize = Enum.AutomaticSize.Y', 'layout.AbsoluteContentSize.Y', 'diasRestantes', 'objetivo'):
+for token in ('painel.AutomaticSize = Enum.AutomaticSize.Y', 'C.aplicarEscala(painel)', 'Tela.diario', 'Tela.textoFim'):
     if token not in run: errors.append("U7 run: " + token)
 banner = (root / "src/client/UI/Avisos.luau").read_text(encoding="utf-8")
 for token in ('C.painel', 'losangos = true', 'p.corDestaque'):

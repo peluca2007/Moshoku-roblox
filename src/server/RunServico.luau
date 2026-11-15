@@ -321,6 +321,20 @@ function Servico.start(deps)
 			if ehOpcaoDePorta(pedido.opcao) and no and no.tipo == "hub" and not (deps.portaPerto and deps.portaPerto(player)) then
 				recusa(player, "Chegue perto da porta do esgoto."); return
 			end
+			-- Sem ficha de luta (personagem ainda sem caminho de poder, ou caído) a sala não teria como
+			-- começar e o grupo ficaria preso dentro da área: recusar antes de gastar o dia.
+			if ehOpcaoDePorta(pedido.opcao) and no and no.tipo == "hub" and deps.prontoParaLutar then
+				for userId, membro in sessao.run.jogadores do
+					local jogador = Players:GetPlayerByUserId(userId)
+					if jogador and membro.presente and not membro.caido then
+						local pronto, motivo = deps.prontoParaLutar(jogador)
+						if not pronto then
+							recusa(player, (if jogador == player then "Você" else jogador.DisplayName) .. " ainda não pode lutar: " .. (motivo or "aprenda um caminho com um mestre da vila."))
+							return
+						end
+					end
+				end
+			end
 			local ok, resultado = sessao:votar(player.UserId, pedido.opcao)
 			if not ok then recusa(player, resultado); return end
 			transmitir()

@@ -92,6 +92,14 @@ runServico = require(Server.RunServico).start({
 	corpoPessoal = mesa.fichaParaTestes or mesa.corpoPessoal, -- bônus para os testes dos eventos de viagem (F8); aceita perfil sem árvore
 	-- Luta das salas e do chefe na arena da mesa; o fim volta por runServico.encerrado.
 	iniciarLuta = lutaDoMundo.iniciarChefe,
+	-- A porta só abre para quem já tem ficha de luta (árvore aprendida e PV acima de zero).
+	prontoParaLutar = function(player)
+		local ok, corpo = pcall(mesa.corpoPessoal, player)
+		if not ok or not corpo then return false, "aprenda um caminho com um mestre da vila." end
+		local atual = corpo.session and corpo.session.current
+		if atual and atual.pv and atual.pv <= 0 then return false, "recupere seus PV antes de descer." end
+		return true
+	end,
 	conta = require(Server.ContaServico).start(),
 	historiaDaSemente = function(semente) return Gerador.gerar(Esgoto.AREA, semente) end,
 	area = Esgoto.AREA,

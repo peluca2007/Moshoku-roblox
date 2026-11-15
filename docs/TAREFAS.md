@@ -30,7 +30,11 @@ TESTER1 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**
 
 GERAL1 — agente Opus (coordenação Claude), **em andamento (14/11/2026)**. Auditoria somente leitura pedida pelo Pedro ("dá uma geral no código"): bloqueadores do fluxo do esgoto, defeitos gerais, telas feias (criação, menus) e limpeza; vira pacotes de correção.
 
-UI1 — **na fila**. Refazer a tela de criação de personagem e os menus (principal, atalhos, status), pedido do Pedro em 14/11.
+UI1 — telas (Pedro, 14/11). **UI1a pronta para revisão (15/11/2026)**: criação com o personagem 3D no centro, painel à direita e etapas embaixo (`client/{CriacaoRapidaView,CriacaoPrevia}`, `shared/Regras/CriacaoRapidaTela`, spec). Clicar na raça só seleciona: os roteiros precisam de um Avançar a mais. Local ok; **visual não conferido no Studio**. Na fila: UI1b menu de pausa central (`InicioView`), atalhos e status.
+
+EXP5 (achado, 15/11): entrar no esgoto sem árvore deixava o grupo preso (a luta era recusada por falta de ficha de luta). Corrigido: `RunServico` recusa o voto de porta via `prontoParaLutar` (`server.server.luau`); conferido no Studio (recusa sem árvore; com árvore a luta da sala 1 começa). Falta jogar o resto da área.
+
+QA1 — agente (coordenação Claude), **em andamento (15/11/2026)**, com uso do Studio autorizado. Suíte de QA no terminal (pedido do Pedro): `tools/qa/` roda cenários no Studio e imprime ok/falha por verificação.
 
 PERG1 — Claude, **pronta para revisão (14/11/2026)**. Interface no estilo Pergaminho (escolha do Pedro): 9 PNGs enviados, ids em `shared/UIArte`, paleta de papel em `shared/UITemaDados` (+ `sobreEscuro`, `barras`, `fundoTela`), ajustes em `client/{UI/Componentes,CenaAbertura,MarcadoresMundo,Hud,RelogioRunView,ResultadoView,ViagemView,AparenciaEditor,ToqueContraste,InicioView,Carregamento,CriacaoRapidaView,CriacaoPersonagemView}`, `server/Mundo/NpcVisual`, spec `UITema`. Local: tudo ok **exceto "Catálogo"** (ambiente: o site do livro está sem `node_modules/tsx`). Studio 1667/0 no servidor e 6/0 de UI no cliente; telas conferidas em [TESTES](TESTES.md). **Não verificados:** luta (HUD, fila de turnos, ações), tela de resultado, menu inicial, ajuda, criação avançada, viagem, textos sobre o mundo (a captura do Studio saiu sem o 3D), celular e larguras médias. Sem commit.
 

@@ -78,6 +78,10 @@ arte, personagens ou fases.
   animações com marcadores (`GetMarkerReachedSignal`) feitas no editor nativo do
   Roblox; `client/CenaAbertura` já segue esse caminho e é a base.
 
+- Telas (14/11): criação de personagem com o personagem em 3D no centro, painel
+  de escolhas à direita e etapas embaixo; menu principal como menu de pausa
+  central (tela escurecida, painel estreito, poucos botões grandes).
+
 ### Decisões em aberto (perguntar ao Pedro com opções e recomendação)
 
 - As prints do documento do Pedro não foram vistas pelo agente (só o texto);

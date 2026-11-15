@@ -13,6 +13,7 @@
 --   vez (ninguém trava a partida dos outros).
 -- O servidor decide tudo; a IA usa o mesmo caminho de dano das habilidades.
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local Personagens = require(game:GetService("ReplicatedStorage").Shared.PersonagensProntos)
 local Armas = require(game:GetService("ReplicatedStorage").Shared.Regras.Armas)
 local Maestrias = require(game:GetService("ReplicatedStorage").Shared.Regras.Maestrias)
@@ -607,6 +608,39 @@ function EncontroService.start(deps)
 					deps.avancarVez(novoId)
 				end
 			end)
+		end
+	end
+
+	-- SÓ STUDIO (QA): a QA (tools/qa/bot_luta.luau) cura a própria ficha na luta do mundo por este caminho,
+	-- que não existe no jogo publicado. Antes ela usava o `adjust` da Mesa, que agora é recusado sem mestre.
+	-- Sem payload além da ação; só administrador, só durante a luta do mundo, só a ficha do próprio jogador.
+	api.curarParaTeste = function(player, quanto)
+		if not RunService:IsStudio() then return false, "Só no Studio." end
+		if not (estado.ativo and estado.mundo) then return false, "Sem luta do mundo." end
+		local Roles = require(script.Parent.MesaRoles)
+		if typeof(player) == "Instance" and not Roles.isAdmin(player) then return false, "Só administrador." end
+		for _, t in tokens do
+			if t.kind == "jogador" and not t.ia and t.ownerUserId == player.UserId and not t.derrotado and t.pv > 0 then
+				local antes = t.pv
+				t.pv = math.min(t.pvMax, t.pv + math.clamp(tonumber(quanto) or 20, 1, 20))
+				t.version += 1
+				deps.mudou()
+				return true, t.pv - antes
+			end
+		end
+		return false, "Ficha não encontrada."
+	end
+	if RunService:IsStudio() and deps.remoteQA ~= false and typeof(deps.remote) == "Instance" then
+		local rs = game:GetService("ReplicatedStorage")
+		local qa = rs:FindFirstChild("QALutaTeste")
+		if not qa then
+			qa = Instance.new("RemoteFunction")
+			qa.Name = "QALutaTeste"
+			qa.Parent = rs
+		end
+		qa.OnServerInvoke = function(player, acao)
+			if acao ~= "curar" then return false, "Ação inválida." end
+			return api.curarParaTeste(player, 20)
 		end
 	end
 

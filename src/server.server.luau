@@ -108,8 +108,8 @@ runServico = require(Server.RunServico).start({
 	objetivo = Gerador.OBJETIVO,
 	portaPerto = Porta.pertoDe,
 	pontoDaPorta = Porta.ponto,
-	-- Descanso do acampamento da área: mesmo caminho do descanso da mesa (recupera PV/PM/PT da ficha pessoal).
-	restaurarDescanso = function(player) return mesa.descansarPessoal(player, "longo") end,
+	-- Descanso do acampamento da área (meio dia): recupera tudo, PV/PM/PT/PP cheios (decisão de 15/11).
+	restaurarDescanso = function(player) return mesa.descansarPessoal(player, "acampamento") end,
 	-- Fim da luta da expedição: o que sobrou de PV/PM/PT/PP volta para a ficha pessoal (próxima sala começa daí).
 	gravarRecursos = require(Server.PersonagemSessao).gravarRecursosDaLuta,
 	-- Ouro da área: o mesmo crédito idempotente das lutas (id de pagamento), que também registra a missão da expedição.

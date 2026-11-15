@@ -95,7 +95,7 @@ return {
 		t.eq(G.OBJETIVO.id, "limpar-o-esgoto")
 		t.eq(G.OBJETIVO.prazoDias, 30)
 	end,
-	["percurso completo: lutas, descanso limitado, chefe e final cumprem o objetivo"] = function(t)
+	["percurso completo: lutas, descanso sem limite, chefe e final cumprem o objetivo"] = function(t)
 		local s = nova()
 		t.eq((s:iniciar("g", { { userId = 1 } })), true)
 		t.eq(s:visao(1).area, nil)
@@ -110,15 +110,15 @@ return {
 		ganhar(t, s)
 		v = s:visao(1)
 		t.eq(v.descansos.usados, 0)
-		t.eq(v.descansos.max, 2)
+		t.eq(v.descansos.max, nil) -- sem limite fixo (decisão de 14/11)
 		t.eq(achar(v.opcoes, "caminho-a").dias, 0)
 		t.ok(achar(v.opcoes, "caminho-b").dica ~= nil)
 		t.eq(s.run.dia, 1)
 		t.eq((s:descansarNoAcampamento(1)), true)
 		t.eq((s:descansarNoAcampamento(1)), true)
-		t.eq((s:descansarNoAcampamento(1)), false) -- limite por área
-		t.eq(s.run.dia, 2)
-		t.eq(s:visao(1).descansos.usados, 2)
+		t.eq((s:descansarNoAcampamento(1)), true) -- sem teto: cada descanso só custa meio dia
+		t.eq(s.run.dia, 2.5)
+		t.eq(s:visao(1).descansos.usados, 3)
 		for passo = 2, 5 do
 			votar(t, s, if passo % 2 == 0 then "caminho-a" else "caminho-b")
 			t.eq(s:visao(1).passo, passo)
@@ -388,5 +388,16 @@ return {
 		t.eq(s.run.dia, dia)
 		t.eq(s:visao(1).descansos.usados, 0)
 		t.eq((s:podeDescansarNoAcampamento(99)), false)
+	end,
+	["descansosMax opcional: area com teto ainda limita"] = function(t)
+		local comTeto = table.clone(AREA)
+		comTeto.descansosMax = 1
+		local s = nova(7, nil, { area = comTeto, historiaDaSemente = function(sem) return G.gerar(comTeto, sem) end })
+		s:iniciar("g", { { userId = 1 } })
+		votar(t, s, "entrar-esgoto")
+		ganhar(t, s)
+		t.eq(s:visao(1).descansos.max, 1)
+		t.eq((s:descansarNoAcampamento(1)), true)
+		t.eq((s:descansarNoAcampamento(1)), false)
 	end,
 }

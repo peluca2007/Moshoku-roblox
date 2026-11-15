@@ -122,6 +122,13 @@ return {
 		t.eq(Tela.decidir(v, { levantadoEm = "esgoto-2" }).tela, "escolhas")
 		t.eq(Tela.decidir(v, { levantadoEm = "outro" }).tela, "acampamento")
 	end,
+	["acampamento sem limite fixo: só o custo no botão, nunca desabilita"] = function(t)
+		local v = visao({ fase = "acampamento", descansos = { usados = 7 } })
+		local d = Tela.decidir(v, {})
+		t.eq(d.descansar.texto, "Descansar · meio dia")
+		t.ok(not d.descansar.desabilitado)
+		t.eq(Tela.diario(v).descansos, "Descansos nesta área: 7")
+	end,
 	["luta esconde tudo menos a faixa"] = function(t)
 		for _, caso in { { v = visao({ fase = "luta" }), e = {} }, { v = visao(), e = { emCombate = true } } } do
 			local d = Tela.decidir(caso.v, caso.e)

@@ -1,5 +1,5 @@
 -- Dados da primeira expedição (DIRECAO §4): o esgoto da cidade, 5 salas de combate com escolha de caminho e um chefe.
--- Só dados congelados; o gerador (Regras/ExpedicaoGerador) sorteia os encontros e a sessão consome `custos`/`descansosMax`.
+-- Só dados congelados; o gerador (Regras/ExpedicaoGerador) sorteia os encontros e a sessão consome `custos` (e `descansosMax`, se houver).
 -- `criaturas` = ids canônicos para 1 jogador (o servidor escala ao tamanho do grupo). Só criaturas com modelo.
 local Esgoto = {}
 
@@ -8,8 +8,8 @@ Esgoto.AREA = table.freeze({
 	-- Custos em dias do prazo da run. Entrar = 1; avançar de sala = grátis; descanso = 0,5.
 	-- Voltar à cidade custa max(1, passo * voltarPorPasso); retomar um passo já vencido custa entrar + passo * voltarPorPasso.
 	custos = table.freeze({ entrar = 1, voltarPorPasso = 0.5, descanso = 0.5 }),
-	-- PROVISÓRIO: limite de descansos por área; a mecânica de exaustão virá depois e substitui este teto.
-	descansosMax = 2,
+	-- Descanso sem limite fixo (decisão do Pedro, 14/11): o grupo escolhe quando descansar e a Exaustão
+	-- (Regras/ExaustaoRun) cobra as lutas seguidas. `descansosMax` opcional: nil = sem limite.
 	encontros = table.freeze({
 		table.freeze({ id = "ratos", dica = "Guinchos e patinhas na água escura", criaturas = table.freeze({ "creature/rato-gigante" }) }),
 		table.freeze({ id = "goblin", dica = "Uma luz de tocha tremula adiante", criaturas = table.freeze({ "creature/goblin-batedor" }) }),

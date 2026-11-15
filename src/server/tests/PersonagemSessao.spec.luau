@@ -669,4 +669,27 @@ return {
 		t.eq(vendeu, true); t.eq(recebido, 7); t.eq(segundo.api.consultar(A).ouro, 32)
 		t.eq(#segundo.api.consultar(A).inventarioLoja, 0)
 	end,
+	["P5: fim da luta da expedição grava PV/PM na ficha; caído volta com 1 PV; acampamento enche tudo"] = function(t)
+		local store = storePerfilFake()
+		local x = contexto(nil, nil, store)
+		t.eq(x.api.carregar(A), true)
+		t.eq(x.handlers.personagemPessoalCriar(A, proposta()), nil)
+		local max = x.api.consultar(A).estatisticas.maxima
+		local ok, r = x.api.gravarRecursosDaLuta(A, { pv = max.pv - 3, pm = 0 })
+		t.eq(ok, true); t.eq(r.caiu, false)
+		local d = x.api.consultar(A).descanso
+		t.eq(d.atuais.pv, max.pv - 3); t.eq(d.atuais.pm, 0); t.eq(d.atuais.pt, max.pt)
+		t.eq(store.dados[101].descanso.atuais.pv, max.pv - 3) -- salvo
+		ok, r = x.api.gravarRecursosDaLuta(A, { pv = 0, pm = 0 })
+		t.eq(ok, true); t.eq(r.caiu, true)
+		t.eq(x.api.consultar(A).descanso.atuais.pv, 1)
+		t.eq((PersonagemSessao.gravarRecursosDaLuta(A, { pv = 2 })), true) -- porta do módulo usa a instância ativa
+		t.eq(x.api.consultar(A).descanso.atuais.pv, 2)
+		local descansou = x.api.descansar(A, "acampamento")
+		t.eq(descansou, true)
+		local cheio = x.api.consultar(A).descanso.atuais
+		t.eq(cheio.pv, max.pv); t.eq(cheio.pm, max.pm); t.eq(cheio.pt, max.pt); t.eq(cheio.pp, max.pp)
+		t.eq((x.api.descansar(A, "longo")), true) -- caminho da cidade (bonusDeRank) continua funcionando
+		t.eq((x.api.gravarRecursosDaLuta(B, { pv = 1 })), false) -- sem ficha
+	end,
 }

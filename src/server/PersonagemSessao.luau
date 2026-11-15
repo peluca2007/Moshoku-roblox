@@ -20,6 +20,7 @@ local Itens = require(game:GetService("ReplicatedStorage").Shared.Livro.Dados.It
 local RegrasLivro = require(game:GetService("ReplicatedStorage").Shared.Livro.Regras)
 local RestricaoDeCriacao = require(game:GetService("ReplicatedStorage").Shared.Regras.RestricaoDeCriacao)
 local ArvoresAprendidas = require(game:GetService("ReplicatedStorage").Shared.Regras.ArvoresAprendidas)
+local EncontrosPagos = require(game:GetService("ReplicatedStorage").Shared.Regras.EncontrosPagos)
 local INTERVALO_NOVA_CARGA = 5
 local LIMITE_PEDIDOS_CRIACAO = 128
 local ITENS_LOJA, ORDEM_ITENS_LOJA = {}, {}
@@ -166,7 +167,7 @@ function PersonagemSessao.start(ctx)
 		perfil.descanso = copiar(registro.descanso)
 		perfil.dojo = if registro.dojo == nil then Dojo.novoEstado() else copiar(registro.dojo)
 		perfil.ouro = registro.ouro or 0
-		perfil.encontrosPagos = copiar(registro.encontrosPagos or {})
+		perfil.encontrosPagos = EncontrosPagos.podar(registro.encontrosPagos)
 		perfil.inventarioLoja = copiar(registro.inventarioLoja or {})
 		perfil.itensVendidos = copiar(registro.itensVendidos or {})
 		perfil.missoes = copiar(registro.missoes or Missao.novoEstado())
@@ -641,12 +642,12 @@ function PersonagemSessao.start(ctx)
 			if pa ~= nil and (type(pa) ~= "number" or pa % 1 ~= 0 or pa < 0 or pa > 100) then return false end
 			local id, perfil = player.UserId, folhas[player.UserId]
 			if not perfil or gravandoArma[id] then return false end
-			for _, pago in ipairs(perfil.encontrosPagos or {}) do if pago == encounterId then return true, perfil.ouro or 0, {} end end
+			if EncontrosPagos.jaPago(perfil.encontrosPagos, encounterId) then return true, perfil.ouro or 0, {} end
 			local atualizado = copiar(perfil)
 			atualizado.ouro = (atualizado.ouro or 0) + moedas
 			atualizado.paGanhos = (atualizado.paGanhos or 0) + (pa or 0)
-			atualizado.encontrosPagos = atualizado.encontrosPagos or {}
-			table.insert(atualizado.encontrosPagos, encounterId)
+			-- Só os mais recentes (EncontrosPagos.LIMITE): a lista inteira passava do teto da persistência.
+			atualizado.encontrosPagos = EncontrosPagos.registrar(atualizado.encontrosPagos, encounterId)
 			local cumpridas = {}
 			if marcoId then
 				local novo

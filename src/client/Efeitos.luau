@@ -100,10 +100,18 @@ end
 
 -- Tremor de câmera (impactos). Na Visão da mesa o BoardView aplica
 -- Efeitos.tremorCFrame() à câmera; fora dela, usa o CameraOffset do avatar.
+local Curvas = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ImpactoCurvas"))
 local tremor = { fim = 0, inicio = 0, forca = 0 }
+-- IMP1: tremor desligável (acessibilidade): atributo `SemTremor` no LocalPlayer ou movimento reduzido.
+function Efeitos.tremorAtivo(): boolean
+	if not Curvas.TREMOR_PADRAO then return false end
+	if Players.LocalPlayer and Players.LocalPlayer:GetAttribute("SemTremor") == true then return false end
+	return not require(script.Parent.MenuEfeitos).reduzidos
+end
 function Efeitos.tremer(forca: number, duracao: number?)
+	if not Efeitos.tremorAtivo() then return end
 	local agora = os.clock()
-	if agora > tremor.fim or forca > tremor.forca then
+	if agora > tremor.fim or forca > tremor.forca * Curvas.envoltoriaTremor((tremor.fim - agora) / math.max(tremor.fim - tremor.inicio, 1e-3)) then
 		tremor.inicio, tremor.fim, tremor.forca = agora, agora + (duracao or 0.3), forca
 	end
 end
@@ -114,8 +122,9 @@ function Efeitos.tremorCFrame(): CFrame
 		return CFrame.identity
 	end
 	local resto = (tremor.fim - agora) / math.max(tremor.fim - tremor.inicio, 1e-3)
-	local f = tremor.forca * resto
-	return CFrame.new(math.noise(agora * 40, 1) * f, math.noise(agora * 40, 2) * f, math.noise(agora * 40, 3) * f)
+	local f = tremor.forca * Curvas.envoltoriaTremor(resto)
+	-- ruído de alta frequência: deslocamento + leve rolagem, amortecido (sem enjoo: some em < 0,6 s)
+	return CFrame.new(math.noise(agora * 45, 1) * f, math.noise(agora * 45, 2) * f, math.noise(agora * 45, 3) * f * 0.5)
 		* CFrame.Angles(0, 0, math.noise(agora * 30, 4) * f * 0.02)
 end
 

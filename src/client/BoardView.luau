@@ -13,6 +13,7 @@ local CondicaoRules = require(Shared:WaitForChild("CondicaoRules"))
 local Condicoes = require(Shared:WaitForChild("Condicoes"))
 local Estilo = require(Shared:WaitForChild("Estilo"))
 local Efeitos = require(script.Parent:WaitForChild("Efeitos"))
+local ImpactoCamera = require(script.Parent:WaitForChild("ImpactoCamera")) -- IMP1: câmera acompanha o golpe
 local Feedback = require(script.Parent:WaitForChild("FeedbackCombate")) -- ANIM3: fila de apresentação (número de dano no impacto)
 local Furtividade = require(Shared.VisibilidadeFurtiva)
 local Enquadramento = require(Shared.EnquadramentoMesa)
@@ -958,6 +959,7 @@ function BoardView.start(state)
 			ombroPos, ombroOlhar = nil, nil
 		end
 		mostrarGrade(if snapAtual and snapAtual.combat.active then math.clamp((mistura - 0.35) / 0.65, 0, 1) else 1)
+		target = ImpactoCamera.aplicar(target) -- IMP1: enquadra atacante e alvo no golpe (com raycast contra paredes)
 		-- Transição suave da câmera do avatar para a Visão da mesa.
 		local t = if blendFrom then (os.clock() - blendStart) / CAMERA_BLEND else 1
 		if blendFrom and t < 1 then

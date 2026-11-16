@@ -12,6 +12,9 @@ local Sons = require(Shared.Sons)
 local Sonorizacao = require(script.Parent.Sonorizacao)
 local FX = require(script.Parent.MenuEfeitos)
 local Feedback = require(script.Parent.FeedbackCombate)
+local ImpactoCamera = require(script.Parent.ImpactoCamera) -- IMP1: câmera, faíscas, rastro, hit-stop
+local ImpactoFx = require(script.Parent.ImpactoFx)
+local Curvas = require(Shared.ImpactoCurvas)
 local AnimacaoCriatura = require(Shared.Mundo.AnimacaoCriatura)
 local CatalogoCriaturas = require(Shared.Animacoes.Criaturas.Catalogo)
 
@@ -92,6 +95,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 	local cenas, pecas, serial = {}, 0, 0
 	local kit = { state = state, posicaoDe = posicaoDe, Efeitos = Efeitos }
 	local encerrado = false
+	local pausar -- IMP1: definida junto de tempoDe
 	local function destruir(cena)
 		if cena.viva then
 			cena.viva = false
@@ -397,8 +401,15 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 			if acertou and (alvo.dano or 0) > 0 then
 				Efeitos.reagir(alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
-				Efeitos.tremer(math.min(0.45, cena.perfil.peso * (if alvo.critico then 0.5 else 0.2)), 0.2)
+				-- IMP1: tremor proporcional ao dano, faíscas no contato e pausa curta (hit-stop) em todas as cenas
+				local amp, dur = Curvas.tremor(alvo.dano, alvo.critico, cena.perfil.peso)
+				Efeitos.tremer(amp, dur)
 				Efeitos.aproximar(if alvo.critico then 0.14 else 0.08, if alvo.critico then 0.55 else 0.4)
+				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, alvo.critico, de - ponto)
+				if not cena.pausada and not FX.reduzidos and Efeitos.tremorAtivo() then
+					cena.pausada = true
+					pausar(Curvas.hitStop(alvo.dano, alvo.critico))
+				end
 			elseif not acertou then
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, 0.3, "esquiva")
 			elseif alvo.dano == 0 and not alvo.passou then
@@ -408,10 +419,25 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 	end
 
 	-- Relógio da cena (segundos desde o início), com CenaTempoFixo e EscalaDeTempoDasCenas.
+	-- IMP1: `pausar` congela o relógio de todas as cenas por `dur` s (hit-stop); ao fim, desloca o início.
 	local function tempoDe(cena)
 		local fixo = workspace:GetAttribute("CenaTempoFixo")
-		return if type(fixo) == "number" then fixo
-			else (os.clock() - cena.inicio) / math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+		if type(fixo) == "number" then return fixo end
+		if cena.pausaAte then
+			if os.clock() < cena.pausaAte then return cena.tempoPausa end
+			cena.inicio += cena.pausaAte - cena.pausaDesde
+			cena.pausaAte = nil
+		end
+		return (os.clock() - cena.inicio) / math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+	end
+	function pausar(dur)
+		if dur <= 0 then return end
+		local agora = os.clock()
+		for _, c in cenas do
+			if c.viva and not c.pausaAte then
+				c.tempoPausa, c.pausaDesde, c.pausaAte = tempoDe(c), agora, agora + dur
+			end
+		end
 	end
 	kit.agora = tempoDe
 	kit.animar, kit.evento, kit.peca, kit.segmento, kit.arco = animar, evento, peca, segmento, arco
@@ -464,6 +490,19 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 			if ok then plano = resultado else warn("[Gestos]", id, resultado) end
 		end
 		plano = plano or {}
+		-- IMP1: rastro da arma no fantasma do atacante, ligado do começo do golpe até logo depois do contato
+		if de and not FX.reduzidos then
+			for _, filho in cena.modelo:GetChildren() do
+				if filho:IsA("Model") then
+					local liga = ImpactoFx.rastro(filho, cena.cor)
+					if liga then
+						local contato = plano.chegada or perfil.carga
+						evento(cena, math.max(0, contato - 0.35), function() liga(true) end)
+						evento(cena, contato + 0.12, function() liga(false) end)
+					end
+				end
+			end
+		end
 		local chave = Sons.lancamento(id, arv, spec)
 		if chave then
 			evento(cena, plano.carga or perfil.carga, function()
@@ -519,6 +558,11 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				end
 				local quando = if plano.chegada then plano.chegada + (i - 1) * 0.04 else lancamento + (if viaja then viagem else 0)
 				local resultado = if #tiros > 1 then tiro else alvo
+				if de and i == 1 and n == 1 and not plano.semCamera then
+					-- IMP1: a câmera de luta acompanha este golpe (antecipação, contato, volta)
+					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando)
+					cena.fim = math.max(cena.fim, quando + 0.9)
+				end
 				-- ANIM3: número, barra e queda do alvo esperam o golpe encostar (limite de segurança na fila)
 				if resultado.acertou ~= false and not FX.reduzidos then
 					local atraso = quando

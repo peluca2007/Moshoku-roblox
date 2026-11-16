@@ -1417,3 +1417,9 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - Mescla da ANIM3 no branch; corpo oficial Man. `qa.py esgoto_sala1` (20 ok) e `qa.py luta` (29 ok) rodados duas vezes cada, sem falhas; `anim_quadros.py` (CorteLeve, CortePesado, Estocada, DisparoArco, ReacaoGolpe, Vitoria) gerou `build/beleza/anim/prancha.jpg`.
 - Intermitência do QA: o anúncio da HUD3 escondia a faixa do dia (`Visible=false`). Agora marca o atributo `EscondidaPeloAnuncio` e o QA (`qa_jogo.LUA_FAIXA`) lê o texto só nesse caso; faixa escondida por outro motivo continua falhando.
 - Não verificado visualmente: arco na mão (ficha de teste usa espada), número/barra esperando o marco `impacto` em quadro capturado.
+
+## IMP1 — impacto do golpe (16/11/2026, Studio por MCP)
+
+- `testar.ps1`: compilação 744 sem erro, `ImpactoCurvas.spec` ok; só falham Catálogo (ambiente) e `ArenasDados` (esgoto cenário cheio, arquivos do CEN2, fora desta tarefa).
+- `qa.py esgoto_sala1` (20 ok) e depois `tools/qa/impacto_fotos.py r1` (golpe real de espada no lobo): capturas em `build/beleza/impacto/r1_0..4.png` mostram câmera baixa de lado, clarão e faíscas no contato, número de dano no impacto; sem erro novo no console.
+- Não verificado: crítico, criatura atacando (clipe do servidor não congela no hit-stop), arco/magia, raycast contra parede de fato, celular. `qa.py luta` completo NÃO foi concluído (interrompido; coincidiu com sessão do CEN2 no Studio).

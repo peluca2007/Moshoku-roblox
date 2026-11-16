@@ -28,7 +28,7 @@ _imgs = {}
 
 
 def boneco(conjunto="aventureiro", cabelo="curto", raca=None, pele="clara", cor_cabelo="castanho", escala=None,
-           sem_pecas=False, olho=(92, 55, 32)):
+           sem_pecas=False, olho=(92, 55, 32), rosto="neutro", barba=None):
     cj = RP.CONJUNTOS[conjunto]
     cores = dict(RP.CORES_BASE)
     cores.update(cj["cores"])
@@ -47,17 +47,19 @@ def boneco(conjunto="aventureiro", cabelo="curto", raca=None, pele="clara", cor_
         cal.salvar(os.path.join(MOLDES, f"calca_{conjunto}_{pele}.png"))
         _imgs[chave] = (cam.imagem(f"camisa_{conjunto}_{pele}"), cal.imagem(f"calca_{conjunto}_{pele}"))
     b.tex_camisa, b.tex_calca = _imgs[chave]
-    rk = ("rosto", olho, cor_cabelo)
+    rk = ("rosto", olho, cor_cabelo, rosto)
     if rk not in _imgs:
-        t = R.tela_rosto(olho, tuple(int(c * 0.7) for c in CABELO[cor_cabelo]))
-        t.salvar_png(os.path.join(MOLDES, f"rosto_{cor_cabelo}.png"))
-        _imgs[rk] = t.imagem(f"rosto_{cor_cabelo}")
+        t = R.tela_rosto(olho, tuple(int(c * 0.7) for c in CABELO[cor_cabelo]), rosto)
+        t.salvar_png(os.path.join(MOLDES, f"rosto_{rosto}_{cor_cabelo}.png"))
+        _imgs[rk] = t.imagem(f"rosto_{rosto}_{cor_cabelo}")
     b.textura_rosto = _imgs[rk]
     if not sem_pecas:
         for f in cj["pecas"]:
             f(b)
     if cabelo:
         CR.CABELOS[cabelo](b)
+    if barba:
+        CR.BARBAS[barba](b)
     if raca:
         CR.RACAS[raca](b)
     if escala:
@@ -325,6 +327,49 @@ def folha_prancha():
     C.compor(arqs, os.path.join(destino, "prancha.jpg"))
 
 
+def folha_v3():
+    """build/beleza/personagem/prancha_v3.jpg (PERS3): 3 conjuntos x 8 cabelos/3 barbas/3 rostos + 6 racas, frente e 3/4."""
+    arqs = []
+    golpe = None
+
+    def classes():
+        itens = []
+        for conj, cab, cc, pele, ro in (("aventureiro", "masculino", "castanho", "clara", "neutro"),
+                                        ("ladino", None, "preto", "media", "serio"),
+                                        ("mago", "longo", "prata", "clara", "alegre")):
+            b = boneco(conj, cab, None, pele, cc, rosto=ro, barba="curta" if conj == "mago" else None)
+            itens += [(b, RP.CONJUNTOS[conj]["nome"] + " (frente)", 0, None, False), (b, "3/4", -38, None, False)]
+        return itens
+    arqs.append(fileira(classes, "PERS3: conjuntos com cabelo, rosto e barba em malha", "v3_classes.png", esp=3.3, margem=1.0))
+
+    def racas(rot):
+        def f():
+            humano = boneco("aventureiro", "masculino", None, "media", "castanho", rosto="neutro", barba="cavanhaque")
+            elfo = boneco("mago", "trancas", "elfo", "elfo", "loiro", escala=(0.92, 0.92, 1.04, 1.0), rosto="alegre")
+            anao = boneco("aventureiro", "coque", "ana", "media", "ruivo", escala=(1.12, 1.1, 0.85, 0.95), rosto="serio")
+            hobbit = boneco("aventureiro", "bob", None, "clara", "castanho", escala=(0.9, 0.9, 0.78, 1.05), rosto="alegre")
+            fera = boneco("ladino", "rabo", "fera", "clara", "castanho", rosto="neutro")
+            ogro = boneco("aventureiro", "espetado", None, "escura", "preto", escala=(1.15, 1.12, 1.18, 1.08), rosto="serio",
+                          barba="curta")
+            return [(b, n, rot, None, False) for b, n in
+                    ((humano, "humano"), (elfo, "elfo"), (anao, "anao"), (hobbit, "hobbit"), (fera, "raca-fera"), (ogro, "ogro"))]
+        return f
+    arqs.append(fileira(racas(0), "Racas (frente)", "v3_racas_f.png", esp=2.6, margem=1.0))
+    arqs.append(fileira(racas(-38), "Racas (3/4)", "v3_racas_p.png", esp=2.6, margem=1.0))
+
+    def cabelos():
+        itens = []
+        for cab, cor in (("curto", "castanho"), ("masculino", "preto"), ("longo", "loiro"), ("rabo", "ruivo"),
+                         ("espetado", "azul"), ("trancas", "prata"), ("coque", "castanho"), ("bob", "preto")):
+            b = boneco("aventureiro", cab, None, "clara", cor, sem_pecas=True, rosto="neutro")
+            itens.append((b, cab, -38 if cab not in ("rabo", "coque") else -125, None, False))
+        return itens
+    arqs.append(fileira(cabelos, "8 cabelos recoloriveis (3/4; rabo e coque por tras)", "v3_cabelos.png", esp=2.6, margem=1.0))
+    destino = os.path.join(C.RAIZ, "build", "beleza", "personagem")
+    os.makedirs(destino, exist_ok=True)
+    C.compor(arqs, os.path.join(destino, "prancha_v3.jpg"))
+
+
 def main():
     resto = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     folha = resto[resto.index("--folha") + 1] if "--folha" in resto else "todas"
@@ -333,6 +378,8 @@ def main():
         folha_estilo(so)
     if folha in ("comparacao", "todas"):
         folha_comparacao()
+    if folha == "v3":
+        folha_v3()
     if folha == "prancha":
         folha_prancha()
 

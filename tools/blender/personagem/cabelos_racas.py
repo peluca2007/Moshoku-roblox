@@ -147,6 +147,73 @@ CABELOS = {"curto": cabelo_curto, "longo": cabelo_longo, "rabo": cabelo_rabo, "e
            "avatar": cabelo_avatar_exemplo}
 
 
+def cabelo_masculino(b, papel="cabelo"):
+    """Curto masculino: laterais baixas, topo com volume e franja curta para o lado."""
+    bm = calota([(0, 36), (35, 28), (60, -2), (100, -14), (130, -34), (180, -40)], k=1.06, esp=0.07)
+    m = bmesh.new()
+    franja(m, (-36, -18, 0, 18, 36), el0=78, el1=40, desvio=-10, w=0.17)
+    for s in (-1, 1):
+        mecha(m, [(s * 76, 36, 1.07), (s * 80, 6, 1.08), (s * 84, -16, 1.04)], [0.16, 0.13, 0.0], [0.05, 0.05, 0.0])
+    for a in (-40, -10, 20, 50, 180):
+        mecha(m, [(a + 160, 56, 1.07), (a * 0.5 + 160, 84, 1.15), (a, 76, 1.16), (a - 10, 58, 1.1)],
+              [0.2, 0.24, 0.2, 0.0], [0.06, 0.09, 0.07, 0.0])
+    C.juntar(bm, m)
+    m.free()
+    b.add("Head", papel, bm, "cabelo_masculino", suave=True)
+
+
+def cabelo_bob(b, papel="cabelo"):
+    """Médio (na altura do queixo), franja reta."""
+    bm = calota([(0, 50), (30, 40), (60, -6), (100, -26), (150, -34), (180, -36)])
+    m = bmesh.new()
+    franja(m, (-42, -24, -6, 12, 30, 46), el0=80, el1=34, desvio=0, w=0.16)
+    for a in (70, 95, 120, 145, 170, 200, 225, 250, 275, 290):
+        a = a if a <= 180 else a - 360
+        for s in ((1,) if abs(a) == a else (1,)):
+            pass
+        mecha(m, [(a * 0.6, 80, 1.07), (a, 40, 1.13), (a, -5, 1.15), (a, -34, 1.12), S(a, -48, 1.04) + Vector((0, 0.04, -0.25))],
+              [0.2, 0.22, 0.22, 0.2, 0.0], [0.06, 0.08, 0.08, 0.07, 0.0])
+    C.juntar(bm, m)
+    m.free()
+    b.add("Head", papel, bm, "cabelo_bob", suave=True)
+
+
+def cabelo_trancas(b, papel="cabelo"):
+    """Duas tranças caindo pelos ombros, repartido ao meio."""
+    bm = calota([(0, 46), (30, 38), (60, 0), (100, -20), (140, -30), (180, -34)], k=1.06)
+    m = bmesh.new()
+    franja(m, (-34, -18, 18, 34), el0=78, el1=44, desvio=-18, w=0.15)
+    for s in (-1, 1):
+        mecha(m, [(s * 70, 40, 1.07), (s * 80, 6, 1.1), (s * 86, -22, 1.08)], [0.17, 0.15, 0.0], [0.05, 0.06, 0.0])
+        x, y = s * 0.72, -0.12
+        for i in range(6):  # gomos da trança: elipsoides alternados
+            z = 4.1 - i * 0.3
+            for d in (-1, 1):
+                bmesh.ops.create_icosphere(m, subdivisions=1, radius=0.17 - i * 0.012,
+                                           matrix=Matrix.Translation((x + d * 0.045, y, z)) @ Matrix.Diagonal((0.9, 0.9, 1.25, 1)))
+        C.sweep(m, [(Vector((x, y, 4.45)), 0.14, 0.12), (Vector((x, y, 4.2)), 0.16, 0.14)], up=(0, -1, 0), lados=6)
+    C.juntar(bm, m)
+    m.free()
+    b.add("Head", papel, bm, "cabelo_trancas", suave=True)
+
+
+def cabelo_coque(b, papel="cabelo"):
+    """Preso: penteado para trás e coque no alto."""
+    bm = calota([(0, 50), (40, 34), (70, -6), (110, -22), (150, -36), (180, -40)], k=1.06, esp=0.06)
+    m = bmesh.new()
+    for a in (-34, -12, 12, 34):
+        mecha(m, [(a * 0.6, 50, 1.07), (a * 0.8, 76, 1.1), (180 - a, 80, 1.1)], [0.14, 0.16, 0.0], [0.04, 0.06, 0.0])
+    topo = S(180, 66, 1.05) + Vector((0, 0.02, 0.1))
+    bmesh.ops.create_icosphere(m, subdivisions=2, radius=0.3, matrix=Matrix.Translation(topo + Vector((0, 0.12, 0.22))) @ Matrix.Diagonal((1, 1, 0.85, 1)))
+    C.aro(m, topo + Vector((0, 0.08, 0.05)), 0.26, 0.26, 0.05, 0.05, n=14, expo_caminho=2, expo=3, lados=6)
+    C.juntar(bm, m)
+    m.free()
+    b.add("Head", papel, bm, "cabelo_coque", suave=True)
+
+
+CABELOS.update({"masculino": cabelo_masculino, "bob": cabelo_bob, "trancas": cabelo_trancas, "coque": cabelo_coque})
+
+
 # ====================================================================================== traços de raça
 def orelhas_elfo(b):
     bm = bmesh.new()
@@ -199,6 +266,33 @@ def barba_ana(b, papel="barba"):
     for s in (-1, 1):
         C.aro(contas, (s * 0.17, -0.7, 3.4), 0.085, 0.07, 0.025, 0.035, n=12, expo_caminho=2, expo=3, lados=5)
     b.add("Head", "metal", contas, "barba_ana", suave=True)
+
+
+def barba_curta(b, papel="barba"):
+    """Barba rente: contorno do queixo, costeletas e bigode."""
+    bm = bmesh.new()
+    for s in (-1, 1):
+        mecha(bm, [(s * 86, 4, 1.02), (s * 80, -20, 1.07), (s * 58, -40, 1.09), (s * 30, -50, 1.09), (s * 6, -52, 1.08)],
+              [0.12, 0.15, 0.17, 0.17, 0.12], [0.04, 0.05, 0.06, 0.06, 0.05])
+        C.sweep(bm, [(Vector((s * 0.03, -0.66, 4.45)), 0.08, 0.05), (Vector((s * 0.2, -0.68, 4.41)), 0.09, 0.05),
+                     (Vector((s * 0.36, -0.67, 4.32)), 0.0, 0.0)], up=(0, -1, 0), lados=6)
+    C.sweep(bm, [(Vector((0, -0.6, 4.2)), 0.4, 0.05), (Vector((0, -0.66, 4.05)), 0.42, 0.07), (Vector((0, -0.64, 3.95)), 0.0, 0.0)],
+            up=(0, -1, 0), lados=10, expo=2.4)
+    b.add("Head", papel, bm, "barba_curta", suave=True)
+
+
+def barba_cavanhaque(b, papel="barba"):
+    """Cavanhaque com bigode fino."""
+    bm = bmesh.new()
+    C.sweep(bm, [(Vector((0, -0.62, 4.24)), 0.2, 0.05), (Vector((0, -0.67, 4.08)), 0.22, 0.08), (Vector((0, -0.66, 3.86)), 0.15, 0.08),
+                 (Vector((0, -0.62, 3.7)), 0.0, 0.0)], up=(0, -1, 0), lados=10, expo=2.4)
+    for s in (-1, 1):
+        C.sweep(bm, [(Vector((s * 0.03, -0.66, 4.46)), 0.07, 0.045), (Vector((s * 0.2, -0.68, 4.43)), 0.08, 0.05),
+                     (Vector((s * 0.38, -0.66, 4.34)), 0.0, 0.0)], up=(0, -1, 0), lados=6)
+    b.add("Head", papel, bm, "barba_cavanhaque", suave=True)
+
+
+BARBAS = {"curta": barba_curta, "cavanhaque": barba_cavanhaque, "longa": barba_ana}
 
 
 RACAS = {"elfo": orelhas_elfo, "ana": barba_ana, "fera": orelhas_fera}

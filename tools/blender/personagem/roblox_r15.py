@@ -158,14 +158,21 @@ def _azel(p):
     return az, el
 
 
+ROSTOS = ("neutro", "alegre", "serio")  # 3 rostos (PNG 512 x 512, decal da cabeça); simétricos por construção
+
+
 def tela_rosto(cor_olho=(92, 55, 32), cor_sobrancelha=(60, 40, 30), estilo="neutro"):
-    """Rosto pintado (Decal/SurfaceAppearance da cabeça): olhos, sobrancelhas, boca nas alturas do catálogo atual."""
+    """Rosto pintado (Decal da cabeça), simétrico: olhos, sobrancelhas, boca. Tudo dentro da face frontal (|x| <= 0,45)."""
+    estilo = {"bravo": "serio"}.get(estilo, estilo)
+    assert estilo in ROSTOS, estilo
     t = C.Tela(-0.6, 0.6, 4.0, 5.2, n=512)
+    alt = {"neutro": 0.17, "alegre": 0.19, "serio": 0.14}[estilo]
+    ang = {"neutro": -3, "alegre": 3, "serio": -11}[estilo]
     for lado in (-1, 1):
-        C.olho_amendoado(t, lado * 0.25, 4.72, 0.24, 0.17, cor_olho, lado, delineado=0.032, inclinacao=4)
-        ang = -10 if estilo == "bravo" else -3
-        C.sobrancelha(t, lado * 0.25, 4.93, 0.26, 0.05, cor_sobrancelha, lado, arco=0.02, angulo=ang)
-    C.boca(t, 0.0, 4.36, 0.2, 0.025 if estilo != "bravo" else -0.01, grossura=0.03)
-    # sombra suave do nariz
+        C.olho_amendoado(t, lado * 0.25, 4.72, 0.24, alt, cor_olho, lado, delineado=0.032, inclinacao=4)
+        C.sobrancelha(t, lado * 0.25, 4.93 if estilo != "serio" else 4.92, 0.26, 0.05, cor_sobrancelha, lado,
+                      arco=0.02, angulo=ang)
+    curva = {"neutro": 0.025, "alegre": 0.07, "serio": -0.008}[estilo]
+    C.boca(t, 0.0, 4.36, 0.2 if estilo != "alegre" else 0.26, curva, grossura=0.03)
     t.pintar(t.traco([(0.0, 4.55), (0.03, 4.47)], [0.02, 0.03]), (150, 90, 70), 0.35)
     return t

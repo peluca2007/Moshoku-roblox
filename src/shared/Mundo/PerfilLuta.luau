@@ -8,7 +8,26 @@ local function misturar(c: { number }, alvo: { number }, t: number): { number }
 	return { c[1] + (alvo[1] - c[1]) * t, c[2] + (alvo[2] - c[2]) * t, c[3] + (alvo[3] - c[3]) * t }
 end
 
-function PerfilLuta.aplicar(perfil)
+-- Clima do esgoto (CEN1): sala fechada, escura, névoa verde-acinzentada; o calor vem das tochas.
+local function esgoto(p)
+	p.ambiente = { 52, 64, 60 }
+	p.ambienteExterno = { 52, 64, 60 }
+	p.deslocaCima = { 20, 28, 24 }
+	p.brilho = 0.5
+	p.difuso = 0.5
+	p.ccContraste = p.ccContraste + 0.06
+	p.ccSaturacao = p.ccSaturacao - 0.08
+	p.ccTint = { 215, 238, 222 }
+	p.atmDensidade = 0.5
+	p.atmHaze = 4
+	p.atmCor = { 70, 96, 84 }
+	p.atmDecay = { 40, 60, 52 }
+	p.raios = 0
+	p.dofDistancia = 70
+	return p
+end
+
+function PerfilLuta.aplicar(perfil, arenaId)
 	local p = table.clone(perfil)
 	p.ccContraste = perfil.ccContraste + 0.14
 	p.ccSaturacao = perfil.ccSaturacao + 0.1
@@ -23,7 +42,7 @@ function PerfilLuta.aplicar(perfil)
 	p.dofDistancia = 55
 	p.dofRaio = 35
 	p.brilho = perfil.brilho * 1.08
-	return p
+	return if arenaId == "esgoto" then esgoto(p) else p
 end
 
 return PerfilLuta

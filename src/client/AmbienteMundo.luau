@@ -147,11 +147,11 @@ function AmbienteMundo.start()
 				local hora = if dentro then nil else ReplicatedStorage:GetAttribute("RunHora")
 				atualizarLuz(raiz, Perfis.luzPessoal(ponto.X, ponto.Z, dentro, hora))
 				local emLuta = pontoDaArena(raiz) ~= nil
-				local chave = (if emLuta then "luta" else "") .. tostring(hora) .. (if dentro then "sala" elseif pesos.ruinas >= 1 then "ruinas" else tostring(math.floor(pesos.floresta * 500)))
+				local chave = (if emLuta then "luta" .. tostring(workspace.Mesa:GetAttribute("ArenaRegional")) else "") .. tostring(hora) .. (if dentro then "sala" elseif pesos.ruinas >= 1 then "ruinas" else tostring(math.floor(pesos.floresta * 500)))
 				if chave ~= chaveAlvo then
 					chaveAlvo = chave
 					alvo = Perfis.modularHora(Perfis.alvo(ponto.X, ponto.Z, dentro), hora)
-					if emLuta then alvo = PerfilLuta.aplicar(alvo) end
+					if emLuta then alvo = PerfilLuta.aplicar(alvo, workspace.Mesa:GetAttribute("ArenaRegional")) end
 					tau = if dentro then Perfis.TAU_SALA else Perfis.TAU_ZONA
 					mudouEm = agora
 				end

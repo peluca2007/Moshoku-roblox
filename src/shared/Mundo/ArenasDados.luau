@@ -112,10 +112,12 @@ ArenasDados.RUINAS = table.freeze({
 	moradores = {},
 })
 
--- Esgoto sob a vila (expedição): pedra úmida e escura, muros, barris, lampiões fracos e ratos espreitando.
--- Sem luz própria por arena: a luz segue `mundo` (ponto da vila); o escuro vem do piso e dos tons.
+-- Esgoto sob a vila (expedição): sala fechada de pedra úmida (CenarioEsgoto), muros, barris, lampiões e ratos.
+-- A luz do cliente segue `mundo`; PerfilLuta troca para o clima do esgoto (verde, escuro, tochas).
 ArenasDados.ESGOTO = table.freeze({
 	mundo = { x = 0, z = -150 },
+	-- Sala fechada (CEN1): paredes, abóbada e túneis montados por server/Mundo/CenarioEsgoto; sem céu.
+	fechada = true,
 	-- Pedra molhada com musgo: MaterialVariant gerado no Studio (generate_material, 15/11/2026, BELEZA1);
 	-- ids dos mapas em docs/MANUTENCAO.md. A cor só tinge o mapa, então fica clara.
 	piso = { material = "Slate", variante = "EsgotoPedra", cor = { 120, 124, 120 } },

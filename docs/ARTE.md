@@ -115,3 +115,7 @@ arquivos baixados nem malha nossa: o corpo vem da Roblox em tempo de execução.
 | `menino` | ROBLOX Boy (109) | 376532000 / 376531012 / 376530220 / 376531300 / 376531703 | Mais baixo e largo, bom p/ anão |
 | (descartado) | City Life Woman (337) | 2492674027 ... | roupa pintada no torso, ignora a camisa |
 | (descartado) | Base Body Dawson/Jordan/Parker (991/994/985) | 11709869073 ... | cabeça 1,6 e pescoço longo; hair/rosto desalinham |
+
+## Cenário do esgoto (CEN1, 16/11/2026)
+
+Só peças do Roblox (Part, cilindros, Fire, ParticleEmitter, PointLight/SpotLight) com materiais nativos e o `MaterialVariant` `EsgotoPedra` já registrado. Nenhum ativo externo novo: a licença não muda. Os kits CC0 (mini-dungeon, fantasy-town-kit) não foram usados: peças procedurais bastaram e evitam conversão e peso. Código: `src/server/Mundo/CenarioEsgoto.luau`.

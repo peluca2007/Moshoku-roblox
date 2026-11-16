@@ -11,6 +11,7 @@ Patrulha encosta → Luta da mesa (motor da sala) no tabuleiro com o cenário da
 | Montagem e troca do cenário em volta do tabuleiro | `server/Mundo/ArenaCenario.luau` (`preparar` monta as quatro arenas no início do servidor, uma por quadro; `aplicar(arenaId | nil)`); moradores usam `Mundo/Npcs.criarCorpo` |
 | Luz da arena (segue a região e a hora da run, não a noite da sala) | `client/AmbienteMundo.pontoDaArena` lê `Mesa.ArenaRegional` e usa `ArenasDados.pontoDoMundo` |
 | Retoque de luz durante a luta (contraste, tom quente, névoa, bloom, desfoque ao longe); some ao sair da arena | `shared/Mundo/PerfilLuta.aplicar`, chamado por `client/AmbienteMundo` quando há arena; spec `PerfilLuta.spec` |
+| Sala fechada do esgoto (paredes, arcos, túneis, abóbada, canos, tochas, feixes, poças, névoa) | `server/Mundo/CenarioEsgoto` (chamado por `ArenaCenario` quando o layout tem `fechada`); clima de luz em `PerfilLuta.aplicar(perfil, arenaId)` |
 | Chão da arena com material gerado (esgoto: `EsgotoPedra`) | `ArenasDados.VARIANTES` (ids dos mapas) + `variante` no layout; o `MaterialVariant` real fica em `default.project.json` (MaterialService), pois script não grava `ColorMap`; `ArenaCenario.propsMaterial` usa-o ou cai no material nativo |
 | Linha curta de efeito nas cartas da luta (sem texto técnico) | `client/UI/ResumoCarta.curto`; texto completo segue em `DescricaoHabilidade` |
 | Separação das barras/nomes sobre os combatentes | `client/BarrasLuta.separar` |

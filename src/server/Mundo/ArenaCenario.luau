@@ -9,6 +9,7 @@ local NpcsDados = require(ReplicatedStorage.Shared.Mundo.NpcsDados)
 local MontarModelo = require(script.Parent.MontarModelo)
 local Props = require(script.Parent.Props)
 local Npcs = require(script.Parent.Npcs)
+local CenarioEsgoto = require(script.Parent.CenarioEsgoto)
 
 local ArenaCenario = {}
 
@@ -117,6 +118,7 @@ local function construir(arenaId)
 			end
 		end
 	end
+	if layout.fechada then CenarioEsgoto.montar(pasta, origem, variante(layout.piso.variante) ~= nil) end
 	local moradores = Instance.new("Folder")
 	moradores.Name, moradores.Parent = "Moradores", pasta
 	for i, m in layout.moradores do morador(moradores, i, m[1], m[2], origem) end

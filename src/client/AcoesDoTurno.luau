@@ -20,6 +20,7 @@ local Execucao = require(Shared:WaitForChild("Regras"):WaitForChild("Execucao"))
 local Layout = require(Shared.Regras.LayoutLuta)
 local Apresentacao = require(Shared.ApresentacaoAcoes)
 local Descricao = require(Shared.DescricaoHabilidade)
+local ResumoCarta = require(script.Parent.UI.ResumoCarta)
 local Previa = require(script.Parent.PreviaFurtiva)
 local T = require(script.Parent.UI.Tema)
 local C = require(script.Parent.UI.Componentes)
@@ -149,8 +150,9 @@ function AcoesDoTurno.start(state)
 	})
 	new("UIListLayout", cartasFrame, { Padding = UDim.new(0, Layout.ESPACO), SortOrder = Enum.SortOrder.LayoutOrder })
 	local dica = texto(gui, {
-		Name = "Dica", AnchorPoint = Vector2.new(1, 1), Size = UDim2.fromOffset(220, 20), TextXAlignment = Enum.TextXAlignment.Right,
-		Visible = false, TextStrokeColor3 = P.cor.trilho, TextStrokeTransparency = 0.2, ZIndex = 6,
+		Name = "Dica", AnchorPoint = Vector2.new(1, 1), Size = UDim2.fromOffset(340, 28), TextXAlignment = Enum.TextXAlignment.Right,
+		Visible = false, TextStrokeColor3 = P.cor.trilho, TextStrokeTransparency = 0.1, ZIndex = 6,
+		FontFace = T.fontes.titulo, TextSize = 19, TextColor3 = P.cor.ouroVivo,
 	})
 
 	local cliques: { [any]: () -> () } = {} -- ação de cada botão, para as teclas
@@ -347,7 +349,7 @@ function AcoesDoTurno.start(state)
 		if mec.descricao and not indisponivel then resumo = mec.descricao end
 		local custo = if indisponivel then "CONSULTA • VEJA OS DETALHES" else linhaDeCusto(mec)
 		local registro = { carta = carta, mec = mec, cor = cor, indisponivel = indisponivel, efeito = efeito, nome = nome, custoLabel = custoLabel,
-			custo = custo, resumo = resumo, linhaResumo = string.gsub(resumo, "%s+", " "), grupo = Apresentacao.grupo(mec, indisponivel),
+			custo = custo, resumo = resumo, linhaResumo = ResumoCarta.curto(mec, dados, indisponivel, habilidadeId), grupo = Apresentacao.grupo(mec, indisponivel),
 			armada = false, hover = false, foco = false, escala = escala, estado = "",
 			ataque = string.sub(habilidadeId, 1, 5) == "mesa/" and Apresentacao.grupo(mec, indisponivel) == "Golpes" }
 		local function dadosDetalhe()
@@ -645,7 +647,7 @@ function AcoesDoTurno.start(state)
 				elseif mec and (mec.tipo == "zona" or mec.alvo == "cone" or mec.alvo == "esferaNaCasa") then "Fixe a prévia · Confirmar área"
 				else "Clique numa casa · Cancelar mira volta"
 		else
-			dica.Text = if token.estadosCombate and #token.estadosCombate > 0 then "Efeitos: " .. table.concat(token.estadosCombate, ", ") else "Vez de " .. token.name
+			dica.Text = if token.estadosCombate and #token.estadosCombate > 0 then "Efeitos: " .. table.concat(token.estadosCombate, ", ") else string.format("Rodada %d · Vez de %s", (state.snapshot() and state.snapshot().combat.round) or 1, token.name)
 		end
 		posicionar()
 	end

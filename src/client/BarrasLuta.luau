@@ -23,6 +23,34 @@ function Barras.marca(id: string): string
 	return string.upper(string.sub(limpo, 1, 1)) .. string.sub(limpo, 2, 3)
 end
 
+-- Afasta verticalmente os marcadores que se sobrepõem na tela (combatentes vizinhos ou alinhados com a
+-- câmera): do mais baixo para o mais alto, o que colide sobe até ficar livre. Só mexe na posição desenhada.
+local ALTURA_ITEM, FOLGA_X = 46, LARGURA + 24
+function Barras.separar(itens: { [string]: any })
+	local lista = {}
+	for _, item in itens do
+		if item.raiz.Visible and item.px then table.insert(lista, item) end
+	end
+	table.sort(lista, function(a, b) return a.py > b.py end)
+	for i, item in lista do
+		local y = item.py
+		for _ = 1, #lista do
+			local colide = false
+			for j = 1, i - 1 do
+				local o = lista[j]
+				if math.abs(o.px - item.px) < FOLGA_X and math.abs(o.yFinal - y) < ALTURA_ITEM then
+					y = o.yFinal - ALTURA_ITEM
+					colide = true
+					break
+				end
+			end
+			if not colide then break end
+		end
+		item.yFinal = y
+		item.raiz.Position = UDim2.fromOffset(item.px, y)
+	end
+end
+
 function Barras.start(state)
 	local jogador = Players.LocalPlayer
 	local gui = Instance.new("ScreenGui")
@@ -113,7 +141,7 @@ function Barras.start(state)
 					vistos[t.id] = true
 					item.raiz.Visible = visivel and p.Z > 0
 					if item.raiz.Visible then
-						item.raiz.Position = UDim2.fromOffset(p.X, p.Y)
+						item.px, item.py = p.X, p.Y
 						item.barra.definir(t.pv, t.pvMax, not item.entrou)
 						if not item.entrou then
 							item.entrou = true
@@ -160,6 +188,7 @@ function Barras.start(state)
 		for id, item in itens do
 			if not vistos[id] then item.raiz:Destroy(); itens[id] = nil end
 		end
+		Barras.separar(itens)
 	end)
 	return gui
 end

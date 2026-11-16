@@ -280,7 +280,7 @@ function Hud.start(state)
 				prazo.Text = string.format("%s%d s", if dono and dono.ownerUserId == eu.UserId then "Sua vez · " else "", resto)
 				prazo.TextColor3 = if resto <= 10 then P.cor.inimigo else P.cor.ouroVivo
 			else
-				prazo.Text = if snap and snap.combat.active then "Rodada " .. (snap.combat.round or 1) else ""
+				prazo.Text = "" -- a rodada aparece na dica do canto inferior direito (AcoesDoTurno)
 				prazo.TextColor3 = P.cor.texto
 			end
 			-- retratos que ainda esperavam o corpo carregar

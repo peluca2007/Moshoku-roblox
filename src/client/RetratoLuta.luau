@@ -11,7 +11,7 @@ local Retrato = {}
 local FOV = 28
 
 local function corpoDe(token): Model?
-	if token.ownerUserId then
+	if token.ownerUserId and not token.criatura then
 		local jogador = Players:GetPlayerByUserId(token.ownerUserId)
 		local personagem = jogador and jogador.Character
 		if personagem and personagem.Parent then return personagem end
@@ -46,6 +46,12 @@ local function enquadrar(clone: Model, cam: Camera)
 		if clone.PrimaryPart then frente = clone.PrimaryPart.CFrame.LookVector end
 		altura = math.max(1.5, tamanho.Y * 0.36)
 		alvo = caixa.Position + Vector3.new(0, tamanho.Y * 0.5 - altura * 0.5, 0)
+		-- Quadrúpede (mais comprido que alto, ex.: lobo): enquadra o corpo todo em vez da "cabeça".
+		local comprimento = math.max(tamanho.X, tamanho.Z)
+		if comprimento > tamanho.Y * 1.2 then
+			altura = comprimento * 0.95
+			alvo = caixa.Position
+		end
 	end
 	local distancia = altura / (2 * math.tan(math.rad(FOV / 2)))
 	cam.CFrame = CFrame.lookAt(alvo + frente * distancia, alvo)

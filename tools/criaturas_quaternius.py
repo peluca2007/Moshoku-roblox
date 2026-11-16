@@ -4,6 +4,7 @@ Uso:
   python tools/criaturas_quaternius.py                 converte tudo (Blender), grava os pivôs e a prancha
   python tools/criaturas_quaternius.py --so Rato       só os módulos cujo nome contém o texto
   python tools/criaturas_quaternius.py --enviar        também envia cada FBX (Open Cloud) e registra em tools/blender/assets.json
+  python tools/criaturas_quaternius.py --studio --via-studio   idem, enviando pelo Studio em vez da chave
   python tools/criaturas_quaternius.py --studio        também roda o passo do Studio (LoadAsset + exportar Modelos/*.luau)
 
 Sem `--enviar` o jogo continua com os modelos de blocos (ModelosCriaturas.escolher cai no antigo quando o módulo novo
@@ -28,7 +29,10 @@ def main():
     ap.add_argument("--so", default="")
     ap.add_argument("--enviar", action="store_true")
     ap.add_argument("--studio", action="store_true")
+    ap.add_argument("--via-studio", action="store_true", help="envia pelo open_cloud_invoke do Studio (sem chave); pasta aprovada em MCP Permissions")
     args = ap.parse_args()
+    if args.via_studio:
+        os.environ["MOSHOKU_VIA_STUDIO"] = "1"
     sys.stdout.reconfigure(encoding="utf-8")
     cmd = [sys.executable, os.path.join(ROOT, "tools", "blender_rodar.py"),
            os.path.join(ROOT, "tools", "blender", "kits", "criaturas_quaternius.py")]

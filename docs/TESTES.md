@@ -1375,3 +1375,7 @@ Não verificado: tooltip e DetalheAcao pintados (só revisão de código, sem ca
 
 ## APRES1 — animações da UAL na luta (15/11/2026, Studio por MCP)
 Verificado: exportação (`anim_exportar.py --ual ... --mapa tools/animacao/ual_clipes.json`: 9 clipes `origem = "ual"`, pés no chão pelo primeiro quadro, `pe_min` 0); `testar.ps1` só com "Catálogo" falhando (ambiente); Play com `qa.py esgoto_sala1 --manter-play` e `python tools/qa/anim_quadros.py` (atributos `LutaClipeTeste`/`LutaClipeManual`/`LutaClipeTempo` de `AnimacaoLuta` põem o clipe em instantes exatos; 6 quadros por clipe em `build/beleza/anim/`, prancha `prancha.jpg`). Não verificado: golpe real contra criatura com a nova pega da arma (a lâmina assume -Z da mão; em alguns quadros fica fora do ângulo natural), DisparoArco/Vitoria/Bloqueio ainda posados à mão, andar (Walk_Loop não ligado: o mundo usa o Animator do Roblox), celular, desempenho.
+
+## MOD3b — envio das criaturas (15/11/2026, parcial)
+- Chave `~/.moshoku/roblox_api_key.txt`: continua HTTP 401 "Invalid API Key".
+- Rota do Studio: `open_cloud_invoke` (POST /assets/v1/assets, multipart, escopos asset:read/asset:write) foi chamado por `tools/roblox_upload.py` (`enviar_via_studio`, `--via-studio` em `criaturas_quaternius.py`, ou `MOSHOKU_VIA_STUDIO=1`). Resultado: recusado antes do envio, "not inside a directory approved for uploads" (Assistant → MCP Permissions → pastas aprovadas). Não verificado: o restante da rota (escopos, operação, LoadAsset), nem nada na luta.

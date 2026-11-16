@@ -62,7 +62,10 @@ def multipart(campos, arquivo_nome, arquivo_bytes, arquivo_tipo):
 
 
 def enviar(arquivo, nome, tipo="Model", descricao="Gerado por script (Blender) para o projeto Moshoku"):
-    """Envia `arquivo` e devolve o assetId (str). Encerra o programa com mensagem em caso de erro."""
+    """Envia `arquivo` e devolve o assetId (str). Encerra o programa com mensagem em caso de erro.
+    MOSHOKU_VIA_STUDIO=1 (ou --via-studio nos scripts) usa a rota do Studio em vez da chave."""
+    if os.environ.get("MOSHOKU_VIA_STUDIO") == "1":
+        return enviar_via_studio(arquivo, nome, tipo, descricao)
     chave = ler_chave()
     usuario = os.environ.get("MOSHOKU_ROBLOX_USER", USUARIO_PADRAO)
     with open(arquivo, "rb") as f:
@@ -94,6 +97,49 @@ def enviar(arquivo, nome, tipo="Model", descricao="Gerado por script (Blender) p
                 sys.exit(f"Upload falhou: {op['error']}")
             return str(op.get("response", {}).get("assetId"))
     sys.exit("Tempo esgotado esperando a moderação/processamento do asset.")
+
+
+def enviar_via_studio(arquivo, nome, tipo="Model", descricao="Gerado por script (Blender) para o projeto Moshoku"):
+    """Mesmo envio, sem chave: `open_cloud_invoke` do MCP do Studio (permissões do Assistant, escopos asset:read/write).
+    Exige que a pasta do arquivo conste em Assistant -> MCP Permissions -> pastas aprovadas para upload (o Pedro
+    configura; o Studio recusa arquivos fora delas e manda não copiar para contornar). Devolve o assetId (str)."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from studio_mcp import Client
+    usuario = os.environ.get("MOSHOKU_ROBLOX_USER", USUARIO_PADRAO)
+    pedido = {"assetType": tipo, "displayName": nome, "description": descricao,
+              "creationContext": {"creator": {"userId": usuario}}}
+    mime = "model/fbx" if arquivo.lower().endswith(".fbx") else (mimetypes.guess_type(arquivo)[0] or "application/octet-stream")
+    c = Client()
+    try:
+        studio = c.studio_id()
+        r = c.call("open_cloud_invoke", {
+            "studio_id": studio, "endpoint": "/assets/v1/assets", "method": "POST",
+            "scopes": ["asset:read", "asset:write"], "body": json.dumps({"request": json.dumps(pedido)}),
+            "files": [{"name": "fileContent", "path": os.path.abspath(arquivo), "contentType": mime}]})
+        if r.get("isError"):
+            sys.exit("Upload pelo Studio recusado: " + r["text"][:600])
+        try:
+            op = json.loads(r["text"][r["text"].index("{"):])
+        except ValueError:
+            sys.exit("Resposta inesperada do Studio: " + r["text"][:600])
+        caminho = op.get("path") or "operations/" + str(op.get("operationId"))
+        for _ in range(60):
+            time.sleep(2)
+            g = c.call("open_cloud_invoke", {"studio_id": studio, "endpoint": f"/assets/v1/{caminho}",
+                                             "method": "GET", "scopes": ["asset:read"]})
+            if g.get("isError"):
+                sys.exit("Falha ao consultar a operação: " + g["text"][:600])
+            try:
+                corpo = json.loads(g["text"][g["text"].index("{"):])
+            except ValueError:
+                continue
+            if corpo.get("done"):
+                if "error" in corpo:
+                    sys.exit(f"Upload falhou: {corpo['error']}")
+                return str(corpo.get("response", {}).get("assetId"))
+        sys.exit("Tempo esgotado esperando o asset.")
+    finally:
+        c.close()
 
 
 def main():

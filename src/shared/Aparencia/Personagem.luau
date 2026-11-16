@@ -15,6 +15,41 @@ Personagem.CONJUNTOS = {
 	mago = { camisa = "rbxassetid://135491093277014", calca = "rbxassetid://82815866746308" },
 }
 
+-- PERS3: rostos pintados (PNG 512x512 com transparência, Decal na cabeça) em 3 estilos x 8 cores de olho, enviados como
+-- Decal pela rota do Studio; id = Texture da imagem. Vazio = rosto de blocos (Catalogo.ROSTO), como antes.
+-- Ex.: Personagem.ROSTOS.neutro.OlhoAzul = "rbxassetid://123". Arquivos: build/personagem/rostos/rosto_<estilo>_<OlhoXxx>.png
+Personagem.ROSTOS = { neutro = {}, alegre = {}, serio = {} }
+
+-- Estilo do rosto pintado que mais se aproxima das escolhas do jogador (olhos/sobrancelhas/boca do catálogo de blocos).
+local SERIO = { OlhoBravo = true, OlhoSonolento = true, SobrancelhaSeria = true, BocaTriste = true, BocaPresas = true }
+local ALEGRE = { OlhoFeliz = true, OlhoBrilho = true, BocaSorriso = true, BocaDentes = true, BocaAberta = true }
+function Personagem.estiloDoRosto(rosto): string
+	local r = rosto or {}
+	for _, id in { r.olhos, r.sobrancelhas, r.boca } do
+		if id and SERIO[id] then return "serio" end
+	end
+	for _, id in { r.olhos, r.boca } do
+		if id and ALEGRE[id] then return "alegre" end
+	end
+	return "neutro"
+end
+
+-- Id do Decal do rosto (ou nil se ainda não enviado).
+function Personagem.rostoDecal(rosto, corOlhoId: string?): string?
+	local porCor = Personagem.ROSTOS[Personagem.estiloDoRosto(rosto)]
+	local id = porCor and corOlhoId and porCor[corOlhoId]
+	if type(id) == "string" and id ~= "" then return id end
+	return nil
+end
+
+-- Módulo a montar de um item do catálogo: a malha (Blender) quando já enviada; senão o reserva de blocos (ou nada).
+function Personagem.moduloDe(item, existe: (string) -> boolean): string?
+	if not item then return nil end
+	if item.malha and existe(item.malha) then return item.malha end
+	if item.soMalha then return nil end
+	return item.modulo
+end
+
 local LADINO = { LadinoCapuz = true, LadinoMascara = true, LadinoCapa = true, LadinoCinto = true }
 local MAGO = { MestraTiara = true, MestraManto = true, MestraObi = true, MestraCajado = true }
 

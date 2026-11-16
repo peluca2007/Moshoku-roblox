@@ -5,6 +5,8 @@ local Visual = require(Shared.Aparencia.Visual)
 local Racas = require(Shared.Aparencia.Racas)
 local Personagem = require(Shared.Aparencia.Personagem)
 
+local Players = game:GetService("Players")
+
 local Modelo = {}
 
 function Modelo.criar(aparencia, raceId)
@@ -46,6 +48,23 @@ function Modelo.criar(aparencia, raceId)
 		if parte:IsA("BasePart") then parte.Anchored = true end
 	end
 	return modelo
+end
+
+-- PERS3: o corpo R15 padrão do jogo (o mesmo das fichas: descrição vazia + cores/escala da raça + Visual.decorar), parado.
+-- CreateHumanoidModelFromDescription YIELDA (rede): chame numa thread própria. Erra se a criação falhar; quem chama cai em
+-- Modelo.criar (blocos). Sem Humanoid ativo: todas as partes ancoradas.
+function Modelo.criarR15(aparencia, raceId)
+	assert(Racas.POR_ID[raceId], "raça desconhecida")
+	local descricao = Visual.descrever(aparencia, raceId)
+	local corpo = Players:CreateHumanoidModelFromDescription(descricao, Enum.HumanoidRigType.R15)
+	local ok, erro = pcall(Visual.decorar, corpo, aparencia, raceId)
+	if not ok then corpo:Destroy(); error(erro) end
+	for _, parte in corpo:GetDescendants() do
+		if parte:IsA("BasePart") then parte.Anchored = true end
+	end
+	local humanoide = corpo:FindFirstChildOfClass("Humanoid")
+	if humanoide then humanoide.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None end
+	return corpo
 end
 
 return Modelo

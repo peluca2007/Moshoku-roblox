@@ -4,6 +4,7 @@ local Catalogo = require(Shared.Aparencia.Catalogo)
 local Racas = require(Shared.Aparencia.Racas)
 local Encaixe = require(script.Parent.EncaixeCosmetico)
 local Personagem = require(script.Parent.Personagem)
+local Montar = require(script.Parent.MontarModelo)
 local Visual = {}
 local function cor(id)
 	local c = Catalogo.CORES[id]
@@ -70,7 +71,13 @@ function Visual.decorar(corpo, a, raceId)
 	local cores = { olho = Color3.fromRGB(245,245,235), iris = cor(a.cores.olho),
 		peleEscura = if escura then pele:Lerp(Color3.new(1, 1, 1), 0.38) else pele:Lerp(Color3.new(), 0.4),
 		boca = if escura then Color3.fromRGB(205,95,105) else Color3.fromRGB(65,30,30), dente = Color3.fromRGB(250,245,225) }
-	for categoria, estilo in a.rosto do
+	-- PERS3: rosto pintado (Decal, simétrico e sem blocos vazando da cabeça) quando já enviado; senão blocos.
+	local decal = Personagem.rostoDecal(a.rosto, a.cores.olho)
+	if decal then
+		local d = Instance.new("Decal")
+		d.Name, d.Face, d.Texture, d.Parent = "face", Enum.NormalId.Front, decal, head
+	end
+	for categoria, estilo in (if decal then {} else a.rosto) do
 		for i, bloco in Catalogo.ROSTO[categoria][estilo] do
 			local p = Instance.new("Part")
 			p.Name = categoria .. tostring(i)
@@ -92,16 +99,20 @@ function Visual.decorar(corpo, a, raceId)
 	-- A mesma configuração de colisão/massa/soldas dos treinadores.
 	Encaixe.configurarPecas(pasta, head, "RostoBlocos")
 	local function montar(item, tint)
-		if not item or not item.modulo then return end
+		local nome = Personagem.moduloDe(item, Montar.existe)
+		if not nome then return end
 		for _, ponto in item.encaixes or { item.encaixe } do
-			local c = { modulo = item.modulo, parte = ponto.parte, offset = ponto.offset }
+			local c = { modulo = nome, parte = ponto.parte, offset = ponto.offset }
 			Encaixe.montar(corpo, c, pasta, medidas.altura, tint) -- altura real da cabeça (= escala se cúbica)
 		end
 	end
 	if Personagem.CABELO_DO_AVATAR then recolorirCabelo(corpo, cor(a.cores.cabelo)) end
 	montar(Catalogo.CABELOS[a.cabelo], cor(a.cores.cabelo))
 	montar(Catalogo.BARBAS[a.barba], cor(a.cores.cabelo))
-	for _, id in Racas.POR_ID[raceId].obrigatorias do montar(Catalogo.PECAS[id]) end
+	for _, id in Racas.POR_ID[raceId].obrigatorias do
+		local item = Catalogo.PECAS[id]
+		montar(item, if item and item.tinge == "pele" then cor(a.cores.pele) elseif item and item.tinge == "cabelo" then cor(a.cores.cabelo) else nil)
+	end
 	for _, id in a.roupas do
 		-- Túnica básica segue a camisa selecionada; trajes autorais mantêm suas cores.
 		montar(Catalogo.PECAS[id], if id == "RoupaTunica1" then cor(a.cores.camisa) else nil)

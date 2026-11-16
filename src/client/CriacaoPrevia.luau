@@ -43,14 +43,34 @@ function Previa.nova(pai)
 	end
 
 	local api = {}
+	local geracao = 0 -- descarta resultado de uma criação R15 que chegou depois de outra mudança
 	function api.limpar()
+		geracao += 1
 		if mundo then mundo:Destroy() end
 		mundo, enquadre = nil, nil
 	end
+	-- Corpo novo (R15 padrão + roupa do jogo) criado em segundo plano; o modelo anterior fica até o novo chegar.
+	-- Se a criação falhar (rede/serviço), cai no rig estático de blocos.
 	function api.definir(aparencia, raceId)
-		api.limpar()
-		local ok, modelo = pcall(ModeloAparencia.criar, aparencia, raceId)
-		if not ok then warn("[CriacaoPrevia] " .. tostring(modelo)); return end
+		geracao += 1
+		local minha = geracao
+		task.spawn(function()
+			local ok, modelo = pcall(ModeloAparencia.criarR15, aparencia, raceId)
+			if minha ~= geracao or not v.Parent then
+				if ok then modelo:Destroy() end
+				return
+			end
+			if not ok then
+				warn("[CriacaoPrevia] R15 indisponível, usando blocos: " .. tostring(modelo))
+				ok, modelo = pcall(ModeloAparencia.criar, aparencia, raceId)
+				if not ok then warn("[CriacaoPrevia] " .. tostring(modelo)); return end
+			end
+			api.montar(modelo)
+		end)
+	end
+	function api.montar(modelo)
+		if mundo then mundo:Destroy() end
+		mundo, enquadre = nil, nil
 		mundo = Instance.new("WorldModel"); mundo.Parent = v
 		modelo.Parent = mundo
 		local caixa, tamanho = modelo:GetBoundingBox()

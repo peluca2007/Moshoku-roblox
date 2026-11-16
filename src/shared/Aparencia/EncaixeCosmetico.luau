@@ -52,7 +52,8 @@ function Encaixe.montar(corpo, contrato, pai, escala, cor)
  local modelo = Montar.montar(contrato.modulo, pai or corpo, alvo.CFrame * offset, e)
  Encaixe.configurarPecas(modelo, alvo, contrato.modulo)
  if cor then
-  for _, p in modelo:GetDescendants() do if p:IsA("BasePart") then p.Color = cor end end
+  -- PERS3: grupos "Interno" (forro da orelha) e "Ferro" (aros) mantêm a cor própria.
+  for _, p in modelo:GetDescendants() do if p:IsA("BasePart") and p.Name ~= "Interno" and p.Name ~= "Ferro" then p.Color = cor end end
  end
  return modelo
 end

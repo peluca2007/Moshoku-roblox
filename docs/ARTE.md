@@ -92,3 +92,11 @@ gera `build/beleza/personagem/prancha.jpg`. Envio pendente (chave da Open Cloud 
 `build/personagem/moldes/camisa_<conjunto>_<pele>.png` e `calca_*` com
 `python tools/roblox_upload.py build/personagem/moldes/camisa_aventureiro_clara.png --nome CamisaAventureiro --tipo Decal`
 (idem ladino/mago e calças); depois preencher `shared/Aparencia/Personagem.CONJUNTOS` com `rbxassetid://<id>`.
+
+## Personagem rodada 3 (PERS3, 16/11/2026)
+
+Cabelos, barbas, orelhas, rostos e peças de roupa modelados por script no Blender (`tools/blender/personagem/`, sem pacote
+externo, sem textura de terceiros): sem licença de terceiros; as peças são nossas. Conferência: `python tools/blender_rodar.py
+tools/blender/personagem/folhas.py --folha v3` gera `build/beleza/personagem/prancha_v3.jpg`. Envio (rota do Studio):
+`$env:MOSHOKU_VIA_STUDIO="1"; python tools/blender/personagem/enviar.py` (peças -> `src/server/Mundo/Modelos`, rostos ->
+`build/personagem/rostos/ids.json`).

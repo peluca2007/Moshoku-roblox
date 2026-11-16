@@ -9,7 +9,7 @@ PORTA = (-4, 3, -186)
 
 LUA_FAIXA = r"""
 local g=game.Players.LocalPlayer.PlayerGui:FindFirstChild('ExpedicaoJogo') if not g then return '' end
-local f=g:FindFirstChild('Faixa') if not f or not f.Visible then return '' end
+local f=g:FindFirstChild('Faixa') if not f or not (f.Visible or f:GetAttribute('EscondidaPeloAnuncio')) then return '' end
 local t={} for _,d in f:GetDescendants() do if d:IsA('TextLabel') and d.Text~='' then table.insert(t,d.Text) end end
 return table.concat(t,' ')
 """

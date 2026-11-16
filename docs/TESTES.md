@@ -1411,3 +1411,9 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - Studio: `python tools/qa/qa.py esgoto_sala1 --manter-play` 20 ok (numa rodada 2 falhas só da faixa do dia, que some no anúncio, intermitentes e alheias ao cenário). Capturas em `build/beleza/cen1_vez.png` (vez do jogador), `cen1_golpe.png`, `cen1_andar.png` (câmera ao andar, grade legível); antes: `build/qa/2026-11-16/hud4_anuncio.png`. `qa.py luta` e `testar.ps1` (só o Catálogo falha, esperado).
 - Sala fechada (`CenarioEsgoto`): paredes com arcos e túneis, abóbada, canos, grade com queda d'água, tochas (8 PointLight), 2 SpotLight de feixe, 3 luzes de túnel, 5 emissores de névoa; remendos de material, musgo e poças no chão. PerfilLuta do esgoto: escuro, névoa verde.
 - Não verificado: desempenho em celular/FPS medido, nº de peças no Studio (estimado ~350), outras salas do esgoto/chefe, vista de cima da câmera antiga (CameraController, y=65, atravessaria o teto).
+
+## ANIM3b (16/11/2026)
+
+- Mescla da ANIM3 no branch; corpo oficial Man. `qa.py esgoto_sala1` (20 ok) e `qa.py luta` (29 ok) rodados duas vezes cada, sem falhas; `anim_quadros.py` (CorteLeve, CortePesado, Estocada, DisparoArco, ReacaoGolpe, Vitoria) gerou `build/beleza/anim/prancha.jpg`.
+- Intermitência do QA: o anúncio da HUD3 escondia a faixa do dia (`Visible=false`). Agora marca o atributo `EscondidaPeloAnuncio` e o QA (`qa_jogo.LUA_FAIXA`) lê o texto só nesse caso; faixa escondida por outro motivo continua falhando.
+- Não verificado visualmente: arco na mão (ficha de teste usa espada), número/barra esperando o marco `impacto` em quadro capturado.

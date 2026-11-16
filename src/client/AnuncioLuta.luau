@@ -86,6 +86,7 @@ function Anuncio.start(state)
 		if visivel then
 			if faixaEscondida then
 				faixaEscondida.Visible = true
+				faixaEscondida:SetAttribute("EscondidaPeloAnuncio", nil)
 				faixaEscondida = nil
 			end
 			return
@@ -94,6 +95,7 @@ function Anuncio.start(state)
 		local f = g and g:FindFirstChild("Faixa")
 		if f and f:IsA("GuiObject") and f.Visible then
 			f.Visible = false
+			f:SetAttribute("EscondidaPeloAnuncio", true) -- o QA lê o texto mesmo assim; esconder por outro motivo continua falhando
 			faixaEscondida = f
 		end
 	end

@@ -19,6 +19,7 @@ local Estilo = require(Shared:WaitForChild("Estilo"))
 local Efeitos = require(script.Parent:WaitForChild("Efeitos"))
 
 local Coreografia = require(script.Parent:WaitForChild("Coreografia"))
+local MagiasAgua = require(script.Parent:WaitForChild("MagiasAgua"))
 local Sonorizacao = require(script.Parent:WaitForChild("Sonorizacao"))
 local Magias = {}
 
@@ -680,6 +681,21 @@ RECEITAS["apagar-fogo"] = function(state, recibo)
 		fumaca(p - Vector3.new(0, 2, 0), 3)
 		Efeitos.floatText(p + Vector3.new(0, 4, 0), if alvo.passou then "APAGOU" else "AINDA QUEIMA", if alvo.passou then Estilo.TINTA else FOGO)
 	end
+end
+
+-- Água (HAB2): receitas próprias em client/MagiasAgua; o contexto entrega as ferramentas daqui.
+for id, receita in MagiasAgua.criar({
+	pasta = function() return pasta end,
+	conectar = conectar,
+	posicaoDe = function(tokenId, fallback) return posicaoDe(state, tokenId, fallback) end,
+	chao = chao,
+	centroCasa = centroCasa,
+	aFrente = aFrente,
+	recuo = function(alvoId, de, forca) recuo(state, alvoId, de, forca) end,
+	veredito = veredito,
+	som = somDoRecibo,
+}) do
+	RECEITAS[id] = receita
 end
 
 -- Entrada ------------------------------------------------------------------

@@ -365,3 +365,5 @@ Onde o personagem é montado: `shared/Aparencia/Visual` (`descrever` = HumanoidD
 Botões do losango: `AcoesDoTurno.botao` (tecla no disco à esquerda, rótulo `TextScaled`, hover anima marca/cor) e tamanhos em `Regras/LayoutLuta` (`LOSANGO`, `VERTICE_*`, `EXTRA_H`). Anel do personagem ativo: `BoardView` (`AnelVez` bloco fino com Decal de `UIArteLuta.PECAS.anel_ativo`). `AnuncioLuta` esconde o ScreenGui `RelogioRun` (dia/sala) enquanto o nome do golpe aparece. Manchas pintadas: `Hud.cartaoDe` (`mancha_cartao`) e `RetratoLuta` (`mancha_retrato`). Crédito game-icons.net (CC BY 3.0): fim de cada aba em `AjudaView`.
 
 - Faixa do dia escondida pelo anúncio: `client/AnuncioLuta` (`relogio`) marca `EscondidaPeloAnuncio`; o QA lê em `tools/qa/qa_jogo.py` (`LUA_FAIXA`).
+
+Magias de Água (respingo, bola, flecha, impacto de gelo, aura Molhado): `client/MagiasAgua` (receitas registradas em `Magias.RECEITAS`), curvas em `shared/AguaCurvas`; QA `tools/qa/hab_agua.py`.

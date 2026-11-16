@@ -8,20 +8,21 @@ local function misturar(c: { number }, alvo: { number }, t: number): { number }
 	return { c[1] + (alvo[1] - c[1]) * t, c[2] + (alvo[2] - c[2]) * t, c[3] + (alvo[3] - c[3]) * t }
 end
 
--- Clima do esgoto (CEN1): sala fechada, escura, névoa verde-acinzentada; o calor vem das tochas.
+-- Clima do esgoto (CEN3): escuro de verdade entre as tochas; o calor e a forma vêm das luzes pontuais.
 local function esgoto(p)
-	p.ambiente = { 52, 64, 60 }
-	p.ambienteExterno = { 52, 64, 60 }
-	p.deslocaCima = { 20, 28, 24 }
-	p.brilho = 0.5
-	p.difuso = 0.5
-	p.ccContraste = p.ccContraste + 0.06
-	p.ccSaturacao = p.ccSaturacao - 0.08
-	p.ccTint = { 215, 238, 222 }
+	p.ambiente = { 50, 64, 60 }
+	p.ambienteExterno = { 50, 64, 60 }
+	p.deslocaCima = { 16, 24, 21 }
+	p.brilho = 0.4
+	p.difuso = 0.45
+	p.exposicao = 0
+	p.ccContraste = p.ccContraste + 0.14
+	p.ccSaturacao = p.ccSaturacao - 0.04
+	p.ccTint = { 222, 240, 228 }
 	p.atmDensidade = 0.5
 	p.atmHaze = 4
-	p.atmCor = { 70, 96, 84 }
-	p.atmDecay = { 40, 60, 52 }
+	p.atmCor = { 64, 90, 78 }
+	p.atmDecay = { 34, 52, 46 }
 	p.raios = 0
 	p.dofDistancia = 70
 	return p

@@ -57,8 +57,8 @@ function EsgotoArcos.nervuras(pasta, origem, meia, alturaTeto, posicoes)
 		for _, p in posicoes do
 			local base = CFrame.new(origem.X + (eixo == "z" and p or 0), topo - R + espessura / 2, origem.Z + (eixo == "x" and p or 0))
 			if eixo == "z" then base = base * CFrame.Angles(0, math.rad(90), 0) end
-			EsgotoArcos.segmentos(pasta, "Nervura", base, R - espessura / 2, espessura, profundidade, 90 - meioAng, 90 + meioAng, 15,
-				EsgotoPecas.PEDRA, Enum.Material.Slate)
+			EsgotoArcos.segmentos(pasta, "Nervura", base, R - espessura / 2, espessura, profundidade, 90 - meioAng, 90 + meioAng, 10,
+				EsgotoPecas.PEDRA_ESCURA, Enum.Material.Slate)
 		end
 	end
 end

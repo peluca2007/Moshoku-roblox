@@ -1418,6 +1418,11 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - Capturas em `build/beleza/esgoto2/` (`r14_*` geral, canto, arco, água, tocha, abóbada, poça; `luta_camera.png` com a câmera da luta). Script `tools/qa/esgoto_fotos.py` (usa câmera própria; só depois de `qa.py esgoto_sala1 --manter-play`) e `tools/qa/studio_janela.ps1` (restaura o Studio minimizado: sem isso a captura sai cinza uniforme ou congelada).
 - Não verificado: FPS/celular, movimento da água a olho (só offset lido), gota e respingo em quadro.
 
+## CEN3 — luz do esgoto (16/11/2026, Studio por MCP)
+- `qa.py esgoto_sala1` 20 ok com o build final; testar.ps1 só com o Catálogo falhando. 715 peças, 18 luzes (2 com sombra). Capturas em `build/beleza/esgoto3/` (geral/luta_camera, arco, tocha, abóbada, água, canto, poça, movimento_1/2 com 2,5 s de intervalo: pixels diferem e OffsetStudsV avançou).
+- Descobertas: com Future, a Atmosphere (cor/densidade) é a luz de base do salão: cor muito escura deixa o chão preto mesmo com Ambient alto; luzes de enchimento extras fizeram as tochas perderem o brilho. Se o Studio tiver arquivos em edição de outro agente, `studio_sync.py` copia o estado quebrado: sincronizei a partir de um worktree do HEAD com só meus arquivos.
+- Não verificado: FPS/celular, `qa.py luta` nesta rodada.
+
 ## ANIM3b (16/11/2026)
 
 - Mescla da ANIM3 no branch; corpo oficial Man. `qa.py esgoto_sala1` (20 ok) e `qa.py luta` (29 ok) rodados duas vezes cada, sem falhas; `anim_quadros.py` (CorteLeve, CortePesado, Estocada, DisparoArco, ReacaoGolpe, Vitoria) gerou `build/beleza/anim/prancha.jpg`.

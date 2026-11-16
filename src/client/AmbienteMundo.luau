@@ -101,6 +101,7 @@ function AmbienteMundo.start()
 		Lighting.Brightness = p.brilho
 		Lighting.EnvironmentDiffuseScale = p.difuso
 		Lighting.EnvironmentSpecularScale = p.especular
+		Lighting.ExposureCompensation = p.exposicao or 0
 		Lighting.Ambient = cor(p.ambiente)
 		Lighting.OutdoorAmbient = cor(p.ambienteExterno)
 		Lighting.ColorShift_Top = cor(p.deslocaCima)

@@ -20,8 +20,8 @@ local peca, luz = EsgotoPecas.peca, EsgotoPecas.luz
 
 -- Vãos (arcos) de cada parede, por x local, e posição das tochas.
 local PAREDES = {
-	{ girar = 0, arcos = { -40, 40 }, tochas = { -16, 16 }, grade = 0 },
-	{ girar = 180, arcos = { 0 }, tochas = { -34, 34 }, grade = -52 },
+	{ girar = 0, arcos = { -40, 40 }, tochas = { -16, 16 }, grade = 0, sombra = true },
+	{ girar = 180, arcos = { 0 }, tochas = { -34, 34 }, grade = -52, sombra = true },
 	{ girar = 90, arcos = { 0 }, tochas = { -26, 26 }, grade = 50 },
 	{ girar = -90, arcos = { -30, 30 }, tochas = { 0 }, grade = 0 },
 }
@@ -58,15 +58,15 @@ local function parede(pasta, base, cfg, tem)
 	for _, ax in arcos do
 		EsgotoArcos.vao(pasta, L, ax, MEIA, ALTURA_TETO)
 		-- Túnel: chão, laterais, teto e fundo escuros, com um fio de água e luz verde ao longe.
-		local fundo = 44
+		local fundo = 34
 		peca(pasta, "TunelChao", Vector3.new(22, 1, fundo), L(ax, -0.5, -MEIA - fundo / 2), PEDRA_ESCURA, Enum.Material.Slate)
 		EsgotoAgua.canal(pasta, "TunelAgua", Vector3.new(7, 0.15, fundo), L(ax, 0.1, -MEIA - fundo / 2))
 		peca(pasta, "TunelParede", Vector3.new(1, 30, fundo), L(ax - 11.5, 15, -MEIA - fundo / 2), VAZIO, Enum.Material.Slate)
 		peca(pasta, "TunelParede", Vector3.new(1, 30, fundo), L(ax + 11.5, 15, -MEIA - fundo / 2), VAZIO, Enum.Material.Slate)
 		peca(pasta, "TunelTeto", Vector3.new(24, 1, fundo), L(ax, 29.5, -MEIA - fundo / 2), VAZIO, Enum.Material.Slate)
-		peca(pasta, "TunelFundo", Vector3.new(24, 30, 1), L(ax, 15, -MEIA - fundo), Color3.fromRGB(40, 70, 58), Enum.Material.SmoothPlastic)
+		peca(pasta, "TunelFundo", Vector3.new(24, 30, 1), L(ax, 15, -MEIA - fundo), Color3.fromRGB(5, 8, 7), Enum.Material.SmoothPlastic)
 		luz(peca(pasta, "TunelLuz", Vector3.new(1, 1, 1), L(ax, 8, -MEIA - fundo + 6), VAZIO, Enum.Material.SmoothPlastic, { Transparency = 1 }),
-			Color3.fromRGB(110, 190, 150), 1.4, 32)
+			Color3.fromRGB(70, 120, 100), 0.5, 22)
 		-- Água que sai do túnel e vira canaleta no chão do salão (fora do tabuleiro: z < -50).
 		EsgotoAgua.canal(pasta, "Canaleta", Vector3.new(7, 0.14, MEIA - 50 + 2), L(ax, 0.09, -MEIA + (MEIA - 50) / 2 + 1))
 		peca(pasta, "MargemCanaleta", Vector3.new(9.4, 0.1, MEIA - 50 + 2), L(ax, 0.05, -MEIA + (MEIA - 50) / 2 + 1), MUSGO, Enum.Material.Grass)
@@ -92,7 +92,7 @@ local function parede(pasta, base, cfg, tem)
 	end
 	-- Tochas: chama com partículas e luz que oscila no cliente.
 	for k, tx in cfg.tochas do
-		EsgotoTochas.montar(pasta, L, MEIA, tx, (cfg.girar + 360) % 360 + k * 7)
+		EsgotoTochas.montar(pasta, L, MEIA, tx, (cfg.girar + 360) % 360 + k * 7, cfg.sombra and k == 1)
 	end
 	EsgotoSujeira.parede(pasta, L, MEIA, fatias, 100 + (cfg.girar + 360) % 360)
 end
@@ -106,11 +106,11 @@ local function chao(pasta, origem)
 	end
 	local function cinza(v) return Color3.fromRGB(v * 0.92, v, v * 0.94) end
 	-- Dentro do tabuleiro (topo em y=1): remendos baixos, longe de linhas.
-	for i = 1, 22 do
+	for i = 1, 12 do
 		local w, d = r:NextNumber(6, 16), r:NextNumber(6, 16)
 		remendo("Remendo", r:NextNumber(-40, 40), r:NextNumber(-40, 40), w, d, 1.011 + i * 0.0003, cinza(r:NextInteger(46, 92)), materiais[r:NextInteger(1, #materiais)])
 	end
-	for i = 1, 10 do
+	for i = 1, 6 do
 		remendo("Musgo", r:NextNumber(-44, 44), r:NextNumber(-44, 44), r:NextNumber(4, 10), r:NextNumber(4, 9), 1.0125 + i * 0.0003, MUSGO:Lerp(PEDRA, r:NextNumber(0, 0.4)), Enum.Material.Grass)
 	end
 	-- Poças de água parada (textura que desliza) e uma goteira do teto sobre as cinco primeiras.
@@ -121,12 +121,12 @@ local function chao(pasta, origem)
 		if i <= 5 then EsgotoAgua.goteira(pasta, Vector3.new(centro.X, ALTURA_TETO - 0.3, centro.Z), ALTURA_TETO - 1.3) end
 	end
 	-- Fora do tabuleiro (topo em y=0): remendos grandes e mais musgo junto às paredes.
-	for i = 1, 14 do
+	for i = 1, 8 do
 		local ang = r:NextNumber(0, math.pi * 2)
 		local raio = r:NextNumber(60, 80)
 		remendo("RemendoFora", math.cos(ang) * raio, math.sin(ang) * raio, r:NextNumber(8, 18), r:NextNumber(8, 18), 0.03 + i * 0.001, cinza(r:NextInteger(40, 80)), materiais[r:NextInteger(1, #materiais)])
 	end
-	for i = 1, 12 do
+	for i = 1, 7 do
 		local ang = r:NextNumber(0, math.pi * 2)
 		local raio = r:NextNumber(62, 82)
 		remendo("MusgoFora", math.cos(ang) * raio, math.sin(ang) * raio, r:NextNumber(5, 11), r:NextNumber(5, 11), 0.05 + i * 0.001, MUSGO, Enum.Material.Grass)
@@ -137,8 +137,8 @@ end
 -- Abóbada: laje escura sobre tudo + nervuras curvas (a câmera do jogo fica abaixo dela, y~26).
 local function teto(pasta, origem)
 	local o = CFrame.new(origem.X, 0, origem.Z)
-	peca(pasta, "Teto", Vector3.new(2 * MEIA + 12, 2, 2 * MEIA + 12), o * CFrame.new(0, ALTURA_TETO + 1, 0), PEDRA_ESCURA, Enum.Material.Slate)
-	EsgotoArcos.nervuras(pasta, origem, MEIA, ALTURA_TETO, { -62, -21, 21, 62 })
+	peca(pasta, "Teto", Vector3.new(2 * MEIA + 12, 2, 2 * MEIA + 12), o * CFrame.new(0, ALTURA_TETO + 1, 0), Color3.fromRGB(18, 22, 21), Enum.Material.Slate)
+	EsgotoArcos.nervuras(pasta, origem, MEIA, ALTURA_TETO, { -50, 0, 50 })
 end
 
 -- Feixes de luz que entram por grades do teto: grade escura, feixe translúcido e SpotLight para o chão.
@@ -149,11 +149,28 @@ local function feixes(pasta, origem)
 		for b = -3, 3, 2 do
 			peca(pasta, "GradeTetoBarra", Vector3.new(0.5, 0.5, 9.4), CFrame.new(x + b, ALTURA_TETO - 0.9, z), FERRO, Enum.Material.Metal)
 		end
-		local feixe = peca(pasta, "Feixe", Vector3.new(7, ALTURA_TETO - 1, 7), CFrame.new(x + 4, (ALTURA_TETO - 1) / 2 + 1, z + 4) * CFrame.Angles(math.rad(-6), 0, math.rad(8)),
-			Color3.fromRGB(190, 225, 215), Enum.Material.Neon, { Transparency = 0.93, CastShadow = false })
+		-- Poeira iluminada no lugar da placa translúcida: partículas suaves num volume invisível sob a grade.
+		local volume = peca(pasta, "Feixe", Vector3.new(6, ALTURA_TETO - 4, 6), CFrame.new(x + 3, (ALTURA_TETO - 4) / 2 + 1.5, z + 3),
+			VAZIO, Enum.Material.SmoothPlastic, { Transparency = 1, CastShadow = false })
+		local poeira = Instance.new("ParticleEmitter")
+		poeira.Texture = "rbxasset://textures/particles/smoke_main.dds"
+		poeira.Shape = Enum.ParticleEmitterShape.Box
+		poeira.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+		poeira.Color = ColorSequence.new(Color3.fromRGB(190, 225, 210))
+		poeira.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 3), NumberSequenceKeypoint.new(1, 6) })
+		poeira.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, 0.93), NumberSequenceKeypoint.new(0.7, 0.93), NumberSequenceKeypoint.new(1, 1) })
+		poeira.Lifetime = NumberRange.new(7, 10)
+		poeira.Rate = 5
+		poeira.Speed = NumberRange.new(0.2, 0.6)
+		poeira.Acceleration = Vector3.new(0, -0.3, 0)
+		poeira.LightEmission = 0.7
+		poeira.LightInfluence = 0
+		poeira.RotSpeed = NumberRange.new(-6, 6)
+		poeira.Parent = volume
+		poeira:Emit(20)
 		local spot = Instance.new("SpotLight")
-		spot.Color, spot.Brightness, spot.Range, spot.Angle, spot.Face, spot.Shadows = Color3.fromRGB(200, 232, 220), 5, 60, 34, Enum.NormalId.Bottom, false
-		spot.Parent = feixe
+		spot.Color, spot.Brightness, spot.Range, spot.Angle, spot.Face, spot.Shadows = Color3.fromRGB(200, 232, 220), 7, 70, 32, Enum.NormalId.Bottom, false
+		spot.Parent = peca(pasta, "FeixeLuz", Vector3.new(1, 1, 1), CFrame.new(x, ALTURA_TETO - 1, z), VAZIO, Enum.Material.SmoothPlastic, { Transparency = 1 })
 	end
 end
 

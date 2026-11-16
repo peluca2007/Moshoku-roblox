@@ -16,14 +16,14 @@ local function emissor(pai, nome, textura, props)
 end
 
 -- `L` posiciona no frame da parede; `x` é a posição ao longo dela.
-function EsgotoTochas.montar(pasta, L, meia, x, semente)
+function EsgotoTochas.montar(pasta, L, meia, x, semente, sombra)
 	local FERRO = EsgotoPecas.FERRO
 	peca(pasta, "TochaSuporte", Vector3.new(0.7, 0.7, 2.4), L(x, 13, -meia + 3.4), FERRO, Enum.Material.Metal)
 	peca(pasta, "TochaAro", Vector3.new(2.2, 0.5, 2.2), L(x, 15.9, -meia + 4.4), FERRO, Enum.Material.Metal)
 	peca(pasta, "TochaCabo", Vector3.new(0.9, 3, 0.9), L(x, 14.4, -meia + 4.4), Color3.fromRGB(70, 46, 28), Enum.Material.Wood)
 	local chama = peca(pasta, "Tocha", Vector3.new(1.1, 1.5, 1.1), L(x, 16.6, -meia + 4.4), Color3.fromRGB(255, 120, 40), Enum.Material.Neon,
 		{ Shape = Enum.PartType.Ball, CastShadow = false })
-	local luz = EsgotoPecas.luz(chama, Color3.fromRGB(255, 154, 78), 2.6, 38)
+	local luz = EsgotoPecas.luz(chama, Color3.fromRGB(255, 150, 70), 3.6, 46, sombra)
 	luz:SetAttribute("BrilhoBase", luz.Brightness)
 	luz:SetAttribute("AlcanceBase", luz.Range)
 	chama:SetAttribute("Semente", semente)

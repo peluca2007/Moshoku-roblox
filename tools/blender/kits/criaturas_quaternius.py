@@ -269,8 +269,10 @@ def converter(modulo, cfg):
         if parte != "Corpo" and pai_parte != parte:
             raizes.setdefault(parte, []).append(cabeca)
 
-    for o, lista in zip(malhas, pts):
+    partes_verts = {}  # parte -> {(índice da malha, vértice)}  (para os clipes por peça rígida)
+    for mi, (o, lista) in enumerate(zip(malhas, pts)):
         grupos_v = [[(o.vertex_groups[g.group].name, g.weight) for g in v.groups] for v in o.data.vertices]
+        olhos_soltos = o.name.lower().startswith("eye")
         eh_olho = not o.vertex_groups or all(n not in ossos for n, _ in (grupos_v[0] if grupos_v else []))
         for p in o.data.polygons:
             peso = {}
@@ -279,14 +281,34 @@ def converter(modulo, cfg):
                     parte = parte_do_osso(nome)
                     peso[parte] = peso.get(parte, 0.0) + w
             parte = "Cabeca" if (eh_olho and not peso) else (max(peso, key=peso.get) if peso else "Corpo")
+            if olhos_soltos:  # malha dos olhos com armadura própria (parada): vai na Cabeca e acompanha a cabeça (ANIM2)
+                parte = "Cabeca"
             mat = o.material_slots[p.material_index].material if o.material_slots and p.material_index < len(o.material_slots) else None
             cor = chave_cor(mat)
             bm = modelo.g(parte, cor)
+            if not olhos_soltos:  # a armadura dos olhos não anima: fora do ajuste rígido
+                partes_verts.setdefault(parte, set()).update((mi, i) for i in p.vertices)
             vs = [bm.verts.new(T(lista[i])) for i in p.vertices]
             try:
                 bm.faces.new(vs)
             except ValueError:
                 pass
+
+    if opcoes_clipes:
+        import numpy as np
+        import criaturas_clipes as clipes
+        rot_np, c_np = np.array(rot), np.array(centro_xy)
+        Tnp = lambda A: ((A - c_np) * esc) @ rot_np.T  # noqa: E731
+        pts_np = [Tnp(np.array([tuple(v) for v in lista])) for lista in pts]
+        pivos_aut = {}
+        for parte, lista in raizes.items():
+            if parte in partes_verts:
+                c = sum(lista, Vector()) / len(lista)
+                pivos_aut[parte] = (c.x, c.y, c.z)
+        pivos_aut.setdefault("Corpo", (0, 0, alvo * 0.3))
+        todos_np = np.concatenate(pts_np)
+        desloc = ((todos_np[:, 0].min() + todos_np[:, 0].max()) / 2, (todos_np[:, 1].min() + todos_np[:, 1].max()) / 2, todos_np[:, 2].min())
+        clipes.gerar(bpy, modulo, malhas, partes_verts, pts_np, Tnp, pivos_aut, desloc)
 
     for o in list(bpy.data.objects):  # remove o FBX original da cena (só interessam as peças novas)
         bpy.data.objects.remove(o, do_unlink=True)
@@ -314,8 +336,13 @@ def converter(modulo, cfg):
     print(f"RESUMO {modulo}: {len(objetos)} peças, {tris} tris, caixa {caixa}, tipo {tipo}, partes {sorted(set(g.split('_')[0] for g in modelo.grupos))}")
 
 
+opcoes_clipes = False
+
+
 def main():
-    opcoes = lib.argumentos({"so": ""})
+    global opcoes_clipes
+    opcoes = lib.argumentos({"so": "", "clipes": "0"})
+    opcoes_clipes = opcoes["clipes"] == "1"
     quais = [q for q in opcoes["so"].split(",") if q]
     for modulo, cfg in CRIATURAS.items():
         if quais and not any(q.lower() in modulo.lower() or q.lower() in cfg[1].lower() for q in quais):

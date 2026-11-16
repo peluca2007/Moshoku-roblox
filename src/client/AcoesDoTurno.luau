@@ -240,7 +240,7 @@ function AcoesDoTurno.start(state)
 	local atacar = botao(menu, "Atacar", "Atacar", tamanhoVertice(), { tecla = "F" }, function() alternarLista("atacar") end)
 	local habilidades = botao(menu, "Habilidades", "Habilidades", tamanhoVertice(), { tecla = "R" }, function() alternarLista("habilidades") end)
 	-- Andar (Cap. 4: 1 Ação, até o Deslocamento): acende as casas e um clique move.
-	local andar = botao(menu, "Andar", "Andar (1 Ação)", tamanhoVertice(), { tecla = "G" }, function()
+	local andar = botao(menu, "Andar", "Andar", tamanhoVertice(), { tecla = "G" }, function()
 		if not atual.tokenId or (atual.restantes or 0) < 1 and (atual.passosLivres or 0) < 1 then
 			return
 		end
@@ -585,7 +585,7 @@ function AcoesDoTurno.start(state)
 		end
 		local mira = state.mira()
 		cancelar.Visible = mira ~= nil
-		rotuloDe(andar, if atual.passosLivres > 0 then "Andar · " .. atual.passosLivres .. " casas" else "Andar (1 Ação)")
+		rotuloDe(andar, if atual.passosLivres > 0 then "Andar · " .. atual.passosLivres .. " casas" else "Andar")
 		andar:SetAttribute("Bloqueada", restantes < 1 and atual.passosLivres < 1)
 		andar:SetAttribute("Desabilitado", restantes < 1 and atual.passosLivres < 1)
 		rotuloDe(encerrar, if restantes == 0 then "Pronto · Encerrar" else "Encerrar turno")

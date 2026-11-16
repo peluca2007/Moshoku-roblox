@@ -57,6 +57,9 @@ function Anuncio.start(state)
 	local anuncio = P.novo("Frame", gui, { Name = "Anuncio", BackgroundTransparency = 1, Visible = false, AnchorPoint = Vector2.new(0.5, 0) })
 	local quem = rotulo(anuncio, "Quem", T.fontes.rotulo, 15, P.cor.ouro, { Size = UDim2.new(1, 0, 0, 20), TextXAlignment = Enum.TextXAlignment.Center })
 	local habilidade = rotulo(anuncio, "Habilidade", T.fontes.titulo, 38, P.cor.ouroVivo, { Position = UDim2.fromOffset(0, 20), Size = UDim2.new(1, 0, 0, 44), TextXAlignment = Enum.TextXAlignment.Center })
+	-- HUD4: mancha de tinta escura atrás do nome (o dourado sumia sobre o céu claro).
+	local mancha = P.arte(anuncio, "mancha_cartao", 0)
+	mancha.Name, mancha.AnchorPoint, mancha.Position, mancha.ImageColor3, mancha.ImageTransparency = "Mancha", Vector2.new(0.5, 0.5), UDim2.fromScale(0.5, 0.5), Color3.fromRGB(14, 10, 8), 1
 	local escalaAnuncio = P.novo("UIScale", anuncio, { Scale = 1 })
 	local function fio(nome: string, lado: number)
 		return P.novo("Frame", anuncio, {
@@ -76,10 +79,23 @@ function Anuncio.start(state)
 	posicionar()
 
 	local serial = 0
-	-- HUD3: o relógio do dia/sala (RelogioRun, topo central) esconde enquanto o nome do golpe aparece.
+	-- HUD3/4: a faixa "Dia N · faltam X dias / Sala" (ExpedicaoJogo.Faixa, topo central) esconde enquanto o nome do
+	-- golpe aparece e volta depois, só se estava visível antes (o dono dela, ExpedicaoView, continua mandando).
+	local faixaEscondida: GuiObject? = nil
 	local function relogio(visivel: boolean)
-		local g = Players.LocalPlayer.PlayerGui:FindFirstChild("RelogioRun")
-		if g and g:IsA("ScreenGui") then g.Enabled = visivel end
+		if visivel then
+			if faixaEscondida then
+				faixaEscondida.Visible = true
+				faixaEscondida = nil
+			end
+			return
+		end
+		local g = Players.LocalPlayer.PlayerGui:FindFirstChild("ExpedicaoJogo")
+		local f = g and g:FindFirstChild("Faixa")
+		if f and f:IsA("GuiObject") and f.Visible then
+			f.Visible = false
+			faixaEscondida = f
+		end
 	end
 	local function ocultar(animado: boolean)
 		serial += 1
@@ -90,6 +106,7 @@ function Anuncio.start(state)
 			return
 		end
 		local saida = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+		P.animar(mancha, { ImageTransparency = 1 }, saida, "mancha")
 		for _, l in { habilidade, quem, resultado } do
 			P.animar(l, { TextTransparency = 1, TextStrokeTransparency = 1 }, saida, "texto")
 		end
@@ -106,6 +123,7 @@ function Anuncio.start(state)
 		quem.Text, habilidade.Text, resultado.Text = string.upper(nomeQuem), nomeHabilidade, detalhe
 		resultado.TextColor3 = CORES[tom] or CORES.neutro
 		posicionar()
+		local topo0 = Layout.topo(workspace.CurrentCamera.ViewportSize.X)
 		anuncio.Visible, resultado.Visible = true, detalhe ~= ""
 		relogio(false)
 		-- entrada: o nome cresce com Back e desce 14 px; os fios abrem do centro para fora
@@ -113,6 +131,9 @@ function Anuncio.start(state)
 			l.TextTransparency, l.TextStrokeTransparency = 1, 1
 		end
 		escalaAnuncio.Scale = 0.8
+		mancha.Size = UDim2.fromOffset(math.clamp(#nomeHabilidade * 22 + 110, 220, topo0.anuncio.w), topo0.anuncio.h + 26)
+		mancha.ImageTransparency = 1
+		P.animar(mancha, { ImageTransparency = 0.12 }, P.SUAVE, "mancha")
 		local topo = Layout.topo(workspace.CurrentCamera.ViewportSize.X)
 		anuncio.Position = UDim2.fromOffset(topo.anuncio.x + topo.anuncio.w / 2, topo.anuncio.y - 14)
 		local entrada = TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out)

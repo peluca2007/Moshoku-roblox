@@ -7,6 +7,25 @@ local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Pivos = require(Shared.Mundo.PivosModelos)
 local Anim = require(Shared.Mundo.AnimacaoCriatura)
 local Modelos = require(Shared.Mundo.ModelosCriaturas)
+local Amostra = require(Shared.Animacoes.Amostra)
+local PASTA_CLIPES = Shared.Animacoes:FindFirstChild("Criaturas")
+local FADE = 0.18 -- troca de clipe base (parado/andando) e entrada/saída das ações (s)
+
+-- Dados de clipes do módulo (ANIM2); nil se não houver ou estiverem malformados (cai nas poses por código).
+local cacheClipes = {}
+local function clipesDe(modulo)
+	local c = cacheClipes[modulo]
+	if c == nil then
+		c = false
+		local m = PASTA_CLIPES and PASTA_CLIPES:FindFirstChild(modulo)
+		if m and m:IsA("ModuleScript") then
+			local ok, dados = pcall(require, m)
+			if ok and Anim.validar(dados) then c = dados end
+		end
+		cacheClipes[modulo] = c
+	end
+	return c or nil
+end
 
 local CriaturaAnimada = {}
 CriaturaAnimada.__index = CriaturaAnimada
@@ -40,13 +59,37 @@ function CriaturaAnimada.montar(info, pai, cf, escala)
 	end
 	if #partes == 0 then modelo:Destroy(); return nil end
 	return setmetatable({
+		clipes = clipesDe(info.modulo), pivosPorGrupo = pivos,
 		modelo = modelo, info = info, escala = escala, partes = partes, grupos = grupos, locais = locais,
 		cfs = table.create(#partes), bracoArma = bracoArma,
-		fase = 0, mov = 0, t = 0, yaw = 0, golpeDesde = nil, quedaDesde = nil, tipo = info.tipo,
+		ataqueN = 0, alternar = true, fase = 0, mov = 0, t = 0, yaw = 0, golpeDesde = nil, quedaDesde = nil, tipo = info.tipo,
 	}, CriaturaAnimada)
 end
 
-function CriaturaAnimada:golpear(agora) self.golpeDesde = agora or os.clock() end
+-- Ação (ataque/dano) com clipe: toca uma vez por cima da base. Sem clipe, usa o golpe por código (só no ataque).
+-- `aoImpacto` (opcional) roda no marco `impacto` do clipe de ataque (gancho para aplicar o dano no instante do golpe).
+function CriaturaAnimada:golpear(agora, aoImpacto)
+	agora = agora or os.clock()
+	self.golpeDesde = agora
+	if self.clipes then
+		local estado = "ataque"
+		if self.alternar and Anim.clipeDe(self.clipes, "ataque2") ~= Anim.clipeDe(self.clipes, "ataque") then
+			estado = if self.ataqueN % 2 == 1 then "ataque2" else "ataque"
+			self.ataqueN += 1
+		end
+		local nome, clipe = Anim.clipeDe(self.clipes, estado)
+		if clipe then
+			self.acao = { clipe = clipe, desde = agora, ataque = true, impacto = aoImpacto, ultimo = -1e-6 }
+		end
+	end
+end
+function CriaturaAnimada:levarGolpe(agora)
+	if self.quedaDesde or not self.clipes then return end
+	local _, clipe = Anim.clipeDe(self.clipes, "dano")
+	if clipe and not (self.acao and self.acao.ataque) then
+		self.acao = { clipe = clipe, desde = agora or os.clock(), ultimo = -1e-6 }
+	end
+end
 function CriaturaAnimada:cair(agora) self.quedaDesde = agora or os.clock() end
 function CriaturaAnimada:caiu() return self.quedaDesde ~= nil end
 -- Altura/pegada do modelo na escala usada (studs), para marcadores e seleção.
@@ -84,12 +127,17 @@ function CriaturaAnimada:atualizar(dt, cf, andando, velocidade, olharPara, agora
 	local dy, dz = Anim.corpo(c)
 	local esc = self.escala
 	local topo = cf
-	if queda then
+	local temMorte = self.clipes ~= nil and select(2, Anim.clipeDe(self.clipes, "morte")) ~= nil
+	if queda and not temMorte then
 		local k = queda * queda
 		topo = cf * CFrame.new(0, -0.25 * esc * k, 0) * CFrame.Angles(0, 0, math.rad(82) * k)
 		dy, dz = 0, 0
 	end
 	local cfs = self.cfs
+	if self.clipes then
+		self:aplicarClipes(dt, topo, agora, queda ~= nil, velocidade)
+		return
+	end
 	for i, p in ipairs(self.partes) do
 		local g = self.grupos[i]
 		local deslocamento = CFrame.new(0, if g.grupo == "PernaE" or g.grupo == "PernaD" then 0 else dy * esc, dz * esc)
@@ -101,6 +149,105 @@ function CriaturaAnimada:atualizar(dt, cf, andando, velocidade, olharPara, agora
 			pose = CFrame.new(g.pivo) * CFrame.Angles(pitch, yaw, roll or 0) * CFrame.new(-g.pivo)
 		end
 		cfs[i] = topo * deslocamento * pose * self.locais[i]
+	end
+	local ok = pcall(workspace.BulkMoveTo, workspace, self.partes, cfs, Enum.BulkMoveMode.FireCFrameChanged)
+	if not ok then
+		for i, p in ipairs(self.partes) do p.CFrame = cfs[i] end
+	end
+end
+
+local IDENT = { 0, 0, 0, 1, 0, 0, 0 }
+
+-- Pose do grupo no clipe `c` em `t`; peça sem curva: repouso.
+local function poseDe(clipe, grupo, dono, t)
+	local qx, qy, qz, qw, dx, dy, dz = Anim.peca(clipe, grupo, t)
+	if not qx and dono and dono ~= grupo then
+		qx, qy, qz, qw, dx, dy, dz = Anim.peca(clipe, dono, t)
+	end
+	if not qx then return 0, 0, 0, 1, 0, 0, 0 end
+	return qx, qy, qz, qw, dx, dy, dz
+end
+
+-- Pose por clipes (ANIM2): base parado/andando com mistura por `mov`, queda = Morrer (segura o último quadro),
+-- ação (ataque/dano) por cima com fade. d é multiplicado pela escala do modelo montado.
+function CriaturaAnimada:aplicarClipes(dt, topo, agora, caindo, velocidade)
+	local esc = self.escala
+	local dados = self.clipes
+	local ritmo = math.clamp((velocidade or 4) / 4, 0.6, 1.6)
+	self.tClipe = (self.tClipe or 0) + dt
+	local tc = self.tClipe
+	local _, parado = Anim.clipeDe(dados, "parado")
+	local _, andando = Anim.clipeDe(dados, "andando")
+	andando = andando or parado
+	parado = parado or andando
+	local tp = parado and (Amostra.tempoLocal(parado, tc)) or 0
+	local ta = andando and (Amostra.tempoLocal(andando, tc * ritmo)) or 0
+	local morte
+	if caindo then
+		local _, m = Anim.clipeDe(dados, "morte")
+		if m then
+			if not self.morteDesde then self.morteDesde = self.quedaDesde or agora end
+			morte = m
+		end
+	else
+		self.morteDesde = nil
+	end
+	local acao = self.acao
+	local ta2, wAcao, ativo = 0, 0, nil
+	if acao and not caindo then
+		local dec = agora - acao.desde
+		local tl, fim = Amostra.tempoLocal(acao.clipe, dec)
+		if fim and dec > acao.clipe.duracao + 0.05 then
+			self.acao = nil
+		else
+			ativo, ta2 = acao.clipe, tl
+			wAcao = Amostra.peso(dec, acao.clipe.duracao, 0.06, FADE, false, false)
+			if acao.impacto then
+				for _, nome in Amostra.marcosEntre(acao.clipe, acao.ultimo, math.min(dec, acao.clipe.duracao)) do
+					if nome == "impacto" then pcall(acao.impacto) end
+				end
+				acao.ultimo = math.min(dec, acao.clipe.duracao)
+			end
+		end
+	elseif acao then
+		self.acao = nil
+	end
+	local wMorte = if morte then math.clamp((agora - self.morteDesde) / FADE, 0, 1) else 0
+	local tm = if morte then (Amostra.tempoLocal(morte, agora - self.morteDesde)) else 0
+	local cache = {}
+	local cfs = self.cfs
+	for i = 1, #self.partes do
+		local g = self.grupos[i]
+		local pose = cache[g.grupo]
+		if pose == nil then
+			pose = CFrame.identity
+			if g.pivo and g.grupo then
+				local dono = if g.grupo == "Arma" then self.bracoArma else nil
+				local qx, qy, qz, qw, dx, dy, dz = 0, 0, 0, 1, 0, 0, 0
+				if parado then
+					local ax, ay, az, aw, adx, ady, adz = poseDe(parado, g.grupo, dono, tp)
+					if andando ~= parado and self.mov > 0.001 then
+						local bx, by, bz, bw, bdx, bdy, bdz = poseDe(andando, g.grupo, dono, ta)
+						qx, qy, qz, qw, dx, dy, dz = Anim.misturar(self.mov, ax, ay, az, aw, adx, ady, adz, bx, by, bz, bw, bdx, bdy, bdz)
+					else
+						qx, qy, qz, qw, dx, dy, dz = ax, ay, az, aw, adx, ady, adz
+					end
+				end
+				if ativo and wAcao > 0 then
+					local bx, by, bz, bw, bdx, bdy, bdz = poseDe(ativo, g.grupo, dono, ta2)
+					qx, qy, qz, qw, dx, dy, dz = Anim.misturar(wAcao, qx, qy, qz, qw, dx, dy, dz, bx, by, bz, bw, bdx, bdy, bdz)
+				end
+				if morte then
+					local bx, by, bz, bw, bdx, bdy, bdz = poseDe(morte, g.grupo, dono, tm)
+					qx, qy, qz, qw, dx, dy, dz = Anim.misturar(wMorte, qx, qy, qz, qw, dx, dy, dz, bx, by, bz, bw, bdx, bdy, bdz)
+				end
+				local r = CFrame.new(0, 0, 0, qx, qy, qz, qw)
+				if g.grupo == "Cabeca" and not morte and self.yaw ~= 0 then r = CFrame.Angles(0, self.yaw, 0) * r end
+				pose = CFrame.new(g.pivo + Vector3.new(dx, dy, dz) * esc) * r * CFrame.new(-g.pivo)
+			end
+			cache[g.grupo or ""] = pose
+		end
+		cfs[i] = topo * pose * self.locais[i]
 	end
 	local ok = pcall(workspace.BulkMoveTo, workspace, self.partes, cfs, Enum.BulkMoveMode.FireCFrameChanged)
 	if not ok then

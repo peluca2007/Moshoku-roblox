@@ -1,12 +1,12 @@
--- GERADO por tools/exportar_modelo.py; não editar. Fonte: criatura-externa semente 1 (asset 133875896265278, Quaternius (CC0)), Creator Store grátis; scripts/uniões removidos.
+-- GERADO por tools/exportar_modelo.py; não editar. Fonte: criatura-externa semente 1 (asset 84818036601834, Quaternius (CC0)), Creator Store grátis; scripts/uniões removidos.
 -- Modelo DragaoQuaternius (DragaoQuaternius): 17 peças; caixa original 7.43 x 8.39 x 9 studs (alinhada ao pivô).
 -- Formato das linhas de P e das tabelas S/R: ver Mundo/MontarModelo.luau.
 return {
 	versao = 1,
-	fonte = { nome = "criatura-externa semente 1", asset = 133875896265278, autor = "Quaternius (CC0)" },
+	fonte = { nome = "criatura-externa semente 1", asset = 84818036601834, autor = "Quaternius (CC0)" },
 	caixa = { 7.428, 8.393, 9 },
 	centro = { 0, 4.197, -.001 },
-	S = {"MeshPart","BracoD_Claws","","Plastic","rbxassetid://104033625201339","BracoD_Main","rbxassetid://94230916340316","BracoD_Wings","rbxassetid://114350665008816","BracoE_Claws","rbxassetid://113744348486198","BracoE_Main","rbxassetid://99561609872588","BracoE_Wings","rbxassetid://112512944543616","Cabeca_Belly","rbxassetid://121103117630425","Cabeca_Claws","rbxassetid://124674833921457","Cabeca_Main","rbxassetid://125262685446830","Cauda_Main","rbxassetid://137776976594758","Corpo_Belly","rbxassetid://112896771785713","Corpo_Eyes","rbxassetid://125158625498807","Corpo_Main","rbxassetid://70486345744010","PernaD_Claws","rbxassetid://129528575419654","PernaD_Main","rbxassetid://89043020678132","PernaE_Claws","rbxassetid://129431255954965","PernaE_Main","rbxassetid://104686666065173"},
+	S = {"MeshPart","BracoD_Claws","","Plastic","rbxassetid://104033625201339","BracoD_Main","rbxassetid://94230916340316","BracoD_Wings","rbxassetid://114350665008816","BracoE_Claws","rbxassetid://113744348486198","BracoE_Main","rbxassetid://99561609872588","BracoE_Wings","rbxassetid://112512944543616","Cabeca_Belly","rbxassetid://121103117630425","Cabeca_Claws","rbxassetid://124674833921457","Cabeca_Eyes","rbxassetid://125158625498807","Cabeca_Main","rbxassetid://76101235539706","Cauda_Main","rbxassetid://137776976594758","Corpo_Belly","rbxassetid://112896771785713","Corpo_Main","rbxassetid://129525365736103","PernaD_Claws","rbxassetid://129528575419654","PernaD_Main","rbxassetid://89043020678132","PernaE_Claws","rbxassetid://129431255954965","PernaE_Main","rbxassetid://104686666065173"},
 	R = {
 		{1,0,0,0,1,0,0,0,1},
 	},
@@ -19,11 +19,11 @@ return {
 		{1,14,3,3.027,4.168,4.242,-2.11,6.309,1.464,1,1842204,4,0,0,3,0,{},{15,3}},
 		{1,16,3,1.204,.801,.383,0,5.08,-2.239,1,9338174,4,0,0,3,0,{},{17,3}},
 		{1,18,3,1.048,.2,.059,0,6.226,-4.271,1,1447446,4,0,0,3,0,{},{19,3}},
-		{1,20,3,2.058,2.748,3.709,0,6.139,-2.646,1,3809572,4,0,0,3,0,{},{21,3}},
-		{1,22,3,2.36,2.015,4.843,0,3.236,2.078,1,3809572,4,0,0,3,0,{},{23,3}},
-		{1,24,3,1.755,1.95,.523,0,3.79,-1.962,1,9338174,4,0,0,3,0,{},{25,3}},
-		{1,26,3,2.077,.549,.552,-.001,6.667,-3.182,1,1842204,4,0,0,3,0,{},{27,3}},
-		{1,28,3,2.077,4.699,3.164,0,4.661,-1.694,1,3809572,4,0,0,3,0,{},{29,3}},
+		{1,20,3,2.077,.549,.552,-.001,6.667,-3.182,1,1842204,4,0,0,3,0,{},{21,3}},
+		{1,22,3,2.076,2.748,3.709,-.001,6.139,-2.646,1,3809572,4,0,0,3,0,{},{23,3}},
+		{1,24,3,2.36,2.015,4.843,0,3.236,2.078,1,3809572,4,0,0,3,0,{},{25,3}},
+		{1,26,3,1.755,1.95,.523,0,3.79,-1.962,1,9338174,4,0,0,3,0,{},{27,3}},
+		{1,28,3,2.077,2.694,1.935,0,3.658,-1.079,1,3809572,4,0,0,3,0,{},{29,3}},
 		{1,30,3,.572,.856,.429,1.143,.428,-.744,1,1447446,4,0,0,3,0,{},{31,3}},
 		{1,32,3,.803,3.384,2.194,1.053,2.199,-.603,1,3809572,4,0,0,3,0,{},{33,3}},
 		{1,34,3,.572,.856,.429,-1.143,.428,-.744,1,1447446,4,0,0,3,0,{},{35,3}},

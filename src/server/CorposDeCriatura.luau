@@ -462,6 +462,11 @@ function Corpos.start(deps)
 				vistos[token.id] = true
 				local c = corpos[token.id] or criar(token)
 				if c then
+					-- Levou dano (PV caiu e segue de pé): clipe LevarGolpe. O dano já foi resolvido pelo servidor.
+					if c.animado and c.pvAnt and token.pv < c.pvAnt and token.pv > 0 and not c.tombado then
+						c.animado:levarGolpe()
+					end
+					c.pvAnt = token.pv
 					local caido = token.derrotado or token.pv <= 0
 					for _, cond in token.conditions or {} do if cond.id == "caido" or cond.id == "inconsciente" then caido = true end end
 					if caido then
@@ -505,6 +510,9 @@ function Corpos.start(deps)
 	function api.olhar(token, x: number, z: number)
 		local c = corpos[token.id]
 		if c then c.alvoOlhar = {x,z} end
+		-- Virar-se para um alvo acompanha um ataque/habilidade: toca o clipe Atacar. Gancho `impacto` do clipe
+		-- ainda não adia o dano (o servidor resolve o golpe antes da animação); ver MANUTENCAO.
+		if c and c.animado and not c.tombado and not c.andando then c.animado:golpear() end
 		if c and not c.conexao and not c.tombado then
 			local p = if c.base then c.base.Position else c.modelo.PrimaryPart.Position
 			colocar(c, p, deps.centro(x, z) + Vector3.new(0, p.Y - deps.centro(x, z).Y, 0))

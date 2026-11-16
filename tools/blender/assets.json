@@ -324,10 +324,10 @@
   "sha256": "0e9330d3249a5e350f886a209658a82723d22e95633e572a5df687f021a99377"
  },
  "DragaoQuaternius": {
-  "asset": "133875896265278",
+  "asset": "84818036601834",
   "modelo": "criatura-externa",
   "semente": "1",
-  "sha256": "2e9efc2035893b0802f18af8005577f6716d9ea616b6d5acd75f0b9b4134cc90"
+  "sha256": "b7449511e166d7e8b5b6565cdffb0a55b42ca4ccc21415af15211e1ff3882746"
  },
  "EscadaQuebrada": {
   "asset": "96769207993749",
@@ -516,10 +516,10 @@
   "sha256": "e43654f20ac7a8255d55ab2e7076a9f71c7d63d422aee0644929879d71b3f1f6"
  },
  "MorcegoQuaternius": {
-  "asset": "136921830559799",
+  "asset": "78939062521401",
   "modelo": "criatura-externa",
   "semente": "1",
-  "sha256": "8fb95f8b0e0c3ff7525c88054f8ea2ed4b77d98df8c724f311a5d2e07a27bb94"
+  "sha256": "993b7d91fea5676ef9651473ad3d95ad008e95f2e09ce64d74fab6e2dc5b5c97"
  },
  "Muro1": {
   "asset": "123916496864929",

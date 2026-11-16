@@ -1385,3 +1385,7 @@ Verificado: exportação (`anim_exportar.py --ual ... --mapa tools/animacao/ual_
 - Moldes enviados pela rota do Studio (6 Decals; id de imagem obtido por LoadAsset) e ligados em `Personagem.CONJUNTOS`. `qa.py esgoto_sala1` 20 ok, `inicio` 8 ok, `luta` 29 ok; `testar.ps1` só com "Catálogo" falhando.
 - Visto no Studio (`build/beleza/personagem/prancha_studio.jpg`, `studio_*`): R15 com cabeça redonda e rosto de blocos de frente, cabelo e barba no lugar, camisa/calça aplicadas, espada na mão, clipe de golpe tocando; na cidade o avatar aparece com a roupa nova.
 - Limitações: prévia da criação (Parts) sem camisa/calça; cabelo do avatar (CABELO_DO_AVATAR) continua desligado, não testado; só tom médio/claro por conjunto; ladino/mago e NPCs não vistos de perto; peças rígidas em malha não feitas.
+
+## ANIM2b — clipes das criaturas no Studio (16/11/2026)
+- `python tools/qa/anim_criaturas.py` (palco com a mesma `CriaturaAnimada` da luta; 5 quadros por estado): rato, aranha, esqueleto e dragão, estados parado/andando/ataque/dano/morte, em `build/beleza/anim/criaturas_studio_*.jpg` e `criaturas_prancha_studio.jpg`. Dragão e morcego reenviados (grupo `Cabeca_Eyes`).
+- Visto: aranha e esqueleto com andar, ataque e morte legíveis; dragão bate asas; rato com pouco movimento visível; LevarGolpe (sintetizado) sutil. Sem rachaduras feias de junta nos quadros. Morcego, vespa, sapo, slime e serpente não capturados.

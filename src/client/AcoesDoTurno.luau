@@ -25,6 +25,7 @@ local Previa = require(script.Parent.PreviaFurtiva)
 local T = require(script.Parent.UI.Tema)
 local C = require(script.Parent.UI.Componentes)
 local P = require(script.Parent.UI.PecasLuta)
+local Arte = require(Shared:WaitForChild("UIArteLuta"))
 
 local AcoesDoTurno = {}
 local new = P.novo
@@ -78,15 +79,13 @@ local function linhaDeCusto(mec): string
 	return table.concat(partes, " • ")
 end
 
--- Custo curto da linha da lista: "2 Ações · 3 PM".
-local function custoCurto(mec, indisponivel): string
+-- Custo de recursos sob o losango das Ações: "3 PM", "2 PM · 1 PT" ou vazio.
+local function custoPm(mec, indisponivel): string
 	if indisponivel then return "Consulta" end
-	local acoes = mec.acoes or 0
 	local partes = {}
-	if acoes > 0 then table.insert(partes, acoes .. (if acoes == 1 then " Ação" else " Ações")) end
 	if (mec.pm or 0) > 0 then table.insert(partes, mec.pm .. " PM") end
 	if (mec.pt or 0) > 0 then table.insert(partes, mec.pt .. " PT") end
-	return if #partes == 0 then "Livre" else table.concat(partes, " · ")
+	return if #partes == 0 then (if (mec.acoes or 0) == 0 then "Livre" else "") else table.concat(partes, "·")
 end
 
 local TECLAS = { habilidades = Enum.KeyCode.R, atacar = Enum.KeyCode.F, andar = Enum.KeyCode.G, encerrar = Enum.KeyCode.V }
@@ -161,10 +160,11 @@ function AcoesDoTurno.start(state)
 	-- rotulo/Marca/Tecla são filhos; atributos Bloqueada/Desabilitado apagam o botão.
 	local function botao(parent, nome: string, rotulo: string, tamanho: UDim2, opcoes, aoClicar: () -> ())
 		local o = opcoes or {}
-		local b = P.placa(parent, nome, tamanho, { classe = "TextButton", transparencia = 0.16, raio = 10, espessura = if o.principal then 2 else 1.5, transparenciaContorno = 0.15 })
-		b.Text, b.AutoButtonColor, b.ZIndex = "", false, 3
-		local contorno = b.Contorno
-		if o.perigo then contorno.Color = P.cor.inimigo end
+		-- Fundo pintado (ARTE2): o botão em si é transparente; "Arte" troca entre normal, foco e bloqueado.
+		local b = new("TextButton", parent, { Name = nome, Size = tamanho, BackgroundTransparency = 1, BorderSizePixel = 0, Text = "", AutoButtonColor = false, ZIndex = 3 })
+		local normal = if o.principal then "botao_principal" else "botao_normal"
+		local arte = P.arte(b, normal)
+		if o.perigo then arte.ImageColor3 = Color3.fromRGB(255, 150, 140) end
 		local rot = texto(b, {
 			Name = "Rotulo", Size = UDim2.new(1, -12, 1, 0), Position = UDim2.fromOffset(6, 0), TextXAlignment = Enum.TextXAlignment.Center,
 			TextWrapped = true, TextTruncate = Enum.TextTruncate.None, FontFace = T.fontes.titulo, TextSize = o.tamanhoTexto or 16,
@@ -175,21 +175,17 @@ function AcoesDoTurno.start(state)
 			BackgroundColor3 = P.cor.ouroVivo, BorderSizePixel = 0, ZIndex = 6, Visible = false,
 		})
 		if o.tecla then
-			local selo = new("Frame", b, {
-				Name = "Tecla", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromOffset(4, 4), Size = UDim2.fromOffset(22, 22),
-				BackgroundColor3 = P.cor.trilho, BorderSizePixel = 0, ZIndex = 8,
-			})
-			new("UICorner", selo, { CornerRadius = UDim.new(1, 0) })
-			new("UIStroke", selo, { Color = P.cor.ouro, Thickness = 1 })
-			texto(selo, {
-				Name = "Letra", Size = UDim2.fromScale(1, 1), Text = o.tecla, TextXAlignment = Enum.TextXAlignment.Center,
-				FontFace = T.fontes.numero, TextSize = 14, TextColor3 = P.cor.ouroVivo, ZIndex = 9,
-			})
+			local selo = P.tecla(b, o.tecla, 26)
+			selo.AnchorPoint, selo.Position = Vector2.new(0.5, 0.5), UDim2.fromOffset(6, 6)
 		end
-		P.foco(b, contorno, 1.05)
+		if o.icone then
+			local ic = P.icone(b, o.icone, P.cor.ouro, 20)
+			ic.AnchorPoint, ic.Position, ic.ZIndex = Vector2.new(1, 0), UDim2.new(1, -9, 0, 5), 6
+		end
+		P.foco(b, nil, 1.05, { img = arte, normal = normal, foco = "botao_foco" })
 		b:GetAttributeChangedSignal("Desabilitado"):Connect(function()
 			local off = b:GetAttribute("Desabilitado") == true
-			P.animar(b, { BackgroundTransparency = if off then 0.5 else 0.16 }, P.SUAVE, "off")
+			P.trocarArte(arte, if off then "botao_bloqueado" else normal)
 			rot.TextTransparency = if off then 0.5 else 0
 		end)
 		b.Activated:Connect(aoClicar)
@@ -229,10 +225,10 @@ function AcoesDoTurno.start(state)
 		if atualizar then atualizar() end
 	end
 	local function tamanhoVertice() return UDim2.fromOffset(Layout.VERTICE_W, Layout.VERTICE_H) end
-	local atacar = botao(menu, "Atacar", "Atacar", tamanhoVertice(), { tecla = "F" }, function() alternarLista("atacar") end)
-	local habilidades = botao(menu, "Habilidades", "Habilidades", tamanhoVertice(), { tecla = "R" }, function() alternarLista("habilidades") end)
+	local atacar = botao(menu, "Atacar", "Atacar", tamanhoVertice(), { tecla = "F", icone = "atacar" }, function() alternarLista("atacar") end)
+	local habilidades = botao(menu, "Habilidades", "Habilidades", tamanhoVertice(), { tecla = "R", icone = "habilidades" }, function() alternarLista("habilidades") end)
 	-- Andar (Cap. 4: 1 Ação, até o Deslocamento): acende as casas e um clique move.
-	local andar = botao(menu, "Andar", "Andar (1 Ação)", tamanhoVertice(), { tecla = "G", tamanhoTexto = 15 }, function()
+	local andar = botao(menu, "Andar", "Andar (1 Ação)", tamanhoVertice(), { tecla = "G", tamanhoTexto = 15, icone = "andar" }, function()
 		if not atual.tokenId or (atual.restantes or 0) < 1 and (atual.passosLivres or 0) < 1 then
 			return
 		end
@@ -247,7 +243,7 @@ function AcoesDoTurno.start(state)
 			alcanceCasas = if (atual.passosLivres or 0) > 0 then atual.passosLivres else atual.deslocamentoCasas or 6, cor = Estilo.CAPITULOS[3],
 		})
 	end)
-	local encerrar = botao(menu, "EncerrarTurno", "Encerrar turno", tamanhoVertice(), { tecla = "V", principal = true, tamanhoTexto = 15 }, function()
+	local encerrar = botao(menu, "EncerrarTurno", "Encerrar turno", tamanhoVertice(), { tecla = "V", principal = true, tamanhoTexto = 15, icone = "encerrar" }, function()
 		local snapshot = state.snapshot()
 		if snapshot and atual.tokenId then
 			modoLista = nil
@@ -327,22 +323,31 @@ function AcoesDoTurno.start(state)
 		local entrada = Catalogo.POR_ID[habilidadeId]
 		local dados = entrada and entrada.data or {}
 		local cor = Estilo.arvore(mec.arvore or arvoreDe(habilidadeId)).cor
-		local carta = P.placa(cartasFrame, "Carta_" .. (dados.id or habilidadeId), UDim2.new(1, -4, 0, Layout.LISTA_LINHA), { classe = "TextButton", transparencia = 0.22, raio = 8, transparenciaContorno = 0.5 })
-		carta.LayoutOrder, carta.AutoButtonColor, carta.Text, carta.ZIndex = ordem, false, "", 3
-		local escala = new("UIScale", carta, { Name = "Foco", Scale = 1 })
-		new("Frame", carta, { Name = "Selo", AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.new(0, 3, 1, -16), Position = UDim2.new(0, 7, 0.5, 0), BackgroundColor3 = cor, BorderSizePixel = 0, ZIndex = 4 })
-		local nome = texto(carta, {
-			Name = "Nome", Position = UDim2.fromOffset(18, 4), Size = UDim2.new(1, -18 - 110 - 46, 0, 24),
-			FontFace = T.fontes.titulo, TextSize = 18, Text = dados.name or mec.nome or habilidadeId, ZIndex = 5,
+		-- Carta pintada (ARTE2): faixa de tinta (normal/foco/bloqueada), ícone da habilidade tingido pela
+		-- árvore, nome grande em fonte de título, custo em Ações num losango e PM/PT logo abaixo.
+		local carta = new("TextButton", cartasFrame, {
+			Name = "Carta_" .. (dados.id or habilidadeId), Size = UDim2.new(1, -4, 0, Layout.LISTA_LINHA), BackgroundTransparency = 1,
+			BorderSizePixel = 0, Text = "", AutoButtonColor = false, LayoutOrder = ordem, ZIndex = 3,
 		})
+		local arte = P.arte(carta, "faixa_normal")
+		local escala = new("UIScale", carta, { Name = "Foco", Scale = 1 })
+		new("Frame", carta, { Name = "Selo", AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.new(0, 3, 1, -22), Position = UDim2.new(0, 11, 0.5, 0), BackgroundColor3 = cor, BorderSizePixel = 0, ZIndex = 4 })
+		local icone = P.icone(carta, Arte.iconeDe(habilidadeId, mec.arvore), cor:Lerp(Color3.new(1, 1, 1), 0.3), 32)
+		icone.AnchorPoint, icone.Position = Vector2.new(0, 0.5), UDim2.new(0, 20, 0.5, 0)
+		local nome = texto(carta, {
+			Name = "Nome", Position = UDim2.fromOffset(58, 2), Size = UDim2.new(1, -58 - 100, 0, 28),
+			FontFace = T.fontes.titulo, TextSize = 21, Text = dados.name or mec.nome or habilidadeId, ZIndex = 5,
+		})
+		local losango = P.losango(carta, if indisponivel then "·" else tostring(mec.acoes or 0), 30)
+		losango.AnchorPoint, losango.Position = Vector2.new(0.5, 0), UDim2.new(1, -66, 0, 5)
 		local custoLabel = texto(carta, {
-			Name = "Custo", AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -46, 0, 6), Size = UDim2.fromOffset(110, 22),
-			FontFace = T.fontes.numero, TextSize = 14, TextColor3 = P.cor.ouro, TextXAlignment = Enum.TextXAlignment.Right,
-			Text = custoCurto(mec, indisponivel), ZIndex = 5,
+			Name = "Custo", AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(1, -66, 0, 36), Size = UDim2.fromOffset(62, 14),
+			FontFace = T.fontes.numero, TextSize = 12, TextColor3 = P.cor.ouro, TextXAlignment = Enum.TextXAlignment.Center,
+			Text = custoPm(mec, indisponivel), ZIndex = 5,
 		})
 		local efeito = texto(carta, {
-			Name = "Efeito", Position = UDim2.fromOffset(18, 30), Size = UDim2.new(1, -18 - 46, 0, 18),
-			FontFace = T.fontes.rotulo, TextSize = 14, TextColor3 = P.cor.secundario, ZIndex = 5,
+			Name = "Efeito", Position = UDim2.fromOffset(58, 30), Size = UDim2.new(1, -58 - 100, 0, 18),
+			FontFace = T.fontes.rotulo, TextSize = 13, TextColor3 = P.cor.secundario, ZIndex = 5,
 		})
 		local resumo = if dados.damage and dados.damage.normal then dados.damage.normal else (dados.effect or "")
 		if indisponivel then resumo = indisponivel elseif mec.aviso then resumo = mec.aviso .. " " .. resumo end
@@ -375,16 +380,15 @@ function AcoesDoTurno.start(state)
 		-- Linha normal ou acesa (cursor, foco do teclado, mira armada, canção ativa).
 		function registro.pintar()
 			local acesa = registro.hover or registro.armada or registro.foco
-			local chave = (if acesa then "1" else "0") .. (if registro.armada then "1" else "0")
+			local bloqueada = carta:GetAttribute("Bloqueada") == true
+			local chave = (if acesa then "1" else "0") .. (if registro.armada then "1" else "0") .. (if bloqueada then "1" else "0")
 			if registro.estado == chave then return end
 			registro.estado = chave
-			P.animar(carta.Contorno, {
-				Transparency = if acesa then 0 else 0.5, Color = if acesa then P.cor.ouroVivo else P.cor.ouro,
-				Thickness = if registro.armada then 2 else 1,
-			}, P.SUAVE, "foco")
-			P.animar(carta, { BackgroundTransparency = if acesa then 0.04 else 0.22 }, P.SUAVE, "fundo")
+			P.trocarArte(arte, if registro.armada or (acesa and not bloqueada) then "faixa_foco" elseif bloqueada then "faixa_bloqueada" else "faixa_normal")
+			icone.ImageTransparency = if bloqueada then 0.55 else 0
+			losango.ImageTransparency = if bloqueada then 0.4 else 0
 			P.animar(escala, { Scale = if acesa then 1.03 else 1 }, P.SUAVE, "foco")
-			P.animar(carta.Selo, { Size = UDim2.new(0, if registro.armada then 6 else 3, 1, -16) }, P.SUAVE, "selo")
+			P.animar(carta.Selo, { Size = UDim2.new(0, if registro.armada then 6 else 3, 1, -22) }, P.SUAVE, "selo")
 		end
 		local function consultar()
 			tooltip.fechar()
@@ -392,9 +396,11 @@ function AcoesDoTurno.start(state)
 			detalhe.abrir(habilidadeId, dadosDetalhe())
 		end
 		-- "?" no canto direito: não cobre o nome nem o custo (deixam 46 px livres).
-		local info = P.placa(carta, "Detalhes", UDim2.fromOffset(30, 30), { classe = "TextButton", transparencia = 0.1, raio = 15, transparenciaContorno = 0.2 })
-		info.AnchorPoint, info.Position, info.ZIndex = Vector2.new(1, 0.5), UDim2.new(1, -8, 0.5, 0), 6
-		info.Text, info.AutoButtonColor, info.FontFace, info.TextSize, info.TextColor3 = "?", false, T.fontes.titulo, 18, P.cor.ouroVivo
+		local info = new("TextButton", carta, {
+			Name = "Detalhes", Size = UDim2.fromOffset(30, 30), BackgroundTransparency = 1, BorderSizePixel = 0, Text = "?", AutoButtonColor = false,
+			FontFace = T.fontes.titulo, TextSize = 18, TextColor3 = P.cor.ouroVivo, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -14, 0.5, 0), ZIndex = 6,
+		})
+		new("ImageLabel", info, { Name = "Disco", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Image = Arte.PECAS.tecla_disco.imagem, ZIndex = 5 })
 		info.Activated:Connect(consultar)
 		carta:SetAttribute("Grupo", registro.grupo)
 		function registro.acionar()

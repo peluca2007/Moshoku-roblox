@@ -19,11 +19,10 @@ function Detalhe.start(parent)
 	})
 	local painel = new("Frame", fundo, {
 		Name = "Painel", AnchorPoint = Vector2.new(.5, .5), Position = UDim2.fromScale(.5, .5),
-		Size = UDim2.fromScale(.92, .8), BackgroundColor3 = P.cor.fundo, BorderSizePixel = 0, Active = true, ZIndex = 11,
+		Size = UDim2.fromScale(.92, .8), BackgroundTransparency = 1, BorderSizePixel = 0, Active = true, ZIndex = 11,
 	})
 	new("UISizeConstraint", painel, { MaxSize = Vector2.new(560, 500) })
-	new("UICorner", painel, { CornerRadius = UDim.new(0, 10) })
-	new("UIStroke", painel, { Color = P.cor.ouro, Thickness = 1.5 })
+	P.arte(painel, "mancha_cartao", 11) -- fundo pintado (ARTE2)
 	local escala = new("UIScale", painel, { Scale = 1 })
 	local function rotulo(nome, props)
 		local t = new("TextLabel", painel, {
@@ -33,10 +32,10 @@ function Detalhe.start(parent)
 		for k, v in props do t[k] = v end
 		return t
 	end
-	local titulo = rotulo("Titulo", { Position = UDim2.fromOffset(16, 10), Size = UDim2.new(1, -80, 0, 52), FontFace = T.fontes.titulo, TextSize = 23, TextColor3 = P.cor.ouroVivo })
-	local custo = rotulo("Custo", { Position = UDim2.fromOffset(16, 66), Size = UDim2.new(1, -32, 0, 38), TextSize = 14, TextColor3 = P.cor.ouro })
+	local titulo = rotulo("Titulo", { Position = UDim2.fromOffset(32, 22), Size = UDim2.new(1, -110, 0, 52), FontFace = T.fontes.titulo, TextSize = 26, TextColor3 = P.cor.ouroVivo })
+	local custo = rotulo("Custo", { Position = UDim2.fromOffset(32, 70), Size = UDim2.new(1, -64, 0, 38), TextSize = 14, TextColor3 = P.cor.ouro })
 	local scroll = new("ScrollingFrame", painel, {
-		Name = "Texto", Position = UDim2.fromOffset(16, 112), Size = UDim2.new(1, -32, 1, -218),
+		Name = "Texto", Position = UDim2.fromOffset(32, 116), Size = UDim2.new(1, -64, 1, -232),
 		AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), ScrollingDirection = Enum.ScrollingDirection.Y,
 		ScrollBarThickness = 4, BorderSizePixel = 0, BackgroundTransparency = 1, ZIndex = 12,
 	})
@@ -46,20 +45,20 @@ function Detalhe.start(parent)
 		TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 12,
 	})
 	local situacao = rotulo("Situacao", {
-		Position = UDim2.new(0, 16, 1, -100), Size = UDim2.new(1, -32, 0, 40), TextSize = 14,
+		Position = UDim2.new(0, 32, 1, -112), Size = UDim2.new(1, -64, 0, 40), TextSize = 14,
 	})
 	local function fechar() fundo.Visible = false end
 	local function botao(nome, texto, props)
 		local b = new("TextButton", painel, {
-			Name = nome, Text = texto, FontFace = T.fontes.rotulo, TextSize = 16,
-			TextColor3 = P.cor.texto, BackgroundColor3 = P.cor.trilho, ZIndex = 12,
+			Name = nome, Text = texto, FontFace = T.fontes.titulo, TextSize = 18,
+			TextColor3 = P.cor.ouroVivo, BackgroundTransparency = 1, ZIndex = 12,
 		})
 		for k, v in props do b[k] = v end
-		new("UICorner", b, { CornerRadius = UDim.new(0, 6) })
+		P.arte(b, "botao_normal", 11)
 		b.Activated:Connect(fechar)
 	end
-	botao("Fechar", "×", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -12, 0, 12), Size = UDim2.fromOffset(44, 44), TextSize = 26 })
-	botao("Voltar", "Voltar às ações", { Position = UDim2.new(0, 16, 1, -56), Size = UDim2.new(1, -32, 0, 44) })
+	botao("Fechar", "×", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -26, 0, 24), Size = UDim2.fromOffset(52, 44), TextSize = 26 })
+	botao("Voltar", "Voltar às ações", { Position = UDim2.new(0, 30, 1, -68), Size = UDim2.new(1, -60, 0, 46) })
 	fundo.Activated:Connect(function(input)
 		-- Activated também pode subir de um descendente; ler/rolar não fecha.
 		local ponto = input.Position

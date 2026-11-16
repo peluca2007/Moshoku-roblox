@@ -6,10 +6,14 @@
 --   P.placa(pai, nome, tamanho, opcoes?)  Frame escuro translúcido com contorno dourado fino.
 --   P.pip(pai, lado)                      losango (Frame girado 45°); P.pipAceso(pip, aceso).
 --   P.foco(botao, contorno?, escala?)     hover com leve escala e brilho; devolve setFoco(bool).
+--   P.arte(pai, peca, z?)                 ImageLabel pintado (9-slice, SliceScale conforme o tamanho); P.trocarArte(img, peca).
+--   P.icone(pai, nome, cor, lado)         ícone branco do atlas (game-icons.net) tingido por ImageColor3.
+--   P.tecla(pai, letra, lado)             disco de tinta com a letra da tecla; P.losango(pai, texto, lado) para custos.
 --   P.barra({parent, nome, tamanho, ...}) barra de vida/PM com "rastro" de dano; devolve tabela com
 --     raiz e definir(atual, maximo, imediato?).
 local TweenService = game:GetService("TweenService")
 local T = require(script.Parent.Tema)
+local Arte = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("UIArteLuta"))
 
 local P = {}
 
@@ -64,6 +68,64 @@ function P.placa(pai: Instance, nome: string, tamanho: UDim2, opcoes: { [string]
 	return f
 end
 
+-- Arte pintada (ARTE2). A peça vira o fundo do botão/placa: o pai fica com fundo transparente.
+function P.ajustarArte(img: ImageLabel)
+	local nome = img:GetAttribute("Peca")
+	local peca = nome and Arte.PECAS[nome]
+	if peca and peca.corte then
+		local tam = img.AbsoluteSize
+		img.SliceScale = Arte.escalaPara(nome, tam.X, tam.Y)
+	end
+end
+
+function P.trocarArte(img: ImageLabel, nome: string)
+	local peca = Arte.PECAS[nome]
+	img:SetAttribute("Peca", nome)
+	img.Image = peca.imagem
+	if peca.corte then
+		img.ScaleType = Enum.ScaleType.Slice
+		img.SliceCenter = Rect.new(peca.corte[1], peca.corte[2], peca.corte[3], peca.corte[4])
+		P.ajustarArte(img)
+	else
+		img.ScaleType = Enum.ScaleType.Stretch
+	end
+end
+
+function P.arte(pai: Instance, nome: string, z: number?): ImageLabel
+	local img = P.novo("ImageLabel", pai, { Name = "Arte", BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.fromScale(1, 1), ZIndex = z or 2, Active = false })
+	P.trocarArte(img, nome)
+	img:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() P.ajustarArte(img) end)
+	return img
+end
+
+function P.icone(pai: Instance, nome: string, cor: Color3, lado: number): ImageLabel
+	local pos = Arte.ICONES[nome] or Arte.ICONES.golpe
+	return P.novo("ImageLabel", pai, {
+		Name = "Icone", BackgroundTransparency = 1, Size = UDim2.fromOffset(lado, lado), Image = Arte.ATLAS.imagem,
+		ImageRectOffset = Vector2.new(pos[1], pos[2]), ImageRectSize = Vector2.new(Arte.ATLAS.tamanho, Arte.ATLAS.tamanho),
+		ImageColor3 = cor, ZIndex = 5,
+	})
+end
+
+local function letraSobre(pai: Instance, texto: string, tamanho: number, cor: Color3)
+	return P.novo("TextLabel", pai, {
+		Name = "Letra", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = texto, ZIndex = 9,
+		FontFace = T.fontes.numero, TextSize = tamanho, TextColor3 = cor, TextXAlignment = Enum.TextXAlignment.Center,
+	})
+end
+
+function P.tecla(pai: Instance, letra: string, lado: number): ImageLabel
+	local img = P.novo("ImageLabel", pai, { Name = "Tecla", BackgroundTransparency = 1, Size = UDim2.fromOffset(lado, lado), Image = Arte.PECAS.tecla_disco.imagem, ZIndex = 8 })
+	letraSobre(img, letra, math.floor(lado * 0.6), P.cor.ouroVivo)
+	return img
+end
+
+function P.losango(pai: Instance, texto: string, lado: number): ImageLabel
+	local img = P.novo("ImageLabel", pai, { Name = "Losango", BackgroundTransparency = 1, Size = UDim2.fromOffset(lado, lado), Image = Arte.PECAS.tecla_losango.imagem, ZIndex = 8 })
+	letraSobre(img, texto, math.floor(lado * 0.52), P.cor.ouroVivo)
+	return img
+end
+
 function P.pip(pai: Instance, lado: number): Frame
 	local f = P.novo("Frame", pai, {
 		Name = "Pip", AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(lado, lado), Rotation = 45,
@@ -78,13 +140,16 @@ function P.pipAceso(pip: Frame, aceso: boolean)
 end
 
 -- Hover/foco: leve escala (UIScale "Foco") e contorno mais vivo. Devolve setFoco(bool) para o foco por teclado.
-function P.foco(botao: GuiObject, contorno: UIStroke?, escala: number?)
+function P.foco(botao: GuiObject, contorno: UIStroke?, escala: number?, arte: { img: ImageLabel, normal: string, foco: string }?)
 	local alvo = escala or 1.05
 	local ui = botao:FindFirstChild("Foco") or P.novo("UIScale", botao, { Name = "Foco", Scale = 1 })
 	local dentro, forcado = false, false
 	local function aplicar()
 		local aceso = dentro or forcado
 		P.animar(ui, { Scale = if aceso then alvo else 1 }, P.SUAVE, "foco")
+		if arte and not botao:GetAttribute("Desabilitado") then
+			P.trocarArte(arte.img, if aceso then arte.foco else arte.normal)
+		end
 		if contorno then
 			P.animar(contorno, { Transparency = if aceso then 0 else 0.15, Color = if aceso then P.cor.ouroVivo else P.cor.ouro }, P.SUAVE, "foco")
 		end

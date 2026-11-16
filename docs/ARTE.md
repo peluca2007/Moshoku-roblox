@@ -37,3 +37,17 @@ Cerca de **28 s por imagem**, tanto 1024x256 quanto 512x512 (5 amostras: 27,6 a 
 - O recorte `remover_fundo.py` por luminância assume fundo escuro; áreas escuras internas do ícone também ficam translúcidas (use `--modo borda` nesses casos). Não há controle de texto: letras geradas são ruins, por isso o negativo as proíbe; rótulos devem ser texto do Roblox.
 - A imagem gerada por IA não tem garantia de ineditismo; revisar antes de usar como marca do jogo.
 - Obs. de instalação: baixar o checkpoint com **um** `curl` só; dois downloads no mesmo arquivo corromperam o primeiro (detectado pelo SHA256).
+
+# Pinceladas e ícones do HUD da luta (ARTE2)
+
+Interface da luta com arte pintada, no espírito do HUD de Clair Obscur: Expedition 33 (só estrutura e clima; arte nossa).
+
+- `tools/arte/pinceladas.py` (Pillow + numpy, sem IA, semente fixa) gera em `build/arte/hud/`: faixa de carta (normal, foco, bloqueada), botão curto (normal, foco, bloqueado, principal), disco e losango de tecla/custo, manchas de retrato e cartão, anel dourado do personagem ativo e `prancha.png` (contato). Bordas de cerdas e falhas de tinta, leve inclinação e fio dourado em um lado. As faixas e botões são 9-slice (cortes em `CORTES`, copiados para `shared/UIArteLuta`).
+- `tools/arte/icones_gameicons.py` baixa os SVG para `build/arte/gameicons/`, tira o fundo, converte em branco com transparência (resvg) e monta um atlas `icones.png` (46 ícones, células de 128 px). O Roblox tinge por `ImageColor3` conforme a árvore da habilidade.
+- Ids e mapeamento `habilidade -> ícone` (por id, palavra e árvore): `src/shared/UIArteLuta.luau`. Para trocar a arte: regerar, servir `build/arte/hud` por HTTP local e enviar com `upload_image` do MCP do Studio, e atualizar os ids.
+- Aplicado em `client/AcoesDoTurno` (botões de comando, abas, cartas), `TooltipAcao`, `DetalheAcao` e nos helpers de `client/UI/PecasLuta` (`P.arte`, `P.icone`, `P.tecla`, `P.losango`).
+- Pendente (fora do escopo da tarefa): usar `mancha_retrato`/`mancha_cartao` nos cartões do grupo e retratos (`Hud`/`RetratoLuta`/`BarrasLuta`) e trocar o disco amarelo do personagem ativo (`BoardView`, parte `turn`) pelo `anel_ativo.png` (id em `UIArteLuta.PECAS.anel_ativo`); crédito dos ícones na tela de Ajuda.
+
+## Créditos dos ícones (CC BY 3.0)
+
+Ícones de [game-icons.net](https://game-icons.net) (repositório github.com/game-icons/icons), licença Creative Commons Attribution 3.0 (<https://creativecommons.org/licenses/by/3.0/>). Autores: **Lorc**, **Delapouite**, **Skoll**, **Willdabeast**, **Carl Olsen**, **sbed** (CC BY 3.0) e **Zeromancer** (heart-plus; CC0 no site). A fonte de cada ícone do atlas está em `build/arte/hud/icones.json` (campo `fonte`, `autor/arquivo`). Alterações: fundo removido, cor branca e recorte em atlas.

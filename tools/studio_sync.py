@@ -9,10 +9,11 @@ Mesma correspondência do default.project.json:
   src/client/*            -> StarterPlayer.StarterPlayerScripts.Client
   src/server.server.luau  -> ServerScriptService.RPGServer (Script)
   src/client.client.luau  -> StarterPlayerScripts.RPGClient (LocalScript)
-Cria o que faltar e só reescreve scripts cujo conteúdo mudou. Scripts do Studio
+Também cria os MaterialVariant de MaterialService (default.project.json). Cria o que faltar e só reescreve scripts cujo conteúdo mudou. Scripts do Studio
 que não existem em src são apenas listados (nada é apagado). O Studio precisa
 estar em modo Edit (sem Play).
 """
+import json
 import os
 import sys
 
@@ -79,6 +80,31 @@ def chunk_code(items):
     return "\n".join(lines)
 
 
+def codigo_material_variants():
+    """Luau que cria/atualiza os MaterialVariant de MaterialService declarados em default.project.json
+    (chão do esgoto etc.), para quem sincroniza sem Rojo. Devolve None se não houver nenhum."""
+    projeto = json.load(open(os.path.join(ROOT, "default.project.json"), encoding="utf-8"))
+    nos = projeto.get("tree", {}).get("MaterialService", {})
+    linhas = []
+    for nome, no in nos.items():
+        if nome.startswith("$") or no.get("$className") != "MaterialVariant":
+            continue
+        linhas.append("do")
+        linhas.append("	local v = game.MaterialService:FindFirstChild(%r) or Instance.new('MaterialVariant')" % nome)
+        linhas.append("	v.Name = %r" % nome)
+        for chave, valor in no.get("$properties", {}).items():
+            if chave == "BaseMaterial":
+                linhas.append("	v.BaseMaterial = Enum.Material.%s" % valor)
+            else:
+                linhas.append("	v.%s = %s" % (chave, json.dumps(valor)))
+        linhas.append("	v.Parent = game.MaterialService")
+        linhas.append("	table.insert(feitos, v.Name)")
+        linhas.append("end")
+    if not linhas:
+        return None
+    return "local feitos = {}\n" + "\n".join(linhas) + "\nreturn 'MaterialVariant: ' .. table.concat(feitos, ', ')"
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     filtros = [f.replace("\\", "/") for f in sys.argv[1:]]
@@ -97,6 +123,9 @@ def main():
             batch = items[start : start + 6]
             result = client.call("execute_luau", {"studio_id": studio, "datamodel_type": "Edit", "code": chunk_code(batch)})
             print(result.get("text", result))
+        codigo = codigo_material_variants()
+        if codigo and (not filtros or any("MaterialService" in f for f in filtros)):
+            print(client.call("execute_luau", {"studio_id": studio, "datamodel_type": "Edit", "code": codigo}).get("text"))
         known = {".".join(p + [n]) for p, n, _, _ in items}
         listing = client.call("execute_luau", {
             "studio_id": studio,

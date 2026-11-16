@@ -7,13 +7,13 @@ local T = {}
 function T.start(gui, aoFechar)
 	local frame = Instance.new("Frame")
 	frame.Name, frame.Visible, frame.ZIndex = "TooltipAcao", false, 15
-	frame.BackgroundColor3, frame.BackgroundTransparency, frame.BorderSizePixel = P.cor.fundo, 0.08, 0
+	frame.BackgroundTransparency, frame.BorderSizePixel = 1, 0
 	frame.Parent = gui
-	local corner = Instance.new("UICorner", frame); corner.CornerRadius = UDim.new(0, 8)
-	local stroke = Instance.new("UIStroke", frame); stroke.Color, stroke.Thickness, stroke.Transparency = P.cor.ouro, 1, 0.2
+	-- Fundo pintado (ARTE2): mancha de tinta 9-slice atrás do texto.
+	local arte = P.arte(frame, "mancha_cartao", 15)
 	local scroll = Instance.new("ScrollingFrame", frame)
 	scroll.Name, scroll.BackgroundTransparency, scroll.BorderSizePixel, scroll.ZIndex = "Conteudo", 1, 0, 16
-	scroll.Position, scroll.Size = UDim2.fromOffset(12, 10), UDim2.new(1, -24, 1, -20)
+	scroll.Position, scroll.Size = UDim2.fromOffset(18, 16), UDim2.new(1, -36, 1, -32)
 	scroll.CanvasSize, scroll.ScrollBarThickness = UDim2.new(), 4
 	local label = Instance.new("TextLabel", scroll)
 	label.Name, label.BackgroundTransparency, label.ZIndex = "Texto", 1, 17
@@ -29,7 +29,7 @@ function T.start(gui, aoFechar)
 		if not ancora or not ancora.Parent then return end
 		local vp = workspace.CurrentCamera.ViewportSize
 		local w, limite = largura(), math.max(80, math.min(380, vp.Y - 80))
-		local h = math.clamp(alturaTexto + 24, math.min(110, limite), limite)
+		local h = math.clamp(alturaTexto + 40, math.min(130, limite), limite)
 		frame.Size = UDim2.fromOffset(w, h)
 		local pos, tam = ancora.AbsolutePosition, ancora.AbsoluteSize
 		local x = pos.X - w - 10
@@ -42,7 +42,7 @@ function T.start(gui, aoFechar)
 	end
 	local function medir()
 		medicao += 1
-		local revisao, texto, w = medicao, label.Text, largura() - 32
+		local revisao, texto, w = medicao, label.Text, largura() - 44
 		-- Medição explícita evita o ciclo entre AutomaticSize e a altura do scroll.
 		task.spawn(function()
 			local params = Instance.new("GetTextBoundsParams")
@@ -75,9 +75,9 @@ function T.start(gui, aoFechar)
 		api.atualizar(chave, dados)
 		posicionar()
 		scroll.CanvasPosition = Vector2.zero
-			frame.BackgroundTransparency = 1
+			arte.ImageTransparency = 1
 			frame.Visible = true
-			P.animar(frame, { BackgroundTransparency = 0.08 }, P.SUAVE, "fade")
+			P.animar(arte, { ImageTransparency = 0 }, P.SUAVE, "fade")
 	end
 	function api.sair()
 		serial += 1; local n = serial

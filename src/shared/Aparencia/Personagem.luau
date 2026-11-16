@@ -10,10 +10,10 @@ Personagem.CABECA_MALHA = 1.2
 -- O cabelo do avatar do jogador só entra quando houver campo próprio no perfil e a verificação no Studio (PERS2 pendente).
 Personagem.CABELO_DO_AVATAR = false
 
--- PERS4: corpo do personagem. "caixas" = R15 padrão de blocos (o que o jogo usa hoje); outro nome = pacote oficial e gratuito
+-- PERS4: corpo do personagem. "caixas" = R15 padrão de blocos (reserva); outro nome = pacote oficial e gratuito
 -- da Roblox (dono Roblox, preço 0) aplicado pela HumanoidDescription, com nossa roupa/peças/rosto por cima. Candidatos e
--- avaliação em docs/ARTE.md (PERS4). Padrão segue "caixas" até o Pedro decidir pela prancha corpos_comparacao.jpg.
-Personagem.CORPO = "caixas"
+-- avaliação em docs/ARTE.md (PERS4). O Pedro escolheu "homem" (bundle 238 "Man") em 16/11/2026 pela prancha corpos_comparacao.jpg.
+Personagem.CORPO = "homem"
 -- Ids dos membros (Torso, Braços, Pernas e cabeça dinâmica; 0 = mantém a cabeça R15 padrão). Fonte: catalog.roblox.com/v1/bundles/details.
 Personagem.CORPOS = {
 	homem = { Torso = 86500008, RightArm = 86500036, LeftArm = 86500054, LeftLeg = 86500064, RightLeg = 86500078, Head = 0 }, -- bundle 238 "Man"

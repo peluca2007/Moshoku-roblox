@@ -69,14 +69,20 @@ return {
 		end
 		t.eq(E.yawLateral({}, { { x = 1, z = 1 } }), 0)
 	end,
-	["ombro: aliado fica atrás do ator, olhando para o alvo, e o alvo está à frente"] = function(t)
+	["ombro: aliado agindo mostra os dois de lado (3/4), nunca o alvo atrás do ator"] = function(t)
 		local ator, alvo = { x = 0, z = 0 }, { x = 0, z = -20 }
 		local c = E.ombro({ ator = ator, alvo = alvo, inimigoAgindo = false })
-		t.ok(c.posicao.z > 5, "câmera atrás do ator") -- alvo em -Z, câmera em +Z
-		t.ok(c.olhar.z < ator.z, "olha para o alvo")
-		t.ok(c.posicao.y > 5 and c.posicao.y < 9, "câmera baixa")
+		t.ok(math.abs(c.posicao.x) > 5, "câmera ao lado da linha ator-alvo")
+		t.ok(c.posicao.z > c.olhar.z, "atrás do meio da dupla (3/4)")
+		t.eq(c.olhar.z, -10)
+		t.ok(c.posicao.y > 3 and c.posicao.y < 9, "câmera baixa")
 		local g = E.ombro({ ator = ator, alvo = alvo, giro = math.pi, inimigoAgindo = false })
-		t.ok(g.posicao.z < -5, "giro de 180 passa para o outro lado")
+		t.ok(g.posicao.x * c.posicao.x < 0, "giro de 180 passa para o outro lado")
+		-- dupla colada: a câmera fica perto (a dupla ocupa o quadro) e o alvo sai da linha de visão do ator
+		local perto = E.ombro({ ator = ator, alvo = { x = 0, z = -2.5 }, inimigoAgindo = false })
+		local dist = math.sqrt(perto.posicao.x ^ 2 + (perto.posicao.z + 1.25) ^ 2)
+		t.ok(dist < 9, "câmera próxima com a dupla colada")
+		t.ok(2.5 * math.abs(perto.posicao.x) / dist >= 1.8, "separação lateral do alvo")
 	end,
 	["ombro: vez do inimigo mostra os dois de lado"] = function(t)
 		local c = E.ombro({ ator = { x = 0, z = -20 }, alvo = { x = 0, z = 0 }, inimigoAgindo = true })

@@ -1450,3 +1450,9 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - Corpo duplicado: `Corpo.ocultar` só reaplicava a transparência local quando a contagem mudava de/para zero; com a contagem já > 0 o corpo real continuava visível ao lado do fantasma. Medido antes: avatar + fantasma visíveis em 59 de 360 quadros; depois: 0 em 360 (1 quadro isolado em uma das corridas, tolerado pelo QA). Cada quadro do QA conta peças visíveis do avatar com fantasma presente.
 - `QaCritico`: o crítico forçado é só visual (flash, dois arcos, câmera lenta); o texto "N de dano" vem do servidor e não muda. Prova: atributo `ImpactoCriticoEm` do Workspace e capturas `r3_critico_*`.
 - Não verificado: câmera base de luta (fora do golpe) ainda cobre o alvo; corte desenhado ainda largo/estourado; câmera lenta do golpe final; celular.
+
+## IMP4 — câmera base 3/4, nome do ataque da criatura, corte limpo (16/11/2026, Studio por MCP)
+
+- `EnquadramentoMesa.ombro` agora é 3/4 lateral para aliado e inimigo (spec atualizado). `impacto_enquadre.py parado` e `mira`: separação em tela atacante/alvo 10,5% fora do golpe, 0 corpos duplicados. Capturas `build/beleza/impacto/r4_parado.png`, `r4_escolha_de_alvo.png`, `r4_critico_*`, `r4_criatura_*` (goblin acertando, faixa "Ataque / 8 de dano").
+- Corte: `r4_corte_base.png` (câmera lenta x10, mesmo ponto da criatura): arco fino laranja com fio branco, sem estourar no Bloom (variantes com Neon escurecido e sem Bloom foram testadas e descartadas).
+- Não verificado: golpe final em câmera lenta, congelamento da criatura, celular. O modo `mira` mediu o mesmo quadro do parado.

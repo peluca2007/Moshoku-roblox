@@ -211,13 +211,14 @@ function E.alvoDoOmbro(pontos, ator)
 	return melhor
 end
 
-E.OMBRO = { ATRAS = 8, LADO = 6, ALTURA = 7.5, OLHAR_FRENTE = 12, OLHAR_ALTURA = 2.5, MAX_FRENTE = 22 }
+E.OMBRO = { ALTURA = 5, OLHAR_ALTURA = 2.2 }
 
--- Posição e ponto de mira (relativos à origem do tabuleiro) da câmera de ombro.
+-- Posição e ponto de mira (relativos à origem do tabuleiro) da câmera de luta fora do golpe.
 -- o = { ator = {x,z}, alvo = {x,z}, inimigoAgindo = bool, giro = rad?, zoom = number? }
--- Aliado agindo: baixa, atrás e ao lado do ator, olhando na direção do alvo (ator no terço inferior).
--- Inimigo agindo: vista de lado/3/4 do par inimigo x alvo (os dois no quadro).
--- `giro` (Q/E) gira o afastamento em volta do foco; `zoom` multiplica as distâncias (roda/pinça).
+-- IMP4: tanto aliado quanto inimigo agindo: vista 3/4 lateral do par ator x alvo, os dois no quadro e o alvo nunca
+-- atrás do ator (antes o aliado tinha câmera "por cima do ombro" que escondia o alvo). Mesma geometria geral da
+-- câmera do golpe (ImpactoCurvas.enquadre), para a transição ser contínua. `giro` (Q/E) gira o afastamento em
+-- volta do foco; `zoom` multiplica as distâncias (roda/pinça).
 function E.ombro(o)
 	local dx, dz = o.alvo.x - o.ator.x, o.alvo.z - o.ator.z
 	local len = math.sqrt(dx * dx + dz * dz)
@@ -228,19 +229,12 @@ function E.ombro(o)
 	local rx, rz = -hz, hx -- direita
 	local z = o.zoom or 1
 	local C = E.OMBRO
-	if o.inimigoAgindo then
-		local mx, mz = (o.ator.x + o.alvo.x) / 2, (o.ator.z + o.alvo.z) / 2
-		local lado = (len * 0.9 + 9) * z
-		return {
-			posicao = { x = mx + rx * lado - hx * len * 0.3 * z, y = C.ALTURA * z, z = mz + rz * lado - hz * len * 0.3 * z },
-			olhar = { x = mx, y = 3, z = mz },
-		}
-	end
-	local atras, lado = C.ATRAS * z, C.LADO * z
-	local frente = math.min(len, C.MAX_FRENTE) * 0.7 + C.OLHAR_FRENTE * 0.3
+	local mx, mz = (o.ator.x + o.alvo.x) / 2, (o.ator.z + o.alvo.z) / 2
+	local lado = (4.8 + len * 0.55) * z
+	local atras = lado * 0.3
 	return {
-		posicao = { x = o.ator.x - hx * atras + rx * lado, y = C.ALTURA * z, z = o.ator.z - hz * atras + rz * lado },
-		olhar = { x = o.ator.x + hx * frente, y = C.OLHAR_ALTURA, z = o.ator.z + hz * frente },
+		posicao = { x = mx + rx * lado - hx * atras, y = C.ALTURA * z, z = mz + rz * lado - hz * atras },
+		olhar = { x = mx, y = C.OLHAR_ALTURA, z = mz },
 	}
 end
 

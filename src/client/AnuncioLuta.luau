@@ -166,7 +166,10 @@ function Anuncio.start(state)
 		if not s or not s.combat.active then return end
 		local quemUsa = state.findToken(r.casterId)
 		local entrada, mec = Catalogo.POR_ID[r.habilidadeId], Execucao.MECANICAS[r.habilidadeId]
-		local nome = (entrada and entrada.data.name) or (mec and mec.nome) or "Ação"
+		-- criatura: o recibo traz `nome` quando o ataque é um especial nomeado; o livro não nomeia o ataque comum das
+		-- criaturas (só dano por turno), então ele aparece como "Ataque" (nada inventado)
+		local nome = (entrada and entrada.data.name) or (mec and mec.nome) or (type(r.nome) == "string" and r.nome ~= "" and r.nome)
+			or (r.habilidadeId == "criatura/ataque" and "Ataque") or "Ação"
 		local detalhe = Anuncio.resultado(r.alvos)
 		if detalhe == "" and type(r.resultado) == "string" then detalhe = r.resultado end
 		mostrar(quemUsa and quemUsa.name or "Alguém", nome, detalhe, Anuncio.tom(r.alvos), 2.8)

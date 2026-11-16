@@ -1,5 +1,6 @@
 """IMP3: mede o enquadramento do golpe (separação em tela atacante/alvo) e corpos duplicados do jogador.
-  python tools/qa/impacto_enquadre.py <normal|criatura> [escala]
+  python tools/qa/impacto_enquadre.py <normal|criatura|parado|mira> [escala]
+  parado = turno do jogador sem ação; mira = escolha de alvo (tecla F); medem a câmera FORA do golpe (peso 0).
 Requer Play em luta (qa.py esgoto_sala1 --manter-play). Reprova (código 1) se, com a câmera do golpe ativa
 (peso >= 0,8), a separação em tela for < 15% da largura, ou se houver mais de uma cabeça visível do jogador."""
 import os, sys
@@ -17,7 +18,12 @@ q.lua_cliente("workspace:SetAttribute('EscalaDeTempoDasCenas', %s) return 'ok'" 
 dur = 9 if escala != "1" else 6
 try:
     lua_arquivo(q, "tools/qa/impacto_amostra.luau", troca={"@DUR@": str(dur)})
-    if modo == "normal":
+    if modo == "parado":
+        pass
+    elif modo == "mira":
+        time.sleep(1)
+        q.tecla("F", 150, 500)
+    elif modo == "normal":
         print("acao:", acao_luta(q, "golpe"))
     else:
         print(q.lua_cliente("""local r=game.ReplicatedStorage:WaitForChild('Mesa') local snap
@@ -31,7 +37,9 @@ finally:
     q.lua_cliente("workspace:SetAttribute('EscalaDeTempoDasCenas', nil) workspace:SetAttribute('QaEnquadre', nil) return 'ok'")
     q.c.close()
 amostras = [tuple(float(x) for x in l.split("|")) for l in bruto.split(";") if l.count("|") == 5]
-ativas = [a for a in amostras if a[1] >= 0.8 and a[2] >= 0]  # câmera do golpe no ponto forte
+ativas = [a for a in amostras if a[1] >= 0.8 and a[2] >= 0]
+if modo in ("parado", "mira"):
+    ativas = [a for a in amostras if a[1] < 0.02 and a[0] > 1.0]  # câmera base, fora do golpe  # câmera do golpe no ponto forte
 print("amostras: %d; com câmera do golpe ativa (peso>=0,8): %d" % (len(amostras), len(ativas)))
 falhas = 0
 if not ativas:

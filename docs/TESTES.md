@@ -1380,3 +1380,8 @@ Verificado: exportação (`anim_exportar.py --ual ... --mapa tools/animacao/ual_
 - Chave do arquivo: ainda 401. Rota do Studio (`open_cloud_invoke`, POST /assets/v1/assets multipart, asset:read/write, `--via-studio`): funcionou depois de aprovar a pasta `build` em Assistant -> MCP Permissions; 9 FBX enviados, LoadAsset + exportação OK (RatoQuaternius 13 peças, etc.).
 - Studio (Edit): as 9 criaturas montadas por `CriaturaAnimada` em fileira, paradas/andando/atacando, vistas em 3/4 (`build/beleza/modelos/prancha_studio.jpg`, `studio_*.jpg`). Texturas, escala e frente corretas; movimento sutil. `qa.py esgoto_sala1`: 20 ok (sorteou bandido, não rato; o rato aparece parado ao fundo).
 - Não verificado: criaturas Quaternius dentro de luta no Studio (aranha/rato/esqueleto escolhidos pelo sorteio), desempenho.
+
+## PERS2b — personagem novo no Studio (16/11/2026)
+- Moldes enviados pela rota do Studio (6 Decals; id de imagem obtido por LoadAsset) e ligados em `Personagem.CONJUNTOS`. `qa.py esgoto_sala1` 20 ok, `inicio` 8 ok, `luta` 29 ok; `testar.ps1` só com "Catálogo" falhando.
+- Visto no Studio (`build/beleza/personagem/prancha_studio.jpg`, `studio_*`): R15 com cabeça redonda e rosto de blocos de frente, cabelo e barba no lugar, camisa/calça aplicadas, espada na mão, clipe de golpe tocando; na cidade o avatar aparece com a roupa nova.
+- Limitações: prévia da criação (Parts) sem camisa/calça; cabelo do avatar (CABELO_DO_AVATAR) continua desligado, não testado; só tom médio/claro por conjunto; ladino/mago e NPCs não vistos de perto; peças rígidas em malha não feitas.

@@ -8,10 +8,10 @@ return {
 		t.eq(P.conjuntoDe({ roupas = { cabeca = "LadinoCapuz" } }), "ladino")
 		t.eq(P.conjuntoDe({ roupas = { costas = "MestraManto", pes = "RoupaBotas1" } }), "mago")
 	end,
-	["moldes vazios dao fallback sem erro"] = function(t)
+	["moldes enviados e conjunto desconhecido cai no aventureiro"] = function(t)
 		local c, l = P.moldes("ladino")
-		t.ok(c == nil and l == nil)
-		t.ok(P.moldes("inexistente") == nil)
+		t.ok(c ~= nil and l ~= nil)
+		t.eq(P.moldes("inexistente"), (P.moldes("aventureiro")))
 	end,
 	["rosto numa cabeca cubica reproduz as medidas antigas"] = function(t)
 		local m = P.medidasCabeca(Vector3.new(1, 1, 1))

@@ -12,7 +12,8 @@ from qa_lib import Qa, RAIZ  # noqa: E402
 SAIDA = os.path.join(RAIZ, "build", "beleza", "anim")
 IDS = {"rato": "creature/rato-gigante", "aranha": "creature/aranha-da-floresta",
        "esqueleto": "creature/esqueleto-andarilho", "dragao": "creature/dragao-azul",
-       "morcego": "creature/morcego-gigante", "serpente": "creature/serpente-de-fogo"}
+       "morcego": "creature/morcego-gigante", "serpente": "creature/serpente-de-fogo",
+       "lobo": "creature/lobo-cinzento", "goblin": "creature/goblin-batedor"}
 ESTADOS = ["parado", "andando", "ataque", "dano", "morte"]
 
 SERVIDOR = r"""

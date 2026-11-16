@@ -473,6 +473,12 @@
   "semente": "1",
   "sha256": "049abc8510c043277ab51b0402163b0513bc7c3daad32002ba7778de5b7034ac"
  },
+ "GoblinQuaternius": {
+  "asset": "85527745949003",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "301f7a5cf1691bcd9259035569169115455a03002014173174b4ab554665d4a4"
+ },
  "GolemPedraMenor": {
   "asset": "135974045085542",
   "modelo": "golem",
@@ -544,6 +550,12 @@
   "modelo": "lobo",
   "semente": "1",
   "sha256": "21ca36aadc0fa348bfc88b0176a5649c4054f38f5024dfa5819e157d96a15667"
+ },
+ "LoboQuaternius": {
+  "asset": "94281687178734",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "e2cb41c80c1f00a61f53827aeda64b6f1845141eb9966d068754e081e258fb4f"
  },
  "MercadoLiso": {
   "asset": "78239011834021",

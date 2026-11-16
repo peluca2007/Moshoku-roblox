@@ -211,7 +211,7 @@ function E.alvoDoOmbro(pontos, ator)
 	return melhor
 end
 
-E.OMBRO = { ATRAS = 9, LADO = 2.6, ALTURA = 5.8, OLHAR_FRENTE = 12, OLHAR_ALTURA = 4.4, MAX_FRENTE = 22 }
+E.OMBRO = { ATRAS = 8, LADO = 6, ALTURA = 7.5, OLHAR_FRENTE = 12, OLHAR_ALTURA = 2.5, MAX_FRENTE = 22 }
 
 -- Posição e ponto de mira (relativos à origem do tabuleiro) da câmera de ombro.
 -- o = { ator = {x,z}, alvo = {x,z}, inimigoAgindo = bool, giro = rad?, zoom = number? }

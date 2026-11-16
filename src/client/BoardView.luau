@@ -729,7 +729,7 @@ function BoardView.start(state)
 	local function mostrarGrade(alfa: number)
 		if math.abs(alfa - gradeAlfa) < 0.02 then return end
 		gradeAlfa = alfa
-		if not gradeFolder or not gradeFolder.Parent then gradeFolder = workspace:FindFirstChild("Grade", true) end
+		if not gradeFolder or not gradeFolder.Parent then gradeFolder = (workspace:FindFirstChild("Mesa") and workspace.Mesa:FindFirstChild("Grade")) end
 		if not gradeFolder then gradeAlfa = -1; return end
 		for _, linha in gradeFolder:GetChildren() do
 			if linha:IsA("BasePart") then linha.LocalTransparencyModifier = 1 - alfa end
@@ -888,7 +888,8 @@ function BoardView.start(state)
 		if snapAtual and snapAtual.combat.active then
 			local pl = planoDeLuta(snapAtual, vp, area)
 			focoAlvo = board.origin + Vector3.new(pl.foco.x, pl.foco.y, pl.foco.z)
-			distAlvo = pl.distancia * zoomUsuario
+			-- Mirando/andando (vista tática) afasta mais, para o alcance e as casas caberem na tela.
+			distAlvo = pl.distancia * zoomUsuario * (if state.mira() then 1.8 else 1)
 		else
 			focoAlvo = board.origin
 			distAlvo = distanciaLivre

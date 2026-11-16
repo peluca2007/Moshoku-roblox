@@ -353,8 +353,8 @@ Reações e modo de efeitos reduzidos.
   `build/ui` em localhost durante o envio), ids em `shared/UIArte.luau` e paleta
   de papel em `shared/UITemaDados`. Falta conferir no Studio a luta e a tela de
   resultado; ver PERG1 em `TAREFAS.md`.
-- A pasta antiga `Desktop\Moshokurpgroblox` (git quebrado, cópia parcial) não é
-  mais usada; apagar só quando o Pedro confirmar.
+- A pasta antiga `Desktop\Moshokurpgroblox` foi para a Lixeira em 16/11/2026, a pedido
+  do Pedro (nenhum arquivo dela faltava aqui).
 - Blender: `Downloads\blender-5.4.0-alpha…\blender.exe`, achado sozinho por
   `tools/blender_rodar.py`.
 - Áudios originais (`audios/`, `assets/sons/gerados`) se perderam; os IDs já

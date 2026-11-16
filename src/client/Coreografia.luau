@@ -95,7 +95,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 	local cenas, pecas, serial = {}, 0, 0
 	local kit = { state = state, posicaoDe = posicaoDe, Efeitos = Efeitos }
 	local encerrado = false
-	local pausar -- IMP1: definida junto de tempoDe
+	local pausar, golpeFinal -- IMP1/IMP2: definidas junto de tempoDe
 	local function destruir(cena)
 		if cena.viva then
 			cena.viva = false
@@ -401,14 +401,26 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 			if acertou and (alvo.dano or 0) > 0 then
 				Efeitos.reagir(alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
-				-- IMP1: tremor proporcional ao dano, faíscas no contato e pausa curta (hit-stop) em todas as cenas
-				local amp, dur = Curvas.tremor(alvo.dano, alvo.critico, cena.perfil.peso)
-				Efeitos.tremer(amp, dur)
-				Efeitos.aproximar(if alvo.critico then 0.14 else 0.08, if alvo.critico then 0.55 else 0.4)
-				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, alvo.critico, de - ponto)
+				-- IMP1/IMP2: corte desenhado, faíscas no sentido do golpe, tremor direcional e pausa (hit-stop) que
+				-- também segura o corpo das criaturas; câmera lenta no crítico e no golpe final da luta.
+				local golpe = ponto - de
+				local crit = alvo.critico == true or workspace:GetAttribute("QaCritico") == true -- QaCritico: só para a QA forçar o crítico
+				local amp, dur = Curvas.tremor(alvo.dano, crit, cena.perfil.peso)
+				Efeitos.tremer(amp, dur, golpe)
+				Efeitos.aproximar(if crit then 0.14 else 0.08, if crit then 0.55 else 0.4)
+				ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit)
+				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, crit, golpe)
+				if crit and Efeitos.tremorAtivo() then ImpactoFx.flash(0.2) end
 				if not cena.pausada and not FX.reduzidos and Efeitos.tremorAtivo() then
 					cena.pausada = true
-					pausar(Curvas.hitStop(alvo.dano, alvo.critico))
+					local parada = Curvas.hitStop(alvo.dano, crit)
+					local lentoDur, taxa = Curvas.lento(crit, golpeFinal(alvo.id))
+					pausar(parada, lentoDur, taxa)
+					local corpos = workspace:FindFirstChild("CorposDeCriatura")
+					if corpos then
+						ImpactoFx.congelar(if cena.casterId then corpos:FindFirstChild(cena.casterId) else nil, parada)
+						ImpactoFx.congelar(corpos:FindFirstChild(alvo.id), parada)
+					end
 				end
 			elseif not acertou then
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, 0.3, "esquiva")
@@ -419,25 +431,39 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 	end
 
 	-- Relógio da cena (segundos desde o início), com CenaTempoFixo e EscalaDeTempoDasCenas.
-	-- IMP1: `pausar` congela o relógio de todas as cenas por `dur` s (hit-stop); ao fim, desloca o início.
+	-- IMP2: o relógio é integrado por janelas (ImpactoCurvas.avanco): `pausar` abre uma janela de hit-stop (taxa 0)
+	-- seguida de câmera lenta (taxa < 1) em todas as cenas vivas; fora delas corre normal.
 	local function tempoDe(cena)
 		local fixo = workspace:GetAttribute("CenaTempoFixo")
 		if type(fixo) == "number" then return fixo end
-		if cena.pausaAte then
-			if os.clock() < cena.pausaAte then return cena.tempoPausa end
-			cena.inicio += cena.pausaAte - cena.pausaDesde
-			cena.pausaAte = nil
-		end
-		return (os.clock() - cena.inicio) / math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+		local agora = os.clock()
+		cena.t = (cena.t or 0) + Curvas.avanco(cena.ultimoReal or cena.inicio, agora,
+			1 / math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1), cena.janelas or {})
+		cena.ultimoReal = agora
+		return cena.t
 	end
-	function pausar(dur)
-		if dur <= 0 then return end
+	function pausar(dur, lentoDur, taxa)
+		if dur <= 0 and (lentoDur or 0) <= 0 then return end
 		local agora = os.clock()
 		for _, c in cenas do
-			if c.viva and not c.pausaAte then
-				c.tempoPausa, c.pausaDesde, c.pausaAte = tempoDe(c), agora, agora + dur
+			if c.viva and not c.janelas then
+				tempoDe(c)
+				c.janelas = { { agora, agora + dur, 0 }, { agora + dur, agora + dur + (lentoDur or 0), taxa or 1 } }
 			end
 		end
+	end
+	-- Último inimigo caindo: o snapshot já traz o PV do alvo em 0 e nenhuma criatura de pé.
+	function golpeFinal(alvoId)
+		local snap = state.snapshot()
+		if not snap or not snap.combat or not snap.combat.active then return false end
+		local caiu = false
+		for _, t in snap.tokens do
+			if t.criatura then
+				if t.id == alvoId then caiu = (t.pv or 1) <= 0 or t.derrotado == true
+				elseif (t.pv or 0) > 0 and not t.derrotado then return false end
+			end
+		end
+		return caiu
 	end
 	kit.agora = tempoDe
 	kit.animar, kit.evento, kit.peca, kit.segmento, kit.arco = animar, evento, peca, segmento, arco
@@ -476,6 +502,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		-- Golpes de todo mundo (ataque básico, criaturas): dourado claro, legível no escuro.
 		local cor = if arv == "basico" then Color3.fromRGB(255, 232, 170) else Estilo.arvore(arv).cor
 		local cena = nova(id, perfil, cor)
+		cena.casterId = recibo.casterId
 		local gelo = string.find(id, "gelo", 1, true) ~= nil
 		local de = if recibo.casterId then posicaoDe(state, recibo.casterId, recibo.origem) else nil
 		local familia = perfil.familia
@@ -497,8 +524,8 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 					local liga = ImpactoFx.rastro(filho, cena.cor)
 					if liga then
 						local contato = plano.chegada or perfil.carga
-						evento(cena, math.max(0, contato - 0.35), function() liga(true) end)
-						evento(cena, contato + 0.12, function() liga(false) end)
+						evento(cena, math.max(0, contato - 0.5), function() liga(true) end)
+						evento(cena, contato + 0.15, function() liga(false) end)
 					end
 				end
 			end
@@ -558,9 +585,11 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				end
 				local quando = if plano.chegada then plano.chegada + (i - 1) * 0.04 else lancamento + (if viaja then viagem else 0)
 				local resultado = if #tiros > 1 then tiro else alvo
+				-- IMP2: criatura atacando: o contato cai no marco `impacto` do clipe dela (o servidor começa o clipe com o recibo)
+				quando = math.max(quando, impactoDaCriatura(state, recibo.casterId) or 0)
 				if de and i == 1 and n == 1 and not plano.semCamera then
 					-- IMP1: a câmera de luta acompanha este golpe (antecipação, contato, volta)
-					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando)
+					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando * math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1))
 					cena.fim = math.max(cena.fim, quando + 0.9)
 				end
 				-- ANIM3: número, barra e queda do alvo esperam o golpe encostar (limite de segurança na fila)

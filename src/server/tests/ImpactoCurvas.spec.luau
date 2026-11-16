@@ -5,7 +5,7 @@ local C = require(Shared.ImpactoCurvas)
 return {
 	["peso da câmera: 0 antes, sobe até o impacto, segura e volta"] = function(t)
 		t.eq(C.peso(0, 0.8), 0)
-		t.eq(C.peso(0.2, 0.8), 0, "ainda fora da janela de antecipação")
+		t.eq(C.peso(0.2, 1.6), 0, "ainda fora da janela de antecipação")
 		local meio = C.peso(0.55, 0.8)
 		t.ok(meio > 0 and meio < 1, "sobe suave")
 		t.eq(C.peso(0.8, 0.8), 1)
@@ -58,14 +58,59 @@ return {
 		t.ok(C.faiscas(20, false) > C.faiscas(2, false))
 		t.ok(C.faiscas(5, true) > C.faiscas(5, false))
 	end,
-	["enquadramento fica ao lado e acima, nunca no mesmo ponto do alvo"] = function(t)
+	["enquadramento 3/4: ao lado, acima e com o alvo fora da linha de visão do atacante"] = function(t)
 		local pos, olhar = C.enquadre({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = -10 }, 1)
 		t.ok(pos.y > olhar.y)
 		t.ok(math.abs(pos.x) > 5, "de lado")
+		t.ok(pos.z > 0, "atrás do atacante (3/4, não de perfil)")
 		t.eq(olhar.z, -5)
 		local pos2 = C.enquadre({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = -10 }, -1)
 		t.eq(pos2.x, -pos.x)
 		local pos3 = C.enquadre({ x = 1, y = 0, z = 1 }, { x = 1, y = 0, z = 1 }, 1)
 		t.ok(pos3.x == pos3.x, "sem NaN com a dupla no mesmo ponto")
+		for _, d in { 2, 3, 5, 8, 15 } do
+			t.ok(C.separacaoLateral(d) >= C.SEPARACAO_MIN, "alvo não fica atrás do atacante a " .. d)
+		end
+	end,
+	["candidatos encurtam a distância e abrem o ângulo, sem perder o lado"] = function(t)
+		local base = C.enquadre({ x = 0, y = 0, z = 0 }, { x = 5, y = 0, z = 0 }, 1)
+		local curto = C.enquadre({ x = 0, y = 0, z = 0 }, { x = 5, y = 0, z = 0 }, 1, 0.5, 0.6)
+		local d0 = math.sqrt((base.x - 2.5) ^ 2 + (base.z) ^ 2)
+		local d1 = math.sqrt((curto.x - 2.5) ^ 2 + (curto.z) ^ 2)
+		t.ok(d1 < d0)
+		t.ok(#C.CANDIDATOS >= 4)
+	end,
+	["caixa da sala: a câmera encolhe pelo caminho até caber, sem mudar de direção"] = function(t)
+		local c = { x = 0, z = 0, meia = 58, teto = 30 }
+		t.eq(C.fracaoDentro({ x = 0, y = 2, z = 0 }, { x = 10, y = 8, z = 10 }, c), 1)
+		local f = C.fracaoDentro({ x = 50, y = 2, z = 0 }, { x = 70, y = 8, z = 0 }, c)
+		t.ok(math.abs(f - 0.4) < 1e-9, "sai em x=58")
+		local alto = C.fracaoDentro({ x = 0, y = 20, z = 0 }, { x = 0, y = 40, z = 0 }, c)
+		t.ok(math.abs(alto - 0.5) < 1e-9, "teto")
+		t.eq(C.fracaoDentro({ x = 0, y = 2, z = 0 }, { x = -100, y = 2, z = 0 }, c), 0.58)
+		t.eq(C.fracaoDentro({ x = 70, y = 2, z = 0 }, { x = 90, y = 2, z = 0 }, c), 0, "olhar fora da caixa: não aproxima")
+	end,
+	["câmera lenta só no crítico e no golpe final"] = function(t)
+		local d0, r0 = C.lento(false, false)
+		t.eq(d0, 0)
+		t.eq(r0, 1)
+		local d1, r1 = C.lento(true, false)
+		t.ok(d1 > 0 and r1 < 1)
+		local d2, r2 = C.lento(false, true)
+		t.ok(d2 >= d1 and r2 <= r1)
+	end,
+	["empurrão direcional começa forte, amortece e acaba"] = function(t)
+		t.eq(C.empurrao(0), 0)
+		t.ok(C.empurrao(0.02) > 0.9)
+		t.eq(C.empurrao(1), 0)
+		t.ok(math.abs(C.empurrao(0.8)) < 0.1)
+	end,
+	["avanço do relógio da cena: pausa para, lento reduz, resto corre"] = function(t)
+		local j = { { 1, 1.07, 0 }, { 1.07, 1.47, 0.3 } }
+		t.eq(C.avanco(0, 1, 1, j), 1)
+		t.ok(math.abs(C.avanco(1, 1.07, 1, j)) < 1e-9, "parado no hit-stop")
+		t.ok(math.abs(C.avanco(1.07, 1.47, 1, j) - 0.12) < 1e-9)
+		t.ok(math.abs(C.avanco(0.5, 2, 1, j) - (0.5 + 0.12 + 0.53)) < 1e-9)
+		t.eq(C.avanco(2, 1, 1, j), 0)
 	end,
 }

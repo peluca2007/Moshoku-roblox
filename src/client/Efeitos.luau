@@ -101,18 +101,20 @@ end
 -- Tremor de câmera (impactos). Na Visão da mesa o BoardView aplica
 -- Efeitos.tremorCFrame() à câmera; fora dela, usa o CameraOffset do avatar.
 local Curvas = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ImpactoCurvas"))
-local tremor = { fim = 0, inicio = 0, forca = 0 }
+local tremor: { fim: number, inicio: number, forca: number, direcao: Vector3? } = { fim = 0, inicio = 0, forca = 0 }
 -- IMP1: tremor desligável (acessibilidade): atributo `SemTremor` no LocalPlayer ou movimento reduzido.
 function Efeitos.tremorAtivo(): boolean
 	if not Curvas.TREMOR_PADRAO then return false end
 	if Players.LocalPlayer and Players.LocalPlayer:GetAttribute("SemTremor") == true then return false end
 	return not require(script.Parent.MenuEfeitos).reduzidos
 end
-function Efeitos.tremer(forca: number, duracao: number?)
+-- `direcao` (opcional, mundo): o tremor ganha um empurrão no sentido do golpe (amortecido, ImpactoCurvas.empurrao).
+function Efeitos.tremer(forca: number, duracao: number?, direcao: Vector3?)
 	if not Efeitos.tremorAtivo() then return end
 	local agora = os.clock()
 	if agora > tremor.fim or forca > tremor.forca * Curvas.envoltoriaTremor((tremor.fim - agora) / math.max(tremor.fim - tremor.inicio, 1e-3)) then
 		tremor.inicio, tremor.fim, tremor.forca = agora, agora + (duracao or 0.3), forca
+		tremor.direcao = if direcao and direcao.Magnitude > 1e-3 then direcao.Unit else nil
 	end
 end
 
@@ -121,10 +123,17 @@ function Efeitos.tremorCFrame(): CFrame
 	if agora >= tremor.fim then
 		return CFrame.identity
 	end
-	local resto = (tremor.fim - agora) / math.max(tremor.fim - tremor.inicio, 1e-3)
+	local total = math.max(tremor.fim - tremor.inicio, 1e-3)
+	local resto = (tremor.fim - agora) / total
 	local f = tremor.forca * Curvas.envoltoriaTremor(resto)
+	local kick = Vector3.zero
+	local cam = workspace.CurrentCamera
+	if tremor.direcao and cam then
+		-- empurra a câmera no sentido do golpe (em espaço da câmera), com amplitude maior que o ruído
+		kick = cam.CFrame:VectorToObjectSpace(tremor.direcao) * (tremor.forca * 2.2 * Curvas.empurrao((agora - tremor.inicio) / total))
+	end
 	-- ruído de alta frequência: deslocamento + leve rolagem, amortecido (sem enjoo: some em < 0,6 s)
-	return CFrame.new(math.noise(agora * 45, 1) * f, math.noise(agora * 45, 2) * f, math.noise(agora * 45, 3) * f * 0.5)
+	return CFrame.new(kick + Vector3.new(math.noise(agora * 45, 1) * f, math.noise(agora * 45, 2) * f, math.noise(agora * 45, 3) * f * 0.5))
 		* CFrame.Angles(0, 0, math.noise(agora * 30, 4) * f * 0.02)
 end
 

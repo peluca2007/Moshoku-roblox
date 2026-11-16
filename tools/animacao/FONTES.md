@@ -25,3 +25,7 @@ o exportador com `--ual` (ver README.md). Registrar aqui a versão do zip e a li
 Os 12 clipes de `src/shared/Animacoes/Clipes/` têm `origem = "script"`: poses-chave escritas à mão em
 `tools/blender/anim_clipes.py` (código do projeto, sem terceiros), interpoladas e com IK de pernas/braços em
 `tools/blender/anim_pose.py`. Sem licença de terceiros envolvida.
+
+## ANIM3 (16/11/2026)
+
+CortePesado, Estocada, DisparoArco, Bloqueio, Vitoria e ReacaoGolpe saem de poses-chave autorais (script `anim_clipes.py`), sem biblioteca externa: a UAL1 Standard (CC0) só tem `Sword_Attack`, soco e pistola. Os demais clipes continuam vindo da UAL1 (CC0). Nenhuma biblioteca nova foi baixada; uma biblioteca CC0 com arco (p. ex. Mixamo não é CC0) ficou como pendência.

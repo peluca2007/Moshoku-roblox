@@ -7,6 +7,7 @@
 local Players = game:GetService("Players")
 local Tocador = require(script.Parent.TocadorClipe)
 local Corpo = require(script.Parent.Corpo)
+local Feedback = require(script.Parent.FeedbackCombate) -- ANIM3: a queda espera o impacto do golpe
 
 local AnimacaoLuta = {}
 
@@ -93,7 +94,7 @@ function AnimacaoLuta.start(state)
 		end
 	end)
 
-	state.onSnapshot(function(snap)
+	local function aplicar(snap)
 		local ativo = snap ~= nil and snap.combat ~= nil and snap.combat.active == true
 		if ativo then
 			local vistos = {}
@@ -112,7 +113,8 @@ function AnimacaoLuta.start(state)
 						if not c.postura or c.postura.terminou then
 							c.postura = c.tocador:tocar("PosturaCombate", { fadeEntrada = 0.35 })
 						end
-						local caido = token.pv ~= nil and token.pv <= 0
+						local visto = Feedback.visto(token) -- só cai quando o golpe encosta
+						local caido = visto.pv ~= nil and visto.pv <= 0
 						if caido and not c.queda then
 							c.queda = c.tocador:tocar("Queda", { fadeEntrada = 0.08 })
 						elseif not caido and c.queda then
@@ -144,6 +146,10 @@ function AnimacaoLuta.start(state)
 		end
 		ultimoAtivo = ativo
 		if ativo then ultimoSnapshot = snap end
+	end
+	state.onSnapshot(aplicar)
+	Feedback.aoLiberar(function()
+		if ultimoAtivo and ultimoSnapshot then aplicar(ultimoSnapshot) end
 	end)
 end
 

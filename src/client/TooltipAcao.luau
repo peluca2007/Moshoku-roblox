@@ -1,13 +1,16 @@
+-- Consulta rápida ao passar o cursor numa habilidade (HUD2): painel escuro com fio dourado, ao lado
+-- esquerdo da linha (ou acima, se não couber), com fade curto. Só apresentação.
 local Tema = require(script.Parent.UI.Tema)
+local P = require(script.Parent.UI.PecasLuta)
 local TextService = game:GetService("TextService")
 local T = {}
 function T.start(gui, aoFechar)
 	local frame = Instance.new("Frame")
 	frame.Name, frame.Visible, frame.ZIndex = "TooltipAcao", false, 15
-	frame.BackgroundColor3, frame.BorderSizePixel = Tema.cores.painel, 0
+	frame.BackgroundColor3, frame.BackgroundTransparency, frame.BorderSizePixel = P.cor.fundo, 0.08, 0
 	frame.Parent = gui
 	local corner = Instance.new("UICorner", frame); corner.CornerRadius = UDim.new(0, 8)
-	local stroke = Instance.new("UIStroke", frame); stroke.Color = Tema.cores.borda
+	local stroke = Instance.new("UIStroke", frame); stroke.Color, stroke.Thickness, stroke.Transparency = P.cor.ouro, 1, 0.2
 	local scroll = Instance.new("ScrollingFrame", frame)
 	scroll.Name, scroll.BackgroundTransparency, scroll.BorderSizePixel, scroll.ZIndex = "Conteudo", 1, 0, 16
 	scroll.Position, scroll.Size = UDim2.fromOffset(12, 10), UDim2.new(1, -24, 1, -20)
@@ -15,7 +18,7 @@ function T.start(gui, aoFechar)
 	local label = Instance.new("TextLabel", scroll)
 	label.Name, label.BackgroundTransparency, label.ZIndex = "Texto", 1, 17
 	label.Size = UDim2.new(1, -8, 0, 0)
-	label.TextWrapped, label.TextSize, label.FontFace, label.TextColor3 = true, 15, Tema.fontes.rotulo, Tema.cores.texto
+	label.TextWrapped, label.TextSize, label.FontFace, label.TextColor3 = true, 15, Tema.fontes.rotulo, P.cor.texto
 	label.TextXAlignment, label.TextYAlignment = Enum.TextXAlignment.Left, Enum.TextYAlignment.Top
 	local id, serial, dentro, ancora = nil, 0, false, nil
 	local medicao, alturaTexto = 0, 0
@@ -28,7 +31,14 @@ function T.start(gui, aoFechar)
 		local w, limite = largura(), math.max(80, math.min(380, vp.Y - 80))
 		local h = math.clamp(alturaTexto + 24, math.min(110, limite), limite)
 		frame.Size = UDim2.fromOffset(w, h)
-		frame.Position = UDim2.fromOffset(math.clamp(ancora.AbsolutePosition.X, 12, math.max(12, vp.X - w - 12)), math.clamp(ancora.AbsolutePosition.Y - h - 8, 12, math.max(12, vp.Y - h - 40)))
+		local pos, tam = ancora.AbsolutePosition, ancora.AbsoluteSize
+		local x = pos.X - w - 10
+		local y = math.clamp(pos.Y + tam.Y - h, 12, math.max(12, vp.Y - h - 12))
+		if x < 12 then
+			x = math.clamp(pos.X, 12, math.max(12, vp.X - w - 12))
+			y = math.clamp(pos.Y - h - 8, 12, math.max(12, vp.Y - h - 40))
+		end
+		frame.Position = UDim2.fromOffset(x, y)
 	end
 	local function medir()
 		medicao += 1
@@ -64,7 +74,10 @@ function T.start(gui, aoFechar)
 		serial += 1; id = chave; ancora = carta
 		api.atualizar(chave, dados)
 		posicionar()
-		scroll.CanvasPosition = Vector2.zero; frame.Visible = true
+		scroll.CanvasPosition = Vector2.zero
+			frame.BackgroundTransparency = 1
+			frame.Visible = true
+			P.animar(frame, { BackgroundTransparency = 0.08 }, P.SUAVE, "fade")
 	end
 	function api.sair()
 		serial += 1; local n = serial

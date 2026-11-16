@@ -157,6 +157,15 @@ visível) não será usado.
 - Ao fim das entregas grandes: site de apresentação do jogo no estilo de uma
   página de changelog (modelos, animações, conceito).
 
+### Mapa: só a cidade (Pedro, 15/11/2026)
+
+O único lugar onde se anda é a cidade. Floresta, Ruínas e o resto do mundo
+aberto ficam de lado por enquanto (não apagar ainda; só não investir neles):
+as áreas avançam por escolhas, não a pé. A cidade tem de ficar bem viva:
+NPCs com rotina e falas, gente andando, lojas e barracas com movimento,
+sons de ambiente, luz e fumaça, animais, coisas para clicar e descobrir.
+A área de testes também está feia e precisa de acabamento.
+
 ### Escala do mundo (Pedro, 15/11/2026)
 
 Todas as construções ficam bem maiores em relação ao personagem (corpo R15

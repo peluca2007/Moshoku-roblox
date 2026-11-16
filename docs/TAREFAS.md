@@ -54,6 +54,10 @@ MOD3 — **na fila, logo depois da LUTA-B ou da LUTA-C (Pedro, 15/11: "vai ter q
 
 ESC1 — **na fila (Pedro, 15/11)**. Aumentar bastante todas as construções da cidade (casas, prédios, muros, portões, praça, taverna, props grandes) em relação ao personagem, com caminhos, colisão, NPCs, porta do esgoto e câmera do mundo acompanhando. Medir antes e depois no Studio, com capturas.
 
+CIDADE1 — **na fila (Pedro, 15/11)**, junto com o ESC1. Cidade bem viva e em escala maior: construções bem maiores, NPCs com rotina e falas, gente andando, barracas e lojas com movimento, sons de ambiente, animais, pontos para interagir. Floresta e Ruínas ficam paradas.
+
+AREA2 — **na fila (Pedro, 15/11)**. Acabamento da área de testes: sala bonita, painel sem texto quebrado nem sobreposto, prévia de cada criatura, gesto e animação em destaque.
+
 APRES1 — **na fila, prioridade do Pedro (15/11)**: animações e modelos primeiro (fase 4 de [DIRECAO §7](DIRECAO.md)); o Pedro acha todas as animações de hoje muito feias (a da flecha foi o exemplo): o pacote refaz a apresentação dos golpes em geral, começando pelos disparos. Começa quando a QA1 liberar o Studio.
 
 UI1 — telas (Pedro, 14/11). **UI1a pronta para revisão (15/11/2026)**: criação com o personagem 3D no centro, painel à direita e etapas embaixo (`client/{CriacaoRapidaView,CriacaoPrevia}`, `shared/Regras/CriacaoRapidaTela`, spec). Clicar na raça só seleciona: os roteiros precisam de um Avançar a mais. Local ok; **visual não conferido no Studio**. Na fila: UI1b menu de pausa central (`InicioView`), atalhos e status.

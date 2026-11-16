@@ -75,6 +75,7 @@ local function listarProps()
 	local usados = {}
 	for _, entrada in ModelosCriaturas.POR_CRIATURA do
 		for _, m in entrada.modulos do usados[m] = true end
+		if entrada.preferido then usados[entrada.preferido] = true end
 	end
 	local lista = {}
 	for _, m in script.Parent.Mundo.Modelos:GetChildren() do
@@ -149,7 +150,7 @@ function AreaDeTestes.start(deps)
 	local function estaNaSala(player) return sessoes[player] ~= nil end
 
 	local function mostrarCriatura(d)
-		local info = ModelosCriaturas.escolher(d.id, d.variante)
+		local info = ModelosCriaturas.escolher(d.id, d.variante, MontarModelo.existe)
 		if not info then return nil, "criatura sem modelo" end
 		local minha = geracao
 		local criatura = CriaturaAnimada.montar(info, vitrine, CFrame.new(PONTO), info.escalaMundo)

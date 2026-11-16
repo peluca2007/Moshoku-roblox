@@ -65,4 +65,26 @@ return {
 		local _, dz = Anim.corpo(c)
 		t.ok(dz < -0.3, "quadrúpede avança no golpe (-Z é frente)")
 	end,
+	["modelo Quaternius só vale se o módulo existir (fallback de blocos)"] = function(t)
+		t.eq(Modelos.escolher("creature/rato-gigante", 0).modulo, "RatoGigante")
+		t.eq(Modelos.escolher("creature/rato-gigante", 0, function() return false end).modulo, "RatoGigante")
+		t.eq(Modelos.escolher("creature/rato-gigante", 0, function(m) return m == "RatoQuaternius" end).modulo, "RatoQuaternius")
+		t.eq(Modelos.escolher("creature/aranha-da-floresta", 3, function() return true end).modulo, "AranhaQuaternius")
+		t.eq(Modelos.escolher("creature/lobo-cinzento", 0, function() return true end).modulo, "LoboCinzento")
+		for _, entrada in Modelos.POR_CRIATURA do
+			for _, m in entrada.modulos do t.ok(Pivos[m] ~= nil, "pivôs de " .. m) end
+			if entrada.preferido then t.ok(Pivos[entrada.preferido] ~= nil, "pivôs de " .. entrada.preferido) end
+		end
+		for _, id in ipairs({ "creature/esqueleto-andarilho", "creature/serpente-de-fogo", "creature/dragao-azul" }) do
+			t.ok(Modelos.escolher(id, 0) ~= nil, id)
+		end
+	end,
+	["voador bate as asas em lados opostos (roll) e as pernas quase não andam"] = function(t)
+		local c = { tipo = "voador", fase = 0, mov = 0, t = 0.1 }
+		local _, _, re = Anim.pose("BracoE", c)
+		local _, _, rd = Anim.pose("BracoD", c)
+		t.ok(re ~= nil and rd ~= nil and math.abs(re + rd) < 1e-6 and math.abs(re) > 0.05)
+		local _, _, sem = Anim.pose("Corpo", c)
+		t.eq(sem, nil)
+	end,
 }

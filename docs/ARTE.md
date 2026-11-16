@@ -51,3 +51,31 @@ Interface da luta com arte pintada, no espírito do HUD de Clair Obscur: Expedit
 ## Créditos dos ícones (CC BY 3.0)
 
 Ícones de [game-icons.net](https://game-icons.net) (repositório github.com/game-icons/icons), licença Creative Commons Attribution 3.0 (<https://creativecommons.org/licenses/by/3.0/>). Autores: **Lorc**, **Delapouite**, **Skoll**, **Willdabeast**, **Carl Olsen**, **sbed** (CC BY 3.0) e **Zeromancer** (heart-plus; CC0 no site). A fonte de cada ícone do atlas está em `build/arte/hud/icones.json` (campo `fonte`, `autor/arquivo`). Alterações: fundo removido, cor branca e recorte em atlas.
+
+# Criaturas Quaternius na luta (MOD3)
+
+Pipeline: `python tools/criaturas_quaternius.py` (Blender: `tools/blender/kits/criaturas_quaternius.py`) lê os FBX de
+`build/externos/{monster-pack,easy-enemy}`, põe o modelo na pose do clipe Idle, divide cada polígono pelo osso de maior peso
+em partes rígidas (Corpo, Cabeca, BracoE/D, PernaE/D, Cauda) e grava `build/criaturas/<Modulo>.fbx|.json|.png` no contrato de
+`tools/blender/criaturas.py` (grupos `<Parte>_<Cor>`, `pivos` em coordenadas Roblox). Os pivôs vão a `Shared/Mundo/PivosModelos`
+(`gravar_pivos`). Prancha: `python tools/blender/kits/prancha.py build/criaturas build/beleza/modelos/prancha.jpg`.
+Fontes e licença: `tools/blender/kits/FONTES.md` (CC0 declarada; confirmar na página, o zip não traz arquivo).
+
+**Animação (decisão com evidência).** As curvas do pacote não foram convertidas: o esqueleto não sobrevive ao envio
+(`roblox_upload` só manda MeshParts) e animação de outro dono não toca (docs/DIRECAO.md §5). As criaturas usam o
+`AnimacaoCriatura` já existente (respirar, andar por pernas/patas, golpe, tombar) sobre as peças rígidas; novo tipo
+`voador` (asas batem em roll). Clipes Luau a partir das curvas ficam como melhoria futura.
+
+**Mapeamento.** rato-gigante -> RatoQuaternius; aranha-da-floresta -> AranhaQuaternius; esqueleto-andarilho -> EsqueletoQuaternius;
+serpente-de-fogo -> SerpenteQuaternius (sem fogo); dragao-azul -> DragaoQuaternius. Convertidos sem criatura no jogo: Slime,
+Morcego, Sapo, Vespa. **Sem correspondente:** lobo-cinzento, goblin-batedor, urso, bandido, treant, golem (ficam os blocos;
+Orc/Humano do Kenney em `build/kits/criaturas` são estáticos e não foram ligados).
+
+**Ligação e fallback.** `ModelosCriaturas.escolher(id, variante, existe)` usa o campo `preferido` só se `existe(modulo)`
+(MontarModelo.existe); sem o módulo em `server/Mundo/Modelos`, segue o modelo de blocos. **Falta o envio:** a chave Open Cloud
+em `~/.moshoku/roblox_api_key.txt` respondeu "Invalid API Key" (15/11) e o Studio estava ocupado. Com chave válida e Studio livre:
+`python tools/criaturas_quaternius.py --studio` (envia, recolore, exporta `Modelos/*.luau`) e `python tools/studio_sync.py`.
+
+**Notas (renders do Blender, sem Studio).** Rato 7,5; Aranha 8; Esqueleto 7,5 (cor lisa de osso); Serpente 8; Sapo 8;
+Slime 7; Morcego 7,5; Vespa 8; Dragão 6,5 (mais morcego grande que dragão). Triângulos: rato 4000, sapo 4900, aranha 2700
+(acima do orçamento de 2500; decimar se pesar). Cor sRGB vem do material e passa por `SATURACAO`/`VALOR` do script.

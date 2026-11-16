@@ -26,3 +26,12 @@ Crédito a Kenney e Quaternius fica como cortesia (colocar nos créditos do jogo
   `catalogo.py`.
 - Criaturas do esgoto (rato, slime, morcego, aranha, esqueleto): nenhum pacote direto. Só orc e humano do Mini Dungeon.
   O rato atual continua o de `tools/blender/criaturas.py`.
+
+## Criaturas Quaternius (MOD3, 15/11/2026)
+
+| Pacote | Origem | Licença | Uso |
+|---|---|---|---|
+| Monster Pack Animated by Quaternius (Bat, Dragon, Skeleton, Slime) | `build/externos/Monster Pack Animated by Quaternius.zip` (baixado pelo coordenador; extraído em `build/externos/monster-pack/`) | CC0 segundo o autor; **o zip não traz arquivo de licença** e a página consultada (quaternius.com) não a mostra no texto: o coordenador deve confirmar a licença na página do pacote | criaturas da luta |
+| Easy Animated Enemy Pack - Jan 2019 (Frog, Rat, Snake, Snake_angry, Spider, Wasp) | `build/externos/Easy Animated Enemy Pack - Jan 2019.zip` (extraído em `build/externos/easy-enemy/`) | idem (CC0 declarada, sem arquivo no zip) | criaturas da luta |
+
+Só os FBX são lidos (malha + pesos); as animações do pacote não são usadas. Crédito a Quaternius como cortesia.

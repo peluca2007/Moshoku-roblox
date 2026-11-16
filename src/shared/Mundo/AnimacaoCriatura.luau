@@ -3,7 +3,7 @@
 -- Pitch positivo balança a ponta do membro para a FRENTE (-Z); yaw positivo gira a cabeça para -X.
 --
 -- Contexto `c`:
---   tipo        "humanoide" | "quadrupede" | "aranha" | "pesado"
+--   tipo        "humanoide" | "quadrupede" | "aranha" | "pesado" | "voador" (asas = BracoE/BracoD batem em roll)
 --   fase        fase da passada (rad, avança com a distância andada)
 --   mov         0..1 quanto está andando (suavizado por quem chama)
 --   t           tempo em segundos (respiração, cauda)
@@ -17,8 +17,9 @@ local AMPLITUDE = {
 	quadrupede = { perna = 0.5, braco = 0.5, bob = 0.07 },
 	aranha = { perna = 0.4, braco = 0.0, bob = 0.04 },
 	pesado = { perna = 0.3, braco = 0.25, bob = 0.06 },
+	voador = { perna = 0.15, braco = 0.0, bob = 0.05 },
 }
-local LUNGE = { humanoide = 0.6, quadrupede = 1.0, aranha = 0.8, pesado = 0.8 }
+local LUNGE = { humanoide = 0.6, quadrupede = 1.0, aranha = 0.8, pesado = 0.8, voador = 0.7 }
 
 AnimacaoCriatura.DURACAO_GOLPE = 0.9
 
@@ -49,7 +50,8 @@ function AnimacaoCriatura.corpo(c)
 	return dy, dz
 end
 
--- Rotação (pitch em X, yaw em Y) de um grupo; grupos sem animação devolvem 0, 0.
+-- Rotação (pitch em X, yaw em Y, roll opcional em Z) de um grupo; grupos sem animação devolvem 0, 0.
+-- Só o tipo "voador" usa o roll: BracoE (+X) sobe com roll positivo, BracoD (-X) com negativo.
 -- "Arma" acompanha o braço que a segura: o chamador usa o pivô desse braço e a pose dele.
 function AnimacaoCriatura.pose(grupo, c)
 	local a = amplitude(c)
@@ -64,6 +66,10 @@ function AnimacaoCriatura.pose(grupo, c)
 	elseif grupo == "PernaD" then
 		local extra = if golpe and tipo == "aranha" then -0.5 * math.sin(math.pi * golpe) else 0
 		return -passo * a.perna + extra, 0
+	elseif tipo == "voador" and (grupo == "BracoE" or grupo == "BracoD") then
+		local ritmo = 7 + 6 * mov + (if golpe then 4 else 0)
+		local batida = math.sin((c.t or 0) * ritmo) * (0.45 + 0.15 * mov)
+		return 0, 0, if grupo == "BracoE" then batida else -batida
 	elseif grupo == "BracoE" or grupo == "BracoD" or grupo == "Arma" then
 		local dono = if grupo == "Arma" then c.bracoArma else grupo
 		if not dono then return 0, 0 end

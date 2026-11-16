@@ -97,8 +97,8 @@ function CriaturaAnimada:atualizar(dt, cf, andando, velocidade, olharPara, agora
 		if queda or not g.pivo then
 			pose = CFrame.identity
 		else
-			local pitch, yaw = Anim.pose(g.grupo, c)
-			pose = CFrame.new(g.pivo) * CFrame.Angles(pitch, yaw, 0) * CFrame.new(-g.pivo)
+			local pitch, yaw, roll = Anim.pose(g.grupo, c)
+			pose = CFrame.new(g.pivo) * CFrame.Angles(pitch, yaw, roll or 0) * CFrame.new(-g.pivo)
 		end
 		cfs[i] = topo * deslocamento * pose * self.locais[i]
 	end

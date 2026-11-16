@@ -106,25 +106,30 @@ def main():
     ap.add_argument("--semente", default="1")
     ap.add_argument("--flores", default="0")
     ap.add_argument("--variante", default="trilhos")
+    ap.add_argument("--fbx", default="", help="FBX+JSON já prontos (kits/criaturas Quaternius, MOD3): pula o Blender de modelos.py")
+    ap.add_argument("--autor", default="Blender (tools/blender/modelos.py)")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
 
-    saida = os.path.join(ROOT, "build", "blender", args.modulo + ".fbx")
+    saida = os.path.abspath(args.fbx) if args.fbx else os.path.join(ROOT, "build", "blender", args.modulo + ".fbx")
     previa = os.path.join(ROOT, "build", "blender", args.modulo + ".png")
-    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "blender_rodar.py"),
-                        os.path.join(ROOT, "tools", "blender", "modelos.py"),
-                        "--modelo", args.modelo, "--semente", args.semente, "--flores", args.flores,
-                        "--variante", args.variante, "--saida", saida, "--previa", previa],
-                       capture_output=True, text=True, encoding="utf-8", errors="replace")
-    if r.returncode != 0 or not os.path.isfile(saida):
-        sys.exit("Blender falhou:\n" + r.stdout[-1500:] + r.stderr[-800:])
+    if not args.fbx:
+        r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "blender_rodar.py"),
+                            os.path.join(ROOT, "tools", "blender", "modelos.py"),
+                            "--modelo", args.modelo, "--semente", args.semente, "--flores", args.flores,
+                            "--variante", args.variante, "--saida", saida, "--previa", previa],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if r.returncode != 0 or not os.path.isfile(saida):
+            sys.exit("Blender falhou:\n" + r.stdout[-1500:] + r.stderr[-800:])
+    elif not os.path.isfile(saida):
+        sys.exit("FBX não encontrado: " + saida)
     lateral = os.path.splitext(saida)[0] + ".json"
     with open(lateral, encoding="utf-8") as f:
         dados = json.load(f)
     dados["nome"] = args.modulo
 
     registro = carregar_registro()
-    hash_atual = chave_cache(args)
+    hash_atual = sha(saida) if args.fbx else chave_cache(args)
     entrada = registro.get(args.modulo)
     if entrada and entrada.get("sha256") == hash_atual:
         asset = entrada["asset"]
@@ -148,7 +153,7 @@ def main():
         cliente.close()
     caminho = f"ServerStorage.BlenderProntos.{args.modulo}"
     r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "exportar_modelo.py"), caminho, args.modulo,
-                        "--asset", asset, "--autor", "Blender (tools/blender/modelos.py)",
+                        "--asset", asset, "--autor", args.autor,
                         "--nome", f"{args.modelo} semente {args.semente}"],
                        capture_output=True, text=True, encoding="utf-8", errors="replace")
     print(r.stdout.strip()[-600:])
@@ -184,4 +189,5 @@ def gravar_pivos(modulo, pivos):
     print(f"[{modulo}] pivôs gravados em {PIVOS}")
 
 
-main()
+if __name__ == "__main__":
+    main()

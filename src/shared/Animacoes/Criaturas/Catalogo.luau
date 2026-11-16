@@ -1,0 +1,14 @@
+-- Gerado por tools/blender/kits/criaturas_clipes.py (ANIM2). Índice dos clipes por criatura: Catalogo[modulo] = dados.
+local Shared = game:GetService("ReplicatedStorage").Shared
+
+return {
+	AranhaQuaternius = require(Shared.Animacoes.Criaturas.AranhaQuaternius),
+	DragaoQuaternius = require(Shared.Animacoes.Criaturas.DragaoQuaternius),
+	EsqueletoQuaternius = require(Shared.Animacoes.Criaturas.EsqueletoQuaternius),
+	MorcegoQuaternius = require(Shared.Animacoes.Criaturas.MorcegoQuaternius),
+	RatoQuaternius = require(Shared.Animacoes.Criaturas.RatoQuaternius),
+	SapoQuaternius = require(Shared.Animacoes.Criaturas.SapoQuaternius),
+	SerpenteQuaternius = require(Shared.Animacoes.Criaturas.SerpenteQuaternius),
+	SlimeQuaternius = require(Shared.Animacoes.Criaturas.SlimeQuaternius),
+	VespaQuaternius = require(Shared.Animacoes.Criaturas.VespaQuaternius),
+}

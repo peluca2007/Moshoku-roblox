@@ -736,7 +736,7 @@ def compor(arquivos, destino, fundo_topo=(232, 226, 214), fundo_base=(198, 190, 
     out = bpy.data.images.new("folha", W, H, alpha=False)
     out.pixels.foreach_set(tela.ravel())
     out.filepath_raw = destino
-    out.file_format = "PNG"
+    out.file_format = "JPEG" if destino.lower().endswith((".jpg", ".jpeg")) else "PNG"
     out.save()
     print("FOLHA", destino)
 

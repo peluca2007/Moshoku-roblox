@@ -125,6 +125,24 @@
   "semente": "1",
   "sha256": "d52f2480e786cb1ea0b32db4754b28ed107e4ea77d889f6a4c79c85e669b111e"
  },
+ "BarbaAna1": {
+  "asset": "107590401656768",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "612778993cae167d85068919eba0ab4819f321ad280d65c2baeb0b502fcfe2ab"
+ },
+ "BarbaCavanhaque1": {
+  "asset": "132677761218909",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "2144e340a9374790c37b1aa2d5a64af98d785304e61de23d3e3ed1c351d429e9"
+ },
+ "BarbaCurta2": {
+  "asset": "90623777955711",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "1b4cf61072d6850ff25f6d545c95ad96cfa439a8db0c9389578cf0607aaccb7c"
+ },
  "BarbaLonga1": {
   "asset": "111752327127564",
   "modelo": "barbatrancada",
@@ -137,11 +155,35 @@
   "semente": "1",
   "sha256": "6d66580024ad91d0e555b1496129eb3b4408405806de193f424a5e3054642ded"
  },
+ "CabeloBob1": {
+  "asset": "100878986069749",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "460a51bda8714934ba3bbf4c38da56759c96f93249855903f6b8185129d18b60"
+ },
+ "CabeloCoque1": {
+  "asset": "103986158099624",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "09c41631b434312bf4edb44ae941297f759a46016824bf5677d2c9ac260f4172"
+ },
  "CabeloCurto1": {
   "asset": "123121495222480",
   "modelo": "cabelocurto",
   "semente": "1",
   "sha256": "73fcdcea67fb74ec3569d481376d1d981739c3a72e3ef9e8049b93af2c26d96d"
+ },
+ "CabeloCurto2": {
+  "asset": "114423861253350",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "f787266b0d37764f941262f2f102372ce0064c365c37b869dc3bc54597f3619e"
+ },
+ "CabeloEspetado1": {
+  "asset": "84366334673415",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "5f7e9ee93a8674a5c930e942538e37ed0efd0e12e21d687a801015c3ccfad02b"
  },
  "CabeloLongo1": {
   "asset": "138692928099685",
@@ -149,11 +191,35 @@
   "semente": "1",
   "sha256": "74000a2d0153e8b9a085271bb8c45577b7cebb429fb9e28f18c19d4e70e72a8d"
  },
+ "CabeloLongo2": {
+  "asset": "87808378773032",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "f42b525fde256364e4df9433a7b87e592445528fa2531ee902d65059dbc47552"
+ },
+ "CabeloMasculino1": {
+  "asset": "86298190334558",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "a687009ccb815ab624be2e325bc599a4987df014c2fe677fb9714293ed6ff3aa"
+ },
+ "CabeloRabo1": {
+  "asset": "72645085999882",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "7b66e215fd7ea4b48232958209e60b65f596737897475ca4ecc889fca67b1df1"
+ },
  "CabeloTrancado1": {
   "asset": "110992475990035",
   "modelo": "cabelotrancado",
   "semente": "1",
   "sha256": "1d04635e18604970929eaa1ec2f816fc626732a6189e3a5063ae5e27b05fa626"
+ },
+ "CabeloTrancas1": {
+  "asset": "81029381070557",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "d20d45fe5671e0cb72e5bc14c289d28d5737644d69cc27e844d34856d978c9b9"
  },
  "Caixotes": {
   "asset": "132468201544077",
@@ -539,11 +605,23 @@
   "semente": "1",
   "sha256": "c560d8d35e4861d031ff3fb44a0f39d4e963c78fd477cd3ad0eb50bcb5a8b07e"
  },
+ "OrelhasBestiais2": {
+  "asset": "73613383820638",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "7d242d7494fda78619b718bfc22598f3c50704d7aa34f1c0a21c974c3301371f"
+ },
  "OrelhasElficas": {
   "asset": "102437848323356",
   "modelo": "orelhaselfo",
   "semente": "1",
   "sha256": "6ffaff205e5228b1c03a61d4ce3b84e71755b5b3277ac1cf00e4dbe7f5afbcf8"
+ },
+ "OrelhasElficas2": {
+  "asset": "116243691556429",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "a09361fe438f5762ac7534cb3b115d5f243d6530556221bcc58a2ea737e71736"
  },
  "Palicada": {
   "asset": "94800365329188",
@@ -623,17 +701,41 @@
   "semente": "1",
   "sha256": "2bac86cfc0ea3948e1ab6ff72c9fc478dbb433c4f24f04cea36027a8e1729a4a"
  },
+ "RoupaCapaCurta1": {
+  "asset": "139770322376026",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "769a9073a8d3a6f3024cdb6568197ad8d33abcfe57e0d8e345710561fdcf40b5"
+ },
  "RoupaCapuz1": {
   "asset": "71400160394371",
   "modelo": "capuzbasico",
   "semente": "1",
   "sha256": "7c44ac5ce3243e99970afdc2f9b931a7eb9bef5c726001179b0299fe6eb2698d"
  },
+ "RoupaCapuz2": {
+  "asset": "129537703145080",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "089f4f416f015b91803fa7b6849f230f37942bf521c8145f31a419f6caf6493c"
+ },
  "RoupaCinto1": {
   "asset": "125652348489825",
   "modelo": "cintobasico",
   "semente": "1",
   "sha256": "1dbc5f2c04e95e4ecd5507135db12df58526d82e15d27a0c2d2d07d2c979c9f5"
+ },
+ "RoupaCintoBolsa1": {
+  "asset": "81257005283823",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "971dcad248ae3a37069d05296c6d97f6ed888a79b8426de674d641cf5b9e7492"
+ },
+ "RoupaOmbreira1": {
+  "asset": "93610142375311",
+  "modelo": "personagem",
+  "semente": "1",
+  "sha256": "c6c4b5350bc42581866b25d2ea32b40813740930cac9ff202ee2a5b45c0984b2"
  },
  "RoupaTunica1": {
   "asset": "137656785012740",

@@ -18,7 +18,38 @@ Personagem.CONJUNTOS = {
 -- PERS3: rostos pintados (PNG 512x512 com transparência, Decal na cabeça) em 3 estilos x 8 cores de olho, enviados como
 -- Decal pela rota do Studio; id = Texture da imagem. Vazio = rosto de blocos (Catalogo.ROSTO), como antes.
 -- Ex.: Personagem.ROSTOS.neutro.OlhoAzul = "rbxassetid://123". Arquivos: build/personagem/rostos/rosto_<estilo>_<OlhoXxx>.png
-Personagem.ROSTOS = { neutro = {}, alegre = {}, serio = {} }
+Personagem.ROSTOS = {
+	neutro = {
+		OlhoAzul = "rbxassetid://134199048162915",
+		OlhoCastanho = "rbxassetid://112311815656153",
+		OlhoDourado = "rbxassetid://128408527998825",
+		OlhoNegro = "rbxassetid://116722672480538",
+		OlhoTurquesa = "rbxassetid://85903743548214",
+		OlhoVerde = "rbxassetid://76840367671652",
+		OlhoVermelho = "rbxassetid://84294286224261",
+		OlhoVioleta = "rbxassetid://99703153368601",
+	},
+	alegre = {
+		OlhoAzul = "rbxassetid://81348637708344",
+		OlhoCastanho = "rbxassetid://128796447536381",
+		OlhoDourado = "rbxassetid://105272146359165",
+		OlhoNegro = "rbxassetid://84133276620541",
+		OlhoTurquesa = "rbxassetid://139772441692989",
+		OlhoVerde = "rbxassetid://105957369499988",
+		OlhoVermelho = "rbxassetid://126232782917635",
+		OlhoVioleta = "rbxassetid://81028372429631",
+	},
+	serio = {
+		OlhoAzul = "rbxassetid://78858948914571",
+		OlhoCastanho = "rbxassetid://89588070570103",
+		OlhoDourado = "rbxassetid://134178187599281",
+		OlhoNegro = "rbxassetid://78485290631751",
+		OlhoTurquesa = "rbxassetid://93695126949528",
+		OlhoVerde = "rbxassetid://129294689952051",
+		OlhoVermelho = "rbxassetid://92059996535444",
+		OlhoVioleta = "rbxassetid://77878014070848",
+	},
+}
 
 -- Estilo do rosto pintado que mais se aproxima das escolhas do jogador (olhos/sobrancelhas/boca do catálogo de blocos).
 local SERIO = { OlhoBravo = true, OlhoSonolento = true, SobrancelhaSeria = true, BocaTriste = true, BocaPresas = true }

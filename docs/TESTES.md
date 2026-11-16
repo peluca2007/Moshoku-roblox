@@ -1,3 +1,7 @@
+## Botão Habilidades vazio na luta (Claude, 15/11/2026)
+
+Studio, `qa.py esgoto_sala1 --manter-play` + clique real em `AcoesDoTurno.Menu.Habilidades`: antes, a lista abria na aba Golpes (0 cartas para o Ladino) e fechava sozinha; depois da correção em `client/AcoesDoTurno` abre na aba Apoio com 5 cartas. Mesmo teste no HUD2 (`hud2-expedition` mesclado localmente em `previa-hud2`, com a mesma correção): 5 cartas. Capturas em `build/beleza/`. `testar.ps1`: só "Catálogo" falha (ambiente, sem `tsx` no site).
+
 ## Suíte de QA no Studio — QA1 (agente Sonnet, 15/11/2026)
 
 - Como rodar: `python tools/qa/qa.py <cenário|todos>` (cenários e limites em `tools/qa/README.md`). Uma linha `OK`/`FALHA` por verificação e `RESULTADO` no fim.

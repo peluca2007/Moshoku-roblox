@@ -482,6 +482,12 @@ function AcoesDoTurno.start(state)
 			registro.pintar()
 		end
 		atacar.Visible, habilidades.Visible = temAtaque, temHabilidade
+		-- Aba vazia (ex.: só habilidades de Apoio e a aba é Golpes): passa à primeira aba com cartas em vez de
+		-- fechar a lista, que antes sumia no clique em Habilidades sem mostrar nada.
+		if modoLista == "habilidades" and visiveis == 0 and contagens.Tudo > 0 then
+			grupo = if contagens.Golpes > 0 then "Golpes" elseif contagens.Apoio > 0 then "Apoio" else "Tudo"
+			return atualizar()
+		end
 		atacar.Marca.Visible, habilidades.Marca.Visible = modoLista == "atacar", modoLista == "habilidades"
 		local registroMira = mira and cartas[mira.habilidadeId]
 		confirmar.Visible = registroMira ~= nil and (mira.modo == "confirmar" or mira.modo == "lista" or mira.ponto ~= nil)

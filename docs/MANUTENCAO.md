@@ -10,6 +10,10 @@ Patrulha encosta → Luta da mesa (motor da sala) no tabuleiro com o cenário da
 | Patrulha → arena e layout de cada arena (props, criaturas espreitando, moradores, ponto do mapa para a luz) | `shared/Mundo/ArenasDados.luau`: `daPatrulha` (`definicao.arena` > id > zona). Cidade = ratos do celeiro/horta; campo = goblin do campo, passagem e patrulha antiga da clareira; floresta = Floresta Sombria; ruínas = Ruínas do Vale. Nova arena: acrescentar layout em `LAYOUTS` e o mapeamento. |
 | Montagem e troca do cenário em volta do tabuleiro | `server/Mundo/ArenaCenario.luau` (`preparar` monta as quatro arenas no início do servidor, uma por quadro; `aplicar(arenaId | nil)`); moradores usam `Mundo/Npcs.criarCorpo` |
 | Luz da arena (segue a região e a hora da run, não a noite da sala) | `client/AmbienteMundo.pontoDaArena` lê `Mesa.ArenaRegional` e usa `ArenasDados.pontoDoMundo` |
+| Retoque de luz durante a luta (contraste, tom quente, névoa, bloom, desfoque ao longe); some ao sair da arena | `shared/Mundo/PerfilLuta.aplicar`, chamado por `client/AmbienteMundo` quando há arena; spec `PerfilLuta.spec` |
+| Chão da arena com material gerado (esgoto: `EsgotoPedra`) | `ArenasDados.VARIANTES` (ids dos mapas) + `variante` no layout; o `MaterialVariant` real fica em `default.project.json` (MaterialService), pois script não grava `ColorMap`; `ArenaCenario.propsMaterial` usa-o ou cai no material nativo |
+| Linha curta de efeito nas cartas da luta (sem texto técnico) | `client/UI/ResumoCarta.curto`; texto completo segue em `DescricaoHabilidade` |
+| Separação das barras/nomes sobre os combatentes | `client/BarrasLuta.separar` |
 | Tela de resultado só com "Continuar" e o ouro ganho | evento `encontro` com `mundo = true`; ouro/PA chegam depois em `recompensaMundo` (`LutaDoMundoServico.pagar` → `deps.avisarRecompensa`, ligado em `server.server`); `client/ResultadoView` |
 | Snapshot ao começar a luta (sem remoto, o despachante não envia) | `deps.mudou()` em `EncontroService.iniciarLutaDoMundo` |
 | Recompensa (Apêndice G da criatura) | `Regras/RecompensaEncontro.daCriatura` + `gerar` |

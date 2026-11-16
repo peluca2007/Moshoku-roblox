@@ -3,6 +3,7 @@ local Shared = game:GetService("ReplicatedStorage").Shared
 local Catalogo = require(Shared.Aparencia.Catalogo)
 local Racas = require(Shared.Aparencia.Racas)
 local Encaixe = require(script.Parent.EncaixeCosmetico)
+local Personagem = require(script.Parent.Personagem)
 local Visual = {}
 local function cor(id)
 	local c = Catalogo.CORES[id]
@@ -10,22 +11,40 @@ local function cor(id)
 end
 Visual.cor = cor -- cores cosméticas do catálogo; não são tokens de interface
 
-function Visual.descrever(a, raceId)
+-- extras.cabeloAvatar: ids de HairAccessory do avatar do jogador (só quando Personagem.CABELO_DO_AVATAR).
+function Visual.descrever(a, raceId, extras)
 	local d = Instance.new("HumanoidDescription") -- vazio: sem roupas/acessórios do usuário
 	for _, campo in { "Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg", "Face", "Shirt", "Pants", "GraphicTShirt" } do d[campo] = 0 end
 	local e = Racas.POR_ID[raceId].escala
 	d.HeightScale, d.WidthScale, d.DepthScale, d.HeadScale = e.altura, e.largura, e.profundidade, e.cabeca
 	d.BodyTypeScale, d.ProportionScale = 0, 0
+	if Personagem.CABELO_DO_AVATAR and extras and type(extras.cabeloAvatar) == "string" then d.HairAccessory = extras.cabeloAvatar end
 	d.HeadColor, d.LeftArmColor, d.RightArmColor = cor(a.cores.pele), cor(a.cores.pele), cor(a.cores.pele)
 	d.TorsoColor, d.LeftLegColor, d.RightLegColor = cor(a.cores.camisa), cor(a.cores.calca), cor(a.cores.calca)
 	return d
+end
+
+-- Cabelo do avatar mantido pela descrição: recolore pela cor da criação (ou deixa como está se não aceitar).
+local function recolorirCabelo(corpo, cor3)
+	for _, acc in corpo:GetChildren() do
+		if acc:IsA("Accessory") and acc.AccessoryType == Enum.AccessoryType.Hair then
+			local h = acc:FindFirstChild("Handle")
+			if h then
+				local m = h:FindFirstChildOfClass("SpecialMesh")
+				local classe = if m then "SpecialMesh" else h.ClassName
+				local e = Personagem.estrategiaCabelo(classe, h:FindFirstChildOfClass("SurfaceAppearance") ~= nil)
+				if e == "vertex" then m.VertexColor = Vector3.new(cor3.R, cor3.G, cor3.B)
+				elseif e == "cor" then h.TextureID = ""; h.Color = cor3 end
+			end
+		end
+	end
 end
 
 local function limpar(corpo)
 	local antiga = corpo:FindFirstChild("AparenciaMoshoku")
 	if antiga then antiga:Destroy() end
 	for _, obj in corpo:GetChildren() do
-		if obj:IsA("Accessory") or obj:IsA("Shirt") or obj:IsA("Pants") or obj:IsA("ShirtGraphic") then obj:Destroy() end
+		if (obj:IsA("Accessory") and not (Personagem.CABELO_DO_AVATAR and obj.AccessoryType == Enum.AccessoryType.Hair)) or obj:IsA("Shirt") or obj:IsA("Pants") or obj:IsA("ShirtGraphic") then obj:Destroy() end
 	end
 end
 
@@ -35,10 +54,13 @@ function Visual.decorar(corpo, a, raceId)
 	local head = corpo:FindFirstChild("Head")
 	if not head or not head:IsA("BasePart") then return end
 	for _, obj in head:GetChildren() do
-		if obj:IsA("Decal") or obj:IsA("SpecialMesh") or obj:IsA("SurfaceAppearance") then obj:Destroy() end
+		-- Cabeça redonda padrão: só o rosto pintado antigo sai; a malha fica (PERS2).
+		if obj:IsA("Decal") or obj:IsA("SurfaceAppearance") or (Personagem.CABECA_CUBICA and obj:IsA("SpecialMesh")) then obj:Destroy() end
 	end
 	local escala = Racas.POR_ID[raceId].escala.cabeca
-	head.Size = Vector3.new(escala, escala, escala) -- cubo real, inclusive com cabeça clássica
+	if Personagem.CABECA_CUBICA then head.Size = Vector3.new(escala, escala, escala) end -- boneco antigo
+	local malha = head:FindFirstChildOfClass("SpecialMesh")
+	local medidas = Personagem.medidasCabeca(head.Size, if malha then malha.Scale else nil)
 	head.Color = cor(a.cores.pele)
 	local pasta = Instance.new("Folder")
 	pasta.Name, pasta.Parent = "AparenciaMoshoku", corpo
@@ -52,12 +74,20 @@ function Visual.decorar(corpo, a, raceId)
 		for i, bloco in Catalogo.ROSTO[categoria][estilo] do
 			local p = Instance.new("Part")
 			p.Name = categoria .. tostring(i)
-			local t, v = bloco.tamanho, bloco.posicao
-			p.Size = Vector3.new(t.x * escala / 2, t.y * escala, t.z * escala)
-			p.CFrame = head.CFrame * CFrame.new(v.x * escala / 2, v.y * escala, v.z * escala)
+			local tamanho, posicao = Personagem.blocoDoRosto(bloco, medidas, escala)
+			p.Size = tamanho
+			p.CFrame = head.CFrame * CFrame.new(posicao)
 			p.Color, p.Material = cores[bloco.papel], Enum.Material.SmoothPlastic
 			p.Parent = pasta
 		end
+	end
+	-- Roupa do jogo: moldes clássicos pintados, quando já enviados; vazio = cor de torso/pernas (fallback).
+	local camisa, calca = Personagem.moldes(Personagem.conjuntoDe(a))
+	if camisa then
+		local c = Instance.new("Shirt"); c.Name, c.ShirtTemplate, c.Parent = "CamisaMoshoku", camisa, corpo
+	end
+	if calca then
+		local c = Instance.new("Pants"); c.Name, c.PantsTemplate, c.Parent = "CalcaMoshoku", calca, corpo
 	end
 	-- A mesma configuração de colisão/massa/soldas dos treinadores.
 	Encaixe.configurarPecas(pasta, head, "RostoBlocos")
@@ -65,9 +95,10 @@ function Visual.decorar(corpo, a, raceId)
 		if not item or not item.modulo then return end
 		for _, ponto in item.encaixes or { item.encaixe } do
 			local c = { modulo = item.modulo, parte = ponto.parte, offset = ponto.offset }
-			Encaixe.montar(corpo, c, pasta, escala, tint)
+			Encaixe.montar(corpo, c, pasta, medidas.altura, tint) -- altura real da cabeça (= escala se cúbica)
 		end
 	end
+	if Personagem.CABELO_DO_AVATAR then recolorirCabelo(corpo, cor(a.cores.cabelo)) end
 	montar(Catalogo.CABELOS[a.cabelo], cor(a.cores.cabelo))
 	montar(Catalogo.BARBAS[a.barba], cor(a.cores.cabelo))
 	for _, id in Racas.POR_ID[raceId].obrigatorias do montar(Catalogo.PECAS[id]) end

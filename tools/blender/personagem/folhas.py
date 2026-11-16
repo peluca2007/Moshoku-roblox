@@ -90,7 +90,7 @@ def colocar(b, x, rot=0.0, pose=None, com_arma=False, y=0.0):
 POSE_GOLPE = ("CorteLeve", 0.40)
 
 
-def fileira(itens, titulo, arquivo, largura_px=2400, esp=3.9, elev=8.0, altura=8.4):
+def fileira(itens, titulo, arquivo, largura_px=2400, esp=3.9, elev=8.0, altura=8.4, margem=0.0):
     """itens = [(boneco, rotulo, rot, pose|None, arma)] numa fileira, câmera ortográfica frontal."""
     C.limpar()
     _imgs.clear()
@@ -109,7 +109,7 @@ def fileira(itens, titulo, arquivo, largura_px=2400, esp=3.9, elev=8.0, altura=8
         x = x0 + xi
         colocar(b, x, rot, pose, com_arma)
         C.texto(rot_lbl, (x, -1.6, -0.55), 0.3, elevacao=elev)
-    largura = xs[-1] + esp + 0.6
+    largura = xs[-1] + esp + 0.6 + margem
     if titulo:
         C.texto(titulo, (x0 - esp / 2 + 0.3, -1.6, altura - 1.55), 0.42, alinhar="LEFT", elevacao=elev, cor=(110, 36, 30))
     alt_px = int(largura_px * altura / largura)
@@ -291,6 +291,40 @@ def folha_comparacao():
     C.compor(arqs, os.path.join(C.SAIDA, "comparacao.png"))
 
 
+# ====================================================================================== prancha (PERS2)
+def folha_prancha():
+    """build/beleza/personagem/prancha.jpg: classes e raças principais, de frente e de lado, em pose de luta."""
+    golpe = C.pose_de_clipe(*POSE_GOLPE)
+    arqs = []
+
+    def classes():
+        itens = []
+        for conj, cab, cc, pele in (("aventureiro", "curto", "castanho", "clara"), ("ladino", "espetado", "preto", "media"),
+                                    ("mago", "longo", "prata", "clara")):
+            b = boneco(conj, cab, None, pele, cc)
+            itens += [(b, RP.CONJUNTOS[conj]["nome"] + " (frente)", -20, golpe, True),
+                      (b, "perfil", -90, golpe, True)]
+        return itens
+    arqs.append(fileira(classes, "Classes: conjuntos do jogo (pano pintado + pecas), pose de luta", "pr_classes.png", esp=3.3, margem=2.4))
+
+    def racas(rot):
+        def f():
+            humano = boneco("aventureiro", "curto", None, "media", "castanho")
+            elfo = boneco("mago", "rabo", "elfo", "elfo", "loiro", escala=(0.92, 0.92, 1.04, 1.0))
+            anao = boneco("aventureiro", "rabo", "ana", "media", "ruivo", escala=(1.12, 1.1, 0.85, 0.95))
+            hobbit = boneco("aventureiro", "espetado", None, "clara", "castanho", escala=(0.9, 0.9, 0.78, 1.05))
+            fera = boneco("ladino", "curto", "fera", "clara", "castanho")
+            ogro = boneco("aventureiro", "curto", None, "escura", "preto", escala=(1.15, 1.12, 1.18, 1.08))
+            return [(b, n, rot, golpe, True) for b, n in
+                    ((humano, "humano"), (elfo, "elfo"), (anao, "anao"), (hobbit, "hobbit"), (fera, "raca-fera"), (ogro, "ogro"))]
+        return f
+    arqs.append(fileira(racas(-25), "Racas (frente): pele pela raca, tracos como acessorios", "pr_racas_f.png", esp=2.6, margem=2.4))
+    arqs.append(fileira(racas(-90), "Racas (perfil)", "pr_racas_p.png", esp=2.6, margem=2.4))
+    destino = os.path.join(C.RAIZ, "build", "beleza", "personagem")
+    os.makedirs(destino, exist_ok=True)
+    C.compor(arqs, os.path.join(destino, "prancha.jpg"))
+
+
 def main():
     resto = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     folha = resto[resto.index("--folha") + 1] if "--folha" in resto else "todas"
@@ -299,6 +333,8 @@ def main():
         folha_estilo(so)
     if folha in ("comparacao", "todas"):
         folha_comparacao()
+    if folha == "prancha":
+        folha_prancha()
 
 
 main()

@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage.Shared
 local Visual = require(Shared.Aparencia.Visual)
 local Racas = require(Shared.Aparencia.Racas)
+local Personagem = require(Shared.Aparencia.Personagem)
 
 local Modelo = {}
 
@@ -19,6 +20,15 @@ function Modelo.criar(aparencia, raceId)
 		parte.Parent = modelo
 	end
 	bloco("Head", 0, 2.5, 0, 1, 1, 1, aparencia.cores.pele)
+	if not Personagem.CABECA_CUBICA then
+		-- Cabeça redonda clássica (PERS2): Part 1x1x1 com SpecialMesh Head; Visual.decorar mede a frente pela escala da malha.
+		local cabeca = modelo.Head
+		local malha = Instance.new("SpecialMesh")
+		malha.MeshType, malha.Scale = Enum.MeshType.Head, Vector3.new(1.25, 1.25, 1.25)
+		malha.Parent = cabeca
+		cabeca.Size = cabeca.Size * (1 / 1.25) * 1.0
+		cabeca.Size = Vector3.new(cabeca.Size.X, cabeca.Size.Y, cabeca.Size.Z)
+	end
 	bloco("UpperTorso", 0, 1.55, 0, 2, 1, 1, aparencia.cores.camisa)
 	bloco("LowerTorso", 0, .8, 0, 2, .5, 1, aparencia.cores.camisa)
 	for _, lado in {{"Left", -1}, {"Right", 1}} do

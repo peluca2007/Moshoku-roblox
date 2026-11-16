@@ -213,6 +213,15 @@ Ideia do Pedro: conjurar magia como **bônus opcional**, nunca obrigatório.
   por ora vale como efeito visual maior. Quem não usa nada conjura normalmente.
 - **Quando:** depois das animações das habilidades (HAB1–HAB3).
 
+### Roda de ações na luta (Pedro, 16/11/2026)
+
+Os comandos do turno passam a abrir numa **roda** (referência de estrutura: Baldur's
+Gate 3), com categorias que abrem as opções: **Golpear** (golpes físicos, corpo a
+corpo ou à distância, conforme a arma equipada), **Habilidades** (magias e técnicas
+aprendidas) e **Ações** (mobilidade e manobras do livro, como andar, disparada,
+escapar, derrubar, interagir; só as que o livro tiver). Substitui o losango de
+comandos do HUD. Ainda não implementado.
+
 ### Decisões em aberto (perguntar ao Pedro com opções e recomendação)
 
 - Nenhuma no momento.

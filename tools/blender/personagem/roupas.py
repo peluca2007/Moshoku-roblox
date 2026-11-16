@@ -542,6 +542,23 @@ def mangas_sino(b):
         b.add(L + "LowerArm", "ouro", f, "mangas", suave=True)
 
 
+def ombreira(b, lado=-1, cor="couro", peca="ombreira"):
+    """Ombreira simples de couro (UpperArm): concha sobre o ombro com aro de metal. lado=-1 direito do personagem."""
+    c = Vector((lado * 1.5, 0.0, 3.82))
+    bm = _bm()
+    C.elipsoide(bm, c, (0.56, 0.56, 0.3), seg=16, aneis=7, filtro=lambda az, el: el > -8)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    bm = C.solidificar(bm, 0.05)
+    b.add("RightUpperArm" if lado < 0 else "LeftUpperArm", cor, bm, peca, suave=True)
+    m = _bm()
+    C.aro(m, c + Vector((0, 0, -0.03)), 0.57, 0.57, 0.035, 0.04, n=20, expo_caminho=2, expo=3, lados=5)
+    b.add("RightUpperArm" if lado < 0 else "LeftUpperArm", "metal", m, peca, suave=True)
+
+
+def capa_curta(b):
+    capa(b, comprimento=1.55, largura=0.95, peca="capa_curta")
+
+
 def cajado(b, pose, pos, rot_z):
     """Cajado na mão direita (apresentação; arma não conta no orçamento do corpo)."""
     import math as _m
@@ -574,7 +591,7 @@ CONJUNTOS = {
         "cores": {"camisa": (222, 206, 168), "colete": (122, 80, 48), "couro": (92, 62, 40), "calca": (92, 84, 62),
                   "bota": (74, 50, 34)},
         "camisa": camisa_aventureiro, "calca": calca_aventureiro,
-        "pecas": [lambda b: cinto(b, z=2.22), lambda b: canos_bota(b, 0.63, "bota"), bolsa_lateral],
+        "pecas": [lambda b: cinto(b, z=2.22), lambda b: canos_bota(b, 0.63, "bota"), bolsa_lateral, ombreira],
         "arma": "espada",
     },
     "ladino": {

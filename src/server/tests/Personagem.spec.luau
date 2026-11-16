@@ -32,4 +32,42 @@ return {
 		t.eq(P.estrategiaCabelo("MeshPart", true), "nenhuma")
 		t.eq(P.estrategiaCabelo("Part", false), "nenhuma")
 	end,
+	["PERS3: estilo do rosto pintado vem das escolhas de blocos"] = function(t)
+		t.eq(P.estiloDoRosto({ olhos = "OlhoQuadrado", sobrancelhas = "SobrancelhaReta", boca = "BocaReta" }), "neutro")
+		t.eq(P.estiloDoRosto({ olhos = "OlhoFeliz", sobrancelhas = "SobrancelhaReta", boca = "BocaSorriso" }), "alegre")
+		t.eq(P.estiloDoRosto({ olhos = "OlhoFeliz", sobrancelhas = "SobrancelhaSeria", boca = "BocaSorriso" }), "serio")
+		t.eq(P.estiloDoRosto(nil), "neutro")
+	end,
+	["PERS3: sem rosto enviado cai nos blocos; com id devolve o decal da cor do olho"] = function(t)
+		local rosto = { olhos = "OlhoQuadrado", sobrancelhas = "SobrancelhaReta", boca = "BocaReta" }
+		t.eq(P.rostoDecal(rosto, "OlhoAzul"), nil)
+		P.ROSTOS.neutro.OlhoAzul = "rbxassetid://1"
+		t.eq(P.rostoDecal(rosto, "OlhoAzul"), "rbxassetid://1")
+		t.eq(P.rostoDecal(rosto, "OlhoVerde"), nil)
+		P.ROSTOS.neutro.OlhoAzul = nil
+	end,
+	["PERS3: malha preferida quando existe; reserva de blocos senao; peca nova so existe em malha"] = function(t)
+		local tudo = function() return true end
+		local nada = function() return false end
+		local curto = C.CABELOS.CabeloCurto1
+		t.eq(P.moduloDe(curto, tudo), "CabeloCurto2")
+		t.eq(P.moduloDe(curto, nada), "CabeloCurto1")
+		t.eq(P.moduloDe(C.CABELOS.CabeloNenhum, tudo), nil)
+		t.eq(P.moduloDe(C.PECAS.RoupaOmbreira1, nada), nil)
+		t.eq(P.moduloDe(C.PECAS.RoupaOmbreira1, tudo), "RoupaOmbreira1")
+	end,
+	["PERS3: catalogo tem 8 cabelos, 3 barbas e pecas novas validas"] = function(t)
+		local n = 0
+		for id in C.CABELOS do if id ~= "CabeloNenhum" then n += 1 end end
+		t.eq(n, 8)
+		local b = 0
+		for id in C.BARBAS do if id ~= "BarbaNenhum" then b += 1 end end
+		t.eq(b, 3)
+		for id, item in { C.CABELOS, C.BARBAS } and C.CABELOS do
+			t.ok(item.modulo ~= nil or id == "CabeloNenhum", "reserva de " .. id)
+		end
+		t.eq(C.PECAS.RoupaCapaCurta1.slot, "costas")
+		t.eq(C.PECAS.RoupaOmbreira1.slot, "ombro")
+		t.eq(C.PECAS.OrelhasElficas.tinge, "pele")
+	end,
 }

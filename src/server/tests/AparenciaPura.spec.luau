@@ -21,7 +21,7 @@ return {
 		t.ok(count(C.ROSTO.olhos)>=9); t.ok(count(C.ROSTO.sobrancelhas)>=6); t.ok(count(C.ROSTO.nariz)>=5); t.ok(C.ROSTO.nariz.NarizNenhum~=nil); t.ok(count(C.ROSTO.boca)>=8)
 		local papeis={olho=true,iris=true,peleEscura=true,boca=true,dente=true}
 		for _,cat in C.ROSTO do for _,blocos in cat do for _,b in blocos do t.ok(papeis[b.papel]); for _,k in {"x","y","z"} do t.eq(type(b.tamanho[k]),"number"); t.eq(type(b.posicao[k]),"number") end end end end
-		for _,p in {C.PECAS,C.CABELOS,C.BARBAS} do for id,v in p do t.ok(v.nome and v.raridade and v.slot and v.encaixe.parte and v.encaixe.offset,id); if id:find("Nenhum") then t.eq(v.modulo,nil) else t.eq(v.modulo,id) end end end
+		for _,p in {C.PECAS,C.CABELOS,C.BARBAS} do for id,v in p do t.ok(v.nome and v.raridade and v.slot and v.encaixe.parte and v.encaixe.offset,id); if id:find("Nenhum") then t.eq(v.modulo,nil) else t.ok(v.modulo==id or v.malha~=nil,id) end end end -- PERS3: reserva de blocos pode ter outro nome (a malha é a peça própria)
 	end,
 	["todos os estilos e cores do catálogo têm nomes de apresentação"] = function(t)
 		for _, categoria in C.ROSTO do

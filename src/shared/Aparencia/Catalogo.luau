@@ -66,18 +66,30 @@ local raras={
 }
 for id, p in PECAS do p.modulo = id end
 for _, e in raras do PECAS[e[1]]={nome=e[1],raridade="rara",slot=e[2],modulo=e[1],encaixe={parte=e[3],offset=e[4]}} end
-local CABELOS=pecas({"CabeloCurto1","CabeloLongo1","CabeloTrancado1","CabeloNenhum"},"cabelo",nil,"Head")
-local BARBAS=pecas({"Barba1","BarbaLonga1","BarbaNenhum"},"barba",nil,"Head")
+local CABELOS=pecas({"CabeloCurto1","CabeloLongo1","CabeloTrancado1","CabeloNenhum","CabeloMasculino1","CabeloRabo1","CabeloEspetado1","CabeloCoque1","CabeloBob1"},"cabelo",nil,"Head")
+local BARBAS=pecas({"Barba1","BarbaLonga1","BarbaNenhum","BarbaCavanhaque1"},"barba",nil,"Head")
 for id,p in CABELOS do p.modulo=if id=="CabeloNenhum" then nil else id end
 for id,p in BARBAS do p.modulo=if id=="BarbaNenhum" then nil else id end
+-- PERS3: malha (Blender, tools/blender/personagem) preferida quando o módulo existe; `modulo` (blocos) é o reserva.
+-- Estilos novos usam o módulo de blocos mais parecido até a malha ser enviada.
+local RESERVA={CabeloMasculino1="CabeloCurto1",CabeloEspetado1="CabeloCurto1",CabeloBob1="CabeloLongo1",CabeloRabo1="CabeloTrancado1",CabeloCoque1="CabeloTrancado1",BarbaCavanhaque1="Barba1"}
+for id,m in RESERVA do (CABELOS[id] or BARBAS[id]).modulo=m end
+for id,m in {CabeloCurto1="CabeloCurto2",CabeloLongo1="CabeloLongo2",CabeloTrancado1="CabeloTrancas1",CabeloMasculino1="CabeloMasculino1",CabeloRabo1="CabeloRabo1",CabeloEspetado1="CabeloEspetado1",CabeloCoque1="CabeloCoque1",CabeloBob1="CabeloBob1"} do CABELOS[id].malha=m end
+for id,m in {Barba1="BarbaCurta2",BarbaLonga1="BarbaAna1",BarbaCavanhaque1="BarbaCavanhaque1"} do BARBAS[id].malha=m end
 local MODULOS={OrelhasElficas={"cabeca","Head"},OrelhasBestiais={"cabeca","Head"},AsasCelestial={"costas","UpperTorso"},CaudaSuperd={"costas","LowerTorso"},ChifresOgro={"cabeca","Head"},}
 for id,v in MODULOS do PECAS[id]={nome=id,raridade="basica",slot=v[1],racial=true,modulo=id,encaixe={parte=v[2],offset={x=0,y=0,z=0}}} end
+-- PERS3: peças em malha. Capuz/cinto simples trocam pela malha; capa curta e ombreira são peças novas.
+PECAS.RoupaCapuz1.malha="RoupaCapuz2"; PECAS.RoupaCinto1.malha="RoupaCintoBolsa1"
+PECAS.OrelhasElficas.malha="OrelhasElficas2"; PECAS.OrelhasElficas.tinge="pele"
+PECAS.OrelhasBestiais.malha="OrelhasBestiais2"; PECAS.OrelhasBestiais.tinge="cabelo"
+for id,v in pecas({"RoupaCapaCurta1"},"costas",nil,"UpperTorso") do PECAS[id]=v; v.modulo=id; v.malha=id; v.soMalha=true end
+for id,v in pecas({"RoupaOmbreira1"},"ombro",nil,"RightUpperArm") do PECAS[id]=v; v.modulo=id; v.malha=id; v.soMalha=true end
 -- Um único módulo de bota é instanciado em cada pé, com soldas independentes.
 PECAS.RoupaBotas1.encaixes={{parte="LeftFoot",offset={x=0,y=0,z=0}},{parte="RightFoot",offset={x=0,y=0,z=0}}}
 for id, nome in {
 	LadinoCapuz="Capuz do Ladino", LadinoMascara="Máscara do Ladino", LadinoCapa="Capa do Ladino", LadinoCinto="Cinto do Ladino",
 	MestraTiara="Tiara da Mestra", MestraManto="Manto da Mestra", MestraObi="Obi da Mestra", MestraCajado="Cajado da Mestra",
-	RoupaTunica1="Túnica básica", RoupaCapuz1="Capuz simples", RoupaCinto1="Cinto simples", RoupaBotas1="Botas simples",
+	RoupaCapaCurta1="Capa curta", RoupaOmbreira1="Ombreira simples", RoupaTunica1="Túnica básica", RoupaCapuz1="Capuz simples", RoupaCinto1="Cinto simples", RoupaBotas1="Botas simples",
 } do PECAS[id].nome = nome end
 -- Rótulos de apresentação: IDs públicos de persistência/rede permanecem intactos.
 local NOMES_ROSTO = {
@@ -98,8 +110,9 @@ for categoria in ROSTO do
 	end
 end
 local NOMES_ESTILO = {
-	CabeloCurto1="Cabelo curto", CabeloLongo1="Cabelo longo", CabeloTrancado1="Cabelo trançado", CabeloNenhum="Sem cabelo",
-	Barba1="Barba curta", BarbaLonga1="Barba longa", BarbaNenhum="Sem barba",
+	CabeloCurto1="Cabelo curto", CabeloLongo1="Cabelo longo", CabeloTrancado1="Tranças", CabeloNenhum="Sem cabelo",
+	Barba1="Barba curta", BarbaLonga1="Barba longa", BarbaNenhum="Sem barba", BarbaCavanhaque1="Cavanhaque",
+	CabeloMasculino1="Curto masculino", CabeloRabo1="Rabo de cavalo", CabeloEspetado1="Cabelo espetado", CabeloCoque1="Cabelo preso", CabeloBob1="Cabelo médio",
 }
 for id, nome in NOMES_ESTILO do
 	local item = CABELOS[id] or BARBAS[id]

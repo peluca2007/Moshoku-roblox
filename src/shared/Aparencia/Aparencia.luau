@@ -19,7 +19,7 @@ function M.validar(a,raceId,possuidos)
 	local permitidas={pele=r.paleta,olho=r.coresOlho,cabelo=r.coresCabelo,camisa=r.coresCamisa,calca=r.coresCalca}
 	for k,lista in permitidas do if not table.find(lista,a.cores[k]) then return false,"cor fora da paleta racial" end end
 	if not validoId(a.cabelo,C.CABELOS) or not validoId(a.barba,C.BARBAS) then return false,"cabelo ou barba inválidos" end
-	if not keys(a.roupas,{cabeca=true,rosto=true,costas=true,cintura=true,mao=true,corpo=true,pes=true}) then return false,"slots inválidos" end
+	if not keys(a.roupas,{cabeca=true,rosto=true,costas=true,cintura=true,mao=true,corpo=true,pes=true,ombro=true}) then return false,"slots inválidos" end
 	for slot,id in a.roupas do
 		if type(id) ~= "string" then return false,"peça inválida" end
 		local p=C.PECAS[id]; if not p or p.slot~=slot then return false,"peça/slot inválidos" end

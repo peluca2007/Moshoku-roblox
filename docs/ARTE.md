@@ -82,3 +82,13 @@ Slime 7; Morcego 7,5; Vespa 8; Dragão 6,5 (mais morcego grande que dragão). Tr
 
 ## Animações da luta: Universal Animation Library (APRES1)
 Quaternius, **CC0 1.0** (`License.txt` do pacote), `Universal Animation Library[Standard].zip` (UAL1, glb Unreal-Godot, 24 fps), baixada em 15/11/2026 e extraída em `build/externos/ual/` (fora do git). Redirecionada para o R15 por `tools/blender/anim_ual.py` com o mapa `tools/animacao/ual_clipes.json` (ver `tools/animacao/README.md`). Clipes da UAL: PosturaCombate (Sword_Idle), CorteLeve/CortePesado (Sword_Attack, 1,1x e 0,7x), Estocada (Punch_Jab), Conjurar (Spell_Simple Enter+Shoot+Exit), Canalizar, ReacaoGolpe (Hit_Chest), Esquiva (Roll), Queda (Death01). Continuam por script (`origem = "script"`): DisparoArco (a UAL1 só tem pistola), Bloqueio, Vitoria.
+
+## Personagem novo (PERS2, 15/11/2026)
+
+Moldes de camisa/calça, cabelos, roupas rígidas e traços de raça são **autorais** (gerados por script Blender em
+`tools/blender/personagem/`, sem pacote externo): sem licença de terceiros. Corpo e cabeça são os padrões do Roblox
+(HumanoidDescription/SpecialMesh Head). Conferência: `python tools/blender_rodar.py tools/blender/personagem/folhas.py --folha prancha`
+gera `build/beleza/personagem/prancha.jpg`. Envio pendente (chave da Open Cloud devolveu 401): moldes em
+`build/personagem/moldes/camisa_<conjunto>_<pele>.png` e `calca_*` com
+`python tools/roblox_upload.py build/personagem/moldes/camisa_aventureiro_clara.png --nome CamisaAventureiro --tipo Decal`
+(idem ladino/mago e calças); depois preencher `shared/Aparencia/Personagem.CONJUNTOS` com `rbxassetid://<id>`.

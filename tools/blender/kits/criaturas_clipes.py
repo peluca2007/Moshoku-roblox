@@ -31,6 +31,10 @@ CLIPES = {
     "SlimeQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Attack", False), "Morrer": ("Death", False)},
     "MorcegoQuaternius": {"Voar": ("Flying", LAÇO), "Atacar": ("Attack", False), "Atacar2": ("Attack2", False), "LevarGolpe": ("Hit", False), "Morrer": ("Death", False)},
     "DragaoQuaternius": {"Voar": ("Flying", LAÇO), "Atacar": ("Attack", False), "Atacar2": ("Attack2", False), "LevarGolpe": ("Hit", False), "Morrer": ("Death", False)},
+    # MOD4: lobo (Animal Pack Vol.2: só Idle e Walking; Atacar, LevarGolpe e Morrer sintetizados) e goblin (Character Pack)
+    "LoboQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walking", LAÇO)},
+    "GoblinQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Punch", False),
+                         "LevarGolpe": ("RecieveHit", False), "Morrer": ("Defeat", False)},
 }
 # Clipes que terminam no último quadro (não voltam ao repouso).
 SEGURAR = {"Morrer"}
@@ -217,6 +221,30 @@ def levar_golpe(pivos_r, altura):
     return tempos, sintetizar(pivos_r, tempos, fn, extra), dur
 
 
+def mordida(pivos_r, altura):
+    """Bote sintetizado (lobo: o pacote só traz Idle e Walking): recua o corpo, salta para a frente (-Z) com a cabeça
+    baixa no instante do impacto (marco) e volta. Quadrúpede: o corpo inclina para a frente, a cabeça avança mais."""
+    dur, fps = 15 / 24, 24
+    tempos = [i / fps for i in range(int(round(dur * fps)) + 1)]
+    t_imp = 0.30
+
+    def env(t):  # -0.35 (recuo) em 0.12 s, 1 no impacto, 0 no fim
+        if t < 0.12:
+            return -0.35 * suave(t / 0.12)
+        if t < t_imp:
+            return -0.35 + 1.35 * suave((t - 0.12) / (t_imp - 0.12))
+        return 1 - suave((t - t_imp) / (dur - t_imp))
+
+    def fn(t):
+        e = env(t)
+        return rot("x", -0.16 * e), np.array([0.0, 0.0, -0.30 * altura * e])
+
+    def extra(parte, t):
+        return rot("x", -0.42 * env(t)) if parte == "Cabeca" else (rot("x", 0.3 * env(t)) if parte == "Cauda" else np.eye(3))
+
+    return tempos, sintetizar(pivos_r, tempos, fn, extra), dur, t_imp
+
+
 def tombar(pivos_r, pontos_r):
     """Morte sintetizada (serpente: o pacote não traz): tomba de lado em 0,6 s e fica, apoiada no chão."""
     dur, fps = 0.6, 24
@@ -316,6 +344,9 @@ def gerar(bpy, modulo, malhas, partes_verts, pts_repouso, T, pivos_aut, desloc):
         else:
             dur = tempos[-1]
         saida[nome] = montar(nome, "pacote:" + acao.name.split("|")[-1], tempos, dados, dur, fps, laco, marco, altura)
+    if "Atacar" not in saida:
+        tempos, dados, dur, t_imp = mordida(pivos_r, altura)
+        saida["Atacar"] = montar("Atacar", "sintetizado", tempos, dados, dur, 24, False, {"impacto": t_imp}, altura)
     if "LevarGolpe" not in saida:
         tempos, dados, dur = levar_golpe(pivos_r, altura)
         saida["LevarGolpe"] = montar("LevarGolpe", "sintetizado", tempos, dados, dur, 24, False, {}, altura)

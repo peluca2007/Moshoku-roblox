@@ -66,6 +66,8 @@ local raras={
 }
 for id, p in PECAS do p.modulo = id end
 for _, e in raras do PECAS[e[1]]={nome=e[1],raridade="rara",slot=e[2],modulo=e[1],encaixe={parte=e[3],offset=e[4]}} end
+-- MOD4: o obi turquesa (caixa larga 2,1 x 1,1 com concha) parecia uma bandeja no peito do mago; o item da Mestra usa o cinto simples.
+PECAS.MestraObi.malha="RoupaCinto1"; PECAS.MestraObi.soMalha=true
 local CABELOS=pecas({"CabeloCurto1","CabeloLongo1","CabeloTrancado1","CabeloNenhum","CabeloMasculino1","CabeloRabo1","CabeloEspetado1","CabeloCoque1","CabeloBob1"},"cabelo",nil,"Head")
 local BARBAS=pecas({"Barba1","BarbaLonga1","BarbaNenhum","BarbaCavanhaque1"},"barba",nil,"Head")
 for id,p in CABELOS do p.modulo=if id=="CabeloNenhum" then nil else id end
@@ -88,7 +90,7 @@ for id,v in pecas({"RoupaOmbreira1"},"ombro",nil,"RightUpperArm") do PECAS[id]=v
 PECAS.RoupaBotas1.encaixes={{parte="LeftFoot",offset={x=0,y=0,z=0}},{parte="RightFoot",offset={x=0,y=0,z=0}}}
 for id, nome in {
 	LadinoCapuz="Capuz do Ladino", LadinoMascara="Máscara do Ladino", LadinoCapa="Capa do Ladino", LadinoCinto="Cinto do Ladino",
-	MestraTiara="Tiara da Mestra", MestraManto="Manto da Mestra", MestraObi="Obi da Mestra", MestraCajado="Cajado da Mestra",
+	MestraTiara="Tiara da Mestra", MestraManto="Manto da Mestra", MestraObi="Cinto da Mestra", MestraCajado="Cajado da Mestra",
 	RoupaCapaCurta1="Capa curta", RoupaOmbreira1="Ombreira simples", RoupaTunica1="Túnica básica", RoupaCapuz1="Capuz simples", RoupaCinto1="Cinto simples", RoupaBotas1="Botas simples",
 } do PECAS[id].nome = nome end
 -- Rótulos de apresentação: IDs públicos de persistência/rede permanecem intactos.

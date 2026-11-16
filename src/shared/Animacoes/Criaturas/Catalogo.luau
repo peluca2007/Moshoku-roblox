@@ -5,6 +5,8 @@ return {
 	AranhaQuaternius = require(Shared.Animacoes.Criaturas.AranhaQuaternius),
 	DragaoQuaternius = require(Shared.Animacoes.Criaturas.DragaoQuaternius),
 	EsqueletoQuaternius = require(Shared.Animacoes.Criaturas.EsqueletoQuaternius),
+	GoblinQuaternius = require(Shared.Animacoes.Criaturas.GoblinQuaternius),
+	LoboQuaternius = require(Shared.Animacoes.Criaturas.LoboQuaternius),
 	MorcegoQuaternius = require(Shared.Animacoes.Criaturas.MorcegoQuaternius),
 	RatoQuaternius = require(Shared.Animacoes.Criaturas.RatoQuaternius),
 	SapoQuaternius = require(Shared.Animacoes.Criaturas.SapoQuaternius),

@@ -35,3 +35,16 @@ Crédito a Kenney e Quaternius fica como cortesia (colocar nos créditos do jogo
 | Easy Animated Enemy Pack - Jan 2019 (Frog, Rat, Snake, Snake_angry, Spider, Wasp) | `build/externos/Easy Animated Enemy Pack - Jan 2019.zip` (extraído em `build/externos/easy-enemy/`) | idem (CC0 declarada, sem arquivo no zip) | criaturas da luta |
 
 Só os FBX são lidos (malha + pesos); as animações do pacote não são usadas. Crédito a Quaternius como cortesia.
+
+## Lobo e goblin (MOD4, 16/11/2026)
+
+Ambos CC0 do Quaternius, baixados do espelho oficial dele no OpenGameArt (licença CC0 lida na página em 16/11/2026) para
+pastas próprias em `build/externos/` (fora do git):
+
+| Pacote | Página | Download | Usado em |
+| --- | --- | --- | --- |
+| Animal Pack Vol.2 (lobo; só Idle e Walking) | https://opengameart.org/content/animated-animales-low-poly (CC0) | https://opengameart.org/sites/default/files/Animal%20Pack%20Vol.2%20by%20%40Quaternius.zip | `animais-vol2` -> LoboQuaternius |
+| Ultimate Animated Character Pack, nov/2019 (Goblin_Male) | https://opengameart.org/content/animated-characters-pack (CC0) | https://opengameart.org/sites/default/files/ultimate_animated_character_pack_by_quaternius.zip | `personagens-ultimate` -> GoblinQuaternius |
+
+Lobo: Respirar/Andar do pacote; Atacar (bote com marco `impacto`), LevarGolpe e Morrer sintetizados. Goblin: Idle, Walk, Punch
+(Atacar), RecieveHit, Defeat do pacote. Registro em `shared/Animacoes/Criaturas/*.luau` (`origem`).

@@ -70,7 +70,9 @@ return {
 		t.eq(Modelos.escolher("creature/rato-gigante", 0, function() return false end).modulo, "RatoGigante")
 		t.eq(Modelos.escolher("creature/rato-gigante", 0, function(m) return m == "RatoQuaternius" end).modulo, "RatoQuaternius")
 		t.eq(Modelos.escolher("creature/aranha-da-floresta", 3, function() return true end).modulo, "AranhaQuaternius")
-		t.eq(Modelos.escolher("creature/lobo-cinzento", 0, function() return true end).modulo, "LoboCinzento")
+		t.eq(Modelos.escolher("creature/lobo-cinzento", 0, function() return false end).modulo, "LoboCinzento")
+		t.eq(Modelos.escolher("creature/lobo-cinzento", 0, function() return true end).modulo, "LoboQuaternius")
+		t.eq(Modelos.escolher("creature/goblin-batedor", 1, function(m) return m == "GoblinQuaternius" end).modulo, "GoblinQuaternius")
 		for _, entrada in Modelos.POR_CRIATURA do
 			for _, m in entrada.modulos do t.ok(Pivos[m] ~= nil, "pivôs de " .. m) end
 			if entrada.preferido then t.ok(Pivos[entrada.preferido] ~= nil, "pivôs de " .. entrada.preferido) end

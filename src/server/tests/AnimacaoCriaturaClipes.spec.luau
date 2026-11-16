@@ -6,7 +6,7 @@ local Catalogo = require(Shared.Animacoes.Criaturas.Catalogo)
 local Pivos = require(Shared.Mundo.PivosModelos)
 
 local MODULOS = { "RatoQuaternius", "AranhaQuaternius", "SerpenteQuaternius", "SapoQuaternius", "VespaQuaternius",
-	"EsqueletoQuaternius", "SlimeQuaternius", "MorcegoQuaternius", "DragaoQuaternius" }
+	"EsqueletoQuaternius", "SlimeQuaternius", "MorcegoQuaternius", "DragaoQuaternius", "LoboQuaternius", "GoblinQuaternius" }
 local VOADORES = { VespaQuaternius = true, MorcegoQuaternius = true, DragaoQuaternius = true }
 
 local function perto(a, b, tol)

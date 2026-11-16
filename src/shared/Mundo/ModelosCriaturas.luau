@@ -9,8 +9,8 @@
 local ModelosCriaturas = {}
 
 ModelosCriaturas.POR_CRIATURA = table.freeze({
-	["creature/goblin-batedor"] = { modulos = { "GoblinFaca", "GoblinArco" }, escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
-	["creature/lobo-cinzento"] = { modulos = { "LoboCinzento" }, escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },
+	["creature/goblin-batedor"] = { modulos = { "GoblinFaca", "GoblinArco" }, preferido = "GoblinQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
+	["creature/lobo-cinzento"] = { modulos = { "LoboCinzento" }, preferido = "LoboQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },
 	["creature/urso-de-presas-vermelhas"] = { modulos = { "UrsoPresasVermelhas" }, escalaMundo = 1, escalaCombate = 0.8, tipo = "quadrupede" },
 	["creature/bandido-de-estrada"] = { modulos = { "BandidoPorrete", "BandidoEspada" }, escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
 	["creature/rato-gigante"] = { modulos = { "RatoGigante" }, preferido = "RatoQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },

@@ -35,6 +35,11 @@ SAIDA = os.path.join(RAIZ, "criaturas")
 MONSTROS = os.path.join(EXTERNOS, "monster-pack", "FBX")
 INIMIGOS = glob.glob(os.path.join(EXTERNOS, "easy-enemy", "*", "FBX"))
 INIMIGOS = INIMIGOS[0] if INIMIGOS else ""
+ANIMAIS = glob.glob(os.path.join(EXTERNOS, "animais-vol2", "*", "FBX"))  # Animal Pack Vol.2 (lobo), MOD4
+ANIMAIS = ANIMAIS[0] if ANIMAIS else ""
+PERSONAGENS = glob.glob(os.path.join(EXTERNOS, "personagens-ultimate", "*", "FBX"))  # Ultimate Animated Character Pack (goblin), MOD4
+PERSONAGENS = PERSONAGENS[0] if PERSONAGENS else ""
+PASTAS = {"monstros": MONSTROS, "easy": INIMIGOS, "animais": ANIMAIS, "personagens": PERSONAGENS}
 
 
 # ---------------------------------------------------------------- regras osso -> parte
@@ -106,6 +111,23 @@ def regra_vespa(nome, x, _):
     return "Corpo"
 
 
+def regra_lobo(nome, x, _):
+    """Ossos sem nome do Animal Pack: Bone.003 cabeça; 004-007 cauda; 014-019 patas da frente; 008-013 patas de trás."""
+    n = nome.replace("_end", "")
+    if n == "Bone.003": return "Cabeca"
+    if n in ("Bone.004", "Bone.005", "Bone.006", "Bone.007"): return "Cauda"
+    if n in ("Bone.014", "Bone.015", "Bone.016", "Bone.017", "Bone.018", "Bone.019"): return "Braco" + _lado(nome, x)
+    if n in ("Bone.008", "Bone.009", "Bone.010", "Bone.011", "Bone.012", "Bone.013"): return "Perna" + _lado(nome, x)
+    return "Corpo"
+
+
+def regra_goblin(nome, x, _):
+    if re.search(r"Head|Neck", nome): return "Cabeca"
+    if re.search(r"Shoulder|UpperArm|LowerArm|Fist", nome): return "Braco" + _lado(nome, x)
+    if re.search(r"UpperLeg|LowerLeg|Foot", nome): return "Perna" + _lado(nome, x)
+    return "Corpo"
+
+
 # Modulo -> (arquivo, regra, medida alvo em studs, "h" maior dimensão horizontal | "a" altura, tipo de animação, yaw extra graus,
 # arquivo de origem do osso que aponta a frente)
 CRIATURAS = {
@@ -118,11 +140,13 @@ CRIATURAS = {
     "SlimeQuaternius": ("monstros", "Slime.fbx", regra_slime, 3.2, "h", "pesado", None),
     "MorcegoQuaternius": ("monstros", "Bat.fbx", regra_morcego, 4.4, "h", "voador", None),
     "DragaoQuaternius": ("monstros", "Dragon.fbx", regra_morcego, 9.0, "h", "voador", None),
+    "LoboQuaternius": ("animais", "Wolf.fbx", regra_lobo, 6.4, "h", "quadrupede", None),
+    "GoblinQuaternius": ("personagens", "Goblin_Male.fbx", regra_goblin, 4.4, "a", "humanoide", None),
 }
 # yaw em graus (rotação em Z do Blender) que põe a frente em -Y; descoberto olhando a pose de repouso.
 YAW = {}
 # Onde a pose de repouso não mostra para onde a criatura olha: (ossos da frente, osso de referência) -> direção no plano XY.
-FRENTE = {"VespaQuaternius": (["Head"], "Abdomen"), "SlimeQuaternius": (["RightEye", "LeftEye"], "Body")}
+FRENTE = {"LoboQuaternius": (["Bone.003"], "Bone"), "VespaQuaternius": (["Head"], "Abdomen"), "SlimeQuaternius": (["RightEye", "LeftEye"], "Body")}
 
 # Aperto da paleta: o pacote é saturado e claro; o jogo é sóbrio (kit_lib.sobrio faz o mesmo para os outros kits).
 SATURACAO, VALOR = 0.78, 0.92
@@ -156,7 +180,7 @@ def importar(caminho):
         acoes = [a for a in bpy.data.actions if a.name.startswith(o.name + "|")]
         escolhida = None
         for pref in ("Idle", "Flying", "Walk"):
-            escolhida = next((a for a in acoes if a.name.endswith("_" + pref)), None)
+            escolhida = next((a for a in acoes if a.name.endswith("_" + pref) or a.name.endswith("|" + pref)), None)
             if escolhida:
                 break
         o.animation_data_create().action = escolhida
@@ -204,7 +228,7 @@ def renderizar(objetos, caminho):
 
 def converter(modulo, cfg):
     pasta, arquivo, regra, alvo, medida, tipo, _ = cfg
-    caminho = os.path.join(MONSTROS if pasta == "monstros" else INIMIGOS, arquivo)
+    caminho = os.path.join(PASTAS[pasta], arquivo)
     importar(caminho)
     dg = bpy.context.evaluated_depsgraph_get()
     yaw = math.radians(YAW.get(modulo, 0.0))

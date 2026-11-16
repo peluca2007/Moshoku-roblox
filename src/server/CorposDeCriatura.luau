@@ -16,6 +16,7 @@ local Visao = require(game.ReplicatedStorage.Shared.VisaoFurtiva)
 local Visual = require(script.Parent.VisualCriaturas)
 local ModelosCriaturas = require(game.ReplicatedStorage.Shared.Mundo.ModelosCriaturas)
 local CriaturaAnimada = require(script.Parent.Mundo.CriaturaAnimada)
+local MontarModelo = require(script.Parent.Mundo.MontarModelo)
 
 local Corpos = {}
 -- O jogo tem uma só mesa. Reutiliza o filtro de névoa já injetado por MesaService
@@ -387,7 +388,7 @@ function Corpos.start(deps)
 		local categoria = criatura and (criatura.categoria or (entrada and entrada.data.categoria))
 		local catalogId = criatura and criatura.catalogId
 		local modelo, tipo, animado
-		local info = ModelosCriaturas.escolher(catalogId, ModelosCriaturas.variante(token.id))
+		local info = ModelosCriaturas.escolher(catalogId, ModelosCriaturas.variante(token.id), MontarModelo.existe)
 		if info then
 			animado = CriaturaAnimada.montar(info, pasta, CFrame.new(deps.centro(token.x, token.z)), info.escalaCombate)
 		end

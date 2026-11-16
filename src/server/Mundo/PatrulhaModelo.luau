@@ -3,6 +3,7 @@
 -- `ref` aceita o id da criatura ("creature/...") ou o prefixo legado de EncontrosPorZona.
 local Modelos = require(game:GetService("ReplicatedStorage").Shared.Mundo.ModelosCriaturas)
 local CriaturaAnimada = require(script.Parent.CriaturaAnimada)
+local Montar = require(script.Parent.MontarModelo)
 local M = {}
 
 -- Devolve `animar(dt, posicaoCorpo, direcao, andando, velocidade, olharPara)` e o objeto animado.
@@ -10,7 +11,7 @@ local M = {}
 function M.criar(pai, corpo, ref, posicao, nome)
 	if type(ref) ~= "string" then return nil end
 	local criaturaId = if string.sub(ref, 1, 9) == "creature/" then ref else Modelos.criaturaDoPrefixo(ref)
-	local info = Modelos.escolher(criaturaId, Modelos.variante(nome or ""))
+	local info = Modelos.escolher(criaturaId, Modelos.variante(nome or ""), Montar.existe)
 	if not info then return nil end
 	local base = posicao - Vector3.new(0, 1.5, 0)
 	local anim = CriaturaAnimada.montar(info, pai, CFrame.new(base), info.escalaMundo)

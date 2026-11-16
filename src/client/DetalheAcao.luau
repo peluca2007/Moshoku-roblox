@@ -1,6 +1,7 @@
--- Consulta local da carta. Não seleciona alvos nem envia pedidos.
+-- Consulta local da carta (HUD2: painel escuro com fio dourado; entra com leve escala). Não seleciona alvos nem envia pedidos.
 local UserInputService = game:GetService("UserInputService")
 local T = require(script.Parent.UI.Tema)
+local P = require(script.Parent.UI.PecasLuta)
 local Detalhe = {}
 
 local function new(class, parent, props)
@@ -18,21 +19,22 @@ function Detalhe.start(parent)
 	})
 	local painel = new("Frame", fundo, {
 		Name = "Painel", AnchorPoint = Vector2.new(.5, .5), Position = UDim2.fromScale(.5, .5),
-		Size = UDim2.fromScale(.92, .8), BackgroundColor3 = T.cores.painel, BorderSizePixel = 0, Active = true, ZIndex = 11,
+		Size = UDim2.fromScale(.92, .8), BackgroundColor3 = P.cor.fundo, BorderSizePixel = 0, Active = true, ZIndex = 11,
 	})
 	new("UISizeConstraint", painel, { MaxSize = Vector2.new(560, 500) })
 	new("UICorner", painel, { CornerRadius = UDim.new(0, 10) })
-	new("UIStroke", painel, { Color = T.cores.borda, Thickness = 2 })
+	new("UIStroke", painel, { Color = P.cor.ouro, Thickness = 1.5 })
+	local escala = new("UIScale", painel, { Scale = 1 })
 	local function rotulo(nome, props)
 		local t = new("TextLabel", painel, {
 			Name = nome, BackgroundTransparency = 1, FontFace = T.fontes.rotulo, TextSize = 15,
-			TextColor3 = T.cores.texto, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12,
+			TextColor3 = P.cor.texto, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12,
 		})
 		for k, v in props do t[k] = v end
 		return t
 	end
-	local titulo = rotulo("Titulo", { Position = UDim2.fromOffset(16, 10), Size = UDim2.new(1, -80, 0, 52), FontFace = T.fontes.titulo, TextSize = 23 })
-	local custo = rotulo("Custo", { Position = UDim2.fromOffset(16, 66), Size = UDim2.new(1, -32, 0, 38), TextSize = 14, TextColor3 = T.cores.alerta })
+	local titulo = rotulo("Titulo", { Position = UDim2.fromOffset(16, 10), Size = UDim2.new(1, -80, 0, 52), FontFace = T.fontes.titulo, TextSize = 23, TextColor3 = P.cor.ouroVivo })
+	local custo = rotulo("Custo", { Position = UDim2.fromOffset(16, 66), Size = UDim2.new(1, -32, 0, 38), TextSize = 14, TextColor3 = P.cor.ouro })
 	local scroll = new("ScrollingFrame", painel, {
 		Name = "Texto", Position = UDim2.fromOffset(16, 112), Size = UDim2.new(1, -32, 1, -218),
 		AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), ScrollingDirection = Enum.ScrollingDirection.Y,
@@ -40,7 +42,7 @@ function Detalhe.start(parent)
 	})
 	local corpo = new("TextLabel", scroll, {
 		Name = "Conteudo", Size = UDim2.new(1, -12, 0, 0), AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1, FontFace = T.fontes.rotulo, TextSize = 16, TextColor3 = T.cores.texto,
+		BackgroundTransparency = 1, FontFace = T.fontes.rotulo, TextSize = 16, TextColor3 = P.cor.texto,
 		TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 12,
 	})
 	local situacao = rotulo("Situacao", {
@@ -50,7 +52,7 @@ function Detalhe.start(parent)
 	local function botao(nome, texto, props)
 		local b = new("TextButton", painel, {
 			Name = nome, Text = texto, FontFace = T.fontes.rotulo, TextSize = 16,
-			TextColor3 = T.cores.texto, BackgroundColor3 = T.cores.cabecalho, ZIndex = 12,
+			TextColor3 = P.cor.texto, BackgroundColor3 = P.cor.trilho, ZIndex = 12,
 		})
 		for k, v in props do b[k] = v end
 		new("UICorner", b, { CornerRadius = UDim.new(0, 6) })
@@ -74,11 +76,14 @@ function Detalhe.start(parent)
 	local function atualizar(dados)
 		titulo.Text, custo.Text, corpo.Text = dados.nome, dados.custo, dados.texto
 		situacao.Text = dados.motivo or "Disponível. Volte às ações para escolher o alvo."
-		situacao.TextColor3 = if dados.motivo then T.cores.alerta else T.cores.sucesso
+		situacao.TextColor3 = if dados.motivo then P.cor.inimigo else T.barras.cheia
 	end
 	return {
 		abrir = function(id, dados)
-			idAberto = id; atualizar(dados); scroll.CanvasPosition = Vector2.zero; fundo.Visible = true
+			idAberto = id; atualizar(dados); scroll.CanvasPosition = Vector2.zero
+			escala.Scale = 0.94
+			fundo.Visible = true
+			P.animar(escala, { Scale = 1 }, P.ENTRADA, "entrada")
 		end,
 		atualizar = function(id, dados) if fundo.Visible and idAberto == id then atualizar(dados) end end,
 		fechar = fechar,

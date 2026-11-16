@@ -1,50 +1,32 @@
--- Menu de ação flutuante da luta (LUTA-B), tema Pergaminho (UI/Componentes). Aparece na vez de uma ficha
--- que este jogador controla: lista curta ao lado do personagem que age (reserva no canto inferior
--- esquerdo se ele sair da tela) com Atacar, Habilidades, Andar e Encerrar turno (e Confirmar/Cancelar
--- mira, Levantar, Apagar o fogo, Pacto quando valem). Atacar e Habilidades abrem uma segunda lista
--- (nome + custo); o detalhe completo fica no tooltip/DetalheAcao. Vida, PM e Ações: cartão do Hud.
+-- Menu de comandos da luta (HUD2): losango no canto inferior direito, um comando em cada vértice
+-- (Habilidades no topo, Atacar à esquerda, Andar à direita, Encerrar na base) com a tecla visível.
+-- Atacar e Habilidades abrem uma lista vertical à esquerda do losango (nome grande, custo em Ações/PM à
+-- direita, uma linha de efeito; a habilidade em foco fica destacada; "?" abre o DetalheAcao). Comandos
+-- extras (Confirmar, Cancelar mira, Levantar, Apagar o fogo, Pacto) empilham acima do losango.
+-- Teclas: R Habilidades, F Atacar, G Andar, V Encerrar turno (Q/E giram a câmera, WASD movem, M alterna
+-- a mesa); com a lista aberta, seta para cima/baixo move o foco e Enter usa.
 -- Só intenção: escolher a habilidade liga a MIRA (MesaState); o clique no tabuleiro manda o pedido;
 -- o servidor valida e resolve. Geometria em shared/Regras/LayoutLuta (pura, com spec).
--- Instances: AcoesDoTurno > Menu (Atacar, Habilidades, Andar, EncerrarTurno, ...) | Lista > Grupos | Cartas > Carta_<id> | Dica.
+-- Instances: AcoesDoTurno > Menu (Atacar, Habilidades, Andar, EncerrarTurno, ConfirmarAcao, CancelarMira,
+-- Levantar, ApagarFogo, EscolherPacto) | Lista > Grupos | Cartas > Carta_<id> | Dica | TooltipAcao | DetalheAcao.
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Estilo = require(Shared:WaitForChild("Estilo"))
 local Catalogo = require(Shared:WaitForChild("Livro"):WaitForChild("Catalogo"))
 local Execucao = require(Shared:WaitForChild("Regras"):WaitForChild("Execucao"))
 local Layout = require(Shared.Regras.LayoutLuta)
-local UIArte = require(Shared.UIArte)
-local Protocol = require(Shared:WaitForChild("MesaProtocol"))
-local RunService = game:GetService("RunService")
 local Apresentacao = require(Shared.ApresentacaoAcoes)
 local Descricao = require(Shared.DescricaoHabilidade)
 local Previa = require(script.Parent.PreviaFurtiva)
 local T = require(script.Parent.UI.Tema)
 local C = require(script.Parent.UI.Componentes)
+local P = require(script.Parent.UI.PecasLuta)
 
 local AcoesDoTurno = {}
-
-local function new(class: string, parent: Instance?, props: { [string]: any }): any
-	local object = Instance.new(class)
-	for key, value in props do
-		object[key] = value
-	end
-	object.Parent = parent
-	return object
-end
-
--- Texto do kit com tamanho/posição próprios (piso de 14 px garantido por aplicarEscala).
-local function texto(parent, props)
-	local label = C.texto({ parent = parent })
-	label.AutomaticSize = Enum.AutomaticSize.None
-	label.TextSize = 14
-	label.TextTruncate = Enum.TextTruncate.AtEnd
-	for key, value in props do
-		label[key] = value
-	end
-	return label
-end
+local new = P.novo
 
 -- Como a mira escolhe: "ficha" (clique num alvo), "casa" (clique numa casa) ou
 -- "confirmar" (segundo clique na carta: em volta de si ou em si).
@@ -95,59 +77,136 @@ local function linhaDeCusto(mec): string
 	return table.concat(partes, " • ")
 end
 
+-- Custo curto da linha da lista: "2 Ações · 3 PM".
+local function custoCurto(mec, indisponivel): string
+	if indisponivel then return "Consulta" end
+	local acoes = mec.acoes or 0
+	local partes = {}
+	if acoes > 0 then table.insert(partes, acoes .. (if acoes == 1 then " Ação" else " Ações")) end
+	if (mec.pm or 0) > 0 then table.insert(partes, mec.pm .. " PM") end
+	if (mec.pt or 0) > 0 then table.insert(partes, mec.pt .. " PT") end
+	return if #partes == 0 then "Livre" else table.concat(partes, " · ")
+end
+
+local TECLAS = { habilidades = Enum.KeyCode.R, atacar = Enum.KeyCode.F, andar = Enum.KeyCode.G, encerrar = Enum.KeyCode.V }
+local EXTRAS_MAX = 5
+
 function AcoesDoTurno.start(state)
 	local player = Players.LocalPlayer
 	local gui = new("ScreenGui", player:WaitForChild("PlayerGui"), {
 		Name = "AcoesDoTurno",
 		ResetOnSpawn = false,
-		IgnoreGuiInset = true, -- coordenadas de WorldToViewportPoint valem direto
+		IgnoreGuiInset = true, -- coordenadas de tela valem direto
 		DisplayOrder = 5,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	})
 	local detalhe = require(script.Parent.DetalheAcao).start(gui)
 	local tooltip = require(script.Parent.TooltipAcao).start(gui, function() Previa.set(nil) end)
 
-	-- Menu principal: lista vertical curta; some fora da vez deste jogador.
-	local menu = new("Frame", gui, { Name = "Menu", Size = UDim2.fromOffset(Layout.MENU_LARGURA, Layout.alturaLista(4)), BackgroundTransparency = 1, Visible = false })
-	new("UIListLayout", menu, { Padding = UDim.new(0, Layout.ESPACO), SortOrder = Enum.SortOrder.LayoutOrder })
-	-- Segunda lista (Atacar / Habilidades): abas Golpes-Apoio-Tudo (só em Habilidades) e as cartas.
-	local lista = new("Frame", gui, { Name = "Lista", Size = UDim2.fromOffset(Layout.LISTA_LARGURA, Layout.LINHA), BackgroundTransparency = 1, Visible = false })
+	local function texto(parent, props)
+		local label = new("TextLabel", nil, {
+			BackgroundTransparency = 1, TextSize = 14, TextTruncate = Enum.TextTruncate.AtEnd, FontFace = T.fontes.rotulo,
+			TextColor3 = P.cor.texto, TextXAlignment = Enum.TextXAlignment.Left, Text = "",
+		})
+		for key, value in props do
+			label[key] = value
+		end
+		label.Parent = parent
+		return label
+	end
+
+	-- Posição absoluta dos blocos (a partir do canto, com âncora: o UIScale encolhe em direção ao canto).
+	local function geometria()
+		local vp = workspace.CurrentCamera.ViewportSize
+		local lo = Layout.losango(vp.X, vp.Y)
+		local extras = Layout.extras(vp.X, vp.Y, EXTRAS_MAX)
+		local topo = extras[EXTRAS_MAX]
+		return vp, lo, extras, { x = lo.x, y = topo.y, w = lo.w, h = lo.y + lo.h - topo.y }
+	end
+	local _, _, _, menuRect0 = geometria()
+
+	-- Menu: contém o losango e a pilha de extras; some fora da vez deste jogador.
+	local menu = new("Frame", gui, {
+		Name = "Menu", AnchorPoint = Vector2.new(1, 1), Size = UDim2.fromOffset(menuRect0.w, menuRect0.h),
+		BackgroundTransparency = 1, Visible = false,
+	})
+	-- Enfeite: losango fino no centro do losango de comandos.
+	local centro = new("Frame", menu, {
+		Name = "Centro", AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(34, 34), Rotation = 45,
+		BackgroundTransparency = 1, BorderSizePixel = 0,
+	})
+	new("UIStroke", centro, { Color = P.cor.ouro, Thickness = 1, Transparency = 0.45 })
+	new("Frame", centro, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(10, 10), BackgroundColor3 = P.cor.ouro, BorderSizePixel = 0 })
+
+	-- Lista de habilidades (à esquerda do losango): abas Golpes-Apoio-Tudo (só em Habilidades) e as linhas.
+	local lista = new("Frame", gui, { Name = "Lista", AnchorPoint = Vector2.new(1, 1), Size = UDim2.fromOffset(Layout.LISTA_LARGURA, Layout.LISTA_LINHA), BackgroundTransparency = 1, Visible = false })
+	local escalaLista = new("UIScale", lista, { Name = "Entrada", Scale = 1 })
 	new("UIListLayout", lista, { Padding = UDim.new(0, Layout.ESPACO), SortOrder = Enum.SortOrder.LayoutOrder })
 	local cartasFrame = new("ScrollingFrame", lista, {
-		Name = "Cartas", Size = UDim2.new(1, 0, 0, Layout.LINHA), CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		ScrollingDirection = Enum.ScrollingDirection.Y, ScrollBarThickness = 3, BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 2,
+		Name = "Cartas", Size = UDim2.new(1, 0, 0, Layout.LISTA_LINHA), CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		ScrollingDirection = Enum.ScrollingDirection.Y, ScrollBarThickness = 3, ScrollBarImageColor3 = P.cor.ouro,
+		BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 2,
 	})
 	new("UIListLayout", cartasFrame, { Padding = UDim.new(0, Layout.ESPACO), SortOrder = Enum.SortOrder.LayoutOrder })
 	local dica = texto(gui, {
-		Name = "Dica", Size = UDim2.fromOffset(Layout.LISTA_LARGURA, 20), TextColor3 = T.sobreEscuro.texto, Text = "", Visible = false,
-		TextStrokeColor3 = T.cores.fundoTela, TextStrokeTransparency = 0.2, ZIndex = 6,
+		Name = "Dica", AnchorPoint = Vector2.new(1, 1), Size = UDim2.fromOffset(220, 20), TextXAlignment = Enum.TextXAlignment.Right,
+		Visible = false, TextStrokeColor3 = P.cor.trilho, TextStrokeTransparency = 0.2, ZIndex = 6,
 	})
 
-	local function botao(parent, rotulo: string, variante: string, largura: number, aoClicar: () -> ())
-		local b = C.botao({
-			parent = parent, texto = rotulo, variante = variante, tamanho = UDim2.fromOffset(largura, Layout.LINHA), aoClicar = aoClicar,
+	local cliques: { [any]: () -> () } = {} -- ação de cada botão, para as teclas
+
+	-- Botão de comando: placa escura com fio dourado fino, escala e brilho no hover.
+	-- rotulo/Marca/Tecla são filhos; atributos Bloqueada/Desabilitado apagam o botão.
+	local function botao(parent, nome: string, rotulo: string, tamanho: UDim2, opcoes, aoClicar: () -> ())
+		local o = opcoes or {}
+		local b = P.placa(parent, nome, tamanho, { classe = "TextButton", transparencia = 0.16, raio = 10, espessura = if o.principal then 2 else 1.5, transparenciaContorno = 0.15 })
+		b.Text, b.AutoButtonColor, b.ZIndex = "", false, 3
+		local contorno = b.Contorno
+		if o.perigo then contorno.Color = P.cor.inimigo end
+		local rot = texto(b, {
+			Name = "Rotulo", Size = UDim2.new(1, -12, 1, 0), Position = UDim2.fromOffset(6, 0), TextXAlignment = Enum.TextXAlignment.Center,
+			TextWrapped = true, TextTruncate = Enum.TextTruncate.None, FontFace = T.fontes.titulo, TextSize = o.tamanhoTexto or 16,
+			TextColor3 = if o.principal then P.cor.ouroVivo elseif o.perigo then P.cor.inimigo else P.cor.texto, Text = rotulo, ZIndex = 5,
 		})
-		b.Rotulo.TextSize = 16
-		b.Rotulo.Position, b.Rotulo.Size = UDim2.fromOffset(8, 0), UDim2.new(1, -16, 1, 0)
-		new("Frame", b, { Name = "Marca", AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -7), Size = UDim2.new(1, -34, 0, 3),
-			BackgroundColor3 = T.cores.titulo, BorderSizePixel = 0, ZIndex = 8, Visible = false })
+		new("Frame", b, {
+			Name = "Marca", AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -5), Size = UDim2.new(1, -30, 0, 2),
+			BackgroundColor3 = P.cor.ouroVivo, BorderSizePixel = 0, ZIndex = 6, Visible = false,
+		})
+		if o.tecla then
+			local selo = new("Frame", b, {
+				Name = "Tecla", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromOffset(4, 4), Size = UDim2.fromOffset(22, 22),
+				BackgroundColor3 = P.cor.trilho, BorderSizePixel = 0, ZIndex = 8,
+			})
+			new("UICorner", selo, { CornerRadius = UDim.new(1, 0) })
+			new("UIStroke", selo, { Color = P.cor.ouro, Thickness = 1 })
+			texto(selo, {
+				Name = "Letra", Size = UDim2.fromScale(1, 1), Text = o.tecla, TextXAlignment = Enum.TextXAlignment.Center,
+				FontFace = T.fontes.numero, TextSize = 14, TextColor3 = P.cor.ouroVivo, ZIndex = 9,
+			})
+		end
+		P.foco(b, contorno, 1.05)
+		b:GetAttributeChangedSignal("Desabilitado"):Connect(function()
+			local off = b:GetAttribute("Desabilitado") == true
+			P.animar(b, { BackgroundTransparency = if off then 0.5 else 0.16 }, P.SUAVE, "off")
+			rot.TextTransparency = if off then 0.5 else 0
+		end)
+		b.Activated:Connect(aoClicar)
+		cliques[b] = aoClicar
 		return b
 	end
-	local function rotuloDe(b, t: string)
-		b.Rotulo.Text = t
-	end
 
-	-- Estado da segunda lista: nil, "atacar" ou "habilidades"; grupo vale só em "habilidades".
+	-- Estado da lista: nil, "atacar" ou "habilidades"; grupo vale só em "habilidades".
 	local modoLista: string? = nil
 	local grupo, atualizar = "Golpes", nil
 	local cartas: { [string]: any } = {}
 	local atual = { tokenId = nil :: string?, ficha = nil :: any, assinatura = "", pacto = 1 }
+	local focoRegistro: any = nil
 
 	local abas = new("Frame", lista, { Name = "Grupos", Size = UDim2.new(1, 0, 0, Layout.LINHA), BackgroundTransparency = 1, LayoutOrder = 1 })
 	new("UIListLayout", abas, { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, Layout.ESPACO), SortOrder = Enum.SortOrder.LayoutOrder })
 	local botoesGrupo = {}
 	for i, nome in { "Golpes", "Apoio", "Tudo" } do
-		local b = botao(abas, nome, "secundario", (Layout.LISTA_LARGURA - 2 * Layout.ESPACO) / 3, function()
+		local b = botao(abas, nome, nome, UDim2.new(1 / 3, -3, 1, 0), { tamanhoTexto = 15 }, function()
 			grupo = nome
 			detalhe.fechar()
 			tooltip.fechar()
@@ -155,24 +214,23 @@ function AcoesDoTurno.start(state)
 			state.setMira(nil)
 			if atualizar then atualizar() end
 		end)
-		b.Name, b.LayoutOrder = nome, i
-		b.Rotulo.TextSize = 15
+		b.LayoutOrder = i
 		botoesGrupo[nome] = b
 	end
 
 	local function alternarLista(modo: string)
 		detalhe.fechar(); tooltip.fechar()
 		modoLista = if modoLista == modo then nil else modo
+		focoRegistro = nil
 		state.setMira(nil)
 		cartasFrame.CanvasPosition = Vector2.zero
 		if atualizar then atualizar() end
 	end
-	local atacar = botao(menu, "Atacar", "secundario", Layout.MENU_LARGURA, function() alternarLista("atacar") end)
-	atacar.Name, atacar.LayoutOrder = "Atacar", 10
-	local habilidades = botao(menu, "Habilidades", "secundario", Layout.MENU_LARGURA, function() alternarLista("habilidades") end)
-	habilidades.Name, habilidades.LayoutOrder = "Habilidades", 11
+	local function tamanhoVertice() return UDim2.fromOffset(Layout.VERTICE_W, Layout.VERTICE_H) end
+	local atacar = botao(menu, "Atacar", "Atacar", tamanhoVertice(), { tecla = "F" }, function() alternarLista("atacar") end)
+	local habilidades = botao(menu, "Habilidades", "Habilidades", tamanhoVertice(), { tecla = "R" }, function() alternarLista("habilidades") end)
 	-- Andar (Cap. 4: 1 Ação, até o Deslocamento): acende as casas e um clique move.
-	local andar = botao(menu, "Andar (1 Ação)", "secundario", Layout.MENU_LARGURA, function()
+	local andar = botao(menu, "Andar", "Andar (1 Ação)", tamanhoVertice(), { tecla = "G", tamanhoTexto = 15 }, function()
 		if not atual.tokenId or (atual.restantes or 0) < 1 and (atual.passosLivres or 0) < 1 then
 			return
 		end
@@ -187,8 +245,7 @@ function AcoesDoTurno.start(state)
 			alcanceCasas = if (atual.passosLivres or 0) > 0 then atual.passosLivres else atual.deslocamentoCasas or 6, cor = Estilo.CAPITULOS[3],
 		})
 	end)
-	andar.Name, andar.LayoutOrder = "Andar", 12
-	local encerrar = botao(menu, "Encerrar turno", "principal", Layout.MENU_LARGURA, function()
+	local encerrar = botao(menu, "EncerrarTurno", "Encerrar turno", tamanhoVertice(), { tecla = "V", principal = true, tamanhoTexto = 15 }, function()
 		local snapshot = state.snapshot()
 		if snapshot and atual.tokenId then
 			modoLista = nil
@@ -196,62 +253,70 @@ function AcoesDoTurno.start(state)
 			state.send("nextTurn", { expectedId = atual.tokenId, expectedTurn = snapshot.combat.turn })
 		end
 	end)
-	encerrar.Name, encerrar.LayoutOrder = "EncerrarTurno", 13
-	local confirmar = botao(menu, "Confirmar ação", "principal", Layout.MENU_LARGURA, function()
+	local vertices = { habilidades = habilidades, atacar = atacar, andar = andar, encerrar = encerrar }
+	-- Comandos extras: empilham acima do losango, na ordem abaixo, só os visíveis.
+	local tamanhoExtra = UDim2.fromOffset(Layout.EXTRA_W, Layout.EXTRA_H)
+	local confirmar = botao(menu, "ConfirmarAcao", "Confirmar ação", tamanhoExtra, { principal = true }, function()
 		local mira = state.mira()
 		local registro = mira and cartas[mira.habilidadeId]
 		if registro and not registro.carta:GetAttribute("Bloqueada") and mira.tokenId == atual.tokenId and (mira.modo == "confirmar" or mira.ponto ~= nil or (mira.modo == "lista" and #(mira.alvoIds or {}) > 0)) then
 			state.dispararMira()
 		end
 	end)
-	confirmar.Name, confirmar.LayoutOrder, confirmar.Visible = "ConfirmarAcao", 1, false
-	local cancelar = botao(menu, "Cancelar mira", "secundario", Layout.MENU_LARGURA, function()
+	local cancelar = botao(menu, "CancelarMira", "Cancelar mira", tamanhoExtra, nil, function()
 		state.setMira(nil)
 	end)
-	cancelar.Name, cancelar.LayoutOrder, cancelar.Visible = "CancelarMira", 2, false
-	local levantar = botao(menu, "Levantar (1 Ação)", "secundario", Layout.MENU_LARGURA, function()
+	local levantar = botao(menu, "Levantar", "Levantar (1 Ação)", tamanhoExtra, { tamanhoTexto = 15 }, function()
 		tooltip.fechar()
 		if atual.tokenId then state.setMira(nil); state.send("usarHabilidade", {tokenId = atual.tokenId, habilidadeId = "mesa/levantar"}) end
 	end)
-	levantar.Name, levantar.LayoutOrder, levantar.Visible = "Levantar", 3, false
-	local apagar = botao(menu, "Apagar o fogo (1 Ação)", "perigo", Layout.MENU_LARGURA, function()
+	local apagar = botao(menu, "ApagarFogo", "Apagar o fogo (1 Ação)", tamanhoExtra, { perigo = true, tamanhoTexto = 15 }, function()
 		if atual.tokenId then
 			state.send("apagarFogo", { tokenId = atual.tokenId })
 		end
 	end)
-	apagar.Name, apagar.LayoutOrder, apagar.Visible = "ApagarFogo", 4, false
-	local pacto = botao(menu, "Escolher Pacto", "secundario", Layout.MENU_LARGURA, function()
+	local pacto = botao(menu, "EscolherPacto", "Escolher Pacto", tamanhoExtra, nil, function()
 		atual.pacto += 1
 		state.setMira(nil)
 	end)
-	pacto.Name, pacto.LayoutOrder, pacto.Visible = "EscolherPacto", 5, false
+	local extras = { confirmar, cancelar, levantar, apagar, pacto }
+	for _, b in extras do b.Visible = false end
 	C.aplicarEscala(menu)
 	C.aplicarEscala(lista)
+	C.aplicarEscala(dica)
+
+	local function rotuloDe(b, t: string)
+		b.Rotulo.Text = t
+	end
 
 	local ultimoTurno = nil
-	local linhasMenu, linhasLista = 4, 1
+	local linhasLista, comAbasLista = 1, false
 
-	-- Posição: ao lado do personagem que age; reserva no canto inferior esquerdo.
+	-- Posição dos blocos (só muda com a tela ou com o conteúdo, não por quadro).
 	local function posicionar()
-		if not menu.Visible then return end
-		local cam = workspace.CurrentCamera
-		local vp = cam.ViewportSize
-		local ponto = nil
-		local token = atual.tokenId and state.findToken(atual.tokenId)
-		if token and token.x and token.z then
-			local p, visivel = cam:WorldToViewportPoint(Protocol.cellCenter(token.x, token.z) + Vector3.new(0, 3, 0))
-			if visivel then ponto = { x = p.X, y = p.Y } end
+		local vp, lo, rectsExtras, mr = geometria()
+		menu.Position, menu.Size = UDim2.fromOffset(vp.X - Layout.MARGEM, vp.Y - Layout.MARGEM), UDim2.fromOffset(mr.w, mr.h)
+		for nome, b in vertices do
+			local v = lo.vertices[nome]
+			b.Position, b.Size = UDim2.fromOffset(lo.x - mr.x + v.x, lo.y - mr.y + v.y), UDim2.fromOffset(v.w, v.h)
 		end
-		local m = Layout.menu(vp.X, vp.Y, ponto, linhasMenu)
-		menu.Position, menu.Size = UDim2.fromOffset(m.x, m.y), UDim2.fromOffset(m.w, m.h)
-		dica.Position = UDim2.fromOffset(m.x, m.y - 24)
-		dica.TextXAlignment = Enum.TextXAlignment.Left
+		centro.Position = UDim2.fromOffset(lo.x - mr.x + lo.w / 2, lo.y - mr.y + lo.h / 2)
+		-- extras visíveis, do mais perto do losango para cima
+		local k = 0
+		for _, b in extras do
+			if b.Visible then
+				k += 1
+				local r = rectsExtras[k]
+				b.Position, b.Size = UDim2.fromOffset(r.x - mr.x, r.y - mr.y), UDim2.fromOffset(r.w, r.h)
+			end
+		end
+		local topoPilha = if k > 0 then rectsExtras[k].y else lo.y
+		dica.Position = UDim2.fromOffset(vp.X - Layout.MARGEM, topoPilha - 4)
 		if lista.Visible then
-			local l = Layout.lista(vp.X, vp.Y, m, linhasLista)
-			lista.Position, lista.Size = UDim2.fromOffset(l.x, l.y), UDim2.fromOffset(l.w, l.h)
+			local l = Layout.lista(vp.X, vp.Y, linhasLista, comAbasLista)
+			lista.Position, lista.Size = UDim2.fromOffset(l.x + l.w, l.y + l.h), UDim2.fromOffset(l.w, l.h)
 		end
 	end
-	RunService.RenderStepped:Connect(posicionar)
 	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(posicionar)
 
 	local function criarCarta(habilidadeId: string, ordem: number)
@@ -260,27 +325,30 @@ function AcoesDoTurno.start(state)
 		local entrada = Catalogo.POR_ID[habilidadeId]
 		local dados = entrada and entrada.data or {}
 		local cor = Estilo.arvore(mec.arvore or arvoreDe(habilidadeId)).cor
-		local carta = new("TextButton", cartasFrame, {
-			Name = "Carta_" .. (dados.id or habilidadeId), LayoutOrder = ordem, AutoButtonColor = false, Text = "",
-			Size = UDim2.new(1, -4, 0, Layout.LINHA), BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 3,
+		local carta = P.placa(cartasFrame, "Carta_" .. (dados.id or habilidadeId), UDim2.new(1, -4, 0, Layout.LISTA_LINHA), { classe = "TextButton", transparencia = 0.22, raio = 8, transparenciaContorno = 0.5 })
+		carta.LayoutOrder, carta.AutoButtonColor, carta.Text, carta.ZIndex = ordem, false, "", 3
+		local escala = new("UIScale", carta, { Name = "Foco", Scale = 1 })
+		new("Frame", carta, { Name = "Selo", AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.new(0, 3, 1, -16), Position = UDim2.new(0, 7, 0.5, 0), BackgroundColor3 = cor, BorderSizePixel = 0, ZIndex = 4 })
+		local nome = texto(carta, {
+			Name = "Nome", Position = UDim2.fromOffset(18, 4), Size = UDim2.new(1, -18 - 110 - 46, 0, 24),
+			FontFace = T.fontes.titulo, TextSize = 18, Text = dados.name or mec.nome or habilidadeId, ZIndex = 5,
 		})
-		local _, arte = C.arte({ parent = carta, nome = "Moldura", peca = "botao", tamanho = UDim2.fromScale(1, 1), zIndex = 3 })
-		new("Frame", carta, { Name = "Selo", Size = UDim2.new(0, 4, 1, -16), Position = UDim2.fromOffset(12, 8), BackgroundColor3 = cor, BorderSizePixel = 0, ZIndex = 4 })
-		texto(carta, {
-			Name = "Nome", Position = UDim2.fromOffset(24, 3), Size = UDim2.new(1, -68, 0, 22),
-			FontFace = T.fontes.titulo, TextSize = 16, TextColor3 = T.cores.texto, Text = dados.name or mec.nome or habilidadeId, ZIndex = 5,
+		local custoLabel = texto(carta, {
+			Name = "Custo", AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -46, 0, 6), Size = UDim2.fromOffset(110, 22),
+			FontFace = T.fontes.numero, TextSize = 14, TextColor3 = P.cor.ouro, TextXAlignment = Enum.TextXAlignment.Right,
+			Text = custoCurto(mec, indisponivel), ZIndex = 5,
 		})
 		local efeito = texto(carta, {
-			Name = "Custo", Position = UDim2.fromOffset(24, 23), Size = UDim2.new(1, -68, 0, 18),
-			FontFace = T.fontes.rotulo, TextSize = 14, TextColor3 = T.cores.secundario,
-			Text = if indisponivel then "CONSULTA • VEJA OS DETALHES" else linhaDeCusto(mec), ZIndex = 5,
+			Name = "Efeito", Position = UDim2.fromOffset(18, 30), Size = UDim2.new(1, -18 - 46, 0, 18),
+			FontFace = T.fontes.rotulo, TextSize = 14, TextColor3 = P.cor.secundario, ZIndex = 5,
 		})
 		local resumo = if dados.damage and dados.damage.normal then dados.damage.normal else (dados.effect or "")
 		if indisponivel then resumo = indisponivel elseif mec.aviso then resumo = mec.aviso .. " " .. resumo end
 		if mec.descricao and not indisponivel then resumo = mec.descricao end
 		local custo = if indisponivel then "CONSULTA • VEJA OS DETALHES" else linhaDeCusto(mec)
-		local registro = { carta = carta, arte = arte, mec = mec, cor = cor, indisponivel = indisponivel, efeito = efeito,
-			custo = custo, resumo = resumo, grupo = Apresentacao.grupo(mec, indisponivel), armada = false, hover = false,
+		local registro = { carta = carta, mec = mec, cor = cor, indisponivel = indisponivel, efeito = efeito, nome = nome, custoLabel = custoLabel,
+			custo = custo, resumo = resumo, linhaResumo = string.gsub(resumo, "%s+", " "), grupo = Apresentacao.grupo(mec, indisponivel),
+			armada = false, hover = false, foco = false, escala = escala, estado = "",
 			ataque = string.sub(habilidadeId, 1, 5) == "mesa/" and Apresentacao.grupo(mec, indisponivel) == "Golpes" }
 		local function dadosDetalhe()
 			local ficha = atual.tokenId and state.fichaDetalhe and state.fichaDetalhe(atual.tokenId)
@@ -302,28 +370,32 @@ function AcoesDoTurno.start(state)
 			}
 		end
 		registro.dadosDetalhe = dadosDetalhe
-		-- Moldura normal ou acesa (cursor, mira armada, canção ativa).
+		-- Linha normal ou acesa (cursor, foco do teclado, mira armada, canção ativa).
 		function registro.pintar()
-			local acesa = registro.hover or registro.armada
-			arte.Image = UIArte.peca(if acesa then "botao_ativo" else "botao").imagem
-			carta.Selo.Size = UDim2.new(0, if registro.armada then 7 else 4, 1, -16)
+			local acesa = registro.hover or registro.armada or registro.foco
+			local chave = (if acesa then "1" else "0") .. (if registro.armada then "1" else "0")
+			if registro.estado == chave then return end
+			registro.estado = chave
+			P.animar(carta.Contorno, {
+				Transparency = if acesa then 0 else 0.5, Color = if acesa then P.cor.ouroVivo else P.cor.ouro,
+				Thickness = if registro.armada then 2 else 1,
+			}, P.SUAVE, "foco")
+			P.animar(carta, { BackgroundTransparency = if acesa then 0.04 else 0.22 }, P.SUAVE, "fundo")
+			P.animar(escala, { Scale = if acesa then 1.03 else 1 }, P.SUAVE, "foco")
+			P.animar(carta.Selo, { Size = UDim2.new(0, if registro.armada then 6 else 3, 1, -16) }, P.SUAVE, "selo")
 		end
 		local function consultar()
 			tooltip.fechar()
 			state.setMira(nil)
 			detalhe.abrir(habilidadeId, dadosDetalhe())
 		end
-		-- "?" pequeno no canto direito: não cobre o texto (nome e custo deixam 44 px livres).
-		local info = new("TextButton", carta, {
-			Name = "Detalhes", Text = "?", AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0),
-			Size = UDim2.fromOffset(32, 32), BackgroundColor3 = T.cores.cabecalho, TextColor3 = T.cores.titulo,
-			FontFace = T.fontes.titulo, TextSize = 18, ZIndex = 6,
-		})
-		new("UICorner", info, { CornerRadius = UDim.new(1, 0) })
-		new("UIStroke", info, { Color = T.cores.borda, Thickness = 1.5 })
+		-- "?" no canto direito: não cobre o nome nem o custo (deixam 46 px livres).
+		local info = P.placa(carta, "Detalhes", UDim2.fromOffset(30, 30), { classe = "TextButton", transparencia = 0.1, raio = 15, transparenciaContorno = 0.2 })
+		info.AnchorPoint, info.Position, info.ZIndex = Vector2.new(1, 0.5), UDim2.new(1, -8, 0.5, 0), 6
+		info.Text, info.AutoButtonColor, info.FontFace, info.TextSize, info.TextColor3 = "?", false, T.fontes.titulo, 18, P.cor.ouroVivo
 		info.Activated:Connect(consultar)
 		carta:SetAttribute("Grupo", registro.grupo)
-		carta.Activated:Connect(function()
+		function registro.acionar()
 			tooltip.fechar()
 			if carta:GetAttribute("Bloqueada") then
 				consultar()
@@ -357,12 +429,14 @@ function AcoesDoTurno.start(state)
 				cor = cor, maxAlvos = mec.maxAlvos, permiteSi = mec.permiteSi,
 				pactoId = atual.ficha and atual.ficha.pactos and atual.ficha.pactos[atual.pacto],
 			})
-		end)
+		end
+		carta.Activated:Connect(registro.acionar)
 		carta.MouseEnter:Connect(function()
 			if carta.Visible and menu.Visible then
 				tooltip.abrir(habilidadeId, dadosDetalhe(), carta)
 				Previa.set(if habilidadeId == "mesa/esconder" then atual.tokenId else nil)
 			end
+			focoRegistro = registro
 			registro.hover = true
 			registro.pintar()
 		end)
@@ -374,11 +448,53 @@ function AcoesDoTurno.start(state)
 		return registro
 	end
 
+	-- Foco do teclado na lista: seta para cima/baixo e Enter.
+	local function linhasVisiveis()
+		local v = {}
+		for _, r in cartas do
+			if r.carta.Visible then table.insert(v, r) end
+		end
+		table.sort(v, function(a, b) return a.carta.LayoutOrder < b.carta.LayoutOrder end)
+		return v
+	end
+	local function moverFoco(passo: number)
+		local v = linhasVisiveis()
+		if #v == 0 then return end
+		local i = table.find(v, focoRegistro) or (if passo > 0 then 0 else #v + 1)
+		local novo = v[math.clamp(i + passo, 1, #v)]
+		if focoRegistro and focoRegistro ~= novo then focoRegistro.foco = false; focoRegistro.pintar() end
+		focoRegistro = novo
+		novo.foco = true
+		novo.pintar()
+		-- mantém a linha à vista
+		local topo, base = novo.carta.AbsolutePosition.Y, novo.carta.AbsolutePosition.Y + novo.carta.AbsoluteSize.Y
+		local area = cartasFrame.AbsolutePosition.Y
+		if topo < area then
+			cartasFrame.CanvasPosition -= Vector2.new(0, area - topo)
+		elseif base > area + cartasFrame.AbsoluteSize.Y then
+			cartasFrame.CanvasPosition += Vector2.new(0, base - area - cartasFrame.AbsoluteSize.Y)
+		end
+	end
+
 	atualizar = function()
 		local snapshot = state.snapshot()
 		local vez = snapshot and snapshot.combat.active and snapshot.combat.turnId
 		local token = if vez then state.findToken(vez) else nil
 		local mostrar = token ~= nil and token.habilidades ~= nil and state.canControl(token)
+		if mostrar and not menu.Visible then
+			-- entrada: os quatro vértices crescem em sequência (Back)
+			local i = 0
+			for _, b in vertices do
+				i += 1
+				local foco = b:FindFirstChild("Foco")
+				if foco then
+					foco.Scale = 0.7
+					task.delay((i - 1) * 0.04, function()
+						if b.Parent then P.animar(foco, { Scale = 1 }, P.ENTRADA, "foco") end
+					end)
+				end
+			end
+		end
 		menu.Visible = mostrar
 		if not mostrar then
 			lista.Visible, dica.Visible = false, false
@@ -401,6 +517,7 @@ function AcoesDoTurno.start(state)
 				registro.carta:Destroy()
 			end
 			table.clear(cartas)
+			focoRegistro = nil
 			-- Os golpes de todo mundo (ataque básico, disparo, Lâmina de Gelo) vêm primeiro.
 			local ordem = 0
 			for _, passe in { true, false } do
@@ -475,10 +592,12 @@ function AcoesDoTurno.start(state)
 			registro.carta:SetAttribute("Ativa", ativa == true)
 			detalhe.atualizar(id, registro.dadosDetalhe())
 			tooltip.atualizar(id, registro.dadosDetalhe())
-			registro.efeito.Text = motivo or registro.custo
-			registro.efeito.TextColor3 = if motivo then T.cores.alerta else T.cores.secundario
-			registro.arte.ImageTransparency = if motivo then 0.45 else 0
+			registro.efeito.Text = motivo or registro.linhaResumo
+			registro.efeito.TextColor3 = if motivo then P.cor.inimigo else P.cor.secundario
+			registro.nome.TextTransparency = if motivo then 0.45 else 0
+			registro.custoLabel.TextTransparency = if motivo then 0.45 else 0
 			registro.armada = (mira ~= nil and mira.habilidadeId == id) or ativa == true
+			registro.foco = registro.foco and naLista
 			registro.pintar()
 		end
 		atacar.Visible, habilidades.Visible = temAtaque, temHabilidade
@@ -500,22 +619,22 @@ function AcoesDoTurno.start(state)
 		end
 		for nome, b in botoesGrupo do
 			rotuloDe(b, nome .. " · " .. contagens[nome])
-			b.Rotulo.TextColor3 = if grupo == nome then T.cores.titulo else T.cores.texto
+			b.Rotulo.TextColor3 = if grupo == nome then P.cor.ouroVivo else P.cor.texto
 			b.Marca.Visible = grupo == nome
 		end
-		-- Alturas: menu pelas entradas visíveis; lista pelas cartas (abas só em Habilidades).
-		linhasMenu = 0
-		for _, filho in menu:GetChildren() do
-			if filho:IsA("TextButton") and filho.Visible then linhasMenu += 1 end
-		end
+		-- Alturas: a lista pelas cartas visíveis (abas só em Habilidades).
 		local comAbas = modoLista == "habilidades"
 		abas.Visible = comAbas
-		local maxCartas = Layout.LISTA_MAX_LINHAS - (if comAbas then 1 else 0)
-		local k = math.max(1, math.min(visiveis, maxCartas))
+		local k = math.max(1, math.min(visiveis, Layout.LISTA_MAX_LINHAS))
 		cartasFrame.Size = UDim2.new(1, 0, 0, Layout.alturaLista(k))
-		linhasLista = k + (if comAbas then 1 else 0)
-		lista.Visible = modoLista ~= nil and visiveis > 0
+		linhasLista, comAbasLista = k, comAbas
 		if modoLista ~= nil and visiveis == 0 then modoLista = nil end
+		local abrir = modoLista ~= nil and visiveis > 0
+		if abrir and not lista.Visible then
+			escalaLista.Scale = 0.92
+			P.animar(escalaLista, { Scale = 1 }, P.ENTRADA, "entrada")
+		end
+		lista.Visible = abrir
 		dica.Visible = true
 		if mira then
 			local mec = Execucao.MECANICAS[mira.habilidadeId]
@@ -532,10 +651,35 @@ function AcoesDoTurno.start(state)
 	end
 
 	cartasFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(function() tooltip.fechar() end)
-	gui.Destroying:Connect(function() tooltip.fechar() end)
+	-- Teclas dos vértices e foco da lista.
+	local teclas = UserInputService.InputBegan:Connect(function(input, processado)
+		if processado or not menu.Visible or UserInputService:GetFocusedTextBox() then return end
+		local dialogo = gui:FindFirstChild("DetalheAcao")
+		if dialogo and dialogo.Visible then return end
+		for nome, tecla in TECLAS do
+			if input.KeyCode == tecla then
+				local b = vertices[nome]
+				if b.Visible then cliques[b]() end
+				return
+			end
+		end
+		if not lista.Visible then return end
+		if input.KeyCode == Enum.KeyCode.Down then
+			moverFoco(1)
+		elseif input.KeyCode == Enum.KeyCode.Up then
+			moverFoco(-1)
+		elseif input.KeyCode == Enum.KeyCode.Return and focoRegistro and focoRegistro.carta.Visible then
+			focoRegistro.acionar()
+		end
+	end)
+	gui.Destroying:Connect(function()
+		teclas:Disconnect()
+		tooltip.fechar()
+	end)
 	if state.onFichaDetalhe then state.onFichaDetalhe(function(id) if id == atual.tokenId then atualizar() end end) end
 	state.onSnapshot(atualizar)
 	state.onMira(atualizar)
+	posicionar()
 	atualizar()
 	return gui
 end

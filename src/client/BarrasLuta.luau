@@ -1,16 +1,21 @@
--- Barras de vida finas sobre cada combatente (LUTA-B): inimigos em vermelho, aliados em verde; o nome
--- só de quem age ou está selecionado; marcadores pequenos de condição ao lado. Posição de tela
--- calculada a partir da casa do token (MesaProtocol.cellCenter). Só lê o snapshot.
+-- Barras de vida sobre cada combatente (HUD2): moldura fina dourada, barra com "rastro" de dano (a parte
+-- perdida fica clara e some com atraso), número de dano grande que salta do alvo, nome (sempre nos
+-- inimigos; nos aliados só de quem age ou está selecionado), losango sobre quem age e marcas de condição.
+-- Posição de tela a partir da casa do token (MesaProtocol.cellCenter). Só lê o snapshot.
 -- Enquanto a luta durar, esconde o rótulo+barra antigos do BoardView (BillboardGui com "BarraPV"),
 -- para não duplicar; ao fim da luta eles voltam.
--- Instances: ScreenGui "BarrasLuta" > <tokenId> > Nome | Trilho > Cheio | Marcas.
+-- Instances: ScreenGui "BarrasLuta" > <tokenId> > Nome | PV (barra) | Vez | Marcas | Saltos > Salto.
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Protocol = require(Shared:WaitForChild("MesaProtocol"))
 local T = require(script.Parent.UI.Tema)
+local P = require(script.Parent.UI.PecasLuta)
 
 local Barras = {}
+
+local LARGURA = 92
+local DURACAO_SALTO = 1.0
 
 -- Abreviação curta da condição para o marcador ("em-chamas" -> "Em ").
 function Barras.marca(id: string): string
@@ -25,36 +30,44 @@ function Barras.start(state)
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	gui.Parent = jogador:WaitForChild("PlayerGui")
 	local itens: { [string]: any } = {}
+	local ultimoPv: { [string]: number } = {}
 	local escondidos, ultimaContagem = false, -1
 
-	local function criar(id: string)
-		local raiz = Instance.new("Frame")
-		raiz.Name, raiz.AnchorPoint, raiz.Size, raiz.BackgroundTransparency = id, Vector2.new(0.5, 1), UDim2.fromOffset(72, 40), 1
-		raiz.Parent = gui
-		local nome = Instance.new("TextLabel")
-		nome.Name, nome.BackgroundTransparency, nome.Size = "Nome", 1, UDim2.new(1, 60, 0, 18)
-		nome.Position, nome.AnchorPoint = UDim2.fromScale(0.5, 0), Vector2.new(0.5, 0)
-		nome.FontFace, nome.TextSize, nome.TextColor3 = T.fontes.titulo, 16, T.sobreEscuro.texto
-		nome.TextStrokeColor3, nome.TextStrokeTransparency, nome.TextTruncate = T.cores.fundoTela, 0.15, Enum.TextTruncate.AtEnd
-		nome.Parent = raiz
-		local trilho = Instance.new("Frame")
-		trilho.Name, trilho.Position, trilho.Size = "Trilho", UDim2.fromOffset(0, 22), UDim2.new(1, 0, 0, 6)
-		trilho.BackgroundColor3, trilho.BackgroundTransparency, trilho.BorderSizePixel = T.cores.fio, 0.25, 0
-		trilho.Parent = raiz
-		Instance.new("UICorner", trilho).CornerRadius = UDim.new(1, 0)
-		local cheio = Instance.new("Frame")
-		cheio.Name, cheio.Size, cheio.BorderSizePixel = "Cheio", UDim2.fromScale(1, 1), 0
-		cheio.Parent = trilho
-		Instance.new("UICorner", cheio).CornerRadius = UDim.new(1, 0)
-		local marcas = Instance.new("Frame")
-		marcas.Name, marcas.Position, marcas.Size, marcas.BackgroundTransparency = "Marcas", UDim2.new(1, 6, 0, 16), UDim2.fromOffset(120, 18), 1
-		marcas.Parent = raiz
-		local lista = Instance.new("UIListLayout")
-		lista.FillDirection, lista.Padding = Enum.FillDirection.Horizontal, UDim.new(0, 3)
-		lista.Parent = marcas
-		local item = { raiz = raiz, nome = nome, cheio = cheio, marcas = marcas, assinatura = "" }
+	local function criar(id: string, token)
+		local raiz = P.novo("Frame", gui, { Name = id, AnchorPoint = Vector2.new(0.5, 1), Size = UDim2.fromOffset(LARGURA, 44), BackgroundTransparency = 1 })
+		local nome = P.novo("TextLabel", raiz, {
+			Name = "Nome", BackgroundTransparency = 1, Size = UDim2.new(1, 70, 0, 20), Position = UDim2.fromScale(0.5, 0), AnchorPoint = Vector2.new(0.5, 0),
+			FontFace = T.fontes.titulo, TextSize = 16, TextColor3 = P.cor.texto, TextStrokeColor3 = P.cor.trilho, TextStrokeTransparency = 0.2,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+		})
+		local vez = P.pip(raiz, 9)
+		vez.Name, vez.Position, vez.Visible = "Vez", UDim2.new(0.5, 0, 0, -6), false
+		local barra = P.barra({ parent = raiz, nome = "PV", posicao = UDim2.fromOffset(0, 24), tamanho = UDim2.new(1, 0, 0, 8), cor = if token.criatura then T.barras.baixa else T.barras.cheia })
+		local marcas = P.novo("Frame", raiz, { Name = "Marcas", Position = UDim2.new(1, 6, 0, 18), Size = UDim2.fromOffset(120, 18), BackgroundTransparency = 1 })
+		P.novo("UIListLayout", marcas, { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 3) })
+		local saltos = P.novo("Frame", raiz, { Name = "Saltos", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 })
+		local item = { raiz = raiz, nome = nome, vez = vez, barra = barra, marcas = marcas, saltos = saltos, assinatura = "", fim = nil, entrou = false }
 		itens[id] = item
 		return item
+	end
+
+	-- Número grande que salta do alvo: sobe com "pop" (Back) e some.
+	local function saltar(item, valor: number, cura: boolean)
+		local l = P.novo("TextLabel", item.saltos, {
+			Name = "Salto", AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0, 20), Size = UDim2.fromOffset(120, 40),
+			BackgroundTransparency = 1, Text = (if cura then "+" else "") .. tostring(math.abs(valor)),
+			FontFace = T.fontes.numero, TextSize = 34, TextColor3 = if cura then T.barras.cheia else Color3.fromRGB(255, 226, 170),
+			TextStrokeColor3 = if cura then P.cor.trilho else T.barras.baixa:Lerp(P.cor.trilho, 0.55), TextStrokeTransparency = 0, ZIndex = 10,
+		})
+		local escala = P.novo("UIScale", l, { Scale = 0.4 })
+		P.animar(escala, { Scale = 1.15 }, TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out), "pop")
+		P.animar(l, { Position = UDim2.new(0.5, (math.random() - 0.5) * 36, 0, -34) }, TweenInfo.new(DURACAO_SALTO, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), "sobe")
+		task.delay(0.55, function()
+			if l.Parent then
+				P.animar(l, { TextTransparency = 1, TextStrokeTransparency = 1 }, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), "some")
+			end
+		end)
+		task.delay(DURACAO_SALTO + 0.05, function() if l.Parent then l:Destroy() end end)
 	end
 
 	local function marcarBillboards(esconder: boolean)
@@ -70,6 +83,7 @@ function Barras.start(state)
 		if not snap or not snap.combat.active then
 			if next(itens) then
 				for id, item in itens do item.raiz:Destroy(); itens[id] = nil end
+				table.clear(ultimoPv)
 			end
 			marcarBillboards(false)
 			ultimaContagem = -1
@@ -83,41 +97,65 @@ function Barras.start(state)
 		local cam = workspace.CurrentCamera
 		local selecionado = state.selectedToken()
 		local vistos = {}
+		local agora = os.clock()
 		for _, t in snap.tokens do
 			local caido = t.derrotado or (t.pv ~= nil and t.pv <= 0)
-			if not t.hidden and not caido and t.x and t.z and t.pv ~= nil and (t.pvMax or 0) > 0 then
-				local p, visivel = cam:WorldToViewportPoint(Protocol.cellCenter(t.x, t.z) + Vector3.new(0, 6.2, 0))
-				local item = itens[t.id] or criar(t.id)
-				vistos[t.id] = true
-				item.raiz.Visible = visivel and p.Z > 0
-				if item.raiz.Visible then
-					item.raiz.Position = UDim2.fromOffset(p.X, p.Y)
-					local r = math.clamp(t.pv / t.pvMax, 0, 1)
-					item.cheio.Size = UDim2.fromScale(r, 1)
-					item.cheio.BackgroundColor3 = if t.criatura then T.barras.baixa else T.barras.cheia
-					local destaque = snap.combat.turnId == t.id or selecionado == t.id
-					item.nome.Visible = destaque
-					if destaque then item.nome.Text = t.name end
-					local ids = {}
-					for _, c in t.conditions or {} do table.insert(ids, c.id) end
-					local assinatura = table.concat(ids, "|")
-					if assinatura ~= item.assinatura then
-						item.assinatura = assinatura
-						for _, f in item.marcas:GetChildren() do if f:IsA("TextLabel") then f:Destroy() end end
-						for i, id in ids do
-							if i > 3 then break end
-							local chip = Instance.new("TextLabel")
-							chip.Name, chip.Text, chip.AutomaticSize, chip.Size = "Marca", Barras.marca(id), Enum.AutomaticSize.X, UDim2.fromOffset(0, 18)
-							chip.BackgroundColor3, chip.TextColor3, chip.FontFace, chip.TextSize = T.cores.painel, T.cores.texto, T.fontes.rotulo, 14
-							chip.LayoutOrder = i
-							Instance.new("UICorner", chip).CornerRadius = UDim.new(0, 4)
-							local pad = Instance.new("UIPadding", chip)
-							pad.PaddingLeft, pad.PaddingRight = UDim.new(0, 4), UDim.new(0, 4)
-							chip.Parent = item.marcas
+			if not t.hidden and t.x and t.z and t.pv ~= nil and (t.pvMax or 0) > 0 then
+				local item = itens[t.id]
+				local anterior = ultimoPv[t.id]
+				-- um token que acabou de cair ainda mostra o último golpe por um instante
+				if caido and item and not item.fim and anterior and anterior > t.pv then
+					item.fim = agora + DURACAO_SALTO + 0.1
+				end
+				if not caido or (item and item.fim and agora < item.fim) then
+					local p, visivel = cam:WorldToViewportPoint(Protocol.cellCenter(t.x, t.z) + Vector3.new(0, 6.2, 0))
+					item = item or criar(t.id, t)
+					vistos[t.id] = true
+					item.raiz.Visible = visivel and p.Z > 0
+					if item.raiz.Visible then
+						item.raiz.Position = UDim2.fromOffset(p.X, p.Y)
+						item.barra.definir(t.pv, t.pvMax, not item.entrou)
+						if not item.entrou then
+							item.entrou = true
+							local escala = P.novo("UIScale", item.raiz, { Scale = 0.7 })
+							P.animar(escala, { Scale = 1 }, P.ENTRADA, "entrada")
+						end
+						if anterior and anterior ~= t.pv then
+							saltar(item, t.pv - anterior, t.pv > anterior)
+						end
+						local daVez = snap.combat.turnId == t.id
+						local mostrarNome = t.criatura or daVez or selecionado == t.id
+						item.nome.Visible = mostrarNome and not caido
+						if mostrarNome then
+							item.nome.Text = t.name
+							item.nome.TextColor3 = if daVez then P.cor.ouroVivo else P.cor.texto
+						end
+						item.vez.Visible = daVez and not caido
+						item.barra.raiz.Visible = not caido
+						item.barra.raiz.Contorno.Color = if t.criatura then P.cor.inimigo else P.cor.ouro
+						local ids = {}
+						for _, c in t.conditions or {} do table.insert(ids, c.id) end
+						local assinatura = table.concat(ids, "|")
+						if assinatura ~= item.assinatura then
+							item.assinatura = assinatura
+							for _, f in item.marcas:GetChildren() do if f:IsA("TextLabel") then f:Destroy() end end
+							for i, cid in ids do
+								if i > 3 then break end
+								local chip = P.novo("TextLabel", nil, {
+									Name = "Marca", Text = Barras.marca(cid), AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, 18),
+									BackgroundColor3 = P.cor.fundo, BackgroundTransparency = 0.15, TextColor3 = P.cor.texto, FontFace = T.fontes.rotulo,
+									TextSize = 14, LayoutOrder = i,
+								})
+								P.novo("UICorner", chip, { CornerRadius = UDim.new(0, 4) })
+								P.novo("UIStroke", chip, { Color = P.cor.ouro, Thickness = 1, Transparency = 0.5 })
+								P.novo("UIPadding", chip, { PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 4) })
+								chip.Parent = item.marcas
+							end
 						end
 					end
 				end
 			end
+			if t.pv ~= nil then ultimoPv[t.id] = t.pv end
 		end
 		for id, item in itens do
 			if not vistos[id] then item.raiz:Destroy(); itens[id] = nil end

@@ -77,12 +77,13 @@ function Servico.start(deps)
  local origem = script.Parent.Mundo.Modelos
  for _, lista in {Catalogo.PECAS, Catalogo.CABELOS, Catalogo.BARBAS} do
   for _, item in lista do
-   local id = item.modulo
-   local fonte = id and origem:FindFirstChild(id)
-   if fonte and fonte:IsA("ModuleScript") and not modelos:FindFirstChild(id) then fonte:Clone().Parent = modelos end
-   if fonte and not moldes:FindFirstChild(id) then
-    local molde = Montar.montar(id, moldes, CFrame.new(), 1)
-    molde.Name = id
+   for _, id in {item.modulo, item.malha} do -- PERS3b: a malha (Blender) também é replicada
+    local fonte = id and origem:FindFirstChild(id)
+    if fonte and fonte:IsA("ModuleScript") and not modelos:FindFirstChild(id) then fonte:Clone().Parent = modelos end
+    if fonte and not moldes:FindFirstChild(id) then
+     local molde = Montar.montar(id, moldes, CFrame.new(), 1)
+     molde.Name = id
+    end
    end
   end
  end

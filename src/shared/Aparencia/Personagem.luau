@@ -5,6 +5,8 @@ local Personagem = {}
 
 -- true restaura a cabeça de cubo do boneco antigo (volta rápida se a cabeça redonda falhar no Studio).
 Personagem.CABECA_CUBICA = false
+-- PERS3b: as peças em malha (Blender) foram feitas para a cabeça R15 de 1,2 stud; o fator é altura real / 1,2.
+Personagem.CABECA_MALHA = 1.2
 -- O cabelo do avatar do jogador só entra quando houver campo próprio no perfil e a verificação no Studio (PERS2 pendente).
 Personagem.CABELO_DO_AVATAR = false
 

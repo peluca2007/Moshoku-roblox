@@ -74,8 +74,16 @@ function Visual.decorar(corpo, a, raceId)
 	-- PERS3: rosto pintado (Decal, simétrico e sem blocos vazando da cabeça) quando já enviado; senão blocos.
 	local decal = Personagem.rostoDecal(a.rosto, a.cores.olho)
 	if decal then
+		-- O Decal direto na cabeça R15 sai como uma lasca (UV da malha) e a textura da cabeça traz um rosto preto:
+		-- limpa a textura e usa uma placa fina na frente (Decal em Part quase transparente; 1.0 esconderia o Decal).
+		head.TextureID = ""
+		local placa = Instance.new("Part")
+		placa.Name, placa.Transparency = "RostoPlaca", 0.99
+		placa.Size = Vector3.new(medidas.largura, medidas.altura, 0.02)
+		placa.CFrame = head.CFrame * CFrame.new(0, 0, -(medidas.profundidade / 2 + 0.012))
 		local d = Instance.new("Decal")
-		d.Name, d.Face, d.Texture, d.Parent = "face", Enum.NormalId.Front, decal, head
+		d.Name, d.Face, d.Texture, d.Parent = "face", Enum.NormalId.Front, decal, placa
+		placa.Parent = pasta
 	end
 	for categoria, estilo in (if decal then {} else a.rosto) do
 		for i, bloco in Catalogo.ROSTO[categoria][estilo] do
@@ -103,11 +111,13 @@ function Visual.decorar(corpo, a, raceId)
 		if not nome then return end
 		for _, ponto in item.encaixes or { item.encaixe } do
 			local c = { modulo = nome, parte = ponto.parte, offset = ponto.offset }
-			Encaixe.montar(corpo, c, pasta, medidas.altura, tint) -- altura real da cabeça (= escala se cúbica)
+			Encaixe.montar(corpo, c, pasta, if nome == item.malha then medidas.altura / Personagem.CABECA_MALHA else medidas.altura, tint) -- altura real da cabeça (= escala se cúbica)
 		end
 	end
 	if Personagem.CABELO_DO_AVATAR then recolorirCabelo(corpo, cor(a.cores.cabelo)) end
-	montar(Catalogo.CABELOS[a.cabelo], cor(a.cores.cabelo))
+	-- PERS3b: o capuz cobre a cabeça; com cabelo junto, as mechas atravessavam o tecido.
+	local capuz = table.find(a.roupas, "RoupaCapuz1") ~= nil or table.find(Racas.POR_ID[raceId].obrigatorias, "RoupaCapuz1") ~= nil
+	if not capuz then montar(Catalogo.CABELOS[a.cabelo], cor(a.cores.cabelo)) end
 	montar(Catalogo.BARBAS[a.barba], cor(a.cores.cabelo))
 	for _, id in Racas.POR_ID[raceId].obrigatorias do
 		local item = Catalogo.PECAS[id]
@@ -115,7 +125,7 @@ function Visual.decorar(corpo, a, raceId)
 	end
 	for _, id in a.roupas do
 		-- Túnica básica segue a camisa selecionada; trajes autorais mantêm suas cores.
-		montar(Catalogo.PECAS[id], if id == "RoupaTunica1" then cor(a.cores.camisa) else nil)
+		montar(Catalogo.PECAS[id], if id == "RoupaTunica1" or id == "RoupaCapaCurta1" then cor(a.cores.camisa) else nil)
 	end
 end
 

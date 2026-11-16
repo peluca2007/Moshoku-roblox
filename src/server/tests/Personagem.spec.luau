@@ -40,11 +40,14 @@ return {
 	end,
 	["PERS3: sem rosto enviado cai nos blocos; com id devolve o decal da cor do olho"] = function(t)
 		local rosto = { olhos = "OlhoQuadrado", sobrancelhas = "SobrancelhaReta", boca = "BocaReta" }
+		local salvo = P.ROSTOS.neutro
+		P.ROSTOS.neutro = {}
 		t.eq(P.rostoDecal(rosto, "OlhoAzul"), nil)
 		P.ROSTOS.neutro.OlhoAzul = "rbxassetid://1"
 		t.eq(P.rostoDecal(rosto, "OlhoAzul"), "rbxassetid://1")
 		t.eq(P.rostoDecal(rosto, "OlhoVerde"), nil)
-		P.ROSTOS.neutro.OlhoAzul = nil
+		P.ROSTOS.neutro = salvo
+		t.ok(type(P.ROSTOS.neutro.OlhoAzul) == "string" and type(P.ROSTOS.serio.OlhoNegro) == "string", "ROSTOS preenchido")
 	end,
 	["PERS3: malha preferida quando existe; reserva de blocos senao; peca nova so existe em malha"] = function(t)
 		local tudo = function() return true end

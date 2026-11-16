@@ -124,7 +124,7 @@ return {
 			t.ok(clipe.raiz and #clipe.raiz >= 1, nome .. " sem raiz")
 			for _, ch in clipe.raiz do
 				-- o personagem fica na casa: deslocamento da raiz limitado
-				t.ok(math.abs(ch[2]) <= 1.5 and math.abs(ch[4]) <= 1.5 and ch[3] >= -2 and ch[3] <= 0.5, nome .. ": raiz fora da casa")
+				t.ok(math.abs(ch[2]) <= 1.5 and math.abs(ch[4]) <= 1.5 and ch[3] >= -2 and ch[3] <= 1.2, nome .. ": raiz fora da casa")
 			end
 		end
 	end,
@@ -145,7 +145,9 @@ return {
 		t.ok(Catalogo.CLIPES.Queda.segurar == true, "Queda termina caído e fica")
 		-- clipes de ação começam na postura (mistura sem salto)
 		local postura = Catalogo.CLIPES.PosturaCombate
+		-- (clipes da UAL começam na pose original dela; o tocador mistura na entrada com fadeEntrada)
 		for _, nome in { "CorteLeve", "CortePesado", "Estocada", "DisparoArco", "Conjurar", "Esquiva", "Bloqueio" } do
+			if Catalogo.CLIPES[nome].origem ~= "script" or postura.origem ~= "script" then continue end
 			for junta, chaves in Catalogo.CLIPES[nome].juntas do
 				local a = chaves[1]
 				local qx, qy, qz, qw = Amostra.junta(postura.juntas[junta], 0)

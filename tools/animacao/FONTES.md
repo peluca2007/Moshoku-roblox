@@ -1,6 +1,6 @@
 # Fontes das animações (ANIM1)
 
-## Universal Animation Library (Quaternius) — NÃO baixada
+## Universal Animation Library (Quaternius) — baixada em 15/11/2026 (UAL1 Standard, CC0; ver docs/ARTE.md)
 
 | | UAL 1 | UAL 2 |
 |---|---|---|

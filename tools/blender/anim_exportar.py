@@ -233,6 +233,12 @@ def main():
             quadros, info = ual[nome]
             base = dict(clipe or {}, **info)
             dados = para_dados(nome, base, quadros, "ual")
+            if not base.get("sem_ajuste_chao"):
+                # o redirecionamento não tem IK: ergue a raiz (constante no clipe) até a sola mais baixa do primeiro quadro tocar o chão
+                import anim_previa
+                m = anim_previa.posar(dados, 0.0)  # mede no primeiro quadro (o rolamento sai do chão depois)
+                m0 = min((m[l + "Foot"] @ c).y for l in ("Right", "Left") for c in anim_previa._cantos(R.PECAS[l + "Foot"][1]))
+                dados["raiz"] = [[t, x, y - m0, z] for t, x, y, z in dados["raiz"]]
             nota = "Origem: Universal Animation Library (Quaternius, CC0), redirecionada para o R15; ver tools/animacao/FONTES.md."
             arma, pior_ik = base.get("arma"), 0.0
         else:

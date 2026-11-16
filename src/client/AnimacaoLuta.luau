@@ -69,15 +69,27 @@ function AnimacaoLuta.start(state)
 	end
 
 	-- Só para inspeção (como CenaTempoFixo): o atributo LutaClipeTeste do Workspace ("Queda", "Vitoria"...)
-	-- toca esse clipe nos avatares em luta; nil o tira.
+	-- toca esse clipe nos avatares em luta; nil o tira. Com LutaClipeManual=true o tempo não anda sozinho: o atributo
+-- LutaClipeTempo (segundos do clipe) o põe em qualquer instante (capturas quadro a quadro da QA).
 	workspace:GetAttributeChangedSignal("LutaClipeTeste"):Connect(function()
 		local nome = workspace:GetAttribute("LutaClipeTeste")
 		for _, c in corpos do
 			if c.teste then c.teste:parar(0.2); c.teste = nil end
 			if type(nome) == "string" and c.tocador.vivo then
-				local ok, controle = pcall(c.tocador.tocar, c.tocador, nome)
-				if ok then c.teste = controle end
+				local manual = workspace:GetAttribute("LutaClipeManual") == true
+				local ok, controle = pcall(c.tocador.tocar, c.tocador, nome, if manual then { manual = true, fadeEntrada = 0.001, fadeSaida = 0.001 } else nil)
+				if ok then
+					c.teste = controle
+					if manual then controle:em(tonumber(workspace:GetAttribute("LutaClipeTempo")) or 0) end
+				end
 			end
+		end
+	end)
+	workspace:GetAttributeChangedSignal("LutaClipeTempo"):Connect(function()
+		local t = tonumber(workspace:GetAttribute("LutaClipeTempo"))
+		if not t then return end
+		for _, c in corpos do
+			if c.teste and not c.teste.terminou then c.teste:em(t) end
 		end
 	end)
 

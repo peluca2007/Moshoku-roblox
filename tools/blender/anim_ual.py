@@ -150,20 +150,35 @@ def exportar(caminho, mapa, fps):
     for clipe, cfg in mapa.items():
         if clipe.startswith("_"):
             continue  # "_nota" e afins
-        acao = bpy.data.actions.get(cfg["acao"])
-        if not acao:
-            print("UAL: ação não encontrada:", cfg["acao"], "disponíveis:", [a.name for a in bpy.data.actions])
-            continue
+        # "acao" pode ser uma lista de trechos ({acao, inicio, fim}) emendados em sequência; "velocidade" > 1 acelera
+        trechos = cfg["acao"] if isinstance(cfg["acao"], list) else [cfg]
+        vel = float(cfg.get("velocidade", 1.0))
         arm.animation_data_create()
-        arm.animation_data.action = acao
-        f0, f1 = acao.frame_range
-        f0 = cfg.get("inicio", f0)
-        f1 = cfg.get("fim", f1)
-        dur = (f1 - f0) / fps_origem
-        n = int(math.ceil(dur * fps - 1e-9))
-        quadros = [f0 + min(k / fps, dur) * fps_origem for k in range(n + 1)]
-        saida[clipe] = (amostrar_armature(arm, ossos, quadros, fps_origem, f0),
-                        {"duracao": round(dur, 4), "laco": bool(cfg.get("laco")), "marcos": cfg.get("marcos", {}),
+        quadros_total, t_base, ok = [], 0.0, True
+        for tr in trechos:
+            nome_acao = tr["acao"] if isinstance(tr, dict) else tr
+            acao = bpy.data.actions.get(nome_acao)
+            if not acao:
+                print("UAL: ação não encontrada:", nome_acao, "disponíveis:", [a.name for a in bpy.data.actions])
+                ok = False
+                break
+            arm.animation_data.action = acao
+            f0, f1 = acao.frame_range
+            f0 = tr.get("inicio", f0) if isinstance(tr, dict) else f0
+            f1 = tr.get("fim", f1) if isinstance(tr, dict) else f1
+            dur = (f1 - f0) / fps_origem / vel
+            n = int(math.ceil(dur * fps - 1e-9))
+            ts = [min(k / fps, dur) for k in range(n + 1)]
+            if quadros_total:
+                ts = ts[1:]  # o primeiro quadro repete o último do trecho anterior
+            qs = [f0 + t * vel * fps_origem for t in ts]
+            for t, pose in amostrar_armature(arm, ossos, qs, fps_origem, f0):
+                quadros_total.append((t_base + t / vel, pose))
+            t_base += dur
+        if not ok:
+            continue
+        saida[clipe] = (quadros_total,
+                        {"duracao": round(t_base, 4), "laco": bool(cfg.get("laco")), "marcos": cfg.get("marcos", {}),
                          "segurar": bool(cfg.get("segurar"))})
     return saida
 

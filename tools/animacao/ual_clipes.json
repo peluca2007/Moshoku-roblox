@@ -1,12 +1,9 @@
 {
-  "_nota": "Mapa dos clipes para as ações da UAL1 Standard (Unreal-Godot/UAL1_Standard.glb, 24 fps). Marcos em segundos do clipe final. Clipes fora daqui (DisparoArco, Canalizar? Bloqueio, Vitoria) continuam posados por script.",
+  "_nota": "Mapa dos clipes para as ações da UAL1 Standard (Unreal-Godot/UAL1_Standard.glb, 24 fps). Marcos em segundos do clipe final. Clipes fora daqui (CortePesado, Estocada, ReacaoGolpe, DisparoArco, Bloqueio, Vitoria; ANIM3) são posados por script: a UAL1 não tem estocada, arco, bloqueio nem golpe pesado, e o Hit_Chest é curto demais.",
   "PosturaCombate": { "acao": "Sword_Idle", "laco": true },
   "CorteLeve": { "acao": [{ "acao": "Sword_Attack", "inicio": 0, "fim": 30 }], "velocidade": 1.1, "marcos": { "impacto": 0.38 } },
-  "CortePesado": { "acao": [{ "acao": "Sword_Attack", "inicio": 0, "fim": 37 }], "velocidade": 0.7, "marcos": { "impacto": 0.6 } },
-  "Estocada": { "acao": "Punch_Jab", "velocidade": 1.0, "marcos": { "impacto": 0.19 } },
   "Conjurar": { "acao": [{ "acao": "Spell_Simple_Enter" }, { "acao": "Spell_Simple_Shoot" }, { "acao": "Spell_Simple_Exit" }], "marcos": { "impacto": 0.7 } },
   "Canalizar": { "acao": "Spell_Simple_Idle_Loop", "laco": true },
-  "ReacaoGolpe": { "acao": "Hit_Chest", "velocidade": 0.8, "marcos": { "impacto": 0.0 } },
   "Esquiva": { "acao": "Roll", "velocidade": 1.5, "marcos": { "desvio": 0.15 } },
   "Queda": { "acao": "Death01", "segurar": true, "marcos": { "chao": 1.0 } }
 }

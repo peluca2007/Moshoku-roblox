@@ -13,6 +13,7 @@ local CondicaoRules = require(Shared:WaitForChild("CondicaoRules"))
 local Condicoes = require(Shared:WaitForChild("Condicoes"))
 local Estilo = require(Shared:WaitForChild("Estilo"))
 local Efeitos = require(script.Parent:WaitForChild("Efeitos"))
+local Feedback = require(script.Parent:WaitForChild("FeedbackCombate")) -- ANIM3: fila de apresentação (número de dano no impacto)
 local Furtividade = require(Shared.VisibilidadeFurtiva)
 local Enquadramento = require(Shared.EnquadramentoMesa)
 local Movimento = require(script.Parent.BloqueioMovimento)
@@ -527,7 +528,8 @@ function BoardView.start(state)
 					Size = UDim2.fromScale(ratio, 1),
 					BackgroundColor3 = barColor(ratio),
 				}):Play()
-				if not fresh and view.lastPv and token.pv ~= view.lastPv then
+				-- ANIM3: o número de dano espera o impacto do golpe (FeedbackCombate o solta e marca como mostrado)
+				if not fresh and view.lastPv and token.pv ~= view.lastPv and not Feedback.emCombate() then
 					Efeitos.damageText(target.Position + Vector3.new(0, 5, 0), token.pv - view.lastPv)
 				end
 				view.lastPv = token.pv

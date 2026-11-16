@@ -11,6 +11,26 @@ local Gestos = require(script.Parent.Gestos)
 local Sons = require(Shared.Sons)
 local Sonorizacao = require(script.Parent.Sonorizacao)
 local FX = require(script.Parent.MenuEfeitos)
+local Feedback = require(script.Parent.FeedbackCombate)
+local AnimacaoCriatura = require(Shared.Mundo.AnimacaoCriatura)
+local CatalogoCriaturas = require(Shared.Animacoes.Criaturas.Catalogo)
+
+-- ANIM3: instante (s após o recibo) em que o golpe de uma criatura encosta: marco `impacto` do clipe de ataque dela
+-- (o servidor começa o clipe ao enviar o recibo). nil se não é criatura ou o clipe não marca.
+local function impactoDaCriatura(state, casterId)
+	local snap = state.snapshot()
+	if not snap or not casterId then return nil end
+	for _, t in snap.tokens do
+		if t.id == casterId then
+			local nome = if type(t.criatura) == "string" then t.criatura elseif type(t.modelo) == "string" then t.modelo else nil
+			if not nome or nome == "" then return nil end
+			local dados = CatalogoCriaturas[string.upper(string.sub(nome, 1, 1)) .. string.sub(nome, 2) .. "Quaternius"]
+			local _, clipe = AnimacaoCriatura.clipeDe(dados, "ataque")
+			return AnimacaoCriatura.marcoImpacto(clipe)
+		end
+	end
+	return nil
+end
 
 local Coreografia = {}
 local MAX_CENAS, MAX_PECAS, MAX_POR_CENA = 6, 640, 170
@@ -499,6 +519,12 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				end
 				local quando = if plano.chegada then plano.chegada + (i - 1) * 0.04 else lancamento + (if viaja then viagem else 0)
 				local resultado = if #tiros > 1 then tiro else alvo
+				-- ANIM3: número, barra e queda do alvo esperam o golpe encostar (limite de segurança na fila)
+				if resultado.acertou ~= false and not FX.reduzidos then
+					local atraso = quando
+					atraso = math.max(atraso, impactoDaCriatura(state, recibo.casterId) or 0)
+					Feedback.fila:reter(alvo.id, os.clock(), atraso)
+				end
 				local somImpacto = Sons.impacto(id, arv, spec, resultado)
 				if somImpacto then
 					evento(cena, quando, function()

@@ -11,6 +11,7 @@ local Shared = game:GetService("ReplicatedStorage").Shared
 local Protocol = require(Shared:WaitForChild("MesaProtocol"))
 local T = require(script.Parent.UI.Tema)
 local P = require(script.Parent.UI.PecasLuta)
+local Feedback = require(script.Parent.FeedbackCombate)
 
 local Barras = {}
 
@@ -126,7 +127,8 @@ function Barras.start(state)
 		local selecionado = state.selectedToken()
 		local vistos = {}
 		local agora = os.clock()
-		for _, t in snap.tokens do
+		for _, t0 in snap.tokens do
+			local t = Feedback.visto(t0) -- ANIM3: barra e número esperam o impacto do golpe
 			local caido = t.derrotado or (t.pv ~= nil and t.pv <= 0)
 			if not t.hidden and t.x and t.z and t.pv ~= nil and (t.pvMax or 0) > 0 then
 				local item = itens[t.id]

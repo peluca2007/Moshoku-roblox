@@ -1,4 +1,4 @@
-"""Clipes posados por script (ANIM1): poses-chave autorais dos 12 clipes de combate.
+﻿"""Clipes posados por script (ANIM1): poses-chave autorais dos 12 clipes de combate.
 
 Cada clipe: duracao (s), laco, marcos {nome: t}, modos (ver anim_pose.resolver), arma da prévia
 ("espada", "arco" ou None) e chaves [(t, canais, tensao)]. As chaves de ação começam e terminam na POSTURA, para o
@@ -62,53 +62,66 @@ CLIPES["CorteLeve"] = dict(
 
 # ------------------------------------------------------------------------------------------------ corte pesado
 CLIPES["CortePesado"] = dict(
-    duracao=1.45, laco=False, marcos={"impacto": 0.80}, modos={}, arma="espada",
+    duracao=1.75, laco=False, marcos={"impacto": 0.98}, modos={}, arma="espada",
     chaves=[
         (0.0, POSTURA, 1.0),
-        # ergue a arma com as duas mãos sobre a cabeça, inclina para trás
-        (0.42, P(POSTURA, raiz_pos=(0.0, -0.14, 0.22), raiz_rot=(0, -8, 0), cintura=(14, -6, 0), pescoco=(-8, 8, 0),
-                 ombroD=(166, 6, 14), cotoveloD=(58, 0, 0), pulsoD=(-14, 0, 0),
-                 ombroE=(160, -6, -12), cotoveloE=(66, 0, 0)), 0.3),
-        # segura no alto (antecipação)
-        (0.60, P(POSTURA, raiz_pos=(0.0, -0.12, 0.26), raiz_rot=(0, -8, 0), cintura=(18, -6, 0), pescoco=(-10, 8, 0),
-                 ombroD=(174, 6, 12), cotoveloD=(62, 0, 0), pulsoD=(-18, 0, 0),
-                 ombroE=(168, -6, -10), cotoveloE=(70, 0, 0)), 1.0),
-        # impacto: desce em arco à frente, tronco dobrado, joelho da frente cede
-        (0.80, P(POSTURA, raiz_pos=(0.0, -0.50, -0.46), raiz_rot=(-4, 0, 0), cintura=(-18, 6, 0), pescoco=(10, 0, 0),
-                 ombroD=(56, 14, -8), cotoveloD=(5, 0, 0), pulsoD=(-62, 0, 0),
-                 ombroE=(56, -26, 10), cotoveloE=(14, 0, 0), pulsoE=(-20, 0, 0)), 0.0),
-        # assenta: a lâmina ainda desce um pouco e para
-        (0.96, P(POSTURA, raiz_pos=(0.0, -0.56, -0.48), raiz_rot=(-6, 0, 0), cintura=(-22, 6, 0), pescoco=(12, 0, 0),
-                 ombroD=(48, 14, -8), cotoveloD=(8, 0, 0), pulsoD=(-60, 0, 0),
-                 ombroE=(44, -26, 10), cotoveloE=(16, 0, 0), pulsoE=(-20, 0, 0)), 1.0),
-        (1.45, POSTURA, 1.0),
+        # agacha e puxa a arma para trás: o corpo "carrega" antes de subir (antecipação longa)
+        (0.26, P(POSTURA, raiz_pos=(0.0, -0.46, 0.30), raiz_rot=(0, -20, 0), cintura=(-4, -22, 0), pescoco=(2, 20, 0),
+                 ombroD=(60, 0, 40), cotoveloD=(80, 0, 0), pulsoD=(-20, 0, 0),
+                 ombroE=(60, -14, -20), cotoveloE=(70, 0, 0)), 0.4),
+        # ergue a arma com as duas mãos sobre a cabeça, tronco arqueado para trás
+        (0.56, P(POSTURA, raiz_pos=(0.0, -0.10, 0.34), raiz_rot=(0, -8, 0), cintura=(20, -6, 0), pescoco=(-10, 8, 0),
+                 ombroD=(170, 6, 14), cotoveloD=(58, 0, 0), pulsoD=(-14, 0, 0),
+                 ombroE=(164, -6, -12), cotoveloE=(66, 0, 0)), 0.3),
+        # segura no alto, tremendo de esforço (o jogador lê "vem coisa pesada")
+        (0.76, P(POSTURA, raiz_pos=(0.0, -0.08, 0.38), raiz_rot=(0, -8, 0), cintura=(24, -6, 0), pescoco=(-12, 8, 0),
+                 ombroD=(180, 6, 12), cotoveloD=(62, 0, 0), pulsoD=(-18, 0, 0),
+                 ombroE=(174, -6, -10), cotoveloE=(70, 0, 0)), 1.0),
+        # desce rápido: tronco dobra, joelho cede, braços chegam estendidos
+        (0.90, P(POSTURA, raiz_pos=(0.0, -0.36, 0.0), raiz_rot=(-2, 0, 0), cintura=(-4, 4, 0), pescoco=(2, 0, 0),
+                 ombroD=(112, 10, -2), cotoveloD=(30, 0, 0), pulsoD=(-40, 0, 0),
+                 ombroE=(110, -16, 4), cotoveloE=(34, 0, 0)), 0.0),
+        # impacto: lâmina no chão à frente, corpo todo no golpe
+        (0.98, P(POSTURA, raiz_pos=(0.0, -0.58, -0.50), raiz_rot=(-4, 0, 0), cintura=(-24, 6, 0), pescoco=(12, 0, 0),
+                 ombroD=(52, 14, -8), cotoveloD=(5, 0, 0), pulsoD=(-62, 0, 0),
+                 ombroE=(52, -26, 10), cotoveloE=(14, 0, 0), pulsoE=(-20, 0, 0)), 0.0),
+        # a lâmina ainda assenta e o corpo fica curvado (recuperação lenta)
+        (1.14, P(POSTURA, raiz_pos=(0.0, -0.62, -0.52), raiz_rot=(-6, 0, 0), cintura=(-26, 6, 0), pescoco=(12, 0, 0),
+                 ombroD=(46, 14, -8), cotoveloD=(8, 0, 0), pulsoD=(-60, 0, 0),
+                 ombroE=(42, -26, 10), cotoveloE=(16, 0, 0), pulsoE=(-20, 0, 0)), 1.0),
+        (1.40, P(POSTURA, raiz_pos=(0.0, -0.40, -0.20), cintura=(-12, 8, 0)), 0.6),
+        (1.75, POSTURA, 1.0),
     ],
 )
 
 # ------------------------------------------------------------------------------------------------ estocada
 CLIPES["Estocada"] = dict(
-    duracao=0.95, laco=False, marcos={"impacto": 0.40}, modos={}, arma="espada",
+    duracao=1.1, laco=False, marcos={"impacto": 0.50}, modos={}, arma="espada",
     chaves=[
         (0.0, POSTURA, 1.0),
-        # recolhe: mão junto ao quadril, ponta para a frente, ombro direito para trás
-        (0.22, P(POSTURA, raiz_pos=(0.0, -0.30, 0.22), raiz_rot=(0, -22, 0), cintura=(-4, -16, 0), pescoco=(0, 34, 0),
-                 ombroD=(12, 10, 18), cotoveloD=(96, 0, 0), pulsoD=(-78, 0, 0),
+        # recolhe: mão junto ao quadril, ponta para a frente, peso no pé de trás (antecipação)
+        (0.30, P(POSTURA, raiz_pos=(0.0, -0.34, 0.26), raiz_rot=(0, -26, 0), cintura=(-4, -20, 0), pescoco=(0, 38, 0),
+                 ombroD=(12, 10, 18), cotoveloD=(100, 0, 0), pulsoD=(-80, 0, 0),
                  ombroE=(46, -10, -20), cotoveloE=(40, 0, 0)), 0.6),
-        (0.30, P(POSTURA, raiz_pos=(0.0, -0.32, -0.15), raiz_rot=(0, -6, 0), cintura=(-8, 4, 0), pescoco=(0, 6, 0),
-                 peE=(-0.72, 0.28, -0.95),
-                 ombroD=(44, 16, 6), cotoveloD=(60, 0, 0), pulsoD=(-80, 0, 0),
+        # arranca: o pé da frente sai, o corpo cai para o alvo antes do braço
+        (0.42, P(POSTURA, raiz_pos=(0.0, -0.36, -0.18), raiz_rot=(0, -6, 0), cintura=(-8, 4, 0), pescoco=(0, 6, 0),
+                 peE=(-0.72, 0.30, -0.98),
+                 ombroD=(44, 16, 6), cotoveloD=(64, 0, 0), pulsoD=(-82, 0, 0),
                  ombroE=(30, -10, -28), cotoveloE=(40, 0, 0)), 0.0),
-        # impacto: avanço com o pé da frente, braço reto, ombro direito à frente
-        (0.40, P(POSTURA, raiz_pos=(0.0, -0.44, -0.66), raiz_rot=(0, 10, 0), cintura=(-12, 22, 0), pescoco=(2, -30, 0),
-                 peE=(-0.72, 0.0, -1.22),
-                 ombroD=(86, 20, -4), cotoveloD=(2, 0, 0), pulsoD=(-82, 0, 0),
-                 ombroE=(10, -10, -40), cotoveloE=(30, 0, 0)), 0.0),
-        (0.52, P(POSTURA, raiz_pos=(0.0, -0.46, -0.70), raiz_rot=(0, 12, 0), cintura=(-13, 24, 0), pescoco=(2, -32, 0),
-                 peE=(-0.72, 0.0, -1.22),
-                 ombroD=(84, 20, -4), cotoveloD=(4, 0, 0), pulsoD=(-80, 0, 0),
-                 ombroE=(8, -10, -42), cotoveloE=(30, 0, 0)), 1.0),
-        (0.72, P(POSTURA, peE=(-0.72, 0.22, -0.9)), 0.0),
-        (0.95, POSTURA, 1.0),
+        # impacto: avanço completo, braço reto na linha do ombro, braço livre aberto atrás para equilibrar
+        (0.50, P(POSTURA, raiz_pos=(0.0, -0.48, -0.60), raiz_rot=(0, 12, 0), cintura=(-14, 24, 0), pescoco=(2, -32, 0),
+                 peE=(-0.72, 0.0, -1.12),
+                 ombroD=(88, 20, -4), cotoveloD=(2, 0, 0), pulsoD=(-84, 0, 0),
+                 ombroE=(-10, -20, -64), cotoveloE=(20, 0, 0)), 0.0),
+        # mantém a ponta cravada
+        (0.68, P(POSTURA, raiz_pos=(0.0, -0.50, -0.64), raiz_rot=(0, 14, 0), cintura=(-15, 26, 0), pescoco=(2, -34, 0),
+                 peE=(-0.72, 0.0, -1.12),
+                 ombroD=(86, 20, -4), cotoveloD=(4, 0, 0), pulsoD=(-82, 0, 0),
+                 ombroE=(-12, -20, -66), cotoveloE=(20, 0, 0)), 1.0),
+        # recupera: a lâmina volta antes do corpo
+        (0.88, P(POSTURA, raiz_pos=(0.0, -0.36, -0.30), peE=(-0.72, 0.18, -0.96),
+                 ombroD=(50, 18, 4), cotoveloD=(50, 0, 0), pulsoD=(-70, 0, 0)), 0.5),
+        (1.1, POSTURA, 1.0),
     ],
 )
 
@@ -120,26 +133,33 @@ ARQUEIRO = dict(
     maoE=(0.70, 0.12, -1.82), poloE=(-0.4, -1.0, 0.2), pulsoE=(0, 0, 0),
 )
 CLIPES["DisparoArco"] = dict(
-    duracao=2.0, laco=False, marcos={"puxar": 0.48, "soltar": 1.22}, arma="arco",
+    duracao=2.4, laco=False, marcos={"puxar": 0.55, "soltar": 1.58}, arma="arco",
     modos={"bracoE": "ik", "bracoD": "ik", "ref_maoE": "ombroE", "ref_maoD": "mundo"},
     chaves=[
         (0.0, POSTURA, 1.0),
-        # vira de lado e ergue o arco; a mão direita encaixa a flecha junto do arco
-        (0.34, P(POSTURA, **dict(ARQUEIRO, raiz_rot=(0, -50, 0)), maoD=(1.0, 3.35, -1.3), poloD=(1.0, -0.6, 0.2), pulsoD=(0, 0, 0)), 0.6),
-        (0.48, P(POSTURA, **ARQUEIRO, maoD=(0.85, 3.62, -1.45), poloD=(1.0, -0.4, 0.4), pulsoD=(0, 0, 0)), 0.6),
-        # puxa até a ancoragem no queixo, cotovelo alto atrás
-        (1.00, P(POSTURA, **dict(ARQUEIRO, cintura=(0, -10, 0)), maoD=(0.46, 3.98, 0.02), poloD=(0.5, 0.3, 1.0),
+        # saca: vira de lado, o arco sobe, a mão direita vai à aljava/corda
+        (0.30, P(POSTURA, **dict(ARQUEIRO, raiz_rot=(0, -44, 0), maoE=(0.4, -0.3, -1.4)), maoD=(0.9, 3.0, -1.0), poloD=(1.0, -0.6, 0.2), pulsoD=(0, 0, 0)), 0.6),
+        # encaixa a flecha junto ao arco
+        (0.55, P(POSTURA, **ARQUEIRO, maoD=(0.85, 3.62, -1.45), poloD=(1.0, -0.4, 0.4), pulsoD=(0, 0, 0)), 0.6),
+        # puxa a corda: o peito abre, o cotovelo sobe atrás
+        (1.05, P(POSTURA, **dict(ARQUEIRO, cintura=(0, -12, 0), pescoco=(0, 70, 0)), maoD=(0.46, 3.98, 0.02), poloD=(0.5, 0.3, 1.0),
                  pulsoD=(0, 0, 0)), 1.0),
-        (1.22, P(POSTURA, **dict(ARQUEIRO, cintura=(0, -10, 0)), maoD=(0.48, 4.0, 0.08), poloD=(0.5, 0.3, 1.0),
-                 pulsoD=(0, 0, 0)), 0.0),
-        # solta: a mão direita salta para trás, o arco cede um pouco
-        (1.34, P(POSTURA, **dict(ARQUEIRO, cintura=(4, -12, 0), maoE=(0.70, 0.02, -1.82)), maoD=(0.95, 4.0, 0.80),
+        # mira: respira, o braço do arco treme um fio (o jogador lê "vai soltar")
+        (1.30, P(POSTURA, **dict(ARQUEIRO, cintura=(0, -13, 0), pescoco=(0, 70, 0), maoE=(0.72, 0.16, -1.84)), maoD=(0.44, 4.0, -0.02),
+                 poloD=(0.5, 0.3, 1.0), pulsoD=(0, 0, 0)), 1.0),
+        (1.50, P(POSTURA, **dict(ARQUEIRO, cintura=(0, -13, 0), pescoco=(0, 70, 0), maoE=(0.68, 0.09, -1.82)), maoD=(0.42, 4.0, -0.04),
+                 poloD=(0.5, 0.3, 1.0), pulsoD=(0, 0, 0)), 0.0),
+        # solta (marco `soltar`): a mão direita salta para trás, o arco cede
+        (1.58, P(POSTURA, **dict(ARQUEIRO, cintura=(0, -13, 0), maoE=(0.70, 0.05, -1.84)), maoD=(0.60, 4.0, 0.30),
+                 poloD=(0.5, 0.3, 1.0), pulsoD=(10, 0, 0)), 0.0),
+        (1.70, P(POSTURA, **dict(ARQUEIRO, cintura=(4, -12, 0), maoE=(0.70, -0.04, -1.84)), maoD=(1.10, 4.0, 0.95),
                  poloD=(0.6, 0.0, 1.0), pulsoD=(20, 0, 0)), 0.0),
-        (1.60, P(POSTURA, **dict(ARQUEIRO, maoE=(0.70, -0.15, -1.78)), maoD=(1.0, 3.6, 0.70), poloD=(0.6, -0.4, 1.0),
+        # acompanha com o arco levantado, depois relaxa
+        (1.95, P(POSTURA, **dict(ARQUEIRO, maoE=(0.70, 0.10, -1.78)), maoD=(1.2, 3.5, 0.70), poloD=(0.6, -0.4, 1.0),
                  pulsoD=(0, 0, 0)), 0.5),
-        (1.80, P(POSTURA, **dict(ARQUEIRO, raiz_rot=(0, -34, 0), pescoco=(0, 30, 0), maoE=(0.1, -0.5, -1.5)),
+        (2.15, P(POSTURA, **dict(ARQUEIRO, raiz_rot=(0, -34, 0), pescoco=(0, 30, 0), maoE=(0.1, -0.5, -1.5)),
                  maoD=(1.6, 2.7, -0.2), poloD=(1.0, -0.3, 0.6), pulsoD=(0, 0, 0)), 0.3),
-        (2.0, POSTURA, 1.0),
+        (2.4, POSTURA, 1.0),
     ],
 )
 
@@ -183,16 +203,23 @@ CLIPES["Canalizar"] = dict(
 
 # ------------------------------------------------------------------------------------------------ reação a golpe
 CLIPES["ReacaoGolpe"] = dict(
-    duracao=0.75, laco=False, marcos={"impacto": 0.0}, modos={}, arma="espada",
+    duracao=1.05, laco=False, marcos={"impacto": 0.0}, modos={}, arma="espada",
     chaves=[
         (0.0, POSTURA, 0.0),
-        # o golpe joga o corpo para trás: quadril recua, tronco e cabeça vão para trás, braços abrem
-        (0.09, P(POSTURA, raiz_pos=(0.0, -0.30, 0.38), raiz_rot=(8, -6, 0), cintura=(18, 2, 6), pescoco=(20, 12, 0),
-                 ombroD=(46, 10, 34), cotoveloD=(40, 0, 0), ombroE=(42, -10, -32), cotoveloE=(46, 0, 0)), 0.0),
-        # recupera curvado para a frente (o corpo "absorve")
-        (0.28, P(POSTURA, raiz_pos=(0.0, -0.34, 0.20), raiz_rot=(-4, -10, 0), cintura=(-16, 8, -2), pescoco=(-4, 6, 0),
-                 ombroD=(24, 22, 16), cotoveloD=(70, 0, 0), ombroE=(26, -18, -16), cotoveloE=(80, 0, 0)), 0.4),
-        (0.75, POSTURA, 1.0),
+        # o golpe joga o corpo: quadril recua, tronco e cabeça são arremessados para trás, braços voam abertos
+        (0.10, P(POSTURA, raiz_pos=(0.0, -0.22, 0.62), raiz_rot=(14, -10, 0), cintura=(30, 6, 10), pescoco=(30, 20, 0),
+                 peE=(-0.72, 0.15, -0.30), peD=(0.78, 0.0, 0.40),
+                 ombroD=(30, 10, 62), cotoveloD=(30, 0, 0), pulsoD=(30, 0, 0),
+                 ombroE=(26, -10, -58), cotoveloE=(36, 0, 0)), 0.0),
+        # cambaleia: o peso vai para o pé de trás, a cabeça acompanha
+        (0.30, P(POSTURA, raiz_pos=(0.0, -0.40, 0.46), raiz_rot=(8, -14, 0), cintura=(22, 10, 6), pescoco=(18, 16, 0),
+                 peE=(-0.72, 0.10, -0.40),
+                 ombroD=(40, 14, 44), cotoveloD=(46, 0, 0), ombroE=(38, -14, -40), cotoveloE=(56, 0, 0)), 0.4),
+        # o corpo "absorve": dobra para a frente, a mão livre vai ao ponto do golpe
+        (0.58, P(POSTURA, raiz_pos=(0.0, -0.46, 0.18), raiz_rot=(-6, -12, 0), cintura=(-22, 8, -4), pescoco=(-8, 8, 0),
+                 ombroD=(26, 22, 16), cotoveloD=(78, 0, 0), ombroE=(60, -26, -6), cotoveloE=(96, 0, 0)), 0.5),
+        (0.80, P(POSTURA, raiz_pos=(0.0, -0.34, 0.08), cintura=(-8, 8, 0)), 0.6),
+        (1.05, POSTURA, 1.0),
     ],
 )
 
@@ -213,19 +240,24 @@ CLIPES["Esquiva"] = dict(
 )
 
 # ------------------------------------------------------------------------------------------------ bloqueio
-GUARDA_ALTA = P(POSTURA, raiz_pos=(0.0, -0.36, 0.10), raiz_rot=(0, -10, 0), cintura=(-2, 8, 0), pescoco=(-4, 2, 0),
-                ombroD=(80, 16, 12), cotoveloD=(84, 0, 0), pulsoD=(0, 90, 0),
-                ombroE=(76, -16, -12), cotoveloE=(84, 0, 0))
+GUARDA_ALTA = P(POSTURA, raiz_pos=(0.0, -0.40, 0.10), raiz_rot=(0, -10, 0), cintura=(-2, 8, 0), pescoco=(-4, 2, 0),
+                ombroD=(84, 16, 12), cotoveloD=(88, 0, 0), pulsoD=(0, 90, 0),
+                ombroE=(80, -16, -12), cotoveloE=(88, 0, 0))
 CLIPES["Bloqueio"] = dict(
-    duracao=0.85, laco=False, marcos={"impacto": 0.24}, modos={}, arma="espada",
+    duracao=1.05, laco=False, marcos={"impacto": 0.26}, modos={}, arma="espada",
     chaves=[
         (0.0, POSTURA, 1.0),
-        (0.16, GUARDA_ALTA, 0.6),
-        (0.24, GUARDA_ALTA, 0.0),
-        # o choque empurra a guarda e o corpo um pouco para trás
-        (0.32, P(GUARDA_ALTA, raiz_pos=(0.0, -0.44, 0.28), cintura=(6, 8, 0), ombroD=(74, 16, 12), ombroE=(70, -16, -12)), 0.2),
-        (0.52, GUARDA_ALTA, 0.6),
-        (0.85, POSTURA, 1.0),
+        # sente o golpe vindo: abaixa e junta os antebraços na frente do rosto
+        (0.12, P(POSTURA, raiz_pos=(0.0, -0.44, 0.16), cintura=(4, 10, 0), pescoco=(-6, 4, 0),
+                 ombroD=(60, 20, 14), cotoveloD=(96, 0, 0), ombroE=(60, -20, -14), cotoveloE=(96, 0, 0)), 0.5),
+        (0.26, GUARDA_ALTA, 0.0),
+        # o choque empurra a guarda e o corpo: recua o pé, joelhos cedem, ombros sobem
+        (0.36, P(GUARDA_ALTA, raiz_pos=(0.0, -0.54, 0.40), raiz_rot=(6, -10, 0), cintura=(12, 8, 0), pescoco=(8, 2, 0),
+                 ombroD=(70, 16, 12), ombroE=(64, -16, -12)), 0.2),
+        # firma o pé e segura a guarda, tremendo de esforço
+        (0.56, P(GUARDA_ALTA, raiz_pos=(0.0, -0.46, 0.22), cintura=(4, 8, 0)), 0.6),
+        (0.76, P(GUARDA_ALTA, raiz_pos=(0.0, -0.40, 0.14)), 0.8),
+        (1.05, POSTURA, 1.0),
     ],
 )
 
@@ -269,13 +301,18 @@ VITORIA = dict(
     ombroE=(-6, -80, -36), cotoveloE=(84, 0, 0), pulsoE=(0, 0, 0),
 )
 CLIPES["Vitoria"] = dict(
-    duracao=1.6, laco=False, segurar=True, marcos={}, modos={}, arma="espada",
+    duracao=2.2, laco=False, segurar=True, marcos={"erguer": 0.62}, modos={}, arma="espada",
     chaves=[
         (0.0, POSTURA, 1.0),
-        # abaixa antes de erguer
-        (0.20, P(POSTURA, raiz_pos=(0.0, -0.36, 0.05), cintura=(-14, 10, 0), ombroD=(20, 22, 20), cotoveloD=(80, 0, 0)), 0.3),
-        (0.52, P(POSTURA, **dict(VITORIA, raiz_pos=(0.0, -0.02, 0.0), ombroD=(160, 0, 14))), 0.0),
-        (0.80, P(POSTURA, **VITORIA), 0.5),
-        (1.6, P(POSTURA, **dict(VITORIA, raiz_pos=(0.0, -0.08, 0.0), cintura=(6, -8, 0))), 1.0),
+        # solta o ar: agacha e junta a força
+        (0.28, P(POSTURA, raiz_pos=(0.0, -0.50, 0.10), cintura=(-18, 10, 0), pescoco=(-6, 8, 0),
+                 ombroD=(14, 22, 22), cotoveloD=(86, 0, 0), ombroE=(20, -22, -24), cotoveloE=(80, 0, 0)), 0.3),
+        # sobe: peito aberto, espada ao alto
+        (0.62, P(POSTURA, **dict(VITORIA, raiz_pos=(0.0, 0.00, 0.0), cintura=(12, -8, 0), pescoco=(14, 12, 0), ombroD=(168, 0, 14))), 0.0),
+        # segunda sacudida: a espada bate no ar, o punho livre fecha junto ao peito
+        (0.92, P(POSTURA, **dict(VITORIA, raiz_pos=(0.0, -0.10, 0.0), ombroD=(150, 0, 14), cintura=(4, -8, 0))), 0.0),
+        (1.14, P(POSTURA, **dict(VITORIA, raiz_pos=(0.0, 0.00, 0.0), ombroD=(172, 0, 16), cintura=(12, -8, 0))), 0.5),
+        (1.60, P(POSTURA, **VITORIA), 0.5),
+        (2.2, P(POSTURA, **dict(VITORIA, raiz_pos=(0.0, -0.08, 0.0), cintura=(6, -8, 0))), 1.0),
     ],
 )

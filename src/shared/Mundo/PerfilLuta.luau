@@ -16,6 +16,8 @@ local function esgoto(p)
 	p.brilho = 0.4
 	p.difuso = 0.45
 	p.exposicao = 0
+	p.bloomLimiar = 2.6 -- só as chamas estouram; pele e cabelo sob a luz-chave não
+	p.bloomIntensidade = 0.3
 	p.ccContraste = p.ccContraste + 0.14
 	p.ccSaturacao = p.ccSaturacao - 0.04
 	p.ccTint = { 222, 240, 228 }

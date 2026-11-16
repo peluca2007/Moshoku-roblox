@@ -1421,7 +1421,8 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 ## CEN3 — luz do esgoto (16/11/2026, Studio por MCP)
 - `qa.py esgoto_sala1` 20 ok com o build final; testar.ps1 só com o Catálogo falhando. 715 peças, 18 luzes (2 com sombra). Capturas em `build/beleza/esgoto3/` (geral/luta_camera, arco, tocha, abóbada, água, canto, poça, movimento_1/2 com 2,5 s de intervalo: pixels diferem e OffsetStudsV avançou).
 - Descobertas: com Future, a Atmosphere (cor/densidade) é a luz de base do salão: cor muito escura deixa o chão preto mesmo com Ambient alto; luzes de enchimento extras fizeram as tochas perderem o brilho. Se o Studio tiver arquivos em edição de outro agente, `studio_sync.py` copia o estado quebrado: sincronizei a partir de um worktree do HEAD com só meus arquivos.
-- Não verificado: FPS/celular, `qa.py luta` nesta rodada.
+- Correção de legibilidade: luz-chave SpotLight quente (brilho 6 estourava o avatar; 2 resolve) + bloom limiar 2,6/intensidade 0,3 no perfil do esgoto + teto mais claro. `qa.py esgoto_sala1` 20 ok e `qa.py luta` 29 ok; capturas `build/beleza/esgoto3/luta_geral.png` e `luta_golpe.png` (+ `build/beleza/impacto/c7_*`).
+- Não verificado: FPS/celular.
 
 ## ANIM3b (16/11/2026)
 

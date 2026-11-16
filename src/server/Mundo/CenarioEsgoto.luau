@@ -137,12 +137,17 @@ end
 -- Abóbada: laje escura sobre tudo + nervuras curvas (a câmera do jogo fica abaixo dela, y~26).
 local function teto(pasta, origem)
 	local o = CFrame.new(origem.X, 0, origem.Z)
-	peca(pasta, "Teto", Vector3.new(2 * MEIA + 12, 2, 2 * MEIA + 12), o * CFrame.new(0, ALTURA_TETO + 1, 0), Color3.fromRGB(18, 22, 21), Enum.Material.Slate)
+	peca(pasta, "Teto", Vector3.new(2 * MEIA + 12, 2, 2 * MEIA + 12), o * CFrame.new(0, ALTURA_TETO + 1, 0), Color3.fromRGB(58, 64, 62), Enum.Material.Slate)
 	EsgotoArcos.nervuras(pasta, origem, MEIA, ALTURA_TETO, { -50, 0, 50 })
 end
 
 -- Feixes de luz que entram por grades do teto: grade escura, feixe translúcido e SpotLight para o chão.
 local function feixes(pasta, origem)
+	-- Luz-chave quente sobre a área de luta, vinda de um vão no teto, com sombra: dá forma a personagens e chão.
+	local fonte = peca(pasta, "LuzChave", Vector3.new(1, 1, 1), CFrame.new(origem.X + 6, ALTURA_TETO - 3, origem.Z + 6), VAZIO, Enum.Material.SmoothPlastic, { Transparency = 1 })
+	local chave = Instance.new("SpotLight")
+	chave.Color, chave.Brightness, chave.Range, chave.Angle, chave.Face, chave.Shadows = Color3.fromRGB(255, 190, 125), 2, 80, 62, Enum.NormalId.Bottom, true
+	chave.Parent = fonte
 	for _, f in { { -22, -18 }, { 28, 22 } } do
 		local x, z = origem.X + f[1], origem.Z + f[2]
 		peca(pasta, "GradeTeto", Vector3.new(9, 0.6, 9), CFrame.new(x, ALTURA_TETO - 0.4, z), VAZIO, Enum.Material.Metal)

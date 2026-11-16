@@ -8,11 +8,11 @@ Personagem.CABECA_CUBICA = false
 -- O cabelo do avatar do jogador só entra quando houver campo próprio no perfil e a verificação no Studio (PERS2 pendente).
 Personagem.CABELO_DO_AVATAR = false
 
--- Moldes clássicos 585x559 (Decal enviado pela Open Cloud: tools/roblox_upload.py --tipo Decal). Id "rbxassetid://N".
+-- Moldes clássicos 585x559 enviados como Decal pela rota do Studio (MOSHOKU_VIA_STUDIO=1); o id guardado é o da IMAGEM do Decal (InsertService:LoadAsset -> Decal.Texture), que o Shirt/Pants aceita. Tons: aventureiro/ladino médio, mago claro.
 Personagem.CONJUNTOS = {
-	aventureiro = { camisa = nil, calca = nil },
-	ladino = { camisa = nil, calca = nil },
-	mago = { camisa = nil, calca = nil },
+	aventureiro = { camisa = "rbxassetid://85431028511988", calca = "rbxassetid://99488561642255" },
+	ladino = { camisa = "rbxassetid://133825146027567", calca = "rbxassetid://92405611086416" },
+	mago = { camisa = "rbxassetid://135491093277014", calca = "rbxassetid://82815866746308" },
 }
 
 local LADINO = { LadinoCapuz = true, LadinoMascara = true, LadinoCapa = true, LadinoCinto = true }

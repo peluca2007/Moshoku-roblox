@@ -16,6 +16,7 @@ local Efeitos = require(script.Parent:WaitForChild("Efeitos"))
 local Furtividade = require(Shared.VisibilidadeFurtiva)
 local Enquadramento = require(Shared.EnquadramentoMesa)
 local Movimento = require(script.Parent.BloqueioMovimento)
+local UIArteLuta = require(Shared:WaitForChild("UIArteLuta"))
 
 local BoardView = {}
 
@@ -94,17 +95,21 @@ function BoardView.start(state)
 			body = piece(model, "Corpo", Enum.PartType.Cylinder, Vector3.new(3.2, 2.2, 2.2), token.color, Enum.Material.SmoothPlastic),
 			head = piece(model, "Cabeca", Enum.PartType.Ball, Vector3.one * 2.3, token.color, Enum.Material.SmoothPlastic),
 			select = piece(model, "AnelSelecao", Enum.PartType.Cylinder, Vector3.new(0.06, 5.6, 5.6), SELECAO, Enum.Material.Neon),
-			turn = piece(model, "AnelVez", Enum.PartType.Cylinder, Vector3.new(0.08, 5.1, 5.1), VEZ, Enum.Material.Neon),
+			turn = piece(model, "AnelVez", Enum.PartType.Block, Vector3.new(6.4, 0.05, 6.4), VEZ, Enum.Material.SmoothPlastic),
 		}
 		parts.select.CastShadow, parts.turn.CastShadow = false, false
 		parts.select.Transparency, parts.turn.Transparency = 1, 1
+		-- HUD3: o anel do personagem ativo é o anel fino dourado pintado (UIArteLuta), não um disco.
+		local anelVez = Instance.new("Decal")
+		anelVez.Name, anelVez.Face, anelVez.Texture, anelVez.Transparency = "Anel", Enum.NormalId.Top, UIArteLuta.PECAS.anel_ativo.imagem, 1
+		anelVez.Parent = parts.turn
 		local offsets = {
 			base = CFrame.new(0, 0.25, 0) * VERTICAL,
 			rim = CFrame.new(0, 0.13, 0) * VERTICAL,
 			body = CFrame.new(0, 2.1, 0) * VERTICAL,
 			head = CFrame.new(0, 4.3, 0),
 			select = CFrame.new(0, 0.04, 0) * VERTICAL,
-			turn = CFrame.new(0, 0.06, 0) * VERTICAL,
+			turn = CFrame.new(0, 0.06, 0),
 		}
 		model.PrimaryPart = parts.base
 
@@ -333,7 +338,8 @@ function BoardView.start(state)
 			end
 			pose(view, cf)
 			view.parts.select.Transparency = if id == selected then 0.25 + math.sin(now * 5) * 0.2 else 1
-			view.parts.turn.Transparency = if isTurn then 0.62 + math.sin(now * 3) * 0.12 else 1 -- câmera perto (LUTA-A): disco mais discreto
+			local anel = view.parts.turn:FindFirstChild("Anel") :: Decal?
+			if anel then anel.Transparency = if isTurn then 0.12 + (math.sin(now * 3) * 0.5 + 0.5) * 0.3 else 1 end -- pulso leve
 			if view.hidden and not view.avatarUserId then
 				local pulse = 0.55 + math.sin(now * 2 + view.seed) * 0.12
 				view.parts.body.Transparency, view.parts.head.Transparency, view.parts.rim.Transparency = pulse, pulse, pulse

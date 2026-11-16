@@ -5,6 +5,7 @@
 -- Instances: <pai> > Retrato (Frame) > Vista (ViewportFrame) | Inicial (TextLabel).
 local Players = game:GetService("Players")
 local T = require(script.Parent.UI.Tema)
+local P = require(script.Parent.UI.PecasLuta)
 
 local Retrato = {}
 
@@ -65,6 +66,7 @@ function Retrato.novo(pai: Instance, nome: string, tamanho: UDim2)
 	local canto = Instance.new("UICorner")
 	canto.CornerRadius = UDim.new(0, 6)
 	canto.Parent = raiz
+	P.arte(raiz, "mancha_retrato", 1) -- HUD3: mancha de tinta pintada atrás do corpo
 	local inicial = Instance.new("TextLabel")
 	inicial.Name, inicial.Size, inicial.BackgroundTransparency, inicial.Text = "Inicial", UDim2.fromScale(1, 1), 1, ""
 	inicial.FontFace, inicial.TextSize, inicial.TextColor3 = T.fontes.titulo, 24, T.sobreEscuro.ouro

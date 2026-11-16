@@ -166,23 +166,35 @@ function AcoesDoTurno.start(state)
 		local arte = P.arte(b, normal)
 		if o.perigo then arte.ImageColor3 = Color3.fromRGB(255, 150, 140) end
 		local rot = texto(b, {
-			Name = "Rotulo", Size = UDim2.new(1, -12, 1, 0), Position = UDim2.fromOffset(6, 0), TextXAlignment = Enum.TextXAlignment.Center,
-			TextWrapped = true, TextTruncate = Enum.TextTruncate.None, FontFace = T.fontes.titulo, TextSize = o.tamanhoTexto or 16,
+			Name = "Rotulo", Size = UDim2.new(1, -40, 1, -8), Position = UDim2.fromOffset(32, 0), TextXAlignment = Enum.TextXAlignment.Center,
+			TextWrapped = true, TextScaled = true, TextTruncate = Enum.TextTruncate.None, FontFace = T.fontes.titulo, TextSize = o.tamanhoTexto or 19,
 			TextColor3 = if o.principal then P.cor.ouroVivo elseif o.perigo then P.cor.inimigo else P.cor.texto, Text = rotulo, ZIndex = 5,
 		})
+		new("UITextSizeConstraint", rot, { MaxTextSize = o.tamanhoTexto or 19, MinTextSize = 11 })
 		new("Frame", b, {
 			Name = "Marca", AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -5), Size = UDim2.new(1, -30, 0, 2),
 			BackgroundColor3 = P.cor.ouroVivo, BorderSizePixel = 0, ZIndex = 6, Visible = false,
 		})
 		if o.tecla then
-			local selo = P.tecla(b, o.tecla, 26)
-			selo.AnchorPoint, selo.Position = Vector2.new(0.5, 0.5), UDim2.fromOffset(6, 6)
+			local selo = P.tecla(b, o.tecla, 30)
+			selo.AnchorPoint, selo.Position = Vector2.new(0, 0.5), UDim2.new(0, 6, 0.5, -2)
 		end
-		if o.icone then
-			local ic = P.icone(b, o.icone, P.cor.ouro, 20)
-			ic.AnchorPoint, ic.Position, ic.ZIndex = Vector2.new(1, 0), UDim2.new(1, -9, 0, 5), 6
-		end
-		P.foco(b, nil, 1.05, { img = arte, normal = normal, foco = "botao_foco" })
+		-- Foco/hover: cresce, a marca dourada abre do centro e o rótulo clareia.
+		local marca = b:FindFirstChild("Marca") :: Frame
+		local largMarca = UDim2.new(1, -40, 0, 2)
+		local manual = false
+		b.MouseEnter:Connect(function()
+			if b:GetAttribute("Desabilitado") then return end
+			manual = marca.Visible
+			if not manual then marca.Visible, marca.Size = true, UDim2.new(0, 0, 0, 2) end
+			P.animar(marca, { Size = largMarca }, TweenInfo.new(0.18, Enum.EasingStyle.Quad), "marca")
+			P.animar(rot, { TextColor3 = P.cor.ouroVivo }, P.SUAVE, "cor")
+		end)
+		b.MouseLeave:Connect(function()
+			if not manual then marca.Visible = false end
+			P.animar(rot, { TextColor3 = if o.principal then P.cor.ouroVivo elseif o.perigo then P.cor.inimigo else P.cor.texto }, P.SUAVE, "cor")
+		end)
+		P.foco(b, nil, 1.08, { img = arte, normal = normal, foco = "botao_foco" })
 		b:GetAttributeChangedSignal("Desabilitado"):Connect(function()
 			local off = b:GetAttribute("Desabilitado") == true
 			P.trocarArte(arte, if off then "botao_bloqueado" else normal)
@@ -225,10 +237,10 @@ function AcoesDoTurno.start(state)
 		if atualizar then atualizar() end
 	end
 	local function tamanhoVertice() return UDim2.fromOffset(Layout.VERTICE_W, Layout.VERTICE_H) end
-	local atacar = botao(menu, "Atacar", "Atacar", tamanhoVertice(), { tecla = "F", icone = "atacar" }, function() alternarLista("atacar") end)
-	local habilidades = botao(menu, "Habilidades", "Habilidades", tamanhoVertice(), { tecla = "R", icone = "habilidades" }, function() alternarLista("habilidades") end)
+	local atacar = botao(menu, "Atacar", "Atacar", tamanhoVertice(), { tecla = "F" }, function() alternarLista("atacar") end)
+	local habilidades = botao(menu, "Habilidades", "Habilidades", tamanhoVertice(), { tecla = "R" }, function() alternarLista("habilidades") end)
 	-- Andar (Cap. 4: 1 Ação, até o Deslocamento): acende as casas e um clique move.
-	local andar = botao(menu, "Andar", "Andar (1 Ação)", tamanhoVertice(), { tecla = "G", tamanhoTexto = 15, icone = "andar" }, function()
+	local andar = botao(menu, "Andar", "Andar (1 Ação)", tamanhoVertice(), { tecla = "G" }, function()
 		if not atual.tokenId or (atual.restantes or 0) < 1 and (atual.passosLivres or 0) < 1 then
 			return
 		end
@@ -243,7 +255,7 @@ function AcoesDoTurno.start(state)
 			alcanceCasas = if (atual.passosLivres or 0) > 0 then atual.passosLivres else atual.deslocamentoCasas or 6, cor = Estilo.CAPITULOS[3],
 		})
 	end)
-	local encerrar = botao(menu, "EncerrarTurno", "Encerrar turno", tamanhoVertice(), { tecla = "V", principal = true, tamanhoTexto = 15, icone = "encerrar" }, function()
+	local encerrar = botao(menu, "EncerrarTurno", "Encerrar turno", tamanhoVertice(), { tecla = "V", principal = true }, function()
 		local snapshot = state.snapshot()
 		if snapshot and atual.tokenId then
 			modoLista = nil

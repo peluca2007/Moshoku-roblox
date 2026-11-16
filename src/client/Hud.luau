@@ -49,10 +49,11 @@ function Hud.start(state)
 		if f then return f end
 		local q = new("CanvasGroup", cartoes, {
 			Name = "Cartao_" .. id, Size = UDim2.fromOffset(Layout.CARTAO_LARGURA, Layout.CARTAO_ALTURA),
-			BackgroundColor3 = P.cor.fundo, BackgroundTransparency = 0.2, BorderSizePixel = 0, GroupTransparency = 1,
+			BackgroundColor3 = P.cor.fundo, BackgroundTransparency = 0.45, BorderSizePixel = 0, GroupTransparency = 1,
 		})
 		new("UICorner", q, { CornerRadius = UDim.new(0, 8) })
-		new("UIStroke", q, { Name = "Contorno", Color = P.cor.ouro, Thickness = 1, Transparency = 0.35 })
+		new("UIStroke", q, { Name = "Contorno", Color = P.cor.ouro, Thickness = 1, Transparency = 0.6 })
+		P.arte(q, "mancha_cartao", 1) -- HUD3: mancha de tinta pintada sob o conteúdo
 		local retrato = Retrato.novo(q, "Retrato", UDim2.fromOffset(RETRATO, RETRATO))
 		retrato.raiz.Position = UDim2.fromOffset(8, 8)
 		local x = 8 + RETRATO + 10

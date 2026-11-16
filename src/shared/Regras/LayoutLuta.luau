@@ -15,9 +15,9 @@ L.GAP = 8
 L.ESPACO = 4
 L.LINHA = 44 -- toque mínimo
 -- Losango de comandos: quatro botões (topo, esquerda, direita, base) num quadrado LOSANGO x LOSANGO.
-L.LOSANGO = 216
-L.VERTICE_W, L.VERTICE_H = 104, 52
-L.EXTRA_W, L.EXTRA_H = 176, 42
+L.LOSANGO = 240
+L.VERTICE_W, L.VERTICE_H = 116, 60
+L.EXTRA_W, L.EXTRA_H = 176, 38
 -- Lista de habilidades (à esquerda do losango).
 L.LISTA_LARGURA = 330
 L.LISTA_LINHA = 54

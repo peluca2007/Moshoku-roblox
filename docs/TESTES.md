@@ -1398,3 +1398,7 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - `pers4_comparar.py`: caixas, homem (Man 238), mulher (Woman 239), menino (Boy 109) x aventureiro/humano, ladino/elfo, mago/anão, ogro, de frente e 3/4: roupa clássica, cabelo/barba/capuz/capa/rosto em placa encaixam; escalas por raça funcionam. Base Body (Dawson/Jordan) e City Life Woman descartados (ARTE.md).
 - Com `CORPO="homem"`: `qa.py luta` 29 ok (armas na mão, golpe e animações sem quebrar; `corpos_luta_homem.jpg`). Padrão voltou a "caixas".
 - Não verificado: mulher/menino em luta, clipes de todas as animações, ficha de outros jogadores, celular, desempenho de carregar o corpo em jogo real.
+
+## HUD3 — HUD da luta, rodada 2 (16/11/2026)
+- Studio (`qa.py esgoto_sala1 --manter-play`, `qa.py luta`: 20 e 9 ok; `testar.ps1` só "Catálogo" falha). Capturas em `build/beleza/hud3_{vez,lista,anuncio}.png`: botões do losango com tecla no disco à esquerda e rótulo ao centro (sem ícone de canto), anel dourado fino pulsando no chão (Decal em `AnelVez`), cartão do grupo e retrato com manchas pintadas, lista de habilidades aberta ao clicar Habilidades.
+- Não verificado: o relógio do dia some durante o anúncio (só inspeção de código; a captura pegou o fim do fade), crédito da Ajuda (só compilação), hover animado dos botões, celular. Console: `ContentId rbxassetid://77389798167274 failed` apareceu uma vez no primeiro Play (anel recém-enviado); no segundo carregou.

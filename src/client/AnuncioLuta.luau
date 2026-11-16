@@ -76,11 +76,17 @@ function Anuncio.start(state)
 	posicionar()
 
 	local serial = 0
+	-- HUD3: o relógio do dia/sala (RelogioRun, topo central) esconde enquanto o nome do golpe aparece.
+	local function relogio(visivel: boolean)
+		local g = Players.LocalPlayer.PlayerGui:FindFirstChild("RelogioRun")
+		if g and g:IsA("ScreenGui") then g.Enabled = visivel end
+	end
 	local function ocultar(animado: boolean)
 		serial += 1
 		local meu = serial
 		if not animado then
 			anuncio.Visible, resultado.Visible = false, false
+			relogio(true)
 			return
 		end
 		local saida = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
@@ -92,6 +98,7 @@ function Anuncio.start(state)
 		task.delay(0.22, function()
 			if gui.Parent and serial == meu then anuncio.Visible, resultado.Visible = false, false end
 		end)
+		task.delay(0.6, function() if gui.Parent and serial == meu then relogio(true) end end)
 	end
 	local function mostrar(nomeQuem: string, nomeHabilidade: string, detalhe: string, tom: string, duracao: number)
 		serial += 1
@@ -100,6 +107,7 @@ function Anuncio.start(state)
 		resultado.TextColor3 = CORES[tom] or CORES.neutro
 		posicionar()
 		anuncio.Visible, resultado.Visible = true, detalhe ~= ""
+		relogio(false)
 		-- entrada: o nome cresce com Back e desce 14 px; os fios abrem do centro para fora
 		for _, l in { quem, habilidade, resultado } do
 			l.TextTransparency, l.TextStrokeTransparency = 1, 1

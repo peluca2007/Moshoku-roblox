@@ -65,6 +65,8 @@ function View.start()
 		for ordem, paragrafo in Conteudo.abas[indice].paragrafos do
 			Extra.texto(texto, paragrafo, ordem)
 		end
+		-- Crédito obrigatório (CC BY 3.0) dos ícones da luta; ver docs/ARTE.md.
+		Extra.texto(texto, "Créditos · Ícones de habilidades: game-icons.net (CC BY 3.0) por Lorc, Delapouite, Skoll, Willdabeast, Carl Olsen, Zeromancer e sbed.", 200)
 		if Conteudo.abas[indice].id == "inicio" then
 			C.botao({ parent = texto, nome = "ReverAbertura", texto = "Rever abertura", variante = "secundario",
 				tamanho = UDim2.new(1, -8, 0, 48), ordem = 100, aoClicar = function()

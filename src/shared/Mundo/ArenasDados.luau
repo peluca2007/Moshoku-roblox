@@ -112,7 +112,7 @@ ArenasDados.RUINAS = table.freeze({
 	moradores = {},
 })
 
--- Esgoto sob a vila (expedição): sala fechada de pedra úmida (CenarioEsgoto), muros, barris, lampiões e ratos.
+-- Esgoto sob a vila (expedição): sala fechada de pedra úmida (CenarioEsgoto), barris, caixotes, lampiões e ratos.
 -- A luz do cliente segue `mundo`; PerfilLuta troca para o clima do esgoto (verde, escuro, tochas).
 ArenasDados.ESGOTO = table.freeze({
 	mundo = { x = 0, z = -150 },
@@ -122,15 +122,11 @@ ArenasDados.ESGOTO = table.freeze({
 	-- ids dos mapas em docs/MANUTENCAO.md. A cor só tinge o mapa, então fica clara.
 	piso = { material = "Slate", variante = "EsgotoPedra", cor = { 120, 124, 120 } },
 	chao = { material = "Pebble", variante = "EsgotoPedra", cor = { 70, 74, 72 } },
+	-- CEN2: sem os muros, colunas, rochas e lenha da arena genérica (a sala já tem paredes e arcos); ficam
+	-- só barris, caixotes, lampiões e ratos junto às paredes, longe da câmera da luta.
 	props = {
-		{ "Muro1", -40, -64, 0 }, { "Muro2", 0, -66, 0 }, { "Muro1", 40, -64, 0 },
-		{ "Muro2", -66, -30, 90 }, { "Muro1", -68, 10, 90 }, { "Muro2", -66, 46, 90 },
-		{ "Muro2", 66, -30, -90 }, { "Muro1", 68, 10, -90 }, { "Muro2", 66, 46, -90 },
-		{ "Muro1", -30, 66, 180 }, { "Muro2", 10, 66, 180 }, { "Muro1", 44, 66, 180 },
-		{ "Coluna1", -58, -58, 0 }, { "Coluna2", 58, -58, 0 }, { "ColunaQuebrada1", -58, 58, 0 }, { "ColunaQuebrada2", 58, 58, 0 },
 		{ "Barril", -58, -42, 0 }, { "Barril", -61, -36, 0 }, { "Caixotes", 60, -44, 30 }, { "Caixotes", 62, 30, -20 },
 		{ "Barril", 58, 62, 0 }, { "Lampiao", -57, 0, 0 }, { "Lampiao", 57, -10, 0 }, { "Lampiao", 0, -58, 0 },
-		{ "Rocha1", -62, 30, 0 }, { "Rocha2", 30, -60, 0 }, { "Lenha", -30, 60, 90 }, { "Tora1", 20, 62, 0 },
 		{ "RatoGigante", -58, -10, 80 }, { "RatoGigante", 60, 12, -100 }, { "RatoGigante", -20, 58, 170 },
 	},
 	moradores = {},

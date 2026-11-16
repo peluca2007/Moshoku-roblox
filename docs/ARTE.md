@@ -119,3 +119,7 @@ arquivos baixados nem malha nossa: o corpo vem da Roblox em tempo de execução.
 ## Cenário do esgoto (CEN1, 16/11/2026)
 
 Só peças do Roblox (Part, cilindros, Fire, ParticleEmitter, PointLight/SpotLight) com materiais nativos e o `MaterialVariant` `EsgotoPedra` já registrado. Nenhum ativo externo novo: a licença não muda. Os kits CC0 (mini-dungeon, fantasy-town-kit) não foram usados: peças procedurais bastaram e evitam conversão e peso. Código: `src/server/Mundo/CenarioEsgoto.luau`.
+
+### CEN2 (16/11/2026)
+
+Acabamento do esgoto, ainda sem ativo externo: arcos em aduelas (segmentos de círculo) e nervuras curvas; água com duas camadas de `Texture` (partícula nativa `rbxasset://textures/particles/smoke_main.dds`, tingida) rolando no cliente; tochas com `ParticleEmitter` nativos (`fire_main`, `sparkles_main`, `smoke_main`) e luz oscilando; remendos de Brick/Concrete/Cobblestone/Slate/Pebble, musgo, lama e entulho (Rock). Props da arena genérica (muros, colunas, rochas, lenha) removidos do layout do esgoto. Código: `src/server/Mundo/Esgoto*.luau`, `src/client/EsgotoAnimacao.luau`.

@@ -1412,6 +1412,12 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - Sala fechada (`CenarioEsgoto`): paredes com arcos e túneis, abóbada, canos, grade com queda d'água, tochas (8 PointLight), 2 SpotLight de feixe, 3 luzes de túnel, 5 emissores de névoa; remendos de material, musgo e poças no chão. PerfilLuta do esgoto: escuro, névoa verde.
 - Não verificado: desempenho em celular/FPS medido, nº de peças no Studio (estimado ~350), outras salas do esgoto/chefe, vista de cima da câmera antiga (CameraController, y=65, atravessaria o teto).
 
+## CEN2 — acabamento do esgoto (16/11/2026, Studio por MCP)
+- `qa.py esgoto_sala1` 20 ok e `qa.py luta` 29 ok (várias rodadas); `testar.ps1` só com o Catálogo falhando (ambiente). Arena: 798 peças, 18 luzes (0 com sombra); `ArenasDados.spec` agora aceita menos props em sala fechada.
+- Animação do cliente confirmada por leitura: `OffsetStudsV` da água cresce e o brilho da tocha varia entre leituras; tags `EsgotoAgua` 25, `EsgotoTocha` 7, `EsgotoGota` 5.
+- Capturas em `build/beleza/esgoto2/` (`r14_*` geral, canto, arco, água, tocha, abóbada, poça; `luta_camera.png` com a câmera da luta). Script `tools/qa/esgoto_fotos.py` (usa câmera própria; só depois de `qa.py esgoto_sala1 --manter-play`) e `tools/qa/studio_janela.ps1` (restaura o Studio minimizado: sem isso a captura sai cinza uniforme ou congelada).
+- Não verificado: FPS/celular, movimento da água a olho (só offset lido), gota e respingo em quadro.
+
 ## ANIM3b (16/11/2026)
 
 - Mescla da ANIM3 no branch; corpo oficial Man. `qa.py esgoto_sala1` (20 ok) e `qa.py luta` (29 ok) rodados duas vezes cada, sem falhas; `anim_quadros.py` (CorteLeve, CortePesado, Estocada, DisparoArco, ReacaoGolpe, Vitoria) gerou `build/beleza/anim/prancha.jpg`.

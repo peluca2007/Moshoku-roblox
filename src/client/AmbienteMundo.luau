@@ -13,6 +13,7 @@ local Arenas = require(ReplicatedStorage.Shared.Mundo.ArenasDados)
 local PerfilLuta = require(ReplicatedStorage.Shared.Mundo.PerfilLuta)
 local ModoCamera = require(script.Parent.ModoCamera)
 local CeuMundo = require(script.Parent.CeuMundo)
+local EsgotoAnimacao = require(script.Parent.EsgotoAnimacao)
 
 local AmbienteMundo = {}
 local iniciado = false
@@ -64,6 +65,7 @@ end
 function AmbienteMundo.start()
 	if iniciado then return end
 	iniciado = true
+	EsgotoAnimacao.start() -- água, tochas e goteiras do esgoto (CEN2); só age quando a sala existe
 	-- Instance criada só neste cliente, ligada à raiz atual e destruída ao trocar
 	-- personagem ou sair da noite/floresta. Não replica nem altera combate/visibilidade.
 	local luzPessoal: PointLight? = nil

@@ -29,7 +29,7 @@ return {
 			t.ok(arena.piso and arena.chao, id .. " piso")
 			local ponto = Arenas.pontoDoMundo(id)
 			t.ok(type(ponto.x) == "number" and type(ponto.z) == "number", id .. " ponto")
-			t.ok(#arena.props >= 15, id .. " cenário cheio")
+			t.ok(#arena.props >= (arena.fechada and 8 or 15), id .. " cenário cheio") -- sala fechada: o cenário vem de CenarioEsgoto
 			for _, p in arena.props do
 				t.ok(math.abs(p[2]) > MEIO + 4 or math.abs(p[3]) > MEIO + 4, id .. ": " .. p[1] .. " fora da grade")
 			end

@@ -397,10 +397,11 @@ function AcoesDoTurno.start(state)
 		end
 		-- "?" no canto direito: não cobre o nome nem o custo (deixam 46 px livres).
 		local info = new("TextButton", carta, {
-			Name = "Detalhes", Size = UDim2.fromOffset(30, 30), BackgroundTransparency = 1, BorderSizePixel = 0, Text = "?", AutoButtonColor = false,
-			FontFace = T.fontes.titulo, TextSize = 18, TextColor3 = P.cor.ouroVivo, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -14, 0.5, 0), ZIndex = 6,
+			Name = "Detalhes", Size = UDim2.fromOffset(30, 30), BackgroundTransparency = 1, BorderSizePixel = 0, Text = "", AutoButtonColor = false,
+			AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -14, 0.5, 0), ZIndex = 6,
 		})
 		new("ImageLabel", info, { Name = "Disco", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Image = Arte.PECAS.tecla_disco.imagem, ZIndex = 5 })
+		texto(info, { Name = "Interrogacao", Size = UDim2.fromScale(1, 1), Text = "?", TextXAlignment = Enum.TextXAlignment.Center, FontFace = T.fontes.titulo, TextSize = 18, TextColor3 = P.cor.ouroVivo, ZIndex = 7 })
 		info.Activated:Connect(consultar)
 		carta:SetAttribute("Grupo", registro.grupo)
 		function registro.acionar()

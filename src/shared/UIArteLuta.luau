@@ -6,7 +6,7 @@
 local UIArteLuta = {}
 
 local function peca(id, l, a, corte)
-	return table.freeze({ imagem = "rbxassetid://" .. id, largura = l, altura = a, corte = if corte then table.freeze(corte) else nil })
+	return table.freeze({ imagem = "rbxassetid://" .. id, largura = l, altura = a, corte = if corte then table.freeze(table.clone(corte)) else nil })
 end
 
 UIArteLuta.ESCALA = 0.5 -- PNG em 2x

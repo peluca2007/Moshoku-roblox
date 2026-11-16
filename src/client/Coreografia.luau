@@ -408,7 +408,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				local amp, dur = Curvas.tremor(alvo.dano, crit, cena.perfil.peso)
 				Efeitos.tremer(amp, dur, golpe)
 				Efeitos.aproximar(if crit then 0.14 else 0.08, if crit then 0.55 else 0.4)
-				ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit)
+				if not cena.temRastro then ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit) end -- com arma, o rastro real da ponta é o corte
 				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, crit, golpe)
 				if crit and Efeitos.tremorAtivo() then ImpactoFx.flash(0.2) end
 				workspace:SetAttribute(if crit then "ImpactoCriticoEm" else "ImpactoAcertoEm", os.clock()) -- QA: prova do efeito
@@ -522,7 +522,8 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		if de and not FX.reduzidos then
 			for _, filho in cena.modelo:GetChildren() do
 				if filho:IsA("Model") then
-					local liga = ImpactoFx.rastro(filho, cena.cor)
+					local liga = ImpactoFx.rastro(filho, cena.cor, cena.modelo)
+					if liga then cena.temRastro = true end
 					if liga then
 						local contato = plano.chegada or perfil.carga
 						evento(cena, math.max(0, contato - 0.5), function() liga(true) end)

@@ -549,8 +549,12 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				local quando = W + c[1]
 				local raio = if spec.baixo then 4.4 else 3.8
 				local marca = if nomeClipe then 0.02 else 0.07 -- com clipe, o contato é o marco `impacto`
-				talho(alvoPos - dir * 0.6 + (if spec.baixo then Vector3.new(0, -1.2, 0) else Vector3.zero), dir, c[2], raio, quando + (if nomeClipe then -0.03 else 0.01), 0.2, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
-				if acertouPrimeiro then
+				-- IMP5: com clipe (R15) o corte é o rastro real da ponta da lâmina (ImpactoFx.rastro) e as faíscas são
+				-- partículas (ImpactoFx.faiscas): o talho solto no ar, o clarão branco e as peças de faísca antigas saem.
+				if not nomeClipe then
+					talho(alvoPos - dir * 0.6 + (if spec.baixo then Vector3.new(0, -1.2, 0) else Vector3.zero), dir, c[2], raio, quando + 0.01, 0.2, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
+				end
+				if acertouPrimeiro and not nomeClipe then
 					faiscas(ponto, dir, quando + marca, if i == #cortes then 12 else 8, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
 					clarao(ponto, quando + marca, if primeiro.critico then 4.2 elseif i == #cortes then 3.4 else 2.4, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
 				end
@@ -559,7 +563,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				end
 			end
 			if spec.baixo then poeira(alvoPos, W + 0.07, 6, 3) end
-			if spec.preciso then
+			if spec.preciso and not nomeClipe then
 				-- Corte de Braço: linha fina e clara sobre o membro.
 				talho(alvoPos + Y * 0.4, dir, 62, 2.2, W + 0.02, 0.14, Color3.fromRGB(255, 255, 255))
 			end

@@ -177,42 +177,70 @@ function M.congelar(modelo: Instance?, dur: number)
 	end)
 end
 
--- Rastro na arma do fantasma `modelo`: acha a maior peça soldada (lâmina/cabo) e liga um Trail entre as pontas.
--- Devolve uma função que liga/desliga o rastro (ele some sozinho depois do `Lifetime`).
-function M.rastro(modelo: Instance, cor: Color3): ((boolean?) -> ())?
+-- Rastro da arma: fita desenhada com a posição REAL do Attachment "Ponta" da arma do fantasma, quadro a quadro
+-- (segmentos finos entre amostras consecutivas que somem em ~0,25 s). Segue a trajetória verdadeira da ponta
+-- e aparece em tempo real, não só em câmera lenta. Devolve `liga(boolean)`; nil se a arma não tem "Ponta".
+local VIDA_RASTRO = 0.26
+function M.rastro(modelo: Instance, cor: Color3, pai: Instance?): ((boolean?) -> ())?
 	if FX.reduzidos then return nil end
-	local melhor: BasePart? = nil
-	local maior = 0
+	local ponta: Attachment? = nil
 	for _, o in modelo:GetDescendants() do
-		if o:IsA("Weld") and o.Part1 and o.Part1.Parent == modelo and o.Part1.Name ~= "HumanoidRootPart" then
-			local p = o.Part1
-			local m = math.max(p.Size.X, p.Size.Y, p.Size.Z)
-			if m > maior and m >= 1.4 and m <= 4.5 and not p:FindFirstChildWhichIsA("Trail") then
-				melhor, maior = p, m
-			end
+		if o:IsA("Attachment") and o.Name == "Ponta" then
+			ponta = o
+			break
 		end
 	end
-	if not melhor then return nil end
-	local eixo = if melhor.Size.Y >= melhor.Size.X and melhor.Size.Y >= melhor.Size.Z then Vector3.yAxis
-		elseif melhor.Size.Z >= melhor.Size.X then Vector3.zAxis else Vector3.xAxis
-	local meia = maior / 2
-	local a0, a1 = Instance.new("Attachment"), Instance.new("Attachment")
-	a0.Name, a1.Name = "RastroPonta", "RastroBase"
-	a0.Position, a1.Position = -eixo * meia, eixo * meia * 0.2 -- ponta (lado -Y da peça) e perto do punho
-	a0.Parent, a1.Parent = melhor, melhor
-	local t = Instance.new("Trail")
-	t.Name = "RastroDaArma"
-	t.Attachment0, t.Attachment1 = a0, a1
-	t.Lifetime, t.LightEmission, t.FaceCamera = 0.32, 1, true
-	t.MinLength = 0.02
-	t.Color = ColorSequence.new(Color3.fromRGB(255, 244, 205), cor:Lerp(Color3.fromRGB(255, 160, 60), 0.5))
-	t.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.5, 0.35), NumberSequenceKeypoint.new(1, 1) })
-	t.WidthScale = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(1, 0.25) })
-	t.Enabled = false
-	t.Parent = melhor
-	modelo:SetAttribute("RastroNaArma", melhor.Name)
-	return function(ligado: boolean?)
-		if t.Parent then t.Enabled = ligado == true end
+	if not ponta then return nil end
+	local destino = pai or modelo
+	local ligado = false
+	local ultimo: Vector3? = nil
+	local itens: { { fora: BasePart, miolo: BasePart, nasceu: number } } = {}
+	local con: RBXScriptConnection? = nil
+	local escala = 1
+	local function novo(cf: CFrame, comp: number, largFora: number, largMiolo: number)
+		local fora = Instance.new("Part")
+		fora.Name, fora.Anchored, fora.CanCollide, fora.CanTouch, fora.CanQuery, fora.CastShadow = "Rastro", true, false, false, false, false
+		fora.Material, fora.Color, fora.Size, fora.CFrame = Enum.Material.SmoothPlastic, Color3.fromRGB(255, 150, 50), Vector3.new(largFora, largFora, comp), cf
+		local miolo = Instance.new("Part")
+		miolo.Name, miolo.Anchored, miolo.CanCollide, miolo.CanTouch, miolo.CanQuery, miolo.CastShadow = "RastroMiolo", true, false, false, false, false
+		miolo.Material, miolo.Color, miolo.Size, miolo.CFrame = Enum.Material.Neon, Color3.fromRGB(255, 205, 130), Vector3.new(largMiolo, largMiolo, comp), cf
+		fora.Parent, miolo.Parent = destino, destino
+		table.insert(itens, { fora = fora, miolo = miolo, nasceu = os.clock() })
+	end
+	local function passo()
+		local agora = os.clock()
+		escala = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+		if ligado and ponta.Parent then
+			local p = ponta.WorldPosition
+			if ultimo and (p - ultimo).Magnitude > 0.03 then
+				local meio = (p + ultimo) / 2
+				novo(CFrame.lookAt(meio, p), (p - ultimo).Magnitude * 1.2, 0.42, 0.12)
+			end
+			ultimo = p
+		else
+			ultimo = nil
+		end
+		for i = #itens, 1, -1 do
+			local it = itens[i]
+			local idade = (agora - it.nasceu) / (VIDA_RASTRO * escala)
+			if idade >= 1 or not it.fora.Parent then
+				it.fora:Destroy()
+				it.miolo:Destroy()
+				table.remove(itens, i)
+			else
+				it.fora.Transparency = math.clamp(0.25 + idade * 0.75, 0, 1)
+				it.miolo.Transparency = math.clamp(0.05 + idade * 0.95, 0, 1)
+			end
+		end
+		if not ligado and #itens == 0 and con then
+			con:Disconnect()
+			con = nil
+		end
+	end
+	modelo:SetAttribute("RastroNaArma", "Ponta")
+	return function(on: boolean?)
+		ligado = on == true
+		if not con then con = RunService.RenderStepped:Connect(passo) end
 	end
 end
 

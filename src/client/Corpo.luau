@@ -381,9 +381,9 @@ function Corpo.arma(f, tipo: string, cor: Color3?)
 	end
 	if tipo == "escudo" then
 		if not maoE then return pecas end
-		local disco = nova(Vector3.new(0.3, 2.8, 2.8), cor or Color3.fromRGB(150, 156, 170), Enum.Material.Metal)
+		local disco = nova(Vector3.new(0.25, 2.1, 2.1), cor or Color3.fromRGB(150, 156, 170), Enum.Material.Metal)
 		disco.Shape = Enum.PartType.Cylinder
-		local borda = nova(Vector3.new(0.34, 1.2, 1.2), cor or METAL, Enum.Material.Neon)
+		local borda = nova(Vector3.new(0.29, 0.9, 0.9), cor or METAL, Enum.Material.Metal)
 		borda.Shape = Enum.PartType.Cylinder
 		-- Cilindro tem o eixo em X: gira para a face olhar para a frente (-Z).
 		soldar(maoE :: BasePart, disco, CFrame.new(0, -0.3, -0.9) * CFrame.Angles(0, math.pi / 2, 0))
@@ -393,7 +393,7 @@ function Corpo.arma(f, tipo: string, cor: Color3?)
 		if pegaClipe then
 			-- Mão fechada no meio do arco; o arco se estende ao longo de Z da mão (vertical com o braço
 			-- estendido) e a curva vai para -Y da mão (para o alvo). A corda é desenhada pelo gesto.
-			local N, meio, curva = 9, 1.7, 0.55
+			local N, meio, curva = 9, 1.4, 0.45
 			local function ponto(a)
 				return Vector3.new(0, -0.15 - math.cos(a) * curva, math.sin(a) * meio)
 			end
@@ -419,26 +419,54 @@ function Corpo.arma(f, tipo: string, cor: Color3?)
 		soldar(maoE :: BasePart, corda, CFrame.new(0, -0.4, 0.2))
 		end
 	elseif mao then
+		-- IMP5: armas proporcionais ao corpo R15 (~5 studs de altura): espada de uma mão com ~3 studs no total
+		-- (cabo, pomo, guarda, lâmina estreita com ponta chanfrada e fio mais claro), sem Neon (estourava no Bloom).
+		-- Convenção: a arma nasce ao longo de -Y do punho; "Ponta" e "BaseLamina" são Attachments para o rastro do golpe.
 		local pesada = tipo == "pesada"
-		local punho = nova(Vector3.new(0.22, pesada and 1.4 or 0.9, 0.22), MADEIRA, Enum.Material.Wood)
+		local AACO = Color3.fromRGB(168, 174, 188)
+		local OURO = Color3.fromRGB(176, 140, 70)
+		local punho = nova(Vector3.new(0.17, if pesada then 1.0 else 0.7, 0.17), MADEIRA, Enum.Material.Wood)
 		soldar(mao :: BasePart, punho, if pegaClipe then CFrame.new(0, -0.15, 0) * CFrame.Angles(math.rad(90), 0, 0) else CFrame.new(0, -0.25, 0))
-		if tipo == "espada" or tipo == "gelo" then
+		if tipo == "espada" or tipo == "gelo" or tipo == "adaga" then
 			local gelo = tipo == "gelo"
-			local lamina = nova(Vector3.new(0.12, 3.6, 0.42), gelo and Color3.fromRGB(175, 225, 255) or METAL, gelo and Enum.Material.Glass or Enum.Material.Metal)
-			soldar(punho, lamina, CFrame.new(0, -2.15, 0))
-			local fio = nova(Vector3.new(0.07, 3.5, 0.08), cor or Color3.fromRGB(255, 240, 200), Enum.Material.Neon)
-			fio.Transparency = if gelo then 0.3 else 0.2
-			soldar(lamina, fio, CFrame.new(0, 0, -0.22)) -- gume brilhante numa borda só
-			local guarda = nova(Vector3.new(0.22, 0.22, 1.2), Color3.fromRGB(150, 118, 60), Enum.Material.Metal)
-			soldar(punho, guarda, CFrame.new(0, -0.55, 0))
-		elseif tipo == "adaga" then
-			local lamina = nova(Vector3.new(0.1, 1.6, 0.34), METAL, Enum.Material.Metal)
-			soldar(punho, lamina, CFrame.new(0, -1.2, 0))
+			local adaga = tipo == "adaga"
+			local compMain = if adaga then 0.8 else 2.0
+			local larg = if adaga then 0.18 else 0.2
+			local corLamina = if gelo then Color3.fromRGB(170, 220, 250) else AACO
+			local mat = if gelo then Enum.Material.Glass else Enum.Material.Metal
+			local pomo = nova(Vector3.new(0.26, 0.26, 0.26), OURO, Enum.Material.Metal)
+			pomo.Shape = Enum.PartType.Ball
+			soldar(punho, pomo, CFrame.new(0, 0.43, 0))
+			local guarda = nova(Vector3.new(0.12, 0.12, if adaga then 0.5 else 0.8), OURO, Enum.Material.Metal)
+			soldar(punho, guarda, CFrame.new(0, -0.4, 0))
+			local lamina = nova(Vector3.new(0.07, compMain, larg), corLamina, mat)
+			soldar(punho, lamina, CFrame.new(0, -0.46 - compMain / 2, 0))
+			-- fio: tira mais clara na borda de baixo (gume), sem brilho
+			local fio = nova(Vector3.new(0.075, compMain, 0.05), Color3.fromRGB(226, 230, 240), mat)
+			soldar(lamina, fio, CFrame.new(0, 0, larg / 2 - 0.025))
+			-- ponta chanfrada: cunha com a altura ao longo da largura da lâmina e o comprimento rumo à ponta
+			local compPonta = if adaga then 0.3 else 0.5
+			local ponta = Instance.new("WedgePart")
+			ponta.Size = Vector3.new(0.07, larg, compPonta)
+			ponta.Color, ponta.Material = corLamina, mat
+			ponta.CanCollide, ponta.CanTouch, ponta.CanQuery, ponta.CastShadow, ponta.Massless, ponta.Anchored = false, false, false, false, true, false
+			ponta.Parent = f.modelo
+			table.insert(pecas, ponta)
+			soldar(lamina, ponta, CFrame.fromMatrix(Vector3.new(0, -(compMain + compPonta) / 2, 0), Vector3.xAxis, Vector3.zAxis, -Vector3.yAxis))
+			local aPonta, aBase = Instance.new("Attachment"), Instance.new("Attachment")
+			aPonta.Name, aBase.Name = "Ponta", "BaseLamina"
+			aPonta.Position, aBase.Position = Vector3.new(0, -(compMain / 2 + compPonta), 0), Vector3.new(0, compMain / 2, 0)
+			aPonta.Parent, aBase.Parent = lamina, lamina
 		else
-			local cabo = nova(Vector3.new(0.26, 3.4, 0.26), MADEIRA, Enum.Material.Wood)
-			soldar(punho, cabo, CFrame.new(0, -1.4, 0))
-			local cabeca = nova(Vector3.new(1.0, 1.1, 2.0), Color3.fromRGB(120, 124, 138), Enum.Material.Metal)
-			soldar(cabo, cabeca, CFrame.new(0, -1.7, 0))
+			-- machado/martelo: cabo de ~2,5 studs e cabeça compacta
+			local cabo = nova(Vector3.new(0.2, 2.2, 0.2), MADEIRA, Enum.Material.Wood)
+			soldar(punho, cabo, CFrame.new(0, -1.15, 0))
+			local cabeca = nova(Vector3.new(0.35, 0.8, 1.3), Color3.fromRGB(120, 124, 138), Enum.Material.Metal)
+			soldar(cabo, cabeca, CFrame.new(0, -1.0, 0))
+			local aPonta, aBase = Instance.new("Attachment"), Instance.new("Attachment")
+			aPonta.Name, aBase.Name = "Ponta", "BaseLamina"
+			aPonta.Position, aBase.Position = Vector3.new(0, -1.0, 0.65), Vector3.new(0, -1.0, -0.65)
+			aPonta.Parent, aBase.Parent = cabeca, cabeca
 		end
 	end
 	return pecas

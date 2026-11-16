@@ -1456,3 +1456,9 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - `EnquadramentoMesa.ombro` agora é 3/4 lateral para aliado e inimigo (spec atualizado). `impacto_enquadre.py parado` e `mira`: separação em tela atacante/alvo 10,5% fora do golpe, 0 corpos duplicados. Capturas `build/beleza/impacto/r4_parado.png`, `r4_escolha_de_alvo.png`, `r4_critico_*`, `r4_criatura_*` (goblin acertando, faixa "Ataque / 8 de dano").
 - Corte: `r4_corte_base.png` (câmera lenta x10, mesmo ponto da criatura): arco fino laranja com fio branco, sem estourar no Bloom (variantes com Neon escurecido e sem Bloom foram testadas e descartadas).
 - Não verificado: golpe final em câmera lenta, congelamento da criatura, celular. O modo `mira` mediu o mesmo quadro do parado.
+
+## IMP5 — arma proporcional e corte pela ponta real (16/11/2026, Studio por MCP)
+
+- Espada nova: capturas `build/beleza/impacto/r5_normal_0.png` (arma proporcional ao corpo Man, com guarda e ponta chanfrada), `r5_close_arma.png` (recorte ampliado), `r5k_critico_1.png`/`r5k_critico_2.png` (câmera lenta de QA ×4: fita laranja que nasce na ponta da lâmina e acompanha o arco real do golpe; sem clarão branco).
+- Em tempo real a fita some em ~0,26 s: nos quadros a ~0,6 s de intervalo quase não aparece; a prova visual é a câmera lenta. `r5_normal_*` em tempo real mostram o golpe sem o clarão antigo.
+- Não verificado: arco, machado, adaga, pega nos clipes de golpe pesado e estocada; celular.

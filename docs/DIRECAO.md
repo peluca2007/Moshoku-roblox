@@ -141,6 +141,22 @@ Animated Enemy Pack (rato, aranha, cobra, sapo, vespa). Conferir a licença de
 cada um ao integrar. `MDA_Hatchery_CP1.zip` (pacote Unity sem licença
 visível) não será usado.
 
+### Pedidos do Pedro (15/11/2026, noite)
+
+- HUD da luta com a estrutura da de Clair Obscur: Expedition 33 (só a
+  estrutura; a arte é nossa): comandos em losango no canto inferior direito,
+  grupo com retratos no canto inferior esquerdo, ordem dos turnos em coluna,
+  nome da habilidade grande ao usar, tudo animado. Pacote HUD2.
+- Ficha/status aberta no mesmo espírito: tela de personagem grande e animada.
+  Pacote FICHA2, depois da HUD2.
+- Frameworks de interface (Fusion, React-Lua, Vide): não adotar por ora; o
+  TweenService e o kit `Componentes` cobrem o que a HUD precisa. Reavaliar se
+  a interface ficar difícil de manter.
+- Skills de terceiros para o Claude Code (repositórios citados pelo Pedro):
+  ler e revisar antes de instalar qualquer uma; nenhuma instalada.
+- Ao fim das entregas grandes: site de apresentação do jogo no estilo de uma
+  página de changelog (modelos, animações, conceito).
+
 ### Escala do mundo (Pedro, 15/11/2026)
 
 Todas as construções ficam bem maiores em relação ao personagem (corpo R15

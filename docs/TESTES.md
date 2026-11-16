@@ -1442,3 +1442,11 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - `qa.py luta` (29 ok, completo) e `qa.py esgoto_sala1` (20 ok) várias vezes e golpes reais com `tools/qa/impacto_fotos.py` (normal, crítico forçado por `QaCritico`, criatura): capturas `build/beleza/impacto/r2_*.png`, `r2b_*`, `r2s_*`. Mostram câmera 3/4 com lobo e jogador lado a lado, faíscas direcionais, flash do crítico. Console sem erro novo.
 - Parede: as peças do esgoto têm `CanQuery=false` (raycast não as vê). `tools/qa/impacto_parede.luau` com lutadores a 54 studs do centro: câmera escolhida e misturada ficou dentro da caixa da sala (meia=58) nos dois quadros.
 - Não verificado: corte/rastro nítidos em quadro, ataque de criatura que acerta (todos erraram), câmera lenta do golpe final, congelamento da criatura, celular.
+
+## IMP3 — câmera 3/4 medida e corpo duplicado (16/11/2026, Studio por MCP)
+
+- Causa da câmera "atrás": a IMP2 tinha a câmera 3/4 distante (~13 studs) e a dupla colada ocupava só 4-5% da largura; o QA antigo nunca media. O executor do Studio tem outra cópia dos módulos, por isso o peso real vai no atributo `ImpactoPeso` do Workspace.
+- `tools/qa/impacto_enquadre.py normal|criatura [escala]`: com a câmera do golpe no ponto forte (peso >= 0,8) a separação em tela atacante/alvo ficou em 10,0-10,4% (jogador atacando) e 12,5-14,2% (criatura atacando); reprova abaixo de 10% ou com um dos dois fora da tela. Antes: 3,4-5,2%.
+- Corpo duplicado: `Corpo.ocultar` só reaplicava a transparência local quando a contagem mudava de/para zero; com a contagem já > 0 o corpo real continuava visível ao lado do fantasma. Medido antes: avatar + fantasma visíveis em 59 de 360 quadros; depois: 0 em 360 (1 quadro isolado em uma das corridas, tolerado pelo QA). Cada quadro do QA conta peças visíveis do avatar com fantasma presente.
+- `QaCritico`: o crítico forçado é só visual (flash, dois arcos, câmera lenta); o texto "N de dano" vem do servidor e não muda. Prova: atributo `ImpactoCriticoEm` do Workspace e capturas `r3_critico_*`.
+- Não verificado: câmera base de luta (fora do golpe) ainda cobre o alvo; corte desenhado ainda largo/estourado; câmera lenta do golpe final; celular.

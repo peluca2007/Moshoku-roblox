@@ -85,6 +85,7 @@ function M.corte(pai: Instance, ponto: Vector3, direcao: Vector3, cor: Color3, c
 	local dir = plano(direcao)
 	local direita = if cam then cam.CFrame.RightVector else Vector3.xAxis
 	local cima = if cam then cam.CFrame.UpVector else Vector3.yAxis
+	local toCam = if cam then (cam.CFrame.Position - ponto).Unit else Vector3.zero
 	local sinal = if direita:Dot(dir) >= 0 then 1 else -1 -- varre no sentido do golpe visto pela câmera
 	local arcos = { { roll = math.rad(32), L = 5.6 } }
 	if critico then
@@ -100,7 +101,8 @@ function M.corte(pai: Instance, ponto: Vector3, direcao: Vector3, cor: Color3, c
 			for camada = 1, 2 do
 				local p = Instance.new("Part")
 				p.Name, p.Anchored, p.CanCollide, p.CanTouch, p.CanQuery, p.CastShadow = "Corte", true, false, false, false, false
-				p.Material, p.Transparency, p.Size = Enum.Material.Neon, 1, Vector3.one * 0.1
+				-- fio de fora em plástico liso (sem estourar no Bloom); só o miolo fino é Neon
+				p.Material, p.Transparency, p.Size = if camada == 1 then Enum.Material.SmoothPlastic else Enum.Material.Neon, 1, Vector3.one * 0.1
 				p.Color = if camada == 1 then Color3.fromRGB(255, 150, 50) else Color3.fromRGB(255, 236, 190)
 				p.Parent = pai
 				par[camada] = p
@@ -112,7 +114,7 @@ function M.corte(pai: Instance, ponto: Vector3, direcao: Vector3, cor: Color3, c
 	local inicio = os.clock()
 	local function pontoDe(arco, a, s)
 		local bow = 1 - (2 * s - 1) ^ 2
-		return ponto + Vector3.new(0, 0.5, 0) + a * ((s - 0.5) * arco.L) - dir * (bow * 0.9)
+		return ponto + Vector3.new(0, 0.5, 0) + toCam * 0.9 + a * ((s - 0.5) * arco.L) - dir * (bow * 0.9)
 	end
 	local con
 	con = RunService.RenderStepped:Connect(function()
@@ -134,7 +136,7 @@ function M.corte(pai: Instance, ponto: Vector3, direcao: Vector3, cor: Color3, c
 			local meio = (a + b) / 2
 			local comp = math.max((b - a).Magnitude * 1.15, 0.05)
 			for camada, p in e.par do
-				local larg = largura * (if camada == 1 then 1.3 else 0.25)
+				local larg = largura * (if camada == 1 then 1.0 else 0.14)
 				p.Size = Vector3.new(larg, larg, comp)
 				p.CFrame = CFrame.lookAt(meio, meio + (b - a))
 				p.Transparency = if vida < 0 then 1 else math.clamp(tr + (if camada == 1 then 0.45 else 0.05), 0, 1)

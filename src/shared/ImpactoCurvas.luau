@@ -78,7 +78,7 @@ end
 -- Ângulo (rad) entre o eixo atacante->alvo e a direção da câmera: 3/4, mais aberto quando a dupla está colada
 -- (assim o atacante nunca tampa o alvo). `dist` em studs, plano.
 function M.anguloCamera(dist: number): number
-	return math.rad(math.clamp(86 - dist * 3, 62, 84))
+	return math.rad(math.clamp(90 - dist * 2, 70, 86))
 end
 
 -- Quanto o alvo fica deslocado, de lado, da linha de visão câmera->atacante (studs). Tem de ser >= SEPARACAO_MIN.
@@ -101,10 +101,10 @@ function M.enquadre(de: { x: number, y: number, z: number }, para: { x: number, 
 	local th = math.min(M.anguloCamera(dist) + (abre or 0), math.rad(88))
 	local mx, mz = (de.x + para.x) / 2, (de.z + para.z) / 2
 	local y = (de.y + para.y) / 2
-	local afast = (10 + dist * 1.2) * (escala or 1)
+	local afast = math.max((4.6 + dist * 0.95) * (escala or 1), 3.5) -- perto: a dupla ocupa o quadro (separação em tela >= ~12%)
 	local dirx, dirz = lx * math.sin(th) - fx * math.cos(th), lz * math.sin(th) - fz * math.cos(th)
 	local olhar = { x = mx, y = y + 1.8, z = mz }
-	local pos = { x = mx + dirx * afast, y = y + 5.2 * (escala or 1) + 1, z = mz + dirz * afast }
+	local pos = { x = mx + dirx * afast, y = y + 2.4 * (escala or 1) + 1, z = mz + dirz * afast }
 	return pos, olhar
 end
 

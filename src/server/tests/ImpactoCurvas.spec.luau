@@ -62,7 +62,7 @@ return {
 		local pos, olhar = C.enquadre({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = -10 }, 1)
 		t.ok(pos.y > olhar.y)
 		t.ok(math.abs(pos.x) > 5, "de lado")
-		t.ok(pos.z > 0, "atrás do atacante (3/4, não de perfil)")
+		t.ok(pos.z > olhar.z, "atrás do meio da dupla (3/4, não de perfil)")
 		t.eq(olhar.z, -5)
 		local pos2 = C.enquadre({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = -10 }, -1)
 		t.eq(pos2.x, -pos.x)

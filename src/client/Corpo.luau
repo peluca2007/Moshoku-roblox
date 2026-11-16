@@ -51,16 +51,49 @@ local function partesDe(modelo: Instance)
 end
 
 -- Esconde (ou mostra) o corpo real só no cliente local. Conta pedidos.
+-- IMP3: o corpo real aparecia junto do fantasma ("duas cabeças") quando a contagem já estava acima de zero (pedido
+-- anterior sem reveal) e o pedido novo não reaplicava nada, ou quando peças nascem depois (cabelo/arma da
+-- aparência). Agora cada pedido reaplica e, enquanto houver corpo escondido, um laço de render mantém todas as
+-- peças (inclusive as novas) com LocalTransparencyModifier = 1.
+local guarda: RBXScriptConnection? = nil
+-- fantasmas vivos por corpo real: sem fantasma, nada justifica o corpo escondido (cura vazamento de contagem)
+local vivos: { [Instance]: number } = setmetatable({}, { __mode = "k" }) :: any
+local function aplicar(modelo: Instance, valor: number)
+	for _, p in partesDe(modelo) do
+		if p.LocalTransparencyModifier ~= valor then
+			p.LocalTransparencyModifier = valor
+		end
+	end
+end
+local function manterEscondidos()
+	if guarda or next(ocultos) == nil then
+		return
+	end
+	guarda = game:GetService("RunService").RenderStepped:Connect(function()
+		local algum = false
+		for modelo in ocultos do
+			if modelo.Parent and (vivos[modelo] or 0) > 0 then
+				algum = true
+				aplicar(modelo, 1)
+			else
+				ocultos[modelo] = nil
+				aplicar(modelo, 0)
+			end
+		end
+		if not algum and guarda then
+			guarda:Disconnect()
+			guarda = nil
+		end
+	end)
+end
+
 function Corpo.ocultar(modelo: Model, esconder: boolean)
 	local antes = ocultos[modelo] or 0
 	local depois = math.max(0, antes + (if esconder then 1 else -1))
 	ocultos[modelo] = if depois > 0 then depois else nil
-	if (antes == 0) == (depois == 0) then
-		return
-	end
-	local valor = if depois > 0 then 1 else 0
-	for _, p in partesDe(modelo) do
-		p.LocalTransparencyModifier = valor
+	aplicar(modelo, if depois > 0 then 1 else 0)
+	if depois > 0 then
+		manterEscondidos()
 	end
 end
 
@@ -162,8 +195,10 @@ function Corpo.fantasma(modelo: Model, pai: Instance)
 		animator.Parent = humanoide
 	end
 	copia.Name = "Fantasma"
+	copia:SetAttribute("FantasmaDe", modelo.Name) -- QA: conta corpos visíveis por personagem
 	copia.Parent = pai
 	ativos += 1
+	vivos[modelo] = (vivos[modelo] or 0) + 1
 	local f = {
 		modelo = copia,
 		raiz = raiz,
@@ -184,6 +219,7 @@ function Corpo.fantasma(modelo: Model, pai: Instance)
 			f.viva = false
 			ativos -= 1
 		end
+		vivos[modelo] = math.max((vivos[modelo] or 1) - 1, 0)
 	end)
 	return f
 end

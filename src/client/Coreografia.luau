@@ -411,6 +411,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit)
 				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, crit, golpe)
 				if crit and Efeitos.tremorAtivo() then ImpactoFx.flash(0.2) end
+				workspace:SetAttribute(if crit then "ImpactoCriticoEm" else "ImpactoAcertoEm", os.clock()) -- QA: prova do efeito
 				if not cena.pausada and not FX.reduzidos and Efeitos.tremorAtivo() then
 					cena.pausada = true
 					local parada = Curvas.hitStop(alvo.dano, crit)
@@ -589,7 +590,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				quando = math.max(quando, impactoDaCriatura(state, recibo.casterId) or 0)
 				if de and i == 1 and n == 1 and not plano.semCamera then
 					-- IMP1: a câmera de luta acompanha este golpe (antecipação, contato, volta)
-					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando * math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1))
+					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando)
 					cena.fim = math.max(cena.fim, quando + 0.9)
 				end
 				-- ANIM3: número, barra e queda do alvo esperam o golpe encostar (limite de segurança na fila)

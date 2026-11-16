@@ -9,7 +9,7 @@ local Protocol = require(Shared.MesaProtocol)
 local FX = require(script.Parent.MenuEfeitos)
 
 local M = {}
-local atual: { de: Vector3, para: Vector3, inicio: number, impacto: number, escolha: any, folga: number? }? = nil
+local atual: { de: Vector3, para: Vector3, inicio: number, impacto: number, esc: number, escolha: any, folga: number? }? = nil
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Exclude
 params.IgnoreWater = true
@@ -24,8 +24,10 @@ local function pt(v: Vector3) return { x = v.X, y = v.Y, z = v.Z } end
 
 -- de/para: pontos no mundo (atacante e alvo); impacto: segundos até o contato.
 function M.golpe(de: Vector3, para: Vector3, impacto: number)
+	workspace:SetAttribute("ImpactoGolpeChamado", os.clock()) -- QA: prova que a Coreografia chamou
 	if FX.reduzidos then return end
-	atual = { de = de, para = para, inicio = os.clock(), impacto = math.max(impacto, 0.1) }
+	atual = { de = de, para = para, inicio = os.clock(), impacto = math.max(impacto, 0.1),
+		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) } -- esc: câmera lenta forçada (só QA) dilata tudo
 end
 
 -- Só para a QA: o golpe atual (com a escolha de enquadramento e a folga do raycast).
@@ -39,7 +41,7 @@ end
 
 function M.peso(): number
 	if not atual then return 0 end
-	local t = os.clock() - atual.inicio
+	local t = (os.clock() - atual.inicio) / atual.esc
 	if t > Curvas.duracaoTotal(atual.impacto) then
 		atual = nil
 		return 0
@@ -96,10 +98,21 @@ end
 M.escolher = escolher
 
 -- `cf`: câmera de luta já calculada. Devolve a câmera com o enquadramento do golpe misturado.
+local publicado = -1
+local function publicar(w: number)
+	-- QA: o executor do Studio tem outra cópia dos módulos; o peso real vai no atributo ImpactoPeso do Workspace
+	local v = math.floor(w * 100 + 0.5) / 100
+	if v ~= publicado then
+		publicado = v
+		workspace:SetAttribute("ImpactoPeso", v)
+	end
+end
+
 function M.aplicar(cf: CFrame): CFrame
 	local g = atual
-	if not g then return cf end
+	if not g then publicar(0) return cf end
 	local w = M.peso() * Curvas.FORCA
+	publicar(w)
 	if w <= 0.001 then return cf end
 	if not g.escolha then escolher(g, cf) end
 	local c = g.escolha

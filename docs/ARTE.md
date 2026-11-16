@@ -100,3 +100,18 @@ externo, sem textura de terceiros): sem licença de terceiros; as peças são no
 tools/blender/personagem/folhas.py --folha v3` gera `build/beleza/personagem/prancha_v3.jpg`. Envio (rota do Studio):
 `$env:MOSHOKU_VIA_STUDIO="1"; python tools/blender/personagem/enviar.py` (peças -> `src/server/Mundo/Modelos`, rostos ->
 `build/personagem/rostos/ids.json`).
+
+## Corpos oficiais gratuitos (PERS4, 16/11/2026)
+
+Só pacotes publicados pela própria Roblox (dono `Roblox`, id 1; preço 0; `catalog.roblox.com/v1/bundles/details`), aplicados
+pela `HumanoidDescription` (`Personagem.CORPOS`, escolhido por `Personagem.CORPO`; padrão ainda `"caixas"`). Sem
+arquivos baixados nem malha nossa: o corpo vem da Roblox em tempo de execução. Todos aceitam o `Shirt`/`Pants` clássico
+(Man/Woman/Boy; os "Base Body" anime têm cabeça dinâmica 1,6 e quebram o encaixe).
+
+| Chave | Pacote (bundle) | Ids Torso/BD/BE/PE/PD | Nota |
+|---|---|---|---|
+| `homem` | Man (238) | 86500008 / 86500036 / 86500054 / 86500064 / 86500078 | Recomendado: mãos, ombros e pés de verdade, cabeça padrão |
+| `mulher` | Woman (239) | 86499666 / 86499698 / 86499716 / 86499753 / 86499793 | Mais fina, ok; precisa de `TorsoColor` = pele |
+| `menino` | ROBLOX Boy (109) | 376532000 / 376531012 / 376530220 / 376531300 / 376531703 | Mais baixo e largo, bom p/ anão |
+| (descartado) | City Life Woman (337) | 2492674027 ... | roupa pintada no torso, ignora a camisa |
+| (descartado) | Base Body Dawson/Jordan/Parker (991/994/985) | 11709869073 ... | cabeça 1,6 e pescoço longo; hair/rosto desalinham |

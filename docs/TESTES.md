@@ -1393,3 +1393,8 @@ Verificado: exportação (`anim_exportar.py --ual ... --mapa tools/animacao/ual_
 ## PERS3b — personagem rodada 2 no Studio (16/11/2026)
 
 Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cinto com bolsa, ombreira) e 24 rostos (Decal pela rota do Studio; `Personagem.ROSTOS` com o id da imagem via `LoadAsset`). Conferido em Play (`qa.py inicio`, `esgoto_sala1`, `luta`: 29 ok, 0 falha) e por capturas em `build/beleza/personagem/prancha_v3_studio.jpg`. Defeitos achados e corrigidos: módulos de malha não replicados ao cliente (caía em blocos), escala 14% grande (cabelo cobrindo o rosto), Decal do rosto virando lasca na cabeça R15 (placa `RostoPlaca`), mechas atravessando o capuz, capa cinza. Observação: a janela do Studio minimizada gera capturas sem 3D. Não verificado: pisca ao trocar opção no editor real (só a grade montada por script), troca de rosto/cabelo clicando na UI de personalização, cidade de perto e luta de frente/costas (a câmera do jogo ignorou o CFrame forçado), celular.
+
+## PERS4 — corpos oficiais no Studio (16/11/2026)
+- `pers4_comparar.py`: caixas, homem (Man 238), mulher (Woman 239), menino (Boy 109) x aventureiro/humano, ladino/elfo, mago/anão, ogro, de frente e 3/4: roupa clássica, cabelo/barba/capuz/capa/rosto em placa encaixam; escalas por raça funcionam. Base Body (Dawson/Jordan) e City Life Woman descartados (ARTE.md).
+- Com `CORPO="homem"`: `qa.py luta` 29 ok (armas na mão, golpe e animações sem quebrar; `corpos_luta_homem.jpg`). Padrão voltou a "caixas".
+- Não verificado: mulher/menino em luta, clipes de todas as animações, ficha de outros jogadores, celular, desempenho de carregar o corpo em jogo real.

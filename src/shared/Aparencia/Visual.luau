@@ -16,12 +16,15 @@ Visual.cor = cor -- cores cosméticas do catálogo; não são tokens de interfac
 function Visual.descrever(a, raceId, extras)
 	local d = Instance.new("HumanoidDescription") -- vazio: sem roupas/acessórios do usuário
 	for _, campo in { "Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg", "Face", "Shirt", "Pants", "GraphicTShirt" } do d[campo] = 0 end
+	local corpo = Personagem.CORPOS[Personagem.CORPO] -- nil = "caixas" (R15 padrão)
+	if corpo then for campo, id in corpo do d[campo] = id end end
 	local e = Racas.POR_ID[raceId].escala
 	d.HeightScale, d.WidthScale, d.DepthScale, d.HeadScale = e.altura, e.largura, e.profundidade, e.cabeca
 	d.BodyTypeScale, d.ProportionScale = 0, 0
 	if Personagem.CABELO_DO_AVATAR and extras and type(extras.cabeloAvatar) == "string" then d.HairAccessory = extras.cabeloAvatar end
 	d.HeadColor, d.LeftArmColor, d.RightArmColor = cor(a.cores.pele), cor(a.cores.pele), cor(a.cores.pele)
-	d.TorsoColor, d.LeftLegColor, d.RightLegColor = cor(a.cores.camisa), cor(a.cores.calca), cor(a.cores.calca)
+	-- Corpos oficiais: o pescoço/ombros que a camisa clássica não cobre aparecem na cor do torso; pele evita o "colarinho" azul.
+	d.TorsoColor, d.LeftLegColor, d.RightLegColor = cor(if corpo then a.cores.pele else a.cores.camisa), cor(a.cores.calca), cor(a.cores.calca)
 	return d
 end
 

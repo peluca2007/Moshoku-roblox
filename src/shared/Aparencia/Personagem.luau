@@ -10,6 +10,17 @@ Personagem.CABECA_MALHA = 1.2
 -- O cabelo do avatar do jogador só entra quando houver campo próprio no perfil e a verificação no Studio (PERS2 pendente).
 Personagem.CABELO_DO_AVATAR = false
 
+-- PERS4: corpo do personagem. "caixas" = R15 padrão de blocos (o que o jogo usa hoje); outro nome = pacote oficial e gratuito
+-- da Roblox (dono Roblox, preço 0) aplicado pela HumanoidDescription, com nossa roupa/peças/rosto por cima. Candidatos e
+-- avaliação em docs/ARTE.md (PERS4). Padrão segue "caixas" até o Pedro decidir pela prancha corpos_comparacao.jpg.
+Personagem.CORPO = "caixas"
+-- Ids dos membros (Torso, Braços, Pernas e cabeça dinâmica; 0 = mantém a cabeça R15 padrão). Fonte: catalog.roblox.com/v1/bundles/details.
+Personagem.CORPOS = {
+	homem = { Torso = 86500008, RightArm = 86500036, LeftArm = 86500054, LeftLeg = 86500064, RightLeg = 86500078, Head = 0 }, -- bundle 238 "Man"
+	mulher = { Torso = 86499666, RightArm = 86499698, LeftArm = 86499716, LeftLeg = 86499753, RightLeg = 86499793, Head = 0 }, -- bundle 239 "Woman"
+	menino = { Torso = 376532000, RightArm = 376531012, LeftArm = 376530220, LeftLeg = 376531300, RightLeg = 376531703, Head = 0 }, -- bundle 109 "ROBLOX Boy"
+}
+
 -- Moldes clássicos 585x559 enviados como Decal pela rota do Studio (MOSHOKU_VIA_STUDIO=1); o id guardado é o da IMAGEM do Decal (InsertService:LoadAsset -> Decal.Texture), que o Shirt/Pants aceita. Tons: aventureiro/ladino médio, mago claro.
 Personagem.CONJUNTOS = {
 	aventureiro = { camisa = "rbxassetid://85431028511988", calca = "rbxassetid://99488561642255" },

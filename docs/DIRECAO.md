@@ -199,6 +199,20 @@ só aparece no chão ao andar ou mirar.
   **Ainda não implementado**: hoje o acampamento é um painel com o grupo parado
   junto à porta (pacote CAMP1 em `TAREFAS.md`).
 
+### Conjuração falada ou montada (Pedro, 16/11/2026)
+
+Ideia do Pedro: conjurar magia como **bônus opcional**, nunca obrigatório.
+
+- **Falar no microfone:** o jogador diz o encantamento. Base: `AudioSpeechToText`
+  do Roblox (lançamento completo em 05/2026; grava até 10 s por pedido, com limite
+  de pedidos por minuto; exige o chat de voz e a nova API de áudio). Falta conferir
+  se o português está entre os idiomas e a precisão com palavras inventadas.
+- **Montar as palavras:** sem digitar e sem copiar e colar. As palavras do
+  encantamento aparecem espalhadas na tela e o jogador clica nelas na ordem certa.
+- **Regra:** o bônus não pode mudar dano nem regra do livro sem decisão do Pedro;
+  por ora vale como efeito visual maior. Quem não usa nada conjura normalmente.
+- **Quando:** depois das animações das habilidades (HAB1–HAB3).
+
 ### Decisões em aberto (perguntar ao Pedro com opções e recomendação)
 
 - Nenhuma no momento.

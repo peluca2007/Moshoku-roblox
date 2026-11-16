@@ -552,10 +552,10 @@
   "sha256": "21ca36aadc0fa348bfc88b0176a5649c4054f38f5024dfa5819e157d96a15667"
  },
  "LoboQuaternius": {
-  "asset": "94281687178734",
+  "asset": "137835906047241",
   "modelo": "criatura-externa",
   "semente": "1",
-  "sha256": "e2cb41c80c1f00a61f53827aeda64b6f1845141eb9966d068754e081e258fb4f"
+  "sha256": "03522f0e828c71597aa91ebac646c327487a4a511d74d82c513b567f95b5d374"
  },
  "MercadoLiso": {
   "asset": "78239011834021",

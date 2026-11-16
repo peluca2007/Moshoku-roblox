@@ -31,10 +31,10 @@ CLIPES = {
     "SlimeQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Attack", False), "Morrer": ("Death", False)},
     "MorcegoQuaternius": {"Voar": ("Flying", LAÇO), "Atacar": ("Attack", False), "Atacar2": ("Attack2", False), "LevarGolpe": ("Hit", False), "Morrer": ("Death", False)},
     "DragaoQuaternius": {"Voar": ("Flying", LAÇO), "Atacar": ("Attack", False), "Atacar2": ("Attack2", False), "LevarGolpe": ("Hit", False), "Morrer": ("Death", False)},
-    # MOD4: lobo (Animal Pack Vol.2: só Idle e Walking; Atacar, LevarGolpe e Morrer sintetizados) e goblin (Character Pack)
+    # MOD4: lobo (Animal Pack Vol.2: só Idle e Walking; Atacar, LevarGolpe e Morrer sintetizados) e goblin (Character Pack; o Defeat do pacote volta de pé, então Morrer é sintetizado)
     "LoboQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walking", LAÇO)},
     "GoblinQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Punch", False),
-                         "LevarGolpe": ("RecieveHit", False), "Morrer": ("Defeat", False)},
+                         "LevarGolpe": ("RecieveHit", False)},
 }
 # Clipes que terminam no último quadro (não voltam ao repouso).
 SEGURAR = {"Morrer"}

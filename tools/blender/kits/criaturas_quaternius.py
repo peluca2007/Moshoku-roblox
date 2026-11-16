@@ -150,6 +150,8 @@ FRENTE = {"LoboQuaternius": (["Bone.003"], "Bone"), "VespaQuaternius": (["Head"]
 
 # Aperto da paleta: o pacote é saturado e claro; o jogo é sóbrio (kit_lib.sobrio faz o mesmo para os outros kits).
 SATURACAO, VALOR = 0.78, 0.92
+# Cor do material clara demais sob a luz do jogo (lobo ficava azul-claro): cinza de lobo escurecido.
+COR_FIXA = {"LoboQuaternius": (124, 116, 106)}
 
 
 def _lin_srgb(c):
@@ -276,7 +278,7 @@ def converter(modulo, cfg):
     modelo = _Criatura(modulo, paleta)
 
     def chave_cor(mat):
-        rgb = cor_do_material(mat)
+        rgb = COR_FIXA.get(modulo) or cor_do_material(mat)
         base = re.sub(r"[^A-Za-z]", "", mat.name if mat else "Cor") or "Cor"
         nome = base
         i = 0

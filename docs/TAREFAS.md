@@ -61,7 +61,7 @@ CIDADE1 — **na fila (Pedro, 15/11)**, junto com o ESC1. Cidade bem viva e em e
 
 AREA2 — **na fila (Pedro, 15/11)**. Acabamento da área de testes: sala bonita, painel sem texto quebrado nem sobreposto, prévia de cada criatura, gesto e animação em destaque.
 
-APRES1 — **na fila, prioridade do Pedro (15/11)**: animações e modelos primeiro (fase 4 de [DIRECAO §7](DIRECAO.md)); o Pedro acha todas as animações de hoje muito feias (a da flecha foi o exemplo): o pacote refaz a apresentação dos golpes em geral, começando pelos disparos. Começa quando a QA1 liberar o Studio.
+APRES1 — agente implementador (coordenação Claude), **em andamento (15/11/2026), com Studio**. Nota do Pedro para as animações: 2,5; meta 7,5. Trocar as poses escritas à mão (ANIM1, `shared/Animacoes/Clipes`) por movimento de verdade: Universal Animation Library da Quaternius (CC0, `build/externos/ual`) redirecionada para o corpo usado na luta, pelo tocador próprio; `generate_animation` do Studio como alternativa. Arquivos: `shared/Animacoes/**`, `tools/blender/anim_*.py`, cliente que toca os clipes (`client/AnimacaoLuta`, `client/Coreografia`) e specs ligados. Não toca nos arquivos da MOD3.
 
 UI1 — telas (Pedro, 14/11). **UI1a pronta para revisão (15/11/2026)**: criação com o personagem 3D no centro, painel à direita e etapas embaixo (`client/{CriacaoRapidaView,CriacaoPrevia}`, `shared/Regras/CriacaoRapidaTela`, spec). Clicar na raça só seleciona: os roteiros precisam de um Avançar a mais. Local ok; **visual não conferido no Studio**. Na fila: UI1b menu de pausa central (`InicioView`), atalhos e status.
 

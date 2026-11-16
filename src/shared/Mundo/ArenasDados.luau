@@ -116,8 +116,10 @@ ArenasDados.RUINAS = table.freeze({
 -- Sem luz própria por arena: a luz segue `mundo` (ponto da vila); o escuro vem do piso e dos tons.
 ArenasDados.ESGOTO = table.freeze({
 	mundo = { x = 0, z = -150 },
-	piso = { material = "Slate", cor = { 58, 64, 62 } },
-	chao = { material = "Pebble", cor = { 34, 38, 36 } },
+	-- Pedra molhada com musgo: MaterialVariant gerado no Studio (generate_material, 15/11/2026, BELEZA1);
+	-- ids dos mapas em docs/MANUTENCAO.md. A cor só tinge o mapa, então fica clara.
+	piso = { material = "Slate", variante = "EsgotoPedra", cor = { 120, 124, 120 } },
+	chao = { material = "Pebble", variante = "EsgotoPedra", cor = { 70, 74, 72 } },
 	props = {
 		{ "Muro1", -40, -64, 0 }, { "Muro2", 0, -66, 0 }, { "Muro1", 40, -64, 0 },
 		{ "Muro2", -66, -30, 90 }, { "Muro1", -68, 10, 90 }, { "Muro2", -66, 46, 90 },
@@ -130,6 +132,16 @@ ArenasDados.ESGOTO = table.freeze({
 		{ "RatoGigante", -58, -10, 80 }, { "RatoGigante", 60, 12, -100 }, { "RatoGigante", -20, 58, 170 },
 	},
 	moradores = {},
+})
+
+-- Materiais gerados no Studio (generate_material) que as arenas usam: nome => mapas. Os MaterialVariant
+-- reais ficam em default.project.json (MaterialService); esta tabela só documenta os ids e é conferida
+-- por spec. `material` do layout é o nativo de reserva; com o variante a peça passa a Plastic.
+ArenasDados.VARIANTES = table.freeze({
+	EsgotoPedra = table.freeze({
+		tile = 10,
+		cor = "rbxassetid://126264462537499", normal = "rbxassetid://136038204322309", rugosidade = "rbxassetid://87206152339961",
+	}),
 })
 
 local LAYOUTS = table.freeze({

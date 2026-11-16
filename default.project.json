@@ -4,6 +4,7 @@
     "$className": "DataModel",
     "ReplicatedStorage": {"Shared": {"$path": "src/shared"}},
     "ServerScriptService": {"RPGServer": {"$path": "src/server.server.luau"}, "Server": {"$path": "src/server"}},
-    "StarterPlayer": {"StarterPlayerScripts": {"RPGClient": {"$path": "src/client.client.luau"}, "Client": {"$path": "src/client"}}}
+    "StarterPlayer": {"StarterPlayerScripts": {"RPGClient": {"$path": "src/client.client.luau"}, "Client": {"$path": "src/client"}}},
+    "MaterialService": {"EsgotoPedra": {"$className": "MaterialVariant", "$properties": {"BaseMaterial": "Plastic", "StudsPerTile": 10, "ColorMap": "rbxassetid://126264462537499", "NormalMap": "rbxassetid://136038204322309", "RoughnessMap": "rbxassetid://87206152339961"}}}
   }
 }

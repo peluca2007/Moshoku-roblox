@@ -10,6 +10,7 @@ local RunService = game:GetService("RunService")
 
 local Perfis = require(ReplicatedStorage.Shared.Mundo.AmbientePerfis)
 local Arenas = require(ReplicatedStorage.Shared.Mundo.ArenasDados)
+local PerfilLuta = require(ReplicatedStorage.Shared.Mundo.PerfilLuta)
 local ModoCamera = require(script.Parent.ModoCamera)
 local CeuMundo = require(script.Parent.CeuMundo)
 
@@ -145,10 +146,12 @@ function AmbienteMundo.start()
 				local pesos = Perfis.pesos(ponto.X, ponto.Z, dentro)
 				local hora = if dentro then nil else ReplicatedStorage:GetAttribute("RunHora")
 				atualizarLuz(raiz, Perfis.luzPessoal(ponto.X, ponto.Z, dentro, hora))
-				local chave = tostring(hora) .. (if dentro then "sala" elseif pesos.ruinas >= 1 then "ruinas" else tostring(math.floor(pesos.floresta * 500)))
+				local emLuta = pontoDaArena(raiz) ~= nil
+				local chave = (if emLuta then "luta" else "") .. tostring(hora) .. (if dentro then "sala" elseif pesos.ruinas >= 1 then "ruinas" else tostring(math.floor(pesos.floresta * 500)))
 				if chave ~= chaveAlvo then
 					chaveAlvo = chave
 					alvo = Perfis.modularHora(Perfis.alvo(ponto.X, ponto.Z, dentro), hora)
+					if emLuta then alvo = PerfilLuta.aplicar(alvo) end
 					tau = if dentro then Perfis.TAU_SALA else Perfis.TAU_ZONA
 					mudouEm = agora
 				end

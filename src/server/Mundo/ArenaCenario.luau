@@ -18,6 +18,26 @@ local ANIM_ACENO = "rbxassetid://507770239"
 local DO_LIVRO = { Capa = true, Maco = true, Aba = true, Selo = true, LuzDoCaos = true, Margem = true,
 	Entrada = true, EntradaFio = true, Quadricula = true }
 
+local MaterialService = game:GetService("MaterialService")
+
+-- MaterialVariant gerado (ArenasDados.VARIANTES): vem do place (default.project.json -> MaterialService),
+-- pois scripts normais não podem gravar BaseMaterial/ColorMap (capacidade Plugin). Sem ele (ex.: place
+-- antigo, ou Studio sem Rojo), a peça usa o material nativo do layout. Devolve o nome ou nil.
+local function variante(nome)
+	if nome and MaterialService:FindFirstChild(nome) then return nome end
+	return nil
+end
+
+-- Propriedades de material de uma peça da arena: variante (sobre Plastic, a base dele) ou material nativo.
+local function propsMaterial(def)
+	local v = variante(def.variante)
+	return {
+		Material = if v then Enum.Material.Plastic else Enum.Material[def.material],
+		MaterialVariant = v or "",
+		Color = Color3.fromRGB(table.unpack(def.cor)),
+	}
+end
+
 local construidas = {} -- arenaId -> Folder (guardada em ServerStorage enquanto não está em uso)
 local atual = nil
 local originais = nil -- { [Instance] = { propriedade = valor } }
@@ -138,12 +158,12 @@ function ArenaCenario.aplicar(arenaId)
 	end
 	local pagina = mesa:FindFirstChild("Tabuleiro")
 	if pagina then
-		guardar(pagina, { Material = Enum.Material[layout.piso.material], Color = Color3.fromRGB(table.unpack(layout.piso.cor)) })
+		guardar(pagina, propsMaterial(layout.piso))
 		local caos = pagina:FindFirstChild("Caos")
 		if caos then guardar(caos, { Enabled = false }) end
 	end
 	local piso = mesa:FindFirstChild("Piso")
-	if piso then guardar(piso, { Material = Enum.Material[layout.chao.material], Color = Color3.fromRGB(table.unpack(layout.chao.cor)) }) end
+	if piso then guardar(piso, propsMaterial(layout.chao)) end
 	construidas[arenaId].Parent = workspace
 	atual = arenaId
 	mesa:SetAttribute("ArenaRegional", arenaId)

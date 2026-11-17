@@ -1565,3 +1565,11 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Vistos nos quadros: respingo (braço estendido), bola (duas mãos acima da cabeça), impacto de gelo (aponta, cristais), lâmina, Primeiro Golpe (estocada com fumaça escura). Escudo e névoa: a pose de 2 mãos aparece, mas só há partículas genéricas (não existe receita própria da Água para eles em MagiasAgua). Flecha de água: inalterada.
 - Investida: cor quente (255,178,96), sombras a 80% de transparência, um corte fino no lugar de dois grossos. Ainda sobra um clarão amarelo forte no impacto (vem de ImpactoFx).
 - `hab_luta_real.py` ganhou `--si` (alvo = o próprio conjurador). Não verificado: magias com recibo real do servidor, celular, desempenho. `qa.py luta` não foi rodado depois desta tarefa (só `testar.ps1`: só Catálogo falha).
+
+## CEN4b fechamento do esgoto em malha (17/11/2026)
+
+- Studio (MCP, com foco, lock CEN4b): `TOM_ESGOTO` cinza-esverdeado (mistura 0,82 e 8% mais escuro) tirou o laranja; chão de base (`BaseLajes`, topo em y 0,04) sob as lajes tapou os buracos escuros. `qa.py esgoto_sala1` 20 ok (a 1 falha da rodada anterior não se repetiu em 4 rodadas com o Studio só meu; as rodadas ruins coincidiram com a REA3 usando o Studio) e `qa.py luta` 29 ok.
+- fps com foco: antes 60,0 / p5 55,9 (8521 partes); depois 60,0 / p5 56,3 (9307 partes, +786). `FILAS` fica em 3.
+- Capturas em `build/beleza/cen4/` (`antes_*`, `depois_*` da câmera alta, `depois_luta_golpe.png` e `luta_golpe_prancha.png` da câmera da luta com o Corte de Braço, vídeo com foco `camera_da_luta.mp4`).
+- Aviso: `esgoto_fotos.py` deixa a câmera própria ligada; depois dele a câmera da luta só volta reiniciando o Play (`qa.py esgoto_sala1 --manter-play`).
+- Não verificado: celular, outras salas do esgoto e chefe, aranha/rato na câmera da luta com o cenário novo.

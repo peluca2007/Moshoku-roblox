@@ -3,11 +3,12 @@
 -- Tudo ancorado, sem colisão nem consulta (câmera e mouse atravessam) e sem sombra própria. Sem os módulos enviados,
 -- `disponivel()` é falso e o cenário de peças retas (CEN1–CEN3) continua como estava.
 local Montar = require(script.Parent.MontarModelo)
+local EsgotoPecas = require(script.Parent.EsgotoPecas)
 
 local EsgotoMalhas = {}
 
 local FILAS = 3
-local TOM_ESGOTO = Color3.fromRGB(72, 86, 82)
+local TOM_ESGOTO = Color3.fromRGB(52, 78, 78)
 local MODULOS = { "EsgotoKKParede", "EsgotoKKParedeQuebrada", "EsgotoKKPilar", "EsgotoKKPiso", "EsgotoKKPisoPedras", "EsgotoKKEntulho" }
 
 function EsgotoMalhas.disponivel()
@@ -26,7 +27,7 @@ local function colocar(pasta, nome, cf, escala)
 			p.Anchored, p.CanCollide, p.CanQuery, p.CanTouch, p.CastShadow, p.Massless = true, false, false, false, false, true
 			p.MaterialVariant = ""
 			-- Pedra bege do pacote -> cinza-esverdeado do esgoto (a luz-chave quente e a Atmosphere da CEN3 fazem o resto).
-			p.Color = p.Color:Lerp(TOM_ESGOTO, 0.62):Lerp(Color3.new(0, 0, 0), 0.12)
+			p.Color = p.Color:Lerp(TOM_ESGOTO, 0.82):Lerp(Color3.new(0, 0, 0), 0.08)
 		end
 	end
 	return modelo
@@ -62,6 +63,14 @@ function EsgotoMalhas.piso(pasta, origem, meia)
 	local r = Random.new(23)
 	local base = CFrame.new(origem.X, -0.55, origem.Z)
 	local largura = meia - 50 -- faixa entre o tabuleiro e a parede
+	-- Chão de base sob as lajes: tapa os vãos escuros entre as lajes hexagonais (topo em y = 0).
+	local fundo = Color3.fromRGB(40, 56, 56)
+	for _, f in { { 0, meia + 50 / 2, 2 * meia + 8, largura + 4 }, { 0, -(meia + 50 / 2), 2 * meia + 8, largura + 4 } } do
+		EsgotoPecas.peca(pasta, "BaseLajes", Vector3.new(f[3], 0.6, f[4]), CFrame.new(origem.X + f[1], -0.26, origem.Z + (f[2] > 0 and 50 + largura / 2 or -(50 + largura / 2))), fundo, Enum.Material.Slate)
+	end
+	for _, sx in { 1, -1 } do
+		EsgotoPecas.peca(pasta, "BaseLajes", Vector3.new(largura + 4, 0.6, 100), CFrame.new(origem.X + sx * (50 + largura / 2), -0.26, origem.Z), fundo, Enum.Material.Slate)
+	end
 	local lado = largura / 2
 	local function laje(x, z, tam)
 		local nome = if r:NextNumber() < 0.12 then "EsgotoKKPisoPedras" else "EsgotoKKPiso"

@@ -7,6 +7,7 @@ local CLIPES = {
 	CorteLeve = require(Shared.Animacoes.Clipes.CorteLeve),
 	CortePesado = require(Shared.Animacoes.Clipes.CortePesado),
 	Estocada = require(Shared.Animacoes.Clipes.Estocada),
+	Emboscada = require(Shared.Animacoes.Clipes.Emboscada), -- HAB1: gerado por tools/animacao/hab1_clipes.py
 	DisparoArco = require(Shared.Animacoes.Clipes.DisparoArco),
 	Conjurar = require(Shared.Animacoes.Clipes.Conjurar),
 	Canalizar = require(Shared.Animacoes.Clipes.Canalizar),
@@ -19,5 +20,5 @@ local CLIPES = {
 
 return {
 	CLIPES = CLIPES,
-	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria" },
+	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria" },
 }

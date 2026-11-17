@@ -36,7 +36,7 @@ if snap and snap.combat.active then r:FireServer('nextTurn',{expectedTurn=snap.c
 finally:
     q.lua_cliente("workspace:SetAttribute('EscalaDeTempoDasCenas', nil) workspace:SetAttribute('QaEnquadre', nil) return 'ok'")
     q.c.close()
-amostras = [tuple(float(x) for x in l.split("|")) for l in bruto.split(";") if l.count("|") == 5]
+amostras = [tuple(float(x) for x in l.split("|")) for l in bruto.split(";") if l.count("|") == 6]
 ativas = [a for a in amostras if a[1] >= 0.8 and a[2] >= 0]
 if modo in ("parado", "mira"):
     ativas = [a for a in amostras if a[1] < 0.02 and a[0] > 1.0]  # câmera base, fora do golpe  # câmera do golpe no ponto forte
@@ -49,6 +49,9 @@ else:
     menor = min(a[2] for a in ativas)
     print("%s separação mínima em tela com o golpe ativo: %.1f%% (mínimo %.0f%%)" % ("OK  " if menor >= SEP_MIN else "FALHA", menor * 100, SEP_MIN * 100))
     falhas += menor < SEP_MIN
+cortados = [a for a in ativas if a[6] < 1]
+print("%s quadros com algum lutador cortado pela borda da tela: %d de %d (câmera do golpe/base medida)" % ("OK  " if not cortados else "FALHA", len(cortados), len(ativas)))
+falhas += bool(cortados)
 # tolera 1 quadro isolado (o fantasma nasce e o corpo real some no mesmo instante de render); 2+ seguidos reprova
 mais = []
 seguidos = 0

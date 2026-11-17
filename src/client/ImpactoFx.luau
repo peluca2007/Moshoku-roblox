@@ -7,6 +7,7 @@ local Lighting = game:GetService("Lighting")
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Curvas = require(Shared.ImpactoCurvas)
 local FX = require(script.Parent.MenuEfeitos)
+local Corpo = require(script.Parent.Corpo)
 
 local M = {}
 local TEX_BRILHO = "rbxasset://textures/particles/sparkles_main.dds"
@@ -145,6 +146,91 @@ function M.corte(pai: Instance, ponto: Vector3, direcao: Vector3, cor: Color3, c
 	end)
 end
 
+-- Fumaça escura rasteira em volta de `ponto` por `dur` s (Primeiro Golpe: o ladino some na sombra antes de atacar).
+function M.fumaca(pai: Instance, ponto: Vector3, dur: number)
+	if FX.reduzidos then return end
+	local base = Instance.new("Part")
+	base.Name, base.Anchored, base.CanCollide, base.CanTouch, base.CanQuery, base.Transparency, base.Size = "Fumaca", true, false, false, false, 1, Vector3.one * 0.2
+	base.Position = ponto - Vector3.new(0, 1.8, 0)
+	base.Parent = pai
+	local at = Instance.new("Attachment")
+	at.Parent = base
+	local e = Instance.new("ParticleEmitter")
+	e.Name, e.Texture, e.Rate, e.LightEmission = "Sombra", TEX_FUMACA, 28, 0
+	e.Color = ColorSequence.new(Color3.fromRGB(18, 16, 24))
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.2), NumberSequenceKeypoint.new(1, 3.4) })
+	e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.35), NumberSequenceKeypoint.new(1, 1) })
+	e.Lifetime = NumberRange.new(0.6, 1.0)
+	e.Speed = NumberRange.new(1, 3)
+	e.SpreadAngle = Vector2.new(180, 180)
+	e.EmissionDirection = Enum.NormalId.Top
+	e.Parent = at
+	local escala = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+	task.delay(dur * escala, function() e.Enabled = false end)
+end
+
+-- Respingo estilizado (sem gore): leque curto de gotas vermelhas esticadas pela velocidade, no sentido do golpe.
+function M.gotas(pai: Instance, ponto: Vector3, direcao: Vector3)
+	if FX.reduzidos then return end
+	local base = Instance.new("Part")
+	base.Name, base.Anchored, base.CanCollide, base.CanTouch, base.CanQuery, base.Transparency, base.Size = "Gotas", true, false, false, false, 1, Vector3.one * 0.2
+	local u = plano(direcao)
+	base.CFrame = CFrame.lookAt(ponto, ponto + u + Vector3.new(0, 0.5, 0))
+	base.Parent = pai
+	local at = Instance.new("Attachment")
+	at.Parent = base
+	local e = Instance.new("ParticleEmitter")
+	e.Name, e.Texture, e.Rate, e.Enabled = "Gota", TEX_BRILHO, 0, false
+	e.LightEmission, e.LockedToPart, e.Orientation = 0.15, false, Enum.ParticleOrientation.VelocityParallel
+	e.Color = ColorSequence.new(Color3.fromRGB(190, 32, 44), Color3.fromRGB(110, 14, 24))
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.55), NumberSequenceKeypoint.new(1, 0.1) })
+	e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.7, 0.1), NumberSequenceKeypoint.new(1, 1) })
+	e.Lifetime = NumberRange.new(0.3, 0.55)
+	e.Speed = NumberRange.new(10, 24)
+	e.Acceleration = Vector3.new(0, -44, 0)
+	e.EmissionDirection = Enum.NormalId.Front
+	e.SpreadAngle = Vector2.new(38, 38)
+	e.Parent = at
+	e:Emit(8)
+end
+
+-- Arma que voa da mão do alvo (Corte de Braço): uma espada de apresentação lançada em arco, gira e cai no chão.
+function M.soltaArma(pai: Instance, mao: Vector3, direcao: Vector3)
+	if FX.reduzidos then return end
+	local modelo = Instance.new("Model")
+	modelo.Name = "ArmaSolta"
+	local raiz = Instance.new("Part")
+	raiz.Name, raiz.Anchored, raiz.CanCollide, raiz.CanTouch, raiz.CanQuery, raiz.Transparency, raiz.Size = "RightHand", true, false, false, false, 1, Vector3.one * 0.3
+	raiz.CFrame = CFrame.new(mao)
+	raiz.Parent = modelo
+	modelo.Parent = pai
+	local pecas = Corpo.arma({ modelo = modelo, clipes = true }, "espada")
+	for _, p in pecas do p.Massless = true end
+	local dir = Vector3.new(direcao.X, 0, direcao.Z)
+	dir = if dir.Magnitude > 1e-3 then dir.Unit else Vector3.zAxis
+	local lado = dir:Cross(Vector3.yAxis)
+	local chao = mao.Y - 2.2
+	local inicio = os.clock()
+	local con
+	con = RunService.RenderStepped:Connect(function()
+		local escala = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+		local t = (os.clock() - inicio) / escala
+		if t > 1.6 or not modelo.Parent then
+			con:Disconnect()
+			modelo:Destroy()
+			return
+		end
+		local tv = math.min(t, 0.62) -- no ar até pousar
+		local pos = mao + dir * (3.2 * tv) + lado * (0.8 * tv) + Vector3.new(0, 4.2 * tv - 9 * tv * tv, 0)
+		pos = Vector3.new(pos.X, math.max(pos.Y, chao + 0.15), pos.Z)
+		local giro = if t < 0.62 then t * 14 else 0.62 * 14 + math.min(t - 0.62, 0.1) * 2
+		raiz.CFrame = CFrame.new(pos) * CFrame.Angles(0, 0.6, 0) * CFrame.Angles(giro, 0, math.pi / 2 * math.min(t / 0.62, 1))
+		if t > 1.2 then
+			for _, p in pecas do p.Transparency = math.clamp((t - 1.2) / 0.4, 0, 1) end
+		end
+	end)
+end
+
 -- Flash curto de tela (crítico): ColorCorrection que clareia e volta em ~0,14 s.
 function M.flash(forca: number?)
 	if FX.reduzidos then return end
@@ -180,7 +266,8 @@ end
 -- Rastro da arma: fita desenhada com a posição REAL do Attachment "Ponta" da arma do fantasma, quadro a quadro
 -- (segmentos finos entre amostras consecutivas que somem em ~0,25 s). Segue a trajetória verdadeira da ponta
 -- e aparece em tempo real, não só em câmera lenta. Devolve `liga(boolean)`; nil se a arma não tem "Ponta".
-local VIDA_RASTRO = 0.26
+local VIDA_RASTRO = 0.30
+local LARG_FORA, LARG_MIOLO = 0.26, 0.07 -- fita fina: afina com a idade
 function M.rastro(modelo: Instance, cor: Color3, pai: Instance?): ((boolean?) -> ())?
 	if FX.reduzidos then return nil end
 	local ponta: Attachment? = nil
@@ -194,18 +281,18 @@ function M.rastro(modelo: Instance, cor: Color3, pai: Instance?): ((boolean?) ->
 	local destino = pai or modelo
 	local ligado = false
 	local ultimo: Vector3? = nil
-	local itens: { { fora: BasePart, miolo: BasePart, nasceu: number } } = {}
+	local itens: { { fora: BasePart, miolo: BasePart, nasceu: number, comp: number } } = {}
 	local con: RBXScriptConnection? = nil
 	local escala = 1
-	local function novo(cf: CFrame, comp: number, largFora: number, largMiolo: number)
+	local function novo(cf: CFrame, comp: number)
 		local fora = Instance.new("Part")
 		fora.Name, fora.Anchored, fora.CanCollide, fora.CanTouch, fora.CanQuery, fora.CastShadow = "Rastro", true, false, false, false, false
-		fora.Material, fora.Color, fora.Size, fora.CFrame = Enum.Material.SmoothPlastic, Color3.fromRGB(255, 150, 50), Vector3.new(largFora, largFora, comp), cf
+		fora.Material, fora.Color, fora.Size, fora.CFrame = Enum.Material.SmoothPlastic, Color3.fromRGB(255, 150, 50), Vector3.new(LARG_FORA, LARG_FORA, comp), cf
 		local miolo = Instance.new("Part")
 		miolo.Name, miolo.Anchored, miolo.CanCollide, miolo.CanTouch, miolo.CanQuery, miolo.CastShadow = "RastroMiolo", true, false, false, false, false
-		miolo.Material, miolo.Color, miolo.Size, miolo.CFrame = Enum.Material.Neon, Color3.fromRGB(255, 205, 130), Vector3.new(largMiolo, largMiolo, comp), cf
+		miolo.Material, miolo.Color, miolo.Size, miolo.CFrame = Enum.Material.Neon, Color3.fromRGB(255, 205, 130), Vector3.new(LARG_MIOLO, LARG_MIOLO, comp), cf
 		fora.Parent, miolo.Parent = destino, destino
-		table.insert(itens, { fora = fora, miolo = miolo, nasceu = os.clock() })
+		table.insert(itens, { fora = fora, miolo = miolo, nasceu = os.clock(), comp = comp })
 	end
 	local function passo()
 		local agora = os.clock()
@@ -214,7 +301,7 @@ function M.rastro(modelo: Instance, cor: Color3, pai: Instance?): ((boolean?) ->
 			local p = ponta.WorldPosition
 			if ultimo and (p - ultimo).Magnitude > 0.03 then
 				local meio = (p + ultimo) / 2
-				novo(CFrame.lookAt(meio, p), (p - ultimo).Magnitude * 1.2, 0.42, 0.12)
+				novo(CFrame.lookAt(meio, p), (p - ultimo).Magnitude * 1.08)
 			end
 			ultimo = p
 		else
@@ -228,8 +315,11 @@ function M.rastro(modelo: Instance, cor: Color3, pai: Instance?): ((boolean?) ->
 				it.miolo:Destroy()
 				table.remove(itens, i)
 			else
-				it.fora.Transparency = math.clamp(0.25 + idade * 0.75, 0, 1)
-				it.miolo.Transparency = math.clamp(0.05 + idade * 0.95, 0, 1)
+				local f = 1 - 0.8 * idade -- afina até 20% da largura
+				it.fora.Size = Vector3.new(LARG_FORA * f, LARG_FORA * f, it.comp)
+				it.miolo.Size = Vector3.new(LARG_MIOLO * f, LARG_MIOLO * f, it.comp)
+				it.fora.Transparency = math.clamp(0.4 + idade * 0.6, 0, 1)
+				it.miolo.Transparency = math.clamp(0.1 + idade * 0.9, 0, 1)
 			end
 		end
 		if not ligado and #itens == 0 and con then

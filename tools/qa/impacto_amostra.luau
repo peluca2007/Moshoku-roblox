@@ -30,6 +30,20 @@ task.spawn(function()
 			-- os dois precisam aparecer na tela; fora dela a separação conta como 0 (reprova)
 			sep = if oa and ob then (Vector2.new(a.X, a.Y) - Vector2.new(b.X, b.Y)).Magnitude / cam.ViewportSize.X else 0
 		end
+		-- enquadramento completo: topo e base das caixas dos dois lutadores dentro da tela (margem de 3%)
+		local inteiro = 1
+		if alvo then
+			local vp = cam.ViewportSize
+			for _, m in { ch, alvo } do
+				local cf, tam = m:GetBoundingBox()
+				for _, dy in { -0.5, 0.5 } do
+					local v, on = cam:WorldToViewportPoint((cf * CFrame.new(0, dy * tam.Y, 0)).Position)
+					if not on or v.X < vp.X * 0.03 or v.X > vp.X * 0.97 or v.Y < vp.Y * 0.03 or v.Y > vp.Y * 0.97 then inteiro = 0 end
+				end
+			end
+		else
+			inteiro = 0
+		end
 		local cabecas, av, fan = 0, 0, 0
 		-- corpo do avatar visível = qualquer peça dele (cabeça, cabelo, arma...) com transparência local < 0,95
 		for _, d in ch:GetDescendants() do
@@ -61,7 +75,7 @@ task.spawn(function()
 			end
 			workspace:SetAttribute("QaCabecas", table.concat(v, " ;; "))
 		end
-		table.insert(linhas, string.format("%.2f|%.2f|%.3f|%d|%d|%d", os.clock() - t0, (workspace:GetAttribute("ImpactoPeso") or 0), sep, cabecas, av, fan))
+		table.insert(linhas, string.format("%.2f|%.2f|%.3f|%d|%d|%d|%d", os.clock() - t0, (workspace:GetAttribute("ImpactoPeso") or 0), sep, cabecas, av, fan, inteiro))
 	end
 	workspace:SetAttribute("QaEnquadre", table.concat(linhas, ";"))
 end)

@@ -7,6 +7,7 @@ local Gestos = {}
 
 local Y = Vector3.yAxis
 local Corpo = require(script.Parent.Corpo)
+local ImpactoFx = require(script.Parent.ImpactoFx)
 local Catalogo = require(game:GetService("ReplicatedStorage").Shared.Animacoes.Catalogo)
 
 -- LUTA-A: clipe por dados num fantasma, dirigido pelo relógio da cena (K.animar), para respeitar
@@ -51,7 +52,7 @@ end
 -- cortes: { { instante, ângulo em graus } } relativos ao fim do preparo.
 local ESPEC = {
 	["esconder"] = { g = "furtivo" },
-	["primeiro-golpe"] = { g = "golpe", cortes = { { 0, -35 }, { .1, 45 } }, peso = .5, preparo = .15 },
+	["primeiro-golpe"] = { g = "golpe", cortes = { { 0, -35 } }, peso = .5, preparo = .15, clipe = "Emboscada", assinatura = true },
 	["dissonancia"] = { g = "cancao" },
 	["marcha"] = { g = "cancao" },
 	["parar-cancao"] = { g = "comando" },
@@ -60,7 +61,7 @@ local ESPEC = {
 	["apontar"] = { g = "comando" },
 	["ataque-basico"] = { g = "golpe", cortes = { { 0, 38 } }, peso = 0.3 },
 	["ataque-a-distancia"] = { g = "disparo", peso = 0.25 },
-	["corte-de-braco"] = { g = "golpe", cortes = { { 0, 62 } }, peso = 0.4, preparo = 0.26, preciso = true },
+	["corte-de-braco"] = { g = "golpe", cortes = { { 0, 62 } }, peso = 0.4, preparo = 0.26, preciso = true, assinatura = true },
 	["golpe-continuo"] = { g = "golpe", cortes = { { 0, 28 }, { 0.12, -34 }, { 0.24, 80 } }, peso = 0.35, preparo = 0.16 },
 	["golpe-baixo"] = { g = "golpe", cortes = { { 0, 88 } }, peso = 0.3, baixo = true, preparo = 0.24 },
 	["golpe-circular"] = { g = "giro", peso = 0.55 },
@@ -79,6 +80,7 @@ local ESPEC = {
 	["provocar-odio-soberano"] = { g = "grito", soberano = true },
 	["puxar"] = { g = "corrente" },
 	["disparo-duplo"] = { g = "disparo", peso = 0.25 },
+	["flecha-de-agua"] = { g = "disparo", peso = 0.25 }, -- HAB2: o corpo arma e solta; o projétil é da receita da Água
 	["tiro-de-contencao"] = { g = "disparo", peso = 0.25, prende = true },
 	["arremesso-de-espada"] = { g = "arremesso", peso = 0.4 },
 	["lamina-de-gelo"] = { g = "conjuro", pose = "empunhar", prop = "gelo" },
@@ -439,9 +441,9 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		local nomeClipe, vel
 		if g == "golpe" and ok and Corpo.tocador(f) then
 			local tipoArma = spec.prop or tipoDaArma()
-			nomeClipe = if tipoArma == "adaga" or spec.semArma then "Estocada"
-				elseif tipoArma == "pesada" or (spec.peso or 0) >= 0.5 then "CortePesado" else "CorteLeve"
-			vel = if #cortes > 1 then 1.7 elseif nomeClipe == "CortePesado" then 1.3 else 1.2
+			nomeClipe = spec.clipe or (if tipoArma == "adaga" or spec.semArma then "Estocada"
+				elseif tipoArma == "pesada" or (spec.peso or 0) >= 0.5 then "CortePesado" else "CorteLeve")
+			vel = if spec.clipe then 1 elseif #cortes > 1 then 1.7 elseif nomeClipe == "CortePesado" then 1.3 else 1.2
 			W = Catalogo.CLIPES[nomeClipe].marcos.impacto / vel
 		end
 		local ultimo = cortes[#cortes][1]
@@ -553,6 +555,14 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				-- partículas (ImpactoFx.faiscas): o talho solto no ar, o clarão branco e as peças de faísca antigas saem.
 				if not nomeClipe then
 					talho(alvoPos - dir * 0.6 + (if spec.baixo then Vector3.new(0, -1.2, 0) else Vector3.zero), dir, c[2], raio, quando + 0.01, 0.2, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)
+				end
+				-- Golpe Contínuo: cada corte intermediário dá uma micro-aproximação e faíscas que crescem; o último segue o impacto geral
+				if nomeClipe and i < #cortes then
+					K.evento(cena, quando + marca, function()
+						K.Efeitos.aproximar(0.04 + 0.02 * i, 0.3)
+						K.Efeitos.tremer(0.06 + 0.05 * i, 0.12, ponto - (f and f.base or ponto))
+						if acertouPrimeiro then ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, 3 + 3 * i, false, dir) end
+					end)
 				end
 				if acertouPrimeiro and not nomeClipe then
 					faiscas(ponto, dir, quando + marca, if i == #cortes then 12 else 8, if spec.gelo then Color3.fromRGB(190, 232, 255) else nil)

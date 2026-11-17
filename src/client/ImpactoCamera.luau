@@ -9,7 +9,7 @@ local Protocol = require(Shared.MesaProtocol)
 local FX = require(script.Parent.MenuEfeitos)
 
 local M = {}
-local atual: { de: Vector3, para: Vector3, inicio: number, impacto: number, esc: number, escolha: any, folga: number? }? = nil
+local atual: { de: Vector3, para: Vector3, inicio: number, impacto: number, esc: number, opc: { escala: number?, altura: number?, orbita: number?, dolly: number? }?, escolha: any, folga: number? }? = nil
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Exclude
 params.IgnoreWater = true
@@ -21,12 +21,20 @@ local function caixa()
 	return { x = b.origin.X, z = b.origin.Z, meia = b.width * b.cell / 2 + Curvas.SALA_MARGEM, teto = b.origin.Y + Curvas.SALA_TETO }
 end
 local function pt(v: Vector3) return { x = v.X, y = v.Y, z = v.Z } end
+-- A caixa só vale quando a dupla está dentro da sala (o tabuleiro); palcos de QA e arenas fora dele não são limitados.
+local function fracaoNaSala(olhar, pos)
+	local c = caixa()
+	if math.abs(olhar.x - c.x) > c.meia + 6 or math.abs(olhar.z - c.z) > c.meia + 6 then return 1 end
+	return Curvas.fracaoDentro(olhar, pos, c)
+end
 
 -- de/para: pontos no mundo (atacante e alvo); impacto: segundos até o contato.
-function M.golpe(de: Vector3, para: Vector3, impacto: number)
+-- opc (assinaturas): { escala = <1 aproxima, altura = ponto de olhar acima do meio da dupla, orbita = rad que a câmera gira em volta
+-- da dupla ao longo do golpe, dolly = fração extra de distância no começo que some até o contato (aproximação lenta) }
+function M.golpe(de: Vector3, para: Vector3, impacto: number, opc: { escala: number?, altura: number?, orbita: number?, dolly: number? }?)
 	workspace:SetAttribute("ImpactoGolpeChamado", os.clock()) -- QA: prova que a Coreografia chamou
 	if FX.reduzidos then return end
-	atual = { de = de, para = para, inicio = os.clock(), impacto = math.max(impacto, 0.1),
+	atual = { de = de, para = para, inicio = os.clock(), impacto = math.max(impacto, 0.1), opc = opc,
 		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) } -- esc: câmera lenta forçada (só QA) dilata tudo
 end
 
@@ -71,7 +79,7 @@ function M.semParede(olhar: Vector3, pos: Vector3): Vector3
 		local dist = math.max((r.Position - olhar).Magnitude - MARGEM, 1.5)
 		d = d.Unit * math.min(dist, d.Magnitude)
 	end
-	return olhar + d * Curvas.fracaoDentro(pt(olhar), pt(olhar + d), caixa())
+	return olhar + d * fracaoNaSala(pt(olhar), pt(olhar + d))
 end
 
 -- Escolhe, uma vez por golpe, o primeiro enquadramento 3/4 (ImpactoCurvas.CANDIDATOS) cuja linha do olhar
@@ -85,11 +93,11 @@ local function escolher(g, cf: CFrame)
 	atualizarFiltro()
 	for _, c in Curvas.CANDIDATOS do
 		local pos, olhar = Curvas.enquadre(
-			{ x = g.de.X, y = g.de.Y, z = g.de.Z }, { x = g.para.X, y = g.para.Y, z = g.para.Z }, lado * c[1], c[2], c[3])
+			{ x = g.de.X, y = g.de.Y, z = g.de.Z }, { x = g.para.X, y = g.para.Y, z = g.para.Z }, lado * c[1], c[2], c[3] * (if g.opc and g.opc.escala then g.opc.escala else 1), if g.opc then g.opc.altura else nil)
 		local p, o = Vector3.new(pos.x, pos.y, pos.z), Vector3.new(olhar.x, olhar.y, olhar.z)
 		local r = workspace:Raycast(o, p - o, params)
 		local livre = math.min(if r then (r.Position - o).Magnitude / math.max((p - o).Magnitude, 1e-3) else 1,
-			Curvas.fracaoDentro(olhar, pos, caixa()))
+			fracaoNaSala(olhar, pos))
 		if livre > folga + 1e-6 then melhor, folga = { lado * c[1], c[2], c[3] }, livre end
 		if livre >= 1 then break end
 	end
@@ -116,8 +124,16 @@ function M.aplicar(cf: CFrame): CFrame
 	if w <= 0.001 then return cf end
 	if not g.escolha then escolher(g, cf) end
 	local c = g.escolha
+	local opc = g.opc
+	local t = (os.clock() - g.inicio) / g.esc
+	local abre, esc = c[2], c[3] * (if opc and opc.escala then opc.escala else 1)
+	if opc then
+		-- movimento autoral: gira devagar em volta da dupla e vem chegando até o contato (dolly), depois recua
+		abre += (opc.orbita or 0) * (math.clamp(t / Curvas.duracaoTotal(g.impacto), 0, 1) - 0.4)
+		esc *= 1 + (opc.dolly or 0) * (1 - Curvas.suave(t / math.max(g.impacto, 0.1)))
+	end
 	local pos, olhar = Curvas.enquadre(
-		{ x = g.de.X, y = g.de.Y, z = g.de.Z }, { x = g.para.X, y = g.para.Y, z = g.para.Z }, c[1], c[2], c[3])
+		{ x = g.de.X, y = g.de.Y, z = g.de.Z }, { x = g.para.X, y = g.para.Y, z = g.para.Z }, c[1], abre, esc, if opc then opc.altura else nil)
 	local p, o = Vector3.new(pos.x, pos.y, pos.z), Vector3.new(olhar.x, olhar.y, olhar.z)
 	local misto = cf:Lerp(CFrame.lookAt(p, o), w)
 	local livre = M.semParede(o, misto.Position)

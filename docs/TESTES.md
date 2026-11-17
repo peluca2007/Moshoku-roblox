@@ -1466,3 +1466,11 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 ## HAB2 — magias de projétil da Água (16/11/2026, Studio por MCP)
 `powershell -File tools/testar.ps1` ok (spec novo `AguaCurvas`: 8). No Studio, `python tools/qa/hab_agua.py todas` (palco isolado no céu, estado falso, CenaTempoFixo por instante) fotografou conjuração, projétil, impacto e Molhado de respingo, bola de água, flecha de água e impacto de gelo em `build/beleza/hab2/` (folhas `_folha_*.png`). Sem erros no console das receitas.
 Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`Efeitos.reagir`), sem clipe ReacaoGolpe (gancho: `Coreografia` expor `Gestos.reacao` às receitas); flecha de água usa o gesto "conjuro/apontar" (gancho: ESPEC `flecha-de-agua` em `Gestos` para DisparoArco); a câmera lenta da flecha desacelera só a cena das magias (relógio próprio), não a câmera nem o corpo do avatar; a aura Molhado dura 4,2 s após o golpe (a condição do snapshot ainda não é desenhada: gancho no BoardView); som só reutiliza as chaves `agua`/`gelo`; erro (`--erro`) e crítico (`--crit`) existem no script mas só o acerto normal foi fotografado.
+
+## HAB1 — espada e ladino, amostra do Corte de Braço (16/11/2026, Studio por MCP)
+
+- Palco isolado `tools/qa/hab_espada.py <habilidade> [escala]` (rig R15 padrão, câmera pela `ImpactoCamera`, relógio das cenas em câmera lenta de QA). Pranchas: `build/beleza/hab1/corte_braco_prancha.png` (10 quadros ×6 lento), `corte_braco_tempo_real.png` (tempo real; a captura de ~0,5 s pega só 2 quadros do golpe), `primeiro_golpe_prancha.png`.
+- Funciona: Primeiro Golpe com antecipação longa agachada, estocada que alcança o alvo e recuperação; fita fina da ponta; solta-arma voando e caindo; gotas vermelhas estilizadas e faíscas direcionais no contato; câmera lateral que fecha no contato.
+- Não funciona bem: a pose do corpo no Corte de Braço (base CorteLeve) fica dobrada/"dino" e a espada penetra o alvo nos quadros finais; refinos aditivos sobre CorteLeve/CortePesado pioraram e foram removidos do catálogo. Sem câmera própria do alvo (boneco sem Humanoid: nenhuma reação ReacaoGolpe provada).
+- Câmera: `ImpactoCamera` ignora a caixa da sala quando a dupla está fora do tabuleiro (palcos de QA).
+- Não verificado: ganchos da Água em luta real (flecha de água, Molhado), Investida, passivas, som.

@@ -408,6 +408,8 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				local amp, dur = Curvas.tremor(alvo.dano, crit, cena.perfil.peso)
 				Efeitos.tremer(amp, dur, golpe)
 				Efeitos.aproximar(if crit then 0.14 else 0.08, if crit then 0.55 else 0.4)
+				-- Corte de Braço: a arma do alvo voa da mão (só apresentação; o efeito real vem do servidor)
+				if cena.bracoCortado and alvo.passou ~= true then ImpactoFx.soltaArma(cena.modelo, ponto + Y * 2.2, golpe); ImpactoFx.gotas(cena.modelo, ponto + Y * 2.2, golpe) end
 				if not cena.temRastro then ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit) end -- com arma, o rastro real da ponta é o corte
 				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, crit, golpe)
 				if crit and Efeitos.tremorAtivo() then ImpactoFx.flash(0.2) end
@@ -415,7 +417,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				if not cena.pausada and not FX.reduzidos and Efeitos.tremorAtivo() then
 					cena.pausada = true
 					local parada = Curvas.hitStop(alvo.dano, crit)
-					local lentoDur, taxa = Curvas.lento(crit, golpeFinal(alvo.id))
+					local lentoDur, taxa = Curvas.lento(crit, golpeFinal(alvo.id), cena.assinatura)
 					pausar(parada, lentoDur, taxa)
 					local corpos = workspace:FindFirstChild("CorposDeCriatura")
 					if corpos then
@@ -504,6 +506,8 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		local cor = if arv == "basico" then Color3.fromRGB(255, 232, 170) else Estilo.arvore(arv).cor
 		local cena = nova(id, perfil, cor)
 		cena.casterId = recibo.casterId
+		cena.bracoCortado = string.find(id, "corte-de-braco", 1, true) ~= nil
+		cena.emboscada = string.find(id, "primeiro-golpe", 1, true) ~= nil
 		local gelo = string.find(id, "gelo", 1, true) ~= nil
 		local de = if recibo.casterId then posicaoDe(state, recibo.casterId, recibo.origem) else nil
 		local familia = perfil.familia
@@ -531,6 +535,10 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 					end
 				end
 			end
+		end
+		if cena.emboscada and de and not FX.reduzidos then
+			-- Primeiro Golpe: sombra e fumaça escura em volta do ladino durante a antecipação longa
+			evento(cena, 0, function() ImpactoFx.fumaca(cena.modelo, de, 0.9) end)
 		end
 		local chave = Sons.lancamento(id, arv, spec)
 		if chave then
@@ -591,7 +599,9 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				quando = math.max(quando, impactoDaCriatura(state, recibo.casterId) or 0)
 				if de and i == 1 and n == 1 and not plano.semCamera then
 					-- IMP1: a câmera de luta acompanha este golpe (antecipação, contato, volta)
-					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando)
+					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando,
+						if spec and spec.assinatura then { escala = if cena.bracoCortado then 0.9 else 0.85, altura = if cena.bracoCortado then 1.4 else nil, orbita = if cena.bracoCortado then math.rad(12) else nil, dolly = 0.1 } else nil)
+					cena.assinatura = spec and spec.assinatura == true
 					cena.fim = math.max(cena.fim, quando + 0.9)
 				end
 				-- ANIM3: número, barra e queda do alvo esperam o golpe encostar (limite de segurança na fila)
@@ -620,12 +630,22 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		local id, arv = recibo.habilidadeId, arvore(recibo.habilidadeId)
 		local perfil = PERFIS[arv]
 		local spec = perfil and Gestos.especificar(id, Execucao.MECANICAS[id] or {}, arv)
-		if not spec or spec.g ~= "conjuro" then return false end
+		if not spec or (spec.g ~= "conjuro" and spec.g ~= "disparo") then return false end -- HAB2: flecha de água também arma o arco
 		local de = posicaoDe(state, recibo.casterId, recibo.origem)
 		local cena = nova(id, perfil, Estilo.arvore(arv).cor)
 		local ok, erro = pcall(Gestos.tocar, kit, cena, recibo, spec, de, Execucao.MECANICAS[id] or {})
 		if not ok then warn("[Gestos]", id, erro) end
-		cena.fim = math.max(cena.fim, perfil.carga + 0.5)
+		cena.fim = math.max(cena.fim, perfil.carga + (if spec.g == "disparo" then 1.3 else 0.5))
+		return ok
+	end
+	-- HAB2: o alvo de uma magia reage como num golpe (ReacaoGolpe/Esquiva/Bloqueio no corpo), além do recuo.
+	-- tipo: nil/"golpe" | "esquiva" | "bloqueio".
+	function api.reacao(alvoId, direcao: Vector3, forca: number?, tipo: string?)
+		if encerrado or type(alvoId) ~= "string" then return false end
+		local cena = nova("reacao", PERFIS.basico, Estilo.TINTA)
+		local ok, erro = pcall(Gestos.reacao, kit, cena, alvoId, direcao, forca or 1, tipo)
+		if not ok then warn("[Gestos] reacao", erro) end
+		cena.fim = math.max(cena.fim, 1.2)
 		return ok
 	end
 	function api.limpar() limpar() end

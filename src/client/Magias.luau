@@ -684,18 +684,51 @@ RECEITAS["apagar-fogo"] = function(state, recibo)
 end
 
 -- Água (HAB2): receitas próprias em client/MagiasAgua; o contexto entrega as ferramentas daqui.
-for id, receita in MagiasAgua.criar({
+local coreografiaRef -- preenchida quando a Coreografia nasce (mais abaixo)
+local ctxAgua = {
 	pasta = function() return pasta end,
 	conectar = conectar,
 	posicaoDe = function(tokenId, fallback) return posicaoDe(state, tokenId, fallback) end,
 	chao = chao,
 	centroCasa = centroCasa,
 	aFrente = aFrente,
-	recuo = function(alvoId, de, forca) recuo(state, alvoId, de, forca) end,
+	recuo = function(alvoId, de, forca)
+		recuo(state, alvoId, de, forca)
+		-- HAB1: o corpo do alvo também reage (ReacaoGolpe), não só a miniatura recua
+		if coreografiaRef then coreografiaRef.reacao(alvoId, posicaoDe(state, alvoId) - de, forca) end
+	end,
 	veredito = veredito,
 	som = somDoRecibo,
-}) do
+}
+for id, receita in MagiasAgua.criar(ctxAgua) do
 	RECEITAS[id] = receita
+end
+-- HAB1: aura Molhado enquanto a condição "molhado" estiver no snapshot (antes sumia em 4,2 s).
+local auras: { [string]: () -> () } = {}
+if state.onSnapshot then
+	state.onSnapshot(function(snap)
+		if encerrado or not snap or not snap.tokens then return end
+		local vistos = {}
+		for _, t in snap.tokens do
+			local molhado = false
+			for _, c in t.conditions or {} do
+				if c.id == "molhado" then molhado = true end
+			end
+			if molhado and not t.hidden then
+				vistos[t.id] = true
+				if not auras[t.id] then
+					local ok, parar = pcall(MagiasAgua.molhado, ctxAgua, t.id, 3600, 0)
+					auras[t.id] = if ok and type(parar) == "function" then parar else function() end
+				end
+			end
+		end
+		for id, parar in auras do
+			if not vistos[id] then
+				pcall(parar)
+				auras[id] = nil
+			end
+		end
+	end)
 end
 
 -- Entrada ------------------------------------------------------------------
@@ -748,6 +781,7 @@ end
 	pasta.Name = opcoes.nomePasta or "MagiasLocais"
 	pasta.Parent = workspace
 	local coreografia = Coreografia.start(state, pasta, posicaoDe, chao, centroCasa)
+	coreografiaRef = coreografia
 	local function limpar()
 		geracaoVisual += 1
 		geracaoSonora += 1

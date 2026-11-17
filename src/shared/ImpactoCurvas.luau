@@ -90,7 +90,7 @@ end
 -- Enquadramento do golpe (coordenadas planas). `de`/`para`: {x,y,z}. `lado` = +1/-1 (lado da câmera);
 -- `abre` = rad extra no ângulo; `escala` encurta a distância (candidatos contra parede).
 -- Devolve posição e ponto de olhar: câmera 3/4 atrás e ao lado do atacante, vendo os dois lutadores.
-function M.enquadre(de: { x: number, y: number, z: number }, para: { x: number, y: number, z: number }, lado: number, abre: number?, escala: number?)
+function M.enquadre(de: { x: number, y: number, z: number }, para: { x: number, y: number, z: number }, lado: number, abre: number?, escala: number?, altura: number?)
 	local dx, dz = para.x - de.x, para.z - de.z
 	local dist = math.sqrt(dx * dx + dz * dz)
 	if dist < 1e-3 then
@@ -103,7 +103,7 @@ function M.enquadre(de: { x: number, y: number, z: number }, para: { x: number, 
 	local y = (de.y + para.y) / 2
 	local afast = math.max((4.6 + dist * 0.95) * (escala or 1), 3.5) -- perto: a dupla ocupa o quadro (separação em tela >= ~12%)
 	local dirx, dirz = lx * math.sin(th) - fx * math.cos(th), lz * math.sin(th) - fz * math.cos(th)
-	local olhar = { x = mx, y = y + 1.8, z = mz }
+	local olhar = { x = mx, y = y + (altura or 0.2), z = mz }
 	local pos = { x = mx + dirx * afast, y = y + 2.4 * (escala or 1) + 1, z = mz + dirz * afast }
 	return pos, olhar
 end
@@ -133,10 +133,11 @@ function M.fracaoDentro(olhar: { x: number, y: number, z: number }, pos: { x: nu
 	return t
 end
 
--- Câmera lenta: (duração real em s, taxa do relógio da cena) após o contato. Crítico e golpe final.
-function M.lento(critico: boolean?, final: boolean?): (number, number)
+-- Câmera lenta: (duração real em s, taxa do relógio da cena) após o contato. Crítico, golpe final e assinaturas.
+function M.lento(critico: boolean?, final: boolean?, assinatura: boolean?): (number, number)
 	if final then return 0.7, 0.22 end
 	if critico then return 0.4, 0.3 end
+	if assinatura then return 0.3, 0.28 end -- Primeiro Golpe e Corte de Braço: contato em câmera lenta
 	return 0, 1
 end
 

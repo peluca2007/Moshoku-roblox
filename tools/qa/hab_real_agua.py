@@ -2,7 +2,7 @@
 Pré-requisito: Play em luta (qa.py primeira_arvore --manter-play; setar workspace.QaEncontro e QaAprender='agua' no servidor;
 qa.py esgoto_sala1 --sem-deps --manter-play). A ficha do QA aprende a árvore da Água por QaAprender (HabilidadeService, só Studio).
   python tools/qa/hab_real_agua.py <respingo|bola-de-agua|flecha-de-agua|impacto-de-gelo|lamina-de-gelo|escudo-de-agua|nevoa-densa> [--rodadas=N]
-Grava build/beleza/hab7/real_<magia>.mp4 e passa N rodadas (padrão 0) depois do uso para ver a zona sumir."""
+Grava build/beleza/cam1/real_<magia>.mp4 (--pasta=... muda; --camera grava a série da câmera em vez do vídeo) e passa N rodadas (padrão 0) depois do uso para ver a zona sumir."""
 import os, sys, time
 sys.path.insert(0, os.path.dirname(__file__))
 from qa_lib import Qa, RAIZ
@@ -12,7 +12,9 @@ magia = sys.argv[1]
 rodadas = next((int(a.split("=", 1)[1]) for a in sys.argv if a.startswith("--rodadas=")), 0)
 q = Qa()
 q.cenario = "hab_real_agua"
-saida = os.path.join(RAIZ, "build", "beleza", "hab7", "real_%s.mp4" % magia)
+pasta = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--pasta=")), os.path.join("build", "beleza", "cam1"))
+camera = "--camera" in sys.argv  # CAM1: em vez de vídeo, grava a série da câmera e reprova se houver salto
+saida = os.path.join(RAIZ, pasta, "real_%s.mp4" % magia)
 os.makedirs(os.path.dirname(saida), exist_ok=True)
 
 ESPERA = """local remote=game.ReplicatedStorage:WaitForChild('Mesa') local snap
@@ -42,6 +44,16 @@ remote:FireServer('requestSnapshot') local t0=os.clock() while not snap and os.c
 remote:FireServer('nextTurn',{expectedTurn=snap.combat.turn}) con:Disconnect() return 'rodada='..tostring(snap.combat.round)"""
 
 print(q.lua_cliente(ESPERA))
+if camera:
+    import cam_serie
+    cam_serie.iniciar(q)
+    # o lua_cliente bloqueia o Heartbeat do cliente enquanto espera: dispara e volta logo, e a espera é do Python
+    print(q.lua_cliente(USAR.replace("@M@", magia).replace("task.wait(2.5) remote:FireServer('requestSnapshot') task.wait(0.5)", "task.wait(0.2)")))
+    time.sleep(7)
+    ok = cam_serie.parar(q, os.path.join(RAIZ, pasta, "real_%s.csv" % magia), magia, ignorar=0.6)  # 0,6 s: o lua_cliente que dispara reseta a câmera do cliente (artefato da QA)
+    print(q.lua_cliente(FIM))
+    q.c.close()
+    sys.exit(0 if ok else 1)
 dur = 9 + rodadas * 14
 with Gravador(saida, dur):
     time.sleep(0.5)

@@ -1,6 +1,6 @@
 """Continuidade da câmera: analisa a série gravada por `hab_luta_real.py --camera=arquivo.csv` (t,x,y,z,lx,ly,lz por quadro)
 e REPROVA (código 1) se algum quadro saltar mais que o limite.
-  python tools/qa/camera_saltos.py arquivo.csv [--max-vel=45] [--max-giro=260] [--rotulo=antes]
+  python tools/qa/camera_saltos.py arquivo.csv [--max-vel=45] [--max-giro=260] [--rotulo=antes] [--ignorar=0.5]
 Limites em studs/s e graus/s sobre atualizações reais da câmera (independe do fps de render)."""
 import math, sys
 
@@ -29,9 +29,9 @@ def analisar(serie, max_pos=2.0, max_gr=14.0):
     return saltos
 
 
-def relatorio(serie, max_vel=45.0, max_giro=260.0, rotulo=""):
+def relatorio(serie, max_vel=45.0, max_giro=260.0, rotulo="", ignorar=0.0):
     """Limites em studs/s e graus/s (independem do fps de render)."""
-    s = analisar(serie)
+    s = [x for x in analisar(serie) if x[0] >= ignorar]  # ignorar: s iniciais (o executor do Studio reseta a câmera ao disparar)
     ruins = [x for x in s if x[4] > max_vel or x[5] > max_giro]
     top = sorted(s, key=lambda x: -x[5])[:4]
     fps = len(s) / max(serie[-1][0] - serie[0][0], 1e-6)
@@ -46,5 +46,6 @@ def relatorio(serie, max_vel=45.0, max_giro=260.0, rotulo=""):
 if __name__ == "__main__":
     def opt(n, d):
         return next((float(a.split("=", 1)[1]) for a in sys.argv if a.startswith("--" + n + "=")), d)
+    ign = opt("ignorar", 0.0)
     rot = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--rotulo=")), "")
-    sys.exit(0 if relatorio(ler(sys.argv[1]), opt("max-vel", 45.0), opt("max-giro", 260.0), rot) else 1)
+    sys.exit(0 if relatorio(ler(sys.argv[1]), opt("max-vel", 45.0), opt("max-giro", 260.0), rot, ign) else 1)

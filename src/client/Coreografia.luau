@@ -13,6 +13,7 @@ local Sonorizacao = require(script.Parent.Sonorizacao)
 local FX = require(script.Parent.MenuEfeitos)
 local Feedback = require(script.Parent.FeedbackCombate)
 local ImpactoCamera = require(script.Parent.ImpactoCamera) -- IMP1: câmera, faíscas, rastro, hit-stop
+local PlanosCamera = require(script.Parent.PlanosCamera) -- CAM1: planos de câmera por habilidade
 local ImpactoFx = require(script.Parent.ImpactoFx)
 local Curvas = require(Shared.ImpactoCurvas)
 local ReacoesAlvo = require(Shared.ReacoesAlvo)
@@ -629,8 +630,12 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				quando = math.max(quando, impactoDaCriatura(state, recibo.casterId) or 0)
 				if de and i == 1 and n == 1 and not plano.semCamera then
 					-- IMP1: a câmera de luta acompanha este golpe (antecipação, contato, volta)
-					ImpactoCamera.golpe(de + Y * 2, destino + Y * 2, quando,
-						if spec and spec.assinatura then { escala = if cena.bracoCortado then 0.9 else 0.85, altura = if cena.bracoCortado then 1.4 else nil, orbita = if cena.bracoCortado then math.rad(12) else nil, dolly = 0.1 } else nil)
+					-- CAM1: habilidades com plano próprio (PlanosCamera); a Investida parte do começo da corrida
+					local planoCam = PlanosCamera.opc(id)
+					local deCam = de
+					if planoCam and recibo.trajeto and #recibo.trajeto == 2 then deCam = celula(recibo.trajeto[1][1], recibo.trajeto[1][2]) end
+					ImpactoCamera.golpe(deCam + Y * 2, destino + Y * 2, quando,
+						if planoCam then planoCam elseif spec and spec.assinatura then { escala = if cena.bracoCortado then 0.9 else 0.85, altura = if cena.bracoCortado then 1.4 else nil, orbita = if cena.bracoCortado then math.rad(12) else nil, dolly = 0.1 } else nil)
 					cena.assinatura = spec and spec.assinatura == true
 					cena.fim = math.max(cena.fim, quando + 0.9)
 				end
@@ -650,6 +655,12 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				impacto(cena, destino, origem, quando, resultado, familia, gelo, plano.impactoProprio, plano.semTextos)
 				if plano.impactoExtra and resultado.acertou ~= false then plano.impactoExtra(destino, quando) end
 			end
+		end
+		-- CAM1: buff em si (Lâmina de Gelo) não tem alvo na lista: o plano olha para o próprio conjurador
+		local planoProprio = PlanosCamera.plano(id)
+		if de and planoProprio and not planoProprio.zona and not (recibo.alvos and recibo.alvos[1]) then
+			ImpactoCamera.golpe(de + Y * 2, de + Y * 2, plano.chegada or (perfil.carga + 0.35), { plano = planoProprio })
+			cena.fim = math.max(cena.fim, (plano.chegada or (perfil.carga + 0.35)) + 0.9)
 		end
 		cena.fim = math.max(cena.fim, 0.5)
 		return true

@@ -6,10 +6,11 @@ local Players = game:GetService("Players")
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Curvas = require(Shared.ImpactoCurvas)
 local Protocol = require(Shared.MesaProtocol)
+local Plano = require(Shared.PlanosCameraCalculo) -- CAM1: planos de câmera por habilidade (client/PlanosCamera)
 local FX = require(script.Parent.MenuEfeitos)
 
 local M = {}
-local atual: { de: Vector3, para: Vector3, inicio: number, impacto: number, esc: number, opc: { escala: number?, altura: number?, orbita: number?, dolly: number? }?, escolha: any, folga: number? }? = nil
+local atual: { de: Vector3, para: Vector3, inicio: number, impacto: number, esc: number, plano: any?, off: number?, ult: number?, eixo: Vector3?, lado: number?, opc: { escala: number?, altura: number?, orbita: number?, dolly: number? }?, escolha: any, folga: number? }? = nil
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Exclude
 params.IgnoreWater = true
@@ -29,13 +30,14 @@ local function fracaoNaSala(olhar, pos)
 end
 
 -- de/para: pontos no mundo (atacante e alvo); impacto: segundos até o contato.
+-- opc.plano (CAM1): tomadas por habilidade (client/PlanosCamera); substitui o enquadramento único abaixo.
 -- opc (assinaturas): { escala = <1 aproxima, altura = ponto de olhar acima do meio da dupla, orbita = rad que a câmera gira em volta
 -- da dupla ao longo do golpe, dolly = fração extra de distância no começo que some até o contato (aproximação lenta) }
 function M.golpe(de: Vector3, para: Vector3, impacto: number, opc: { escala: number?, altura: number?, orbita: number?, dolly: number? }?)
 	workspace:SetAttribute("ImpactoGolpeChamado", os.clock()) -- QA: prova que a Coreografia chamou
 	if FX.reduzidos then return end
 	atual = { de = de, para = para, inicio = os.clock(), impacto = math.max(impacto, 0.1), opc = opc,
-		dir = opc and opc.dir, esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) } -- esc: câmera lenta forçada (só QA) dilata tudo
+		dir = opc and opc.dir, plano = opc and opc.plano, esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) } -- esc: câmera lenta forçada (só QA) dilata tudo
 end
 
 -- REA2: câmera presa num ponto móvel (ex.: a arma caindo): `posicao()` devolve o ponto no mundo (nil = mantém o último).
@@ -59,6 +61,13 @@ end
 function M.peso(): number
 	if not atual then return 0 end
 	local t = (os.clock() - atual.inicio) / atual.esc
+	if atual.plano then
+		if t > Plano.fim(atual.plano, atual.impacto) then
+			atual = nil
+			return 0
+		end
+		return Plano.amostrar(atual.plano, t, atual.impacto).w
+	end
 	if t > Curvas.duracaoTotal(atual.impacto) then
 		atual = nil
 		return 0
@@ -140,7 +149,13 @@ local function dentroDeLutador(pos: Vector3): boolean
 	end
 	return false
 end
+-- CAM1: com um plano de câmera ativo, a oclusão é tratada pelo próprio plano (em torno do ponto de interesse).
+function M.planoAtivo(): boolean
+	return atual ~= nil and atual.plano ~= nil and M.peso() > 0.02
+end
+
 function M.desocluir(cf: CFrame, a: Vector3, b: Vector3): CFrame
+	if M.planoAtivo() then return cf end
 	pOclusao.FilterDescendantsInstances = lutadores()
 	local pos = cf.Position
 	local function ruim(p: Vector3): boolean
@@ -205,11 +220,69 @@ local function publicar(w: number)
 	end
 end
 
+local function plano(v: Vector3): Vector3 return Vector3.new(v.X, 0, v.Z) end
+local OFFSETS = { 0.35, -0.35, 0.7, -0.7, 1.1, -1.1, 1.6, -1.6 }
+
+-- CAM1: câmera de um plano. Resolve o ponto de interesse (de/para/meio/proj), põe a câmera em volta dele (ângulo, distância,
+-- altura), tira de dentro de parede e muda de ângulo (de forma suave) se um corpo cobrir o alvo ou a câmera cair dentro de um.
+local function aplicarPlano(g, cf: CFrame): CFrame
+	local agora = os.clock()
+	local t = (agora - g.inicio) / g.esc
+	if t > Plano.fim(g.plano, g.impacto) then atual = nil publicar(0) return cf end
+	local s = Plano.amostrar(g.plano, t, g.impacto)
+	publicar(s.w)
+	if s.w <= 0.001 then return cf end
+	if not g.eixo then
+		local f = plano(g.para - g.de)
+		if f.Magnitude < 0.5 then f = plano(cf.LookVector) end -- sem direção própria (zona, buff em si): usa a da câmera da luta
+		if f.Magnitude < 0.01 then f = Vector3.zAxis end
+		g.eixo = f.Unit
+		local perp = Vector3.new(-g.eixo.Z, 0, g.eixo.X)
+		g.lado = if (cf.Position - (g.de + g.para) / 2):Dot(perp) >= 0 then 1 else -1
+		g.off, g.ult = 0, agora
+	end
+	local f: Vector3, lado: number = g.eixo, g.lado
+	local function ancora(nome: string): Vector3
+		if nome == "de" then return g.de elseif nome == "para" then return g.para elseif nome == "meio" then return (g.de + g.para) / 2 end
+		return g.de:Lerp(g.para, math.clamp(t / g.impacto, 0, 1))
+	end
+	local foco = ancora(s.f1):Lerp(ancora(s.f2), s.u)
+	local perp = Vector3.new(-f.Z, 0, f.X) * lado
+	local function posicao(off: number): Vector3
+		local a = math.rad(s.ang) + off
+		return foco + (perp * math.cos(a) - f * math.sin(a)) * s.dist + Vector3.new(0, s.alt, 0)
+	end
+	pOclusao.FilterDescendantsInstances = lutadores()
+	local function ruim(off: number): boolean
+		local p = M.semParede(foco, posicao(off))
+		return dentroDeLutador(p) or ocluido(p, foco)
+	end
+	local dt = math.min(agora - (g.ult or agora), 0.1)
+	g.ult = agora
+	local off = g.off or 0
+	if ruim(off) then
+		local melhor
+		for _, d in OFFSETS do
+			if not ruim(off + d) then melhor = off + d break end
+		end
+		if melhor then
+			-- o giro é suave; só salta de uma vez se a câmera já estaria dentro de um corpo
+			local dentro = dentroDeLutador(M.semParede(foco, posicao(off)))
+			off = if dentro then melhor else off + math.clamp(melhor - off, -2.2 * dt, 2.2 * dt)
+		end
+		g.off = off
+	end
+	local pos = M.semParede(foco, posicao(off))
+	local alvo = CFrame.lookAt(pos, foco + Vector3.new(0, s.mira, 0))
+	return cf:Lerp(alvo, s.w)
+end
+
 function M.aplicar(cf: CFrame): CFrame
 	local preso = aplicarFoco(cf)
 	if preso then return preso end
 	local g = atual
 	if not g then publicar(0) return cf end
+	if g.plano then return aplicarPlano(g, cf) end
 	local w = M.peso() * Curvas.FORCA
 	publicar(w)
 	if w <= 0.001 then return cf end

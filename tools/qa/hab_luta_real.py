@@ -72,23 +72,11 @@ r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},%s alvos={
 
 
 if camera:
-    import subprocess
-    subprocess.run(["powershell", "-File", os.path.join(RAIZ, "tools", "qa", "studio_janela.ps1"), "-Foco"], capture_output=True)  # sem foco o Studio cai para ~15 fps
-    time.sleep(1)
-    q.lua_cliente("""local RS=game:GetService('RunService') shared.CamSerie={} local t0=os.clock()
-shared.CamCon=RS.Heartbeat:Connect(function() local c=workspace.CurrentCamera local p,l=c.CFrame.Position,c.CFrame.LookVector
-table.insert(shared.CamSerie,string.format('%.4f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f',os.clock()-t0,p.X,p.Y,p.Z,l.X,l.Y,l.Z)) end) return 'gravando'""")
+    import cam_serie
+    cam_serie.iniciar(q)
     disparar()
     time.sleep(7 * max(float(escala), 1.0))
-    # a série vem em pedaços (limite de resposta)
-    n = int(q.lua_cliente("shared.CamCon:Disconnect() return tostring(#shared.CamSerie)"))
-    linhas = []
-    for i in range(1, n + 1, 150):
-        linhas += q.lua_cliente("local o={} for i=%d,math.min(%d,#shared.CamSerie) do table.insert(o,shared.CamSerie[i]) end return table.concat(o,';')" % (i, i + 149)).split(";")
-    with open(camera, "w", encoding="utf-8") as f:
-        f.write("t,x,y,z,lx,ly,lz" + chr(10) + chr(10).join(linhas) + chr(10))
-    from camera_saltos import ler, relatorio
-    ok = relatorio(ler(camera), rotulo=ident.split("/")[-1])
+    ok = cam_serie.parar(q, camera, ident.split("/")[-1])
     q.lua_cliente("workspace:SetAttribute('EscalaDeTempoDasCenas', nil) workspace:SetAttribute('QaCritico', nil) return 'ok'")
     q.c.close()
     sys.exit(0 if ok else 1)

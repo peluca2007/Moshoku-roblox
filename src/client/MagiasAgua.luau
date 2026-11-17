@@ -14,6 +14,7 @@ local Curvas = require(Shared:WaitForChild("AguaCurvas"))
 local Efeitos = require(script.Parent:WaitForChild("Efeitos"))
 local FX = require(script.Parent:WaitForChild("MenuEfeitos"))
 local Protocol = require(Shared:WaitForChild("MesaProtocol"))
+local PlanosCamera = require(script.Parent:WaitForChild("PlanosCamera")) -- CAM1: planos de câmera por habilidade
 
 local MagiasAgua = {}
 
@@ -531,7 +532,11 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 		end
 		ctx.som({ habilidadeId = "ability/agua/Principiante/escudo-de-agua" }, "agua", 1.0)
 		-- câmera curta mostrando o muro subir
-		if ctx.focoCamera then ctx.focoCamera(base + normal * curva + Vector3.new(0, alto * 0.45, 0), 2.6, nil, 13, 5, -normal) end
+		-- CAM1: 3/4 pela face do muro, do lado dos aliados, recuando e subindo (aliados em `-normal`, inimigos em `normal`)
+		if ctx.camera then
+			local meio = base + normal * curva * 0.6 + Vector3.new(0, alto * 0.45, 0)
+			ctx.camera(meio - normal * 6, meio, 0, PlanosCamera.opc("escudo-de-agua", true))
+		end
 		anim = cena:anim(t0, t0 + 3600, function()
 			local t = cena.T - t0
 			local sumindo = estado.tFim ~= nil
@@ -621,6 +626,7 @@ local function zonaNevoa(ctx, muro, t0: number)
 			rolos[i] = { parte = pr, em = emissorNevoa(pr, 4, 7, 0.5, 3.2, 1.6) }
 		end
 		ctx.som({ habilidadeId = "ability/agua/Principiante/nevoa-densa" }, "agua", 0.8)
+		if ctx.camera then ctx.camera(Vector3.new(c.X, chaoY + 2, c.Z), Vector3.new(c.X, chaoY + 2, c.Z), 0, PlanosCamera.opc("nevoa-densa", true)) end -- CAM1: sobe e mostra a área
 		anim = cena:anim(t0, t0 + 3600, function()
 			local t = cena.T - t0
 			local k = math.clamp(t / 2, 0, 1)
@@ -673,7 +679,7 @@ function MagiasAgua.criar(ctx)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 40, 0.22, 0.45)
 		local t0 = 0.4
-		if ctx.camera and not falha then ctx.camera(mao, destino, t0 + voo, { escala = 1.0, altura = 0.4 }) end -- HAB6: a câmera mostra o acerto, mesmo de longe
+		if ctx.camera then ctx.camera(mao, destino, t0 + voo, PlanosCamera.opc("respingo")) end -- CAM1: plano próprio (HAB6: mostra o acerto, mesmo de longe)
 		orbeNaMao(cena, 0.05, t0, mao, dir, 1.5, 5)
 		local n = if FX.reduzidos then 4 else 9
 		local direita, cima = eixos(dir)
@@ -714,7 +720,7 @@ function MagiasAgua.criar(ctx)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 28, 0.35, 0.8)
 		local t0 = 0.85
-		if ctx.camera and not falha then ctx.camera(mao, destino, t0 + voo, { escala = 1.2, altura = 0.5 }) end -- HAB6
+		if ctx.camera then ctx.camera(mao, destino, t0 + voo, PlanosCamera.opc("bola-de-agua")) end -- CAM1
 		orbeNaMao(cena, 0.05, t0, mao, dir, 3.2, 5)
 		local esfera, nucleo
 		local direita, cima = eixos(dir)
@@ -767,7 +773,7 @@ function MagiasAgua.criar(ctx)
 		local mao, destino, dir, falha, para = rota(ctx, recibo, alvo, 8)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 46, 0.3, 0.75)
-		if ctx.camera and not falha then ctx.camera(mao, destino, 0.85 + voo, { escala = 1.1, altura = 0.5 }) end -- câmera segue até o acerto
+		if ctx.camera then ctx.camera(mao, destino, 0.85 + voo, PlanosCamera.opc("flecha-de-agua")) end -- CAM1: segue a flecha até o acerto
 		local tSolta = 0.85
 		local direita, cima = eixos(dir)
 		local lado = direita * 0.9

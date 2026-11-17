@@ -20,6 +20,8 @@ EXP3 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. S
 
 EXP4 — agente (coordenação Claude), **pronta para revisão (14/11/2026)**. Cliente da expedição: `client/{ExpedicaoView,RunView,ObjetivoEstado}`, `client.client.luau` (relógio não inicia), `shared/Regras/{ExpedicaoTela,Objetivos}`, specs `ExpedicaoTela`, `Objetivos`. Local ok. Não verificado: Studio.
 
+CAM1 — Claude (agente), **pronta para revisão (17/11/2026)**; evidência e limites em [TESTES](TESTES.md#cam1-17112026--planos-de-câmera-por-habilidade-buildbelezacam1). Planos de câmera por habilidade (Ladino: Primeiro Golpe; Água: Respingo, Bola, Flecha, Lâmina de Gelo, Escudo, Névoa; Espada: Corte de Braço, Investida, Golpe Contínuo). Arquivos: `client/PlanosCamera` (novo), `client/ImpactoCamera`, parte de câmera do `BoardView`, só as chamadas de câmera de `Gestos`/`Magias`/`MagiasAgua`/`Coreografia`, `tools/qa/*`, docs TESTES/MANUTENCAO.
+
 EXP5 — Claude, **em andamento (14/11/2026)**. Integração e playtest da fatia no Studio (porta → salas → acampamento → chefe → volta), luta e resultado no tema Pergaminho.
 
 EXP6 — **na fila**. Exaustão do livro por luta no lugar do limite de 2 descansos; fragmento por chefe e luta final no dia 30 (missão da calamidade de mana).

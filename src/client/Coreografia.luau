@@ -154,14 +154,14 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 	-- Arco em fita: contorno aberto, preserva a leitura do tabuleiro no centro.
 	local function arco(cena, centro, raio, inicio, duracao, vertical, abertura, giro, cor)
 		local pontos = {}
-		for _ = 1, 12 do table.insert(pontos, peca(cena, "fio", cor)) end
+		for _ = 1, 12 do table.insert(pontos, peca(cena, "fio", cor, Enum.Material.SmoothPlastic)) end -- fio fosco: Neon estourava em amarelo grosso perto da câmera
 		animar(cena, inicio, duracao, function(t)
 			local r = raio * (0.4 + 0.6 * suave(t))
 			local base = CFrame.new(centro) * CFrame.Angles(if vertical then math.pi / 2 else 0, giro + t * 0.9, 0)
 			for i, p in pontos do
 				local a = (i - 1) / 12 * abertura
 				local b = i / 12 * abertura
-				segmento(p, base:PointToWorldSpace(Vector3.new(math.cos(a) * r, 0, math.sin(a) * r)), base:PointToWorldSpace(Vector3.new(math.cos(b) * r, 0, math.sin(b) * r)), 0.1 + (1 - t) * 0.12, 0.1 + t ^ 2 * 0.9)
+				segmento(p, base:PointToWorldSpace(Vector3.new(math.cos(a) * r, 0, math.sin(a) * r)), base:PointToWorldSpace(Vector3.new(math.cos(b) * r, 0, math.sin(b) * r)), 0.05 + (1 - t) * 0.05, 0.35 + t ^ 2 * 0.65)
 			end
 		end)
 	end

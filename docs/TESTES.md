@@ -1573,3 +1573,12 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Capturas em `build/beleza/cen4/` (`antes_*`, `depois_*` da câmera alta, `depois_luta_golpe.png` e `luta_golpe_prancha.png` da câmera da luta com o Corte de Braço, vídeo com foco `camera_da_luta.mp4`).
 - Aviso: `esgoto_fotos.py` deixa a câmera própria ligada; depois dele a câmera da luta só volta reiniciando o Play (`qa.py esgoto_sala1 --manter-play`).
 - Não verificado: celular, outras salas do esgoto e chefe, aranha/rato na câmera da luta com o cenário novo.
+
+## HAB3 (17/11/2026) — Escudo de Água, Névoa Densa, soltura e recibos reais (Studio com foco, `build/beleza/hab3/`)
+
+- Descoberta: o servidor já manda as zonas no snapshot (`jogo.muros`, com prazo do servidor) e o `BoardView` as desenhava como blocos Neon por casa (o "piso branco" da névoa e as barras ciano do escudo). Agora, para estilo `agua`/`nevoa`, o BoardView chama `MagiasAgua.zonaDoMuro` e o visual some quando o muro some do snapshot (prazo certo, sem contagem de rodadas no cliente).
+- Escudo: parede translúcida 2 casas (10 studs) com Texture rolando nas duas faces, ondulação, espuma e jato na base, onda ao subir e respingo ao cair. Provado em vídeo com recibo real (`real_escudo-de-agua.mp4`, 2 rodadas passadas): a parede some. Visto de lado fica fina como uma placa; sem câmera própria.
+- Névoa: bruma cinza-azulada sobre ~6 m (emissor largo + véu no chão) com visibilidade menor; sutil. `real_nevoa-densa.mp4`.
+- Recibos reais: gancho só Studio `workspace.QaAprender="agua"` (HabilidadeService) dá a árvore à ficha do QA (compra + rank + mana) e `hab_real_agua.py <magia>` usa `usarHabilidade`. Funcionaram: respingo, bola de água, impacto de gelo, escudo, névoa. O personagem não aparece com a espada na mão ao conjurar (o fantasma não leva a arma; a real está oculta). `spec.solta` alinha a soltura do clipe com o projétil (respingo 0,4, bola 0,85, gelo 0,75): a bola e o gelo saem da mão no instante do gesto nos quadros.
+- Investida: `cena.semCorte` e sem clarão neon; resta só o corte fino do gesto e as faíscas.
+- Não verificado: flecha de água e lâmina de gelo pelo caminho real (a luta terminou em derrota antes da vez; o QA é fraco), `qa.py luta` (o lock foi tomado por outro agente no meio; `testar.ps1` só com Catálogo falhando), celular, desempenho, a QaAprender só pega a ficha depois de entrar na luta.

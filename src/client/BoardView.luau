@@ -43,7 +43,7 @@ local TERRAIN_LOOK = {
 	dificil = { color = Estilo.misturar(Estilo.CAPITULOS[1], Estilo.PAPEL, 0.35), height = 0.12, transparency = 0.15, material = Enum.Material.SmoothPlastic },
 	agua = { color = Estilo.misturar(Estilo.CAPITULOS[2], Estilo.PAPEL, 0.45), height = 0.12, transparency = 0.15, material = Enum.Material.Glass },
 }
-local FOG_COLOR = Estilo.MESA_FUNDO
+local FOG_COLOR = Color3.fromRGB(150, 172, 184) -- HAB3: névoa cinza-azulada (antes o branco do fundo da mesa, que parecia um piso branco)
 local VERTICAL = CFrame.Angles(0, 0, math.rad(90)) -- cilindros do Roblox deitam no eixo X
 
 local function ease(t: number): number
@@ -378,6 +378,16 @@ function BoardView.start(state)
 				local estilo = muro.estilo or "fogo"
 				local cores = { agua = Color3.fromRGB(68, 160, 220), terra = Color3.fromRGB(133, 97, 66), anteparo = Color3.fromRGB(160, 128, 210), nevoa = Color3.fromRGB(193, 201, 208), atoleiro = Color3.fromRGB(110, 83, 57) }
 				local cor = cores[estilo] or FOGO
+				-- HAB3: escudo de água e névoa têm visual próprio (MagiasAgua); o muro de blocos fica só para os demais estilos
+				local okZona, pararZona = pcall(function() return require(script.Parent:WaitForChild("MagiasAgua")).zonaDoMuro(muro) end)
+				if okZona and type(pararZona) == "function" then
+					modelo:SetAttribute("ZonaPropria", true)
+					modelo.Destroying:Connect(pararZona)
+					modelo.Name = muro.id
+					modelo.Parent = murosFolder
+					murosVistos[muro.id] = modelo
+					continue
+				end
 				local altura = if estilo == "atoleiro" or estilo == "braseiro" then 0.3 else ALTURA_DO_MURO
 				local largura = if estilo == "terra" then board.cell else board.cell - .8
 				modelo.Name = muro.id
@@ -441,6 +451,7 @@ function BoardView.start(state)
 		for id, modelo in murosVistos do
 			if not vivos[id] then
 				murosVistos[id] = nil
+				if modelo:GetAttribute("ZonaPropria") then modelo:Destroy() continue end
 				for _, parte in modelo:GetChildren() do
 					if parte:IsA("BasePart") then
 						local fogo = parte:FindFirstChildOfClass("Fire")

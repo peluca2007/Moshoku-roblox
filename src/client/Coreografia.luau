@@ -430,7 +430,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				if corpoAlvo and corpoAlvo:IsA("Model") and not corpoAlvo:FindFirstChildOfClass("Humanoid") then
 					ImpactoFx.tranco(corpoAlvo, golpe, reac.forca, reac.reacao == "membro-atingido")
 				end
-				if not cena.temRastro then ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit) end -- com arma, o rastro real da ponta é o corte
+				if not cena.temRastro and not cena.semCorte then ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit) end -- com arma, o rastro real da ponta é o corte
 				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, crit, golpe)
 				if crit and Efeitos.tremorAtivo() then ImpactoFx.flash(0.2) end
 				workspace:SetAttribute(if crit then "ImpactoCriticoEm" else "ImpactoAcertoEm", os.clock()) -- QA: prova do efeito

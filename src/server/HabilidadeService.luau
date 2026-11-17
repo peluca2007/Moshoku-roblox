@@ -62,6 +62,28 @@ function HabilidadeService.start(deps)
 	local turnoAtual = { tokenId = nil :: string?, turno = -1, usadas = 0, usos = {} :: { [string]: boolean }, acertou = false, acertados = {} }
 	local zonas: { any } = {}
 	local proximaZona = 0
+	-- QA (só no Studio, HAB3): workspace.QaAprender = "agua" faz as fichas de jogador aprenderem as habilidades Principiante dessa
+	-- árvore (compradas na ficha, como fora da luta) e enche a mana; o uso passa pelo caminho normal (usarHabilidade).
+	if game:GetService("RunService"):IsStudio() then
+		workspace:GetAttributeChangedSignal("QaAprender"):Connect(function()
+			local arv = workspace:GetAttribute("QaAprender")
+			if type(arv) ~= "string" or arv == "" then return end
+			local n = 0
+			for _, t in tokens do
+				if t.ownerUserId and t.ficha2 and t.ficha2.construction then
+					for _, id in ipairs({ "respingo", "bola-de-agua", "flecha-de-agua", "impacto-de-gelo", "lamina-de-gelo", "escudo-de-agua", "nevoa-densa" }) do
+						local full = "ability/" .. arv .. "/Principiante/" .. id
+						if not table.find(t.ficha2.construction.purchasedIds, full) then table.insert(t.ficha2.construction.purchasedIds, full) end
+					end
+					local rk = "rank/" .. arv .. "/Principiante"
+					if t.ficha2.construction.unlockedRankIds and not table.find(t.ficha2.construction.unlockedRankIds, rk) then table.insert(t.ficha2.construction.unlockedRankIds, rk) end
+					t.mana = math.max(t.mana or 0, 30)
+					n += 1
+				end
+			end
+			workspace:SetAttribute("QaAprenderFeito", n)
+		end)
+	end
 	local sequencia = 0
 	local estados = Estados.novo()
 	local fontesCondicao = {}

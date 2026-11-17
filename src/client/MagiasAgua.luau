@@ -13,6 +13,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Curvas = require(Shared:WaitForChild("AguaCurvas"))
 local Efeitos = require(script.Parent:WaitForChild("Efeitos"))
 local FX = require(script.Parent:WaitForChild("MenuEfeitos"))
+local Protocol = require(Shared:WaitForChild("MesaProtocol"))
 
 local MagiasAgua = {}
 
@@ -68,8 +69,10 @@ end
 
 -- fn(u) roda a cada quadro com u em 0..1 entre t0 e t1 e uma última vez com u = 1.
 function Cena:anim(t0: number, t1: number, fn: (number) -> ())
-	table.insert(self.anims, { t0 = t0, t1 = math.max(t1, t0 + 1e-3), fn = fn, fim = false })
+	local a = { t0 = t0, t1 = math.max(t1, t0 + 1e-3), fn = fn, fim = false }
+	table.insert(self.anims, a)
 	self.fimT = math.max(self.fimT, t1)
+	return a -- HAB3: quem cria uma animação longa (zona) pode encerrá-la antes marcando a.fim
 end
 
 -- Câmera lenta curta: a partir de agora, `dur` s reais na taxa `minimo`, depois rampa de volta a 1.
@@ -444,8 +447,143 @@ local function finalDoAcerto(ctx, cena, t: number, recibo, alvo, para: Vector3, 
 	end)
 end
 
+
+-- Zonas persistentes (HAB3): Escudo de Água e Névoa Densa ficam em cena até o prazo (rodadas do combate, lidas do
+-- snapshot) e então se desfazem com respingo/dissipação. O servidor decide a zona; aqui só se desenha.
+
+local function geometriaDaZona(ctx, muro)
+	local pts = {}
+	for _, c in muro.casas or {} do table.insert(pts, ctx.centroCasa(c[1], c[2])) end
+	if #pts == 0 then pts = { Vector3.zero } end
+	local soma = Vector3.zero
+	for _, p in pts do soma += p end
+	return soma / #pts, pts
+end
+
+-- Escudo de Água: parede d'água de ~3 m (2 casas), translúcida, com correnteza rolando nas duas faces, ondulação,
+-- espuma e jato na base; sobe com uma onda, respinga ao ser erguida e ao se desfazer.
+local function zonaEscudo(ctx, muro, t0: number)
+	local cena = novaCena(ctx)
+	local centro, pts = geometriaDaZona(ctx, muro)
+	local chaoY = ctx.chao(centro).Y
+	local base = Vector3.new(centro.X, chaoY, centro.Z)
+	local ao = if #pts >= 2 then Vector3.new(pts[#pts].X - pts[1].X, 0, pts[#pts].Z - pts[1].Z) else Vector3.xAxis
+	local normal = if ao.Magnitude > 0.1 then ao.Unit:Cross(Vector3.yAxis) else Vector3.zAxis
+	local larg = math.max(#pts, 2) * Protocol.BOARD.cell
+	local alto = Protocol.BOARD.cell * 2.6
+	local estado = { tFim = nil :: number? }
+	local anim
+	cena:em(t0, function()
+		local parede = cena:peca({ Size = Vector3.new(larg, 0.1, 0.7), Color = Color3.fromRGB(70, 130, 175), Transparency = 0.78, Material = Enum.Material.Glass })
+		local texA, texB
+		for _, face in { Enum.NormalId.Front, Enum.NormalId.Back } do
+			local tx = Instance.new("Texture")
+			tx.Texture, tx.Face, tx.Color3 = TEX.fumaca, face, Color3.fromRGB(150, 200, 225)
+			tx.StudsPerTileU, tx.StudsPerTileV, tx.Transparency = 3.2, 3.2, 0.72
+			tx.Parent = parede
+			if face == Enum.NormalId.Front then texA = tx else texB = tx end
+		end
+		local espuma = cena:peca({ Size = Vector3.new(larg, 0.5, 1.2), Color = ESPUMA, Transparency = 0.45, Material = Enum.Material.Glass })
+		local jato = cena:peca({ Size = Vector3.new(larg, 0.3, 0.6), Transparency = 1 })
+		local borrifo = cena:emissor(jato, "brilho", ESPUMA, {
+			Rate = if FX.reduzidos then 8 else 26, Speed = NumberRange.new(3, 7), SpreadAngle = Vector2.new(18, 18),
+			Lifetime = NumberRange.new(0.5, 0.9), Acceleration = Vector3.new(0, -16, 0),
+			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.1) }),
+			EmissionDirection = Enum.NormalId.Top,
+		})
+		respingo(cena, cena.T + 0.02, base, 0.9)
+		ctx.som({ habilidadeId = "ability/agua/Principiante/escudo-de-agua" }, "agua", 1.0)
+		anim = cena:anim(t0, t0 + 3600, function()
+			local t = cena.T - t0
+			local k = math.clamp(t / 0.5, 0, 1)
+			k = 1 - (1 - k) ^ 3
+			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 0.6, 0, 1) end
+			local h = math.max(alto * k, 0.05)
+			local onda = math.sin(cena.T * 2.4) * 0.12
+			local meio = base + Vector3.new(0, h / 2, 0)
+			parede.Size = Vector3.new(larg, h, 0.7 + onda * 0.4)
+			parede.CFrame = CFrame.lookAt(meio, meio + normal)
+			parede.Transparency = 0.78 + 0.06 * math.sin(cena.T * 3.1)
+			texA.OffsetStudsV, texB.OffsetStudsV = -cena.T * 2.6, -cena.T * 2.1 -- correnteza descendo, uma face mais rápida
+			texA.OffsetStudsU, texB.OffsetStudsU = math.sin(cena.T * 0.9) * 1.2, -cena.T * 0.8
+			local pe = base + Vector3.new(0, 0.25, 0)
+			espuma.CFrame = CFrame.lookAt(pe, pe + normal)
+			espuma.Size = Vector3.new(larg * (0.96 + 0.04 * math.sin(cena.T * 5)), 0.5, 1.2 + onda)
+			jato.CFrame = CFrame.lookAt(base + Vector3.new(0, 0.2, 0), base + Vector3.new(0, 0.2, 0) + normal)
+			borrifo.Rate = (if FX.reduzidos then 8 else 26) * k
+			if estado.tFim and cena.T - estado.tFim > 0.7 then
+				for _, i in cena.lixo do if i.Parent then i:Destroy() end end
+				table.clear(cena.lixo)
+				anim.fim = true
+			end
+		end)
+	end)
+	cena:iniciar()
+	return function()
+		if estado.tFim then return end
+		estado.tFim = cena.T
+		respingo(cena, cena.T + 0.3, base, 1.3)
+	end
+end
+
+-- Névoa Densa: volume de névoa de ~6 m de raio (emissor largo de fumaça + véu no chão); nasce devagar, deixa a
+-- visibilidade baixa e se dissipa (as partículas vivas se esvaem em alguns segundos).
+local function zonaNevoa(ctx, muro, t0: number)
+	local cena = novaCena(ctx)
+	local c = geometriaDaZona(ctx, muro)
+	local chaoY = ctx.chao(c).Y
+	local raio = Protocol.BOARD.cell * 4
+	local estado = { tFim = nil :: number? }
+	local anim
+	cena:em(t0, function()
+		local vol = cena:peca({ Size = Vector3.new(raio * 1.7, 4.5, raio * 1.7), Position = Vector3.new(c.X, chaoY + 2.4, c.Z), Transparency = 1 })
+		local veu = cena:disco(Vector3.new(c.X, chaoY + 0.15, c.Z), raio * 2, ESPUMA, 0.85)
+		local cinza = Color3.fromRGB(140, 160, 170)
+		local fumo = cena:emissor(vol, "fumaca", cinza, {
+			Rate = 0, Speed = NumberRange.new(0.2, 0.9), SpreadAngle = Vector2.new(180, 180),
+			Lifetime = NumberRange.new(5, 7), Drag = 0.5, Rotation = NumberRange.new(0, 360), RotSpeed = NumberRange.new(-8, 8),
+			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 4), NumberSequenceKeypoint.new(1, 8) }),
+			Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.25, 0.93), NumberSequenceKeypoint.new(0.75, 0.94), NumberSequenceKeypoint.new(1, 1) }),
+			LightEmission = 0, LightInfluence = 1,
+		})
+		fumo.Color = ColorSequence.new(cinza, Color3.fromRGB(175, 192, 200))
+		ctx.som({ habilidadeId = "ability/agua/Principiante/nevoa-densa" }, "agua", 0.8)
+		anim = cena:anim(t0, t0 + 3600, function()
+			local t = cena.T - t0
+			local k = math.clamp(t / 1.8, 0, 1)
+			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 1.2, 0, 1) end
+			fumo.Rate = (if FX.reduzidos then 4 else 10) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
+			veu.Transparency = 1 - 0.1 * k
+			if estado.tFim and cena.T - estado.tFim > 1.5 then
+				fumo.Enabled = false
+				if cena.T - estado.tFim > 10 then
+					for _, i in cena.lixo do if i.Parent then i:Destroy() end end
+					table.clear(cena.lixo)
+					anim.fim = true
+				end
+			end
+		end)
+	end)
+	cena:iniciar()
+	return function()
+		if not estado.tFim then estado.tFim = cena.T end
+	end
+end
+
+local CTX_ZONAS = nil -- contexto guardado em criar(ctx): o BoardView (que desenha os muros do snapshot) usa para as zonas da Água
+
+-- Desenho de um muro/zona do snapshot (`jogo.muros`) de estilo "agua" ou "nevoa". O prazo é do servidor: o BoardView
+-- chama a função devolvida quando o muro some do snapshot. Devolve nil se este estilo não tem visual próprio aqui.
+function MagiasAgua.zonaDoMuro(muro: any): (() -> ())?
+	if not CTX_ZONAS then return nil end
+	if muro.estilo == "agua" then return zonaEscudo(CTX_ZONAS, muro, 1.0) end
+	if muro.estilo == "nevoa" then return zonaNevoa(CTX_ZONAS, muro, 1.1) end
+	return nil
+end
+
 function MagiasAgua.criar(ctx)
 	local R = {}
+	CTX_ZONAS = ctx
 
 	-- Respingo: truque rápido. Faísca d'água na ponta dos dedos, jato fino de gotas em fila, estalo no alvo.
 	R["ability/agua/Principiante/respingo"] = function(_, recibo)

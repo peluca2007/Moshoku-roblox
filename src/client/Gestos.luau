@@ -87,11 +87,11 @@ local ESPEC = {
 	["arremesso-de-espada"] = { g = "arremesso", peso = 0.4 },
 	["lamina-de-gelo"] = { g = "conjuro", pose = "empunhar", prop = "gelo", clipe = "MagiaCast1M" },
 	-- REA3: conjurações do Pro Magic Pack (Mixamo) por magia da Água
-	["respingo"] = { g = "conjuro", pose = "apontar", clipe = "MagiaAtq1M2" }, -- 1 mão, rápido
-	["bola-de-agua"] = { g = "conjuro", pose = "apontar", clipe = "MagiaAtq2M1" }, -- 2 mãos puxando
-	["impacto-de-gelo"] = { g = "conjuro", pose = "apontar", clipe = "MagiaAtq1M3" }, -- aponta e fecha a mão
-	["escudo-de-agua"] = { g = "conjuro", pose = "palmas", clipe = "MagiaArea1" }, -- 2 mãos
-	["nevoa-densa"] = { g = "conjuro", pose = "palmas", clipe = "MagiaArea2" },
+	["respingo"] = { g = "conjuro", pose = "apontar", solta = 0.4, clipe = "MagiaAtq1M2" }, -- 1 mão, rápido
+	["bola-de-agua"] = { g = "conjuro", pose = "apontar", solta = 0.85, clipe = "MagiaAtq2M1" }, -- 2 mãos puxando
+	["impacto-de-gelo"] = { g = "conjuro", pose = "apontar", solta = 0.75, clipe = "MagiaAtq1M3" }, -- aponta e fecha a mão
+	["escudo-de-agua"] = { g = "conjuro", pose = "palmas", solta = 1.0, clipe = "MagiaArea1" }, -- 2 mãos
+	["nevoa-densa"] = { g = "conjuro", pose = "palmas", solta = 1.1, clipe = "MagiaArea2" },
 }
 local MAGICAS = {
 	agua = true, vento = true, terra = true, cura = true, desintoxicacao = true, teorica = true, invocacao = true, fogo = true,
@@ -184,6 +184,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 	-- REA3: a Investida da Espada deixa um rastro quente e fino (como a fita da lâmina), não a cor da classe (rosa forte)
 	local cor = if spec.g == "investida" and spec.estilo == "espada" then Color3.fromRGB(255, 178, 96) else cena.cor
 	cena.cor = cor
+	if spec.g == "investida" and spec.estilo == "espada" then cena.semCorte = true end -- HAB3: sem o talho/clarão grande do ImpactoFx; o corte fino é do próprio gesto
 	local casterId = recibo.casterId
 	if not casterId then
 		return nil
@@ -707,7 +708,6 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 			-- REA3: um corte fino e quente (antes dois cortes grossos e um clarão grande, "rosa forte demais")
 			talho(alvoFinal - olhar * 0.5, olhar, 78, 3.2, tImp, 0.18)
 			faiscas(alvoFinal - olhar * 1.1, olhar, tImp + 0.05, 10)
-			clarao(alvoFinal - olhar * 1.1, tImp + 0.05, 2.2)
 		elseif est == "quadrupede" then
 			for i = 1, 3 do
 				talho(alvoFinal - olhar * 0.5 + dir:Cross(Y) * ((i - 2) * 0.9), olhar, 62 + i * 3, 3.2, tImp + i * 0.03, 0.2)
@@ -964,7 +964,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				-- REA3: cada magia da Água tem a própria conjuração do Pro Magic Pack (spec.clipe); o marco `impacto` é a soltura
 				local nomeConj = spec.clipe or "Conjurar"
 				local clipe = Catalogo.CLIPES[nomeConj]
-				local vel = math.clamp(clipe.marcos.impacto / math.max(carga, 0.4), 1, 2.4)
+				local vel = math.clamp(clipe.marcos.impacto / (spec.solta or math.max(carga, 0.4)), 0.6, 2.4) -- spec.solta: instante em que a receita da magia solta o projétil/efeito
 				cargaClipe = clipe.marcos.impacto / vel
 				local dur = math.min(clipe.duracao / vel, cargaClipe + 0.9)
 				clipeNaCena(K, cena, f, "PosturaCombate", 0, dur, 1, 0, { camada = "base", fade = 0 })

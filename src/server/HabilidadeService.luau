@@ -78,6 +78,7 @@ function HabilidadeService.start(deps)
 					local rk = "rank/" .. arv .. "/Principiante"
 					if t.ficha2.construction.unlockedRankIds and not table.find(t.ficha2.construction.unlockedRankIds, rk) then table.insert(t.ficha2.construction.unlockedRankIds, rk) end
 					t.mana = math.max(t.mana or 0, 30)
+					t.pvMax = math.max(t.pvMax or 0, 120); t.pv = t.pvMax -- QA: ficha forte para não perder a luta durante a prova em vídeo
 					n += 1
 				end
 			end

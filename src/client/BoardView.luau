@@ -369,7 +369,7 @@ function BoardView.start(state)
 	end)
 	avisosGui.Destroying:Connect(function() seguirAvisos:Disconnect() end)
 	local ALTURA_DO_MURO = board.cell * 2 -- 3 m = 2 casas de 1,5 m
-	local function renderMuros(lista)
+	local function renderMuros(lista, snapshot)
 		local vivos = {}
 		for _, muro in lista or {} do
 			vivos[muro.id] = true
@@ -379,7 +379,19 @@ function BoardView.start(state)
 				local cores = { agua = Color3.fromRGB(68, 160, 220), terra = Color3.fromRGB(133, 97, 66), anteparo = Color3.fromRGB(160, 128, 210), nevoa = Color3.fromRGB(193, 201, 208), atoleiro = Color3.fromRGB(110, 83, 57) }
 				local cor = cores[estilo] or FOGO
 				-- HAB3: escudo de água e névoa têm visual próprio (MagiasAgua); o muro de blocos fica só para os demais estilos
-				local okZona, pararZona = pcall(function() return require(script.Parent:WaitForChild("MagiasAgua")).zonaDoMuro(muro) end)
+				local okZona, pararZona = pcall(function()
+					-- o muro de água fica virado para os inimigos: média das casas das criaturas vivas
+					local frente: Vector3? = nil
+					local soma, n = Vector3.zero, 0
+					for _, t in snapshot and snapshot.tokens or {} do
+						if t.criatura and (t.pv or 1) > 0 and not t.derrotado then soma += Protocol.cellCenter(t.x, t.z); n += 1 end
+					end
+					if n > 0 and muro.casas and muro.casas[1] then
+						local c0 = Protocol.cellCenter(muro.casas[1][1], muro.casas[1][2])
+						frente = soma / n - c0
+					end
+					return require(script.Parent:WaitForChild("MagiasAgua")).zonaDoMuro(muro, frente)
+				end)
 				if okZona and type(pararZona) == "function" then
 					modelo:SetAttribute("ZonaPropria", true)
 					modelo.Destroying:Connect(pararZona)
@@ -478,7 +490,7 @@ function BoardView.start(state)
 		if snapshot.salaConceitual and not snapshot.combat.active then
 			snapshot=table.clone(snapshot);snapshot.tokens={};snapshot.avatares={};snapshot.jogo=nil
 		end
-		renderMuros(snapshot.jogo and snapshot.jogo.muros)
+		renderMuros(snapshot.jogo and snapshot.jogo.muros, snapshot)
   armas.render(snapshot.jogo and snapshot.jogo.objetos)
 		local seen = {}
 		for _, token in snapshot.tokens do

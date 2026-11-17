@@ -40,10 +40,10 @@ end
 
 -- REA2: câmera presa num ponto móvel (ex.: a arma caindo): `posicao()` devolve o ponto no mundo (nil = mantém o último).
 -- Aproxima em ~0,15 s, segura até `dur` e solta em ~0,3 s; mistura com a câmera da luta (que continua calculando).
-local foco: { inicio: number, dur: number, posicao: () -> Vector3?, ultimo: Vector3, esc: number }? = nil
-function M.foco(inicial: Vector3, dur: number, posicao: () -> Vector3?)
+local foco: { inicio: number, dur: number, posicao: () -> Vector3?, ultimo: Vector3, esc: number, dist: number, altura: number }? = nil
+function M.foco(inicial: Vector3, dur: number, posicao: () -> Vector3?, opc: { dist: number?, altura: number? }?)
 	if FX.reduzidos then return end
-	foco = { inicio = os.clock(), dur = dur, posicao = posicao, ultimo = inicial,
+	foco = { inicio = os.clock(), dur = dur, posicao = posicao, ultimo = inicial, dist = (opc and opc.dist) or 3.6, altura = (opc and opc.altura) or 5,
 		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) }
 	workspace:SetAttribute("ImpactoFocoEm", os.clock()) -- QA
 end
@@ -59,7 +59,7 @@ local function aplicarFoco(cf: CFrame): CFrame?
 	local fora = Vector3.new(cf.Position.X - alvo.X, 0, cf.Position.Z - alvo.Z)
 	fora = if fora.Magnitude > 0.1 then fora.Unit else Vector3.zAxis
 	fora = CFrame.Angles(0, math.rad(65), 0):VectorToWorldSpace(fora) -- de lado: a câmera da luta fica atrás do atacante, que taparia a arma
-	local pos = alvo + fora * 3.6 + Vector3.new(0, 5, 0) -- de cima e perto: nenhum corpo fica entre a câmera e a arma
+	local pos = alvo + fora * f.dist + Vector3.new(0, f.altura, 0) -- de cima e perto: nenhum corpo fica entre a câmera e a arma
 	local mira = alvo - Vector3.new(0, 0.3, 0)
 	pos = M.semParede(mira, pos)
 	return cf:Lerp(CFrame.lookAt(pos, mira), w)

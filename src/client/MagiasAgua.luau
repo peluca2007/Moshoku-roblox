@@ -460,58 +460,94 @@ local function geometriaDaZona(ctx, muro)
 	return soma / #pts, pts
 end
 
--- Escudo de Água: parede d'água de ~3 m (2 casas), translúcida, com correnteza rolando nas duas faces, ondulação,
--- espuma e jato na base; sobe com uma onda, respinga ao ser erguida e ao se desfazer.
-local function zonaEscudo(ctx, muro, t0: number)
+-- Escudo de Água (HAB3b): muro de água CURVO e GROSSO (arco de ~2 casas, 1,5 stud de espessura) virado para os inimigos.
+-- Camadas por segmento: núcleo azul translúcido, superfície com textura rolando PARA CIMA, espuma ondulando no topo;
+-- por cima, gotas escorrendo pela face e respingo contínuo na base. Sobe em onda, respinga ao subir e ao se desfazer.
+local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 	local cena = novaCena(ctx)
 	local centro, pts = geometriaDaZona(ctx, muro)
 	local chaoY = ctx.chao(centro).Y
 	local base = Vector3.new(centro.X, chaoY, centro.Z)
 	local ao = if #pts >= 2 then Vector3.new(pts[#pts].X - pts[1].X, 0, pts[#pts].Z - pts[1].Z) else Vector3.xAxis
-	local normal = if ao.Magnitude > 0.1 then ao.Unit:Cross(Vector3.yAxis) else Vector3.zAxis
+	local lateral = if ao.Magnitude > 0.1 then ao.Unit else Vector3.xAxis
+	local normal = lateral:Cross(Vector3.yAxis)
+	if frente and frente.Magnitude > 0.1 and normal:Dot(frente) < 0 then normal = -normal end
 	local larg = math.max(#pts, 2) * Protocol.BOARD.cell
-	local alto = Protocol.BOARD.cell * 2.6
+	local alto = Protocol.BOARD.cell * 1.7
+	local espessura = 1.5
+	local curva = 1.6 -- o arco abaulado para os inimigos
+	local N = if FX.reduzidos then 5 else 9
 	local estado = { tFim = nil :: number? }
 	local anim
+	local AZUL_NUCLEO, AZUL_SUP, AZUL_TEX = Color3.fromRGB(34, 104, 176), Color3.fromRGB(70, 150, 205), Color3.fromRGB(160, 214, 238)
 	cena:em(t0, function()
-		local parede = cena:peca({ Size = Vector3.new(larg, 0.1, 0.7), Color = Color3.fromRGB(70, 130, 175), Transparency = 0.78, Material = Enum.Material.Glass })
-		local texA, texB
-		for _, face in { Enum.NormalId.Front, Enum.NormalId.Back } do
-			local tx = Instance.new("Texture")
-			tx.Texture, tx.Face, tx.Color3 = TEX.fumaca, face, Color3.fromRGB(150, 200, 225)
-			tx.StudsPerTileU, tx.StudsPerTileV, tx.Transparency = 3.2, 3.2, 0.72
-			tx.Parent = parede
-			if face == Enum.NormalId.Front then texA = tx else texB = tx end
+		local segs = {}
+		for i = 1, N do
+			local s = ((i - 0.5) / N) * 2 - 1
+			local pos = base + lateral * (s * larg / 2) + normal * (curva * (1 - s * s))
+			local tang = (lateral * (larg / 2) + normal * (-2 * curva * s)).Unit
+			local face = tang:Cross(Vector3.yAxis)
+			if face:Dot(normal) < 0 then face = -face end
+			local w = larg / N * 1.18
+			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.5, Material = Enum.Material.SmoothPlastic })
+			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.25), Color = AZUL_SUP, Transparency = 0.72, Material = Enum.Material.Glass })
+			local tex = {}
+			for _, f in { Enum.NormalId.Front, Enum.NormalId.Back } do
+				local tx = Instance.new("Texture")
+				tx.Texture, tx.Face, tx.Color3, tx.Transparency = TEX.fumaca, f, AZUL_TEX, 0.55
+				tx.StudsPerTileU, tx.StudsPerTileV = 2.6, 2.6
+				tx.Parent = sup
+				table.insert(tex, tx)
+			end
+			local espuma = cena:peca({ Size = Vector3.new(w * 0.95, 0.7, espessura + 0.6), Color = ESPUMA, Transparency = 0.3, Material = Enum.Material.SmoothPlastic })
+			local fonte = cena:peca({ Size = Vector3.new(w * 0.8, 0.2, 0.4), Transparency = 1 })
+			local gotas = cena:emissor(fonte, "brilho", AZUL_TEX, {
+				Rate = if FX.reduzidos then 2 else 5, Speed = NumberRange.new(0.2, 0.8), SpreadAngle = Vector2.new(8, 8),
+				Lifetime = NumberRange.new(0.8, 1.3), Acceleration = Vector3.new(0, -14, 0),
+				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.38), NumberSequenceKeypoint.new(1, 0.12) }),
+				EmissionDirection = Enum.NormalId.Front, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(1, 0.8) }),
+			})
+			local borrifo = cena:emissor(fonte, "brilho", ESPUMA, {
+				Rate = if FX.reduzidos then 4 else 11, Speed = NumberRange.new(3, 6), SpreadAngle = Vector2.new(22, 22),
+				Lifetime = NumberRange.new(0.4, 0.8), Acceleration = Vector3.new(0, -18, 0),
+				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.1) }),
+				EmissionDirection = Enum.NormalId.Top,
+			})
+			segs[i] = { pos = pos, face = face, nucleo = nucleo, sup = sup, tex = tex, espuma = espuma, fonte = fonte, gotas = gotas, borrifo = borrifo }
 		end
-		local espuma = cena:peca({ Size = Vector3.new(larg, 0.5, 1.2), Color = ESPUMA, Transparency = 0.45, Material = Enum.Material.Glass })
-		local jato = cena:peca({ Size = Vector3.new(larg, 0.3, 0.6), Transparency = 1 })
-		local borrifo = cena:emissor(jato, "brilho", ESPUMA, {
-			Rate = if FX.reduzidos then 8 else 26, Speed = NumberRange.new(3, 7), SpreadAngle = Vector2.new(18, 18),
-			Lifetime = NumberRange.new(0.5, 0.9), Acceleration = Vector3.new(0, -16, 0),
-			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.1) }),
-			EmissionDirection = Enum.NormalId.Top,
-		})
-		respingo(cena, cena.T + 0.02, base, 0.9)
+		for i = 1, N, 2 do
+			respingo(cena, cena.T + 0.02 + i * 0.03, segs[i].pos, 0.8)
+		end
 		ctx.som({ habilidadeId = "ability/agua/Principiante/escudo-de-agua" }, "agua", 1.0)
+		-- câmera curta mostrando o muro subir
+		if ctx.focoCamera then ctx.focoCamera(base + normal * curva + Vector3.new(0, alto * 0.45, 0), 1.5, nil, 15, 5) end
 		anim = cena:anim(t0, t0 + 3600, function()
 			local t = cena.T - t0
-			local k = math.clamp(t / 0.5, 0, 1)
-			k = 1 - (1 - k) ^ 3
-			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 0.6, 0, 1) end
-			local h = math.max(alto * k, 0.05)
-			local onda = math.sin(cena.T * 2.4) * 0.12
-			local meio = base + Vector3.new(0, h / 2, 0)
-			parede.Size = Vector3.new(larg, h, 0.7 + onda * 0.4)
-			parede.CFrame = CFrame.lookAt(meio, meio + normal)
-			parede.Transparency = 0.78 + 0.06 * math.sin(cena.T * 3.1)
-			texA.OffsetStudsV, texB.OffsetStudsV = -cena.T * 2.6, -cena.T * 2.1 -- correnteza descendo, uma face mais rápida
-			texA.OffsetStudsU, texB.OffsetStudsU = math.sin(cena.T * 0.9) * 1.2, -cena.T * 0.8
-			local pe = base + Vector3.new(0, 0.25, 0)
-			espuma.CFrame = CFrame.lookAt(pe, pe + normal)
-			espuma.Size = Vector3.new(larg * (0.96 + 0.04 * math.sin(cena.T * 5)), 0.5, 1.2 + onda)
-			jato.CFrame = CFrame.lookAt(base + Vector3.new(0, 0.2, 0), base + Vector3.new(0, 0.2, 0) + normal)
-			borrifo.Rate = (if FX.reduzidos then 8 else 26) * k
-			if estado.tFim and cena.T - estado.tFim > 0.7 then
+			local sumindo = estado.tFim ~= nil
+			for i, g in segs do
+				local ki = math.clamp((t - i * 0.045) / 0.5, 0, 1)
+				ki = 1 - (1 - ki) ^ 3
+				if sumindo then ki = 1 - math.clamp((cena.T - estado.tFim - i * 0.03) / 0.55, 0, 1) end
+				local h = math.max(alto * ki, 0.05)
+				local onda = math.sin(cena.T * 2.2 + i * 0.9) * 0.18
+				local cf = CFrame.lookAt(g.pos + Vector3.new(0, h / 2, 0), g.pos + Vector3.new(0, h / 2, 0) + g.face)
+				g.nucleo.Size = Vector3.new(g.nucleo.Size.X, h, espessura + onda * 0.3)
+				g.nucleo.CFrame = cf
+				g.nucleo.Transparency = 0.5 + 0.07 * math.sin(cena.T * 2.6 + i)
+				g.sup.Size = Vector3.new(g.sup.Size.X, h, espessura + 0.25 + onda * 0.3)
+				g.sup.CFrame = cf
+				g.tex[1].OffsetStudsV, g.tex[2].OffsetStudsV = cena.T * 2.4, cena.T * 1.9 -- correnteza subindo
+				g.tex[1].OffsetStudsU, g.tex[2].OffsetStudsU = math.sin(cena.T * 0.8 + i) * 0.8, -cena.T * 0.5
+				local topo = g.pos + Vector3.new(0, h + 0.05 + onda * 0.5, 0)
+				g.espuma.CFrame = CFrame.lookAt(topo, topo + g.face)
+				g.espuma.Size = Vector3.new(g.espuma.Size.X, 0.6 + 0.25 * math.sin(cena.T * 4 + i * 1.7), espessura + 0.6)
+				local alto2 = g.pos + g.face * (espessura / 2 + 0.1) + Vector3.new(0, h - 0.2, 0)
+				g.fonte.CFrame = CFrame.lookAt(alto2, alto2 + g.face)
+				g.gotas.Rate = (if FX.reduzidos then 2 else 5) * ki
+				g.borrifo.Rate = (if FX.reduzidos then 4 else 11) * ki
+				if ki <= 0 or t < 0 then g.espuma.Transparency = 1 else g.espuma.Transparency = 0.3 end
+			end
+			if sumindo and cena.T - estado.tFim > 1.1 then
 				for _, i in cena.lixo do if i.Parent then i:Destroy() end end
 				table.clear(cena.lixo)
 				anim.fim = true
@@ -522,12 +558,14 @@ local function zonaEscudo(ctx, muro, t0: number)
 	return function()
 		if estado.tFim then return end
 		estado.tFim = cena.T
-		respingo(cena, cena.T + 0.3, base, 1.3)
+		for i = 1, 3 do
+			respingo(cena, cena.T + 0.2 + i * 0.1, base + lateral * ((i - 2) * larg / 3) + normal * curva, 1.1)
+		end
 	end
 end
 
--- Névoa Densa: volume de névoa de ~6 m de raio (emissor largo de fumaça + véu no chão); nasce devagar, deixa a
--- visibilidade baixa e se dissipa (as partículas vivas se esvaem em alguns segundos).
+-- Névoa Densa (HAB3b): volume de bruma de ~6 m de raio e ~7 studs de altura que cobre os lutadores parcialmente:
+-- bolhas de névoa translúcidas à deriva (volume), emissor largo de fumaça, véu no chão; nasce em ~2 s e se dissipa.
 local function zonaNevoa(ctx, muro, t0: number)
 	local cena = novaCena(ctx)
 	local c = geometriaDaZona(ctx, muro)
@@ -535,28 +573,45 @@ local function zonaNevoa(ctx, muro, t0: number)
 	local raio = Protocol.BOARD.cell * 4
 	local estado = { tFim = nil :: number? }
 	local anim
+	local cinza = Color3.fromRGB(150, 168, 178)
 	cena:em(t0, function()
-		local vol = cena:peca({ Size = Vector3.new(raio * 1.7, 4.5, raio * 1.7), Position = Vector3.new(c.X, chaoY + 2.4, c.Z), Transparency = 1 })
-		local veu = cena:disco(Vector3.new(c.X, chaoY + 0.15, c.Z), raio * 2, ESPUMA, 0.85)
-		local cinza = Color3.fromRGB(140, 160, 170)
+		local vol = cena:peca({ Size = Vector3.new(raio * 1.8, 7, raio * 1.8), Position = Vector3.new(c.X, chaoY + 3.5, c.Z), Transparency = 1 })
+		local veu = cena:disco(Vector3.new(c.X, chaoY + 0.2, c.Z), raio * 2.1, cinza, 0.8)
+		local nuvens = {}
+		local semente = (muro.id and #muro.id or 3) * 7.13
+		for i = 1, if FX.reduzidos then 8 else 18 do
+			local ang = i * 2.399 + semente
+			local dist = raio * 0.8 * math.sqrt((i % 9) / 9 + 0.08)
+			local tam = 9 + (i % 4) * 2.5
+			local p = cena:bola(tam, Vector3.new(c.X + math.cos(ang) * dist, chaoY + 1.5 + (i % 3) * 1.6, c.Z + math.sin(ang) * dist), cinza, 0.86)
+			p.Material = Enum.Material.SmoothPlastic
+			p.CastShadow = false
+			nuvens[i] = { p = p, ang = ang, dist = dist, base = p.Position, fase = i * 0.7, tam = tam }
+		end
 		local fumo = cena:emissor(vol, "fumaca", cinza, {
 			Rate = 0, Speed = NumberRange.new(0.2, 0.9), SpreadAngle = Vector2.new(180, 180),
 			Lifetime = NumberRange.new(5, 7), Drag = 0.5, Rotation = NumberRange.new(0, 360), RotSpeed = NumberRange.new(-8, 8),
-			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 4), NumberSequenceKeypoint.new(1, 8) }),
-			Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.25, 0.93), NumberSequenceKeypoint.new(0.75, 0.94), NumberSequenceKeypoint.new(1, 1) }),
+			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 6), NumberSequenceKeypoint.new(1, 12) }),
+			Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.25, 0.86), NumberSequenceKeypoint.new(0.75, 0.88), NumberSequenceKeypoint.new(1, 1) }),
 			LightEmission = 0, LightInfluence = 1,
 		})
-		fumo.Color = ColorSequence.new(cinza, Color3.fromRGB(175, 192, 200))
+		fumo.Color = ColorSequence.new(cinza, Color3.fromRGB(185, 200, 208))
 		ctx.som({ habilidadeId = "ability/agua/Principiante/nevoa-densa" }, "agua", 0.8)
 		anim = cena:anim(t0, t0 + 3600, function()
 			local t = cena.T - t0
-			local k = math.clamp(t / 1.8, 0, 1)
-			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 1.2, 0, 1) end
-			fumo.Rate = (if FX.reduzidos then 4 else 10) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
-			veu.Transparency = 1 - 0.1 * k
+			local k = math.clamp(t / 2, 0, 1)
+			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 1.4, 0, 1) end
+			fumo.Rate = (if FX.reduzidos then 8 else 22) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
+			veu.Transparency = 1 - 0.22 * k
+			for _, n in nuvens do
+				local a = n.ang + cena.T * 0.05
+				n.p.Position = n.base + Vector3.new(math.cos(a) * 1.2, math.sin(cena.T * 0.4 + n.fase) * 0.5, math.sin(a) * 1.2)
+				n.p.Size = Vector3.one * n.tam * (0.4 + 0.6 * k)
+				n.p.Transparency = 1 - 0.14 * k
+			end
 			if estado.tFim and cena.T - estado.tFim > 1.5 then
 				fumo.Enabled = false
-				if cena.T - estado.tFim > 10 then
+				if cena.T - estado.tFim > 9 then
 					for _, i in cena.lixo do if i.Parent then i:Destroy() end end
 					table.clear(cena.lixo)
 					anim.fim = true
@@ -574,9 +629,9 @@ local CTX_ZONAS = nil -- contexto guardado em criar(ctx): o BoardView (que desen
 
 -- Desenho de um muro/zona do snapshot (`jogo.muros`) de estilo "agua" ou "nevoa". O prazo é do servidor: o BoardView
 -- chama a função devolvida quando o muro some do snapshot. Devolve nil se este estilo não tem visual próprio aqui.
-function MagiasAgua.zonaDoMuro(muro: any): (() -> ())?
+function MagiasAgua.zonaDoMuro(muro: any, frente: Vector3?): (() -> ())?
 	if not CTX_ZONAS then return nil end
-	if muro.estilo == "agua" then return zonaEscudo(CTX_ZONAS, muro, 1.0) end
+	if muro.estilo == "agua" then return zonaEscudo(CTX_ZONAS, muro, 1.0, frente) end
 	if muro.estilo == "nevoa" then return zonaNevoa(CTX_ZONAS, muro, 1.1) end
 	return nil
 end

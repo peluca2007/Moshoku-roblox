@@ -698,6 +698,7 @@ local ctxAgua = {
 		if coreografiaRef then coreografiaRef.reacao(alvoId, posicaoDe(state, alvoId) - de, forca) end
 	end,
 	veredito = veredito,
+	focoCamera = function(ponto, dur, posicao, dist, altura) require(script.Parent:WaitForChild("ImpactoCamera")).foco(ponto, dur, posicao or function() return nil end, { dist = dist, altura = altura }) end, -- HAB3b
 	som = somDoRecibo,
 	-- HAB1d: câmera de luta acompanha o projétil e fecha no acerto (ImpactoCamera)
 	camera = function(de, para, impacto, opc) require(script.Parent:WaitForChild("ImpactoCamera")).golpe(de, para, impacto, opc) end,

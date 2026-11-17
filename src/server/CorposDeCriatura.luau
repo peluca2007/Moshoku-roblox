@@ -454,16 +454,18 @@ function Corpos.start(deps)
 	end
 
 	local api = {}
-
-	function api.sincronizar()
-		-- QA (só no Studio): workspace.QaSoltarArma = id da ficha faz a arma do corpo cair, como o Corte de Braço faria
-		if game:GetService("RunService"):IsStudio() then
+	-- QA (só no Studio): workspace.QaSoltarArma = id da ficha faz a arma do corpo cair, como o Corte de Braço faria
+	if game:GetService("RunService"):IsStudio() then
+		workspace:GetAttributeChangedSignal("QaSoltarArma"):Connect(function()
 			local qa = workspace:GetAttribute("QaSoltarArma")
 			if type(qa) == "string" and qa ~= "" and corpos[qa] then
 				workspace:SetAttribute("QaSoltarArma", nil)
 				workspace:SetAttribute("QaSoltouArma", api.soltarArma({ id = qa }))
 			end
-		end
+		end)
+	end
+
+	function api.sincronizar()
 		local vistos = {}
 		for _, token in deps.fichas() do
 			if token.criatura and not deps.secreto(token) then
@@ -515,18 +517,19 @@ function Corpos.start(deps)
 	end
 
 	-- REA1: Corte de Braço que fez o alvo largar a arma: a peça `Arma` do corpo sai da animação e cai com física
-	-- (replicada a todos); some depois de 25 s. Sem arma no modelo devolve false (nada cai do nada).
+	-- (replicada a todos); some depois de 3 min. Sem arma no modelo devolve false (nada cai do nada).
 	function api.soltarArma(token): boolean
 		local c = corpos[token.id]
 		if not c or not c.animado or not c.animado.soltarArma then return false end
 		local r = c.animado:soltarArma()
 		if not r then return false end
+		workspace:SetAttribute("QaArmaSolta", r.principal and (r.principal.Name .. "|" .. tostring(#r.demais)) or "?")
 		local dono = c.modelo
 		for _, p in r.demais do
 			p.Parent = workspace
 			p.AssemblyLinearVelocity = Vector3.new(math.random(-6, 6), 14, math.random(-6, 6))
 			p.AssemblyAngularVelocity = Vector3.new(math.random(-8, 8), math.random(-8, 8), math.random(-8, 8))
-			game:GetService("Debris"):AddItem(p, 25)
+			game:GetService("Debris"):AddItem(p, 180)
 		end
 		return true
 	end

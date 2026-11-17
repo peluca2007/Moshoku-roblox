@@ -664,7 +664,7 @@ function HabilidadeService.start(deps)
    if Protocol.isCell(x + 1, z) and not barreiraEm(x + 1, z) then x += 1 end
    local objeto = largarArma(alvo, x, z)
    efeito.largouArma = objeto ~= nil
-   if objeto and alvo.criatura and deps.soltarArma then deps.soltarArma(alvo) end -- a peça real do corpo cai (física) -- REA1: o recibo diz se algo caiu de verdade (só apresentação)
+   if objeto and alvo.criatura and deps.soltarArma and deps.soltarArma(alvo) then objeto.fisica = true end -- a peça real do corpo cai (física) e é a arma no chão -- REA1: o recibo diz se algo caiu de verdade (só apresentação)
    if mec.corteBraco and Estado.patamar(alvo) < (Regras.bonusDeRank.Santo or 4) then
     Estados.definir(estados, alvo.id, "bracoInutil", true, conjurador.id, { de = "alvo" }, combat.round)
    end
@@ -2246,7 +2246,7 @@ function HabilidadeService.start(deps)
     local posicao = table.clone(dono); posicao.x, posicao.z = o.x, o.z
     for _, player in game:GetService("Players"):GetPlayers() do if not deps.canSee(player, posicao) then publico = false; break end end
    end
-   if publico then table.insert(noChao, { id = o.id, x = o.x, z = o.z, nome = "Arma no chão" }) end
+   if publico then table.insert(noChao, { id = o.id, x = o.x, z = o.z, nome = "Arma no chão", fisica = o.fisica }) end
   end
   return { acoes = acoes, muros = lista, objetos = noChao }
 	end

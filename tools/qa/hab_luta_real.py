@@ -47,7 +47,7 @@ print(info)
 if "|" not in info:
     sys.exit(1)
 hid, aid = info.split("|")[:2]
-if nome_exige and nome_exige.lower() not in info.split("|")[2].lower():
+if nome_exige and not any(n.strip().lower() in info.split("|")[2].lower() for n in nome_exige.split(",")):
     print("alvo errado:", info); sys.exit(2)
 q.lua_cliente("workspace:SetAttribute('EscalaDeTempoDasCenas', %s) workspace:SetAttribute('QaCritico', %s) return 'ok'" % (escala, "true" if crit else "nil"))
 time.sleep(0.5)
@@ -59,6 +59,10 @@ r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},alvos={{id
     if solta and resultado == "falha":
         time.sleep(0.85 * float(escala))  # o contato cai ~0,8 s depois do recibo
         q.lua_servidor("workspace:SetAttribute('QaSoltarArma', '%s') return 'ok'" % aid)
+        time.sleep(0.5)
+        # prova por números: peças Arma* fora do modelo (filhas do workspace): Y, ancoragem, colisão, ao longo de 3 s
+        print("QaSoltouArma/QaArmaSolta:", q.lua_servidor("return tostring(workspace:GetAttribute('QaSoltouArma'))..' '..tostring(workspace:GetAttribute('QaArmaSolta'))"))
+        print(q.lua_servidor("""local o={} for i=1,10 do local l={} for _,p in workspace:GetChildren() do if p:IsA('BasePart') and p.Name:sub(1,4)=='Arma' then l[#l+1]=string.format('%s y=%.2f A=%s C=%s',p.Name,p.Position.Y,tostring(p.Anchored),tostring(p.CanCollide)) end end o[#o+1]=string.format('t=%.1f %s',i*0.3,table.concat(l,' ; ')) task.wait(0.3) end return table.concat(o,' || ')"""))
 
 
 if camera:

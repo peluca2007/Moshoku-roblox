@@ -35,7 +35,8 @@ function A.start()
 			vivos[o.id] = true
 			local v = vistos[o.id] or criar(o.id); vistos[o.id] = v
 			local base = CFrame.new(Protocol.cellCenter(o.x,o.z) + Vector3.new(0,.3,0)) * CFrame.Angles(0, .6, 0)
-			for _, p in v.partes do p[1].CFrame = base * p[2] end
+			for _, p in v.partes do p[1].CFrame = base * p[2]; p[1].Transparency = if o.fisica then 1 else 0 -- REA1: com a arma física do corpo, só a etiqueta fica (uma arma no mundo)
+			end
 		end
 		for id, v in vistos do if not vivos[id] then v.modelo:Destroy(); vistos[id] = nil end end
 	end

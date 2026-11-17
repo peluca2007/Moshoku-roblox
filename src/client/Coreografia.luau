@@ -418,7 +418,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				local nomeAlvo = tokenAlvo and (tokenAlvo.criatura or tokenAlvo.modelo or tokenAlvo.name)
 				local reac = ReacoesAlvo.decidir(cena.habilidade, ReacoesAlvo.tipoDoAlvo(if type(nomeAlvo) == "string" then nomeAlvo else nil), armado, alvo)
 				if reac.solta then
-					ImpactoFx.soltaArma(cena.modelo, corpoAlvo, golpe)
+					-- a arma cai de verdade pelo servidor (CorposDeCriatura.soltarArma); o cliente só põe o respingo
 					ImpactoFx.gotas(cena.modelo, ponto + Y * 2.2, golpe)
 				end
 				if corpoAlvo and corpoAlvo:IsA("Model") and not corpoAlvo:FindFirstChildOfClass("Humanoid") then

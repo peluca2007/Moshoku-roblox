@@ -23,9 +23,16 @@ local CLIPES = {
 	SlashMx2 = require(Shared.Animacoes.Clipes.SlashMx2), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
 	SlashMx3 = require(Shared.Animacoes.Clipes.SlashMx3), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
 	CorridaMx = require(Shared.Animacoes.Clipes.CorridaMx), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	MagiaAtq1M2 = require(Shared.Animacoes.Clipes.MagiaAtq1M2), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	MagiaAtq1M3 = require(Shared.Animacoes.Clipes.MagiaAtq1M3), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	MagiaAtq2M1 = require(Shared.Animacoes.Clipes.MagiaAtq2M1), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	MagiaArea1 = require(Shared.Animacoes.Clipes.MagiaArea1), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	MagiaArea2 = require(Shared.Animacoes.Clipes.MagiaArea2), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	MagiaCast1M = require(Shared.Animacoes.Clipes.MagiaCast1M), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	AtqMx3 = require(Shared.Animacoes.Clipes.AtqMx3), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
 }
 
 return {
 	CLIPES = CLIPES,
-	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria", "CorteDeBraco", "ReacaoMixamo", "EsquivaMixamo", "SlashMx1", "SlashMx2", "SlashMx3", "CorridaMx" },
+	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria", "CorteDeBraco", "ReacaoMixamo", "EsquivaMixamo", "SlashMx1", "SlashMx2", "SlashMx3", "CorridaMx", "MagiaAtq1M2", "MagiaAtq1M3", "MagiaAtq2M1", "MagiaArea1", "MagiaArea2", "MagiaCast1M", "AtqMx3" },
 }

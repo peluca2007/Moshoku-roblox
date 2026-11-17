@@ -15,6 +15,7 @@ longe = "--longe" in sys.argv
 camera = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--camera=")), None)  # grava a série da câmera (csv) e reprova se houver salto
 nome_exige = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--nome=")), None)  # sai com 2 se o alvo não tiver esse trecho no nome
 solta = "--solta" in sys.argv  # pede ao servidor (só Studio) que a arma do corpo caia de verdade
+si = "--si" in sys.argv  # recibo com o próprio conjurador como alvo (escudo, cura, auras)
 resultado = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--res=")), "falha")  # falha | passa | erro (Vigor/erro do recibo visual)
 video = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--video=")), None)
 trajeto = next((int(a.split("=", 1)[1]) for a in sys.argv if a.startswith("--trajeto=")), 0)  # Investida: casas de corrida para trás do conjurador (REA2)
@@ -60,7 +61,7 @@ time.sleep(0.5)
 
 def disparar():
     q.lua_servidor("""local r=game.ReplicatedStorage.Mesa for _,p in game.Players:GetPlayers() do
-r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},%s alvos={{id='%s',acertou=%s,critico=%s,dano=6,passou=%s,largouArma=%s}}}) end return 'enviado'""" % (ident, hid, traj_lua, aid, "false" if resultado == "erro" else "true", "true" if crit else "false", "true" if resultado == "passa" else "false", "true" if (solta and resultado == "falha") else "false"))
+r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},%s alvos={{id='%s',acertou=%s,critico=%s,dano=6,passou=%s,largouArma=%s}}}) end return 'enviado'""" % (ident, hid, traj_lua, hid if si else aid, "false" if resultado == "erro" else "true", "true" if crit else "false", "true" if resultado == "passa" else "false", "true" if (solta and resultado == "falha") else "false"))
     if solta and resultado == "falha":
         time.sleep(0.85 * float(escala))  # o contato cai ~0,8 s depois do recibo
         q.lua_servidor("workspace:SetAttribute('QaSoltarArma', '%s') return 'ok'" % aid)

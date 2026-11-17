@@ -1558,3 +1558,10 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Antes: `qa.py esgoto_sala1` 20 ok, fps 60,0 (p5 55,9), 8521 partes; capturas `build/beleza/cen4/antes_*.png`.
 - Depois (primeira versão, pedra bege): `qa.py esgoto_sala1` 19 ok (1 falha não analisada), capturas `build/beleza/cen4/depois_*.png`: tijolos em 3 fileiras, pilares do chão ao teto, arco com canal de borda de pedra, lajes hexagonais no piso fora do tabuleiro. Ficou quente demais (laranja) em relação à CEN3; ajustei a cor no código (`TOM_ESGOTO`, tinta cinza-esverdeada) mas as capturas finais NÃO foram refeitas.
 - Não verificado: fps depois (a medida deu erro de Client), `qa.py luta`, cor final, vídeo da câmera da luta. As últimas rodadas do qa falharam porque outro agente (REA3) passou a usar o Studio ao mesmo tempo.
+
+## REA3 (17/11/2026) — Água com Pro Magic Pack, Primeiro Golpe Mixamo, rastro da Investida (Studio com foco, `build/beleza/rea3/`)
+
+- Clipes (via `anim_mixamo.py`): `MagiaAtq1M2` (respingo), `MagiaAtq2M1` (bola), `MagiaAtq1M3` (impacto de gelo), `MagiaCast1M` (lâmina), `MagiaArea1` (escudo), `MagiaArea2` (névoa), `AtqMx3` (Primeiro Golpe). Ligados por `spec.clipe` em `Gestos.ESPEC` (o marco `impacto` do clipe é a soltura da magia). Descartados: clipes cuja raiz saía da casa (spec reprovou `AtqMx1`).
+- Vistos nos quadros: respingo (braço estendido), bola (duas mãos acima da cabeça), impacto de gelo (aponta, cristais), lâmina, Primeiro Golpe (estocada com fumaça escura). Escudo e névoa: a pose de 2 mãos aparece, mas só há partículas genéricas (não existe receita própria da Água para eles em MagiasAgua). Flecha de água: inalterada.
+- Investida: cor quente (255,178,96), sombras a 80% de transparência, um corte fino no lugar de dois grossos. Ainda sobra um clarão amarelo forte no impacto (vem de ImpactoFx).
+- `hab_luta_real.py` ganhou `--si` (alvo = o próprio conjurador). Não verificado: magias com recibo real do servidor, celular, desempenho. `qa.py luta` não foi rodado depois desta tarefa (só `testar.ps1`: só Catálogo falha).

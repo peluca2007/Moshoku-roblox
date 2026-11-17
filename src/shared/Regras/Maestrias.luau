@@ -91,6 +91,17 @@ function Maestrias.imuneA(flags, condicao: string): boolean
 	return false
 end
 
+-- HAB8: nome da passiva que deu a imunidade (para a tela avisar "Sem Recuo"); nil se não é imune.
+function Maestrias.fonteDaImunidade(flags, condicao: string): string?
+	if not Maestrias.imuneA(flags, condicao) then
+		return nil
+	end
+	if condicao == "amedrontado" and flags.semRecuo == true then
+		return "Sem Recuo"
+	end
+	return "Paciência de Pedra"
+end
+
 -- Base Firme: não é empurrado, puxado contra a vontade nem derrubado por efeito
 -- que permita teste de Força ou Agilidade.
 function Maestrias.resisteDeslocamento(flags, atributoDoTeste: string?): boolean

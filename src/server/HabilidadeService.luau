@@ -106,6 +106,12 @@ function HabilidadeService.start(deps)
 	-- Árvores de utilidade (A20): Ladino, Bardo, Tático.
 	local utilidades
 	local casasMovidas, turnosDaFicha, ataqueNaVez, quebrantadosNaVez = {}, {}, {}, {}
+	-- HAB8: última passiva que agiu em cada token ({ nome, detalhe, n }); o snapshot leva e o cliente mostra quando `n` muda
+	local avisosPassiva: { [string]: { nome: string, detalhe: string?, n: number } } = {}
+	local function avisarPassiva(token, nome: string, detalhe: string?)
+		local antes = avisosPassiva[token.id]
+		avisosPassiva[token.id] = { nome = nome, detalhe = detalhe, n = (antes and antes.n or 0) + 1 }
+	end
 	local function flags(token) return Maestrias.daFicha(token and token.ficha2, deps.catalogo) end
 
 	-- Mecânicas das condições do catálogo (id local → mecanica).
@@ -158,7 +164,11 @@ function HabilidadeService.start(deps)
 	end
 
 	local function aplicarCondicao(token, id: string, acumulos: number?, nota: string?)
-		if Maestrias.imuneA(flags(token), id) then return end
+		if Maestrias.imuneA(flags(token), id) then
+			local fonte = Maestrias.fonteDaImunidade(flags(token), id)
+			if fonte and combat.active then avisarPassiva(token, fonte, "imune") end
+			return
+		end
 		if temCondicao(token, id) and not (Condicoes.POR_ID[id] and Condicoes.POR_ID[id].acumulavel) then
 			return
 		end
@@ -600,7 +610,10 @@ function HabilidadeService.start(deps)
   if efeito.aplica then
    local lista = {}
    for _, id in efeito.aplica do
-    if Maestrias.imuneA(flags(alvo), id) then table.insert(efeito.notas, "Imune a " .. id)
+    if Maestrias.imuneA(flags(alvo), id) then
+     table.insert(efeito.notas, "Imune a " .. id)
+     local fonte = Maestrias.fonteDaImunidade(flags(alvo), id)
+     if fonte then avisarPassiva(alvo, fonte, "imune") end
     else table.insert(lista, id) end
    end
    efeito.aplica = lista
@@ -865,6 +878,9 @@ function HabilidadeService.start(deps)
 			cura = efeito.cura or efeito.pvTemp,
 			aplica = if efeito.aplica then efeito.aplica[1] else nil,
 			largouArma = efeito.largouArma,
+			-- HAB8: destaques do golpe (combo do Golpe Contínuo, Dano Furtivo e triplo do Primeiro Golpe), só para mostrar
+			combo = if efeito.ataque and efeito.ataque.acertou then efeito.combo else nil,
+			furtivo = efeito.furtivo,
 		}
 	end
 
@@ -1973,7 +1989,10 @@ function HabilidadeService.start(deps)
 		utilidades.atualizarVisao(token, deX, deZ)
 		if combat.active and deps.currentTurnId() == token.id then
 			turnosDaFicha[token.id] = turnosDaFicha[token.id] or 1
+			local antes = Maestrias.caExtra(token.ficha2, flags(token), casasMovidas[token.id] or 0)
 			casasMovidas[token.id] = (casasMovidas[token.id] or 0) + Combate.distancia(deX, deZ, token.x, token.z)
+			local depois = Maestrias.caExtra(token.ficha2, flags(token), casasMovidas[token.id])
+			if depois > antes then avisarPassiva(token, "Roupa Leve", "+" .. depois .. " CA") end -- HAB8
 		end
   limparVinculos()
   for fonteId, posicao in ultimasPosicoes do
@@ -2246,8 +2265,12 @@ function HabilidadeService.start(deps)
 	function api.suporteDe(token, podeVer) return utilidades.suporteDe(token, podeVer) end
 	function api.testeFurtivo(token) return utilidades.testeFurtivo(token) end
 
+	function api.avisoPassiva(token)
+		return avisosPassiva[token.id]
+	end
 	function api.estadosDe(token)
 		local lista = Estados.nomes(estados, token.id)
+		if Maestrias.caExtra(token.ficha2, flags(token), casasMovidas[token.id] or 0) > 0 then table.insert(lista, "roupaLeve") end -- HAB8
 		for _, texto in formulas.estadosDe(token) do table.insert(lista, texto) end
 		for _, texto in utilidades.estadosDe(token) do table.insert(lista, texto) end
 		return lista
@@ -2374,7 +2397,7 @@ function HabilidadeService.start(deps)
 	function api.descartarTudo()
 		formulas.descartar()
 		utilidades.limpar()
-		table.clear(casasMovidas); table.clear(turnosDaFicha); table.clear(ataqueNaVez); table.clear(quebrantadosNaVez)
+		table.clear(casasMovidas); table.clear(turnosDaFicha); table.clear(ataqueNaVez); table.clear(quebrantadosNaVez); table.clear(avisosPassiva)
   restaurarEquipamento()
 		table.clear(estados.efeitos)
 		table.clear(usosCombate)
@@ -2391,7 +2414,7 @@ function HabilidadeService.start(deps)
 	function api.combateEncerrado()
 		formulas.descanso()
 		utilidades.limpar()
-		table.clear(casasMovidas); table.clear(turnosDaFicha); table.clear(ataqueNaVez); table.clear(quebrantadosNaVez)
+		table.clear(casasMovidas); table.clear(turnosDaFicha); table.clear(ataqueNaVez); table.clear(quebrantadosNaVez); table.clear(avisosPassiva)
   restaurarEquipamento()
 		local ids = {}; for id, t in tokens do if t.invocado then table.insert(ids, id) end end
 		for _, id in ids do deps.removerFicha(id) end

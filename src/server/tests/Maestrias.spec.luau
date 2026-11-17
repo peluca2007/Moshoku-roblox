@@ -36,6 +36,12 @@ return {
 		t.eq(Maestrias.resisteDeslocamento({ baseFirme = true }, "forca"), true)
 		t.eq(Maestrias.resisteDeslocamento({ baseFirme = true }, "vigor"), false)
 	end,
+	["HAB8: a passiva que deu a imunidade tem nome para a tela"] = function(t)
+		t.eq(Maestrias.fonteDaImunidade({ semRecuo = true }, "amedrontado"), "Sem Recuo")
+		t.eq(Maestrias.fonteDaImunidade({ pacienciaDePedra = true }, "amedrontado"), "Paciência de Pedra")
+		t.eq(Maestrias.fonteDaImunidade({ pacienciaDePedra = true }, "provocado"), "Paciência de Pedra")
+		t.eq(Maestrias.fonteDaImunidade({ semRecuo = true }, "provocado"), nil)
+	end,
 	["empate de iniciativa é de quem tem Quem Se Move Primeiro"] = function(t)
 		local e = { { id = "a", initiative = 12 }, { id = "b", initiative = 12 }, { id = "c", initiative = 15 } }
 		Maestrias.ordenarEmpates(e, function(id) return id == "b" end)

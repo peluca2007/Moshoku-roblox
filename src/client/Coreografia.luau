@@ -19,6 +19,8 @@ local Curvas = require(Shared.ImpactoCurvas)
 local ReacoesAlvo = require(Shared.ReacoesAlvo)
 local AnimacaoCriatura = require(Shared.Mundo.AnimacaoCriatura)
 local CatalogoCriaturas = require(Shared.Animacoes.Criaturas.Catalogo)
+local Fila = require(Shared.Animacoes.FilaApresentacao)
+local Destaques = require(Shared.DestaquesGolpe) -- HAB8: combo e furtivo/triplo no contato
 
 -- ANIM3: instante (s após o recibo) em que o golpe de uma criatura encosta: marco `impacto` do clipe de ataque dela
 -- (o servidor começa o clipe ao enviar o recibo). nil se não é criatura ou o clipe não marca.
@@ -397,9 +399,15 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		evento(cena, inicio, function()
 			cena.modelo:SetAttribute("Fase", "impacto")
 			if semTextos then
-			elseif alvo.critico then Efeitos.floatText(ponto + Y * 4, "CRÍTICO!", Estilo.ALERTA)
-			elseif not acertou then Efeitos.floatText(ponto + Y * 4, "ERROU", Estilo.TINTA_SUAVE)
+			elseif alvo.critico then Efeitos.destaque(ponto + Y * 4, "CRÍTICO!", Estilo.ALERTA, true) -- HAB8: grande, com pop
+			elseif not acertou then Efeitos.destaque(ponto + Y * 4, "ERROU", Estilo.TINTA_SUAVE, false)
 			elseif alvo.passou then Efeitos.floatText(ponto + Y * 4, "RESISTIU", Estilo.TINTA_SUAVE) end
+			if not semTextos then
+				for k, d in Destaques.listar(alvo) do
+					-- o triplo é o momento da assinatura: vinho forte; combo e furtivo comum em ouro
+					Efeitos.destaque(ponto + Y * (5.5 + (k - 1) * 1.6), d.texto, if d.forte then Estilo.PERIGO else Estilo.ALERTA, d.forte)
+				end
+			end
 			if acertou and (alvo.dano or 0) > 0 then
 				Efeitos.reagir(alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, cena.perfil.peso * (if alvo.critico then 2 else 1))
@@ -640,10 +648,17 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 					cena.fim = math.max(cena.fim, quando + 0.9)
 				end
 				-- ANIM3: número, barra e queda do alvo esperam o golpe encostar (limite de segurança na fila)
-				if resultado.acertou ~= false and not FX.reduzidos then
+				if not FX.reduzidos then -- HAB8: erro também segura (a faixa só diz "errou" quando o golpe passa)
 					local atraso = quando
 					atraso = math.max(atraso, impactoDaCriatura(state, recibo.casterId) or 0)
-					Feedback.fila:reter(alvo.id, os.clock(), atraso)
+					-- HAB8: a estimativa (em segundos reais) erra com câmera lenta e planos longos: segura com teto
+					-- maior e solta no evento de contato da própria cena, que corre no relógio da cena
+					Feedback.fila:reter(alvo.id, os.clock(), atraso + 0.6, nil, Fila.TETO_COM_SINAL)
+					if n == #tiros then
+						local idAlvo = alvo.id
+						evento(cena, quando, function() Feedback.fila:soltar(idAlvo, os.clock()) end)
+						table.insert(cena.limpezas, function() Feedback.fila:soltar(idAlvo, os.clock()) end) -- cena cancelada não prende o PV
+					end
 				end
 				local somImpacto = Sons.impacto(id, arv, spec, resultado)
 				if somImpacto then

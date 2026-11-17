@@ -81,15 +81,21 @@ function Barras.start(state)
 	end
 
 	-- Número grande que salta do alvo: sobe com "pop" (Back) e some.
-	local function saltar(item, valor: number, cura: boolean)
+	-- HAB8: o tamanho cresce com o estrago (fração da vida máxima); golpe que tira 1/3 da vida sai bem maior
+	local function saltar(item, valor: number, cura: boolean, pvMax: number?)
+		local fracao = math.clamp(math.abs(valor) / math.max(pvMax or 20, 1), 0, 1)
+		local tamanho = math.floor(36 + 28 * math.min(1, fracao * 3))
 		local l = P.novo("TextLabel", item.saltos, {
-			Name = "Salto", AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0, 20), Size = UDim2.fromOffset(120, 40),
+			Name = "Salto", AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0, 20), Size = UDim2.fromOffset(160, tamanho + 8),
 			BackgroundTransparency = 1, Text = (if cura then "+" else "") .. tostring(math.abs(valor)),
-			FontFace = T.fontes.numero, TextSize = 34, TextColor3 = if cura then T.barras.cheia else Color3.fromRGB(255, 226, 170),
+			FontFace = T.fontes.numero, TextSize = tamanho, TextColor3 = if cura then T.barras.cheia else Color3.fromRGB(255, 226, 170),
 			TextStrokeColor3 = if cura then P.cor.trilho else T.barras.baixa:Lerp(P.cor.trilho, 0.55), TextStrokeTransparency = 0, ZIndex = 10,
 		})
-		local escala = P.novo("UIScale", l, { Scale = 0.4 })
-		P.animar(escala, { Scale = 1.15 }, TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out), "pop")
+		local escala = P.novo("UIScale", l, { Scale = 0.3 })
+		P.animar(escala, { Scale = 1.3 }, TweenInfo.new(0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out), "pop")
+		task.delay(0.16, function()
+			if l.Parent then P.animar(escala, { Scale = 1 }, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), "assenta") end
+		end)
 		P.animar(l, { Position = UDim2.new(0.5, (math.random() - 0.5) * 36, 0, -34) }, TweenInfo.new(DURACAO_SALTO, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), "sobe")
 		task.delay(0.55, function()
 			if l.Parent then
@@ -151,7 +157,7 @@ function Barras.start(state)
 							P.animar(escala, { Scale = 1 }, P.ENTRADA, "entrada")
 						end
 						if anterior and anterior ~= t.pv then
-							saltar(item, t.pv - anterior, t.pv > anterior)
+							saltar(item, t.pv - anterior, t.pv > anterior, t.pvMax)
 						end
 						local daVez = snap.combat.turnId == t.id
 						local mostrarNome = t.criatura or daVez or selecionado == t.id

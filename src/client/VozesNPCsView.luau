@@ -6,6 +6,7 @@ local Plano = require(RS.Shared.VozesNPCs)
 local Falas = require(RS.Shared.DublagemNPCs)
 local Protocol = require(RS.Shared.MesaProtocol)
 local Sonorizacao = require(script.Parent.Sonorizacao)
+local Feedback = require(script.Parent.FeedbackCombate) -- HAB8: a voz de dor espera o golpe encostar
 local View = {}
 function View.start(state)
 	local mem, fila, ativos, variantes = Plano.novo(), {}, {}, {}
@@ -59,7 +60,9 @@ function View.start(state)
 		while n < 2 and #fila > 0 and tentativas > 0 do
 			tentativas -= 1
 			local item = table.remove(fila, 1)
-			if not valido(item) or os.clock() - item.criado > 3.5 or Sonorizacao.volume() <= 0 then continue end
+			if not valido(item) or os.clock() - item.criado > 5.5 or Sonorizacao.volume() <= 0 then continue end
+			-- HAB8: PV ainda retido = o golpe não chegou; a fala volta para a fila (a retenção tem teto de 4 s)
+			if item.tokenId and Feedback.retido(item.tokenId) then table.insert(fila, item); continue end
 			local ocupado = false
 			for _, tocando in ativos do if tocando.tokenId == item.tokenId then ocupado = true; break end end
 			if ocupado then table.insert(fila, item); continue end
@@ -96,7 +99,8 @@ function View.start(state)
 		if ativo then adicionar(Plano.snapshot(mem, s)) end
 		despachar()
 	end)
-	state.onEfeito(function(r) adicionar(Plano.efeito(mem, state.snapshot(), r)); despachar() end)
+	-- HAB8: defer: a Coreografia/MagiasAgua registram a retenção do alvo neste mesmo evento
+	state.onEfeito(function(r) task.defer(function() if encerrado then return end adicionar(Plano.efeito(mem, state.snapshot(), r)); despachar() end) end)
 	state.onEncontro(function() limpar(); emCombate, ultimaVez = false, nil end)
 	local remoto = RS:WaitForChild(Protocol.REMOTE).OnClientEvent:Connect(function(tipo, d)
 		if tipo == "chefeEfeito" then adicionar(Plano.especial(mem, state.snapshot(), d)); despachar() end

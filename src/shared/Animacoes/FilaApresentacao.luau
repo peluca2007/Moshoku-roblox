@@ -18,6 +18,9 @@ Fila.IMPACTO_PADRAO = 0.4
 export type Retencao = { pvAntes: number, ate: number, provisoria: boolean? }
 -- Espera pelo recibo quando o PV cai sem retenção (snapshot antes do recibo).
 Fila.CARENCIA = 0.25
+-- HAB8: teto para quem avisa o contato com `soltar` (a cena sabe o instante exato, mesmo com câmera lenta e planos
+-- de câmera longos); o teto só vale se a cena morrer antes de avisar.
+Fila.TETO_COM_SINAL = 4.0
 
 function Fila.nova(seguranca: number?)
 	return setmetatable({
@@ -58,7 +61,8 @@ end
 
 -- Segura o PV de `id` em `pvAntes` até `agora + atraso` (limitado pela segurança). Sem `pvAntes`, usa o valor visto
 -- antes da última mudança (se recente) ou o atual. Retenções repetidas ficam com o maior prazo e o primeiro PV.
-function Fila:reter(id: string, agora: number, atraso: number, pvAntes: number?): Retencao?
+-- `teto` (opcional): limite próprio desta retenção (até Fila.TETO_COM_SINAL), para quem chamará `soltar` no contato.
+function Fila:reter(id: string, agora: number, atraso: number, pvAntes: number?, teto: number?): Retencao?
 	local v = self.vistos[id]
 	local antes = pvAntes
 	if antes == nil and v then
@@ -67,7 +71,8 @@ function Fila:reter(id: string, agora: number, atraso: number, pvAntes: number?)
 	if type(antes) ~= "number" then
 		return nil
 	end
-	local ate = agora + math.clamp(atraso, 0, self.seguranca)
+	local limite = if type(teto) == "number" then math.clamp(teto, 0, Fila.TETO_COM_SINAL) else self.seguranca
+	local ate = agora + math.clamp(atraso, 0, limite)
 	local r = self.retidos[id]
 	if r and r.provisoria then
 		r.ate, r.provisoria = ate, nil
@@ -78,6 +83,16 @@ function Fila:reter(id: string, agora: number, atraso: number, pvAntes: number?)
 		self.retidos[id] = r
 	end
 	return r
+end
+
+-- HAB8: o golpe encostou agora: a retenção de `id` vence já (o próximo `expirados` solta número e barra).
+function Fila:soltar(id: string, agora: number): boolean
+	local r = self.retidos[id]
+	if not r then
+		return false
+	end
+	r.ate = math.min(r.ate, agora)
+	return true
 end
 
 function Fila:retido(id: string, agora: number): boolean

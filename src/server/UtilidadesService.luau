@@ -302,6 +302,7 @@ function UtilidadesService.novo(ctx)
 						local n = U.dadosFurtivos(meu.furtivo, mec.primeiroGolpe == true)
 						local r = Combate.rolarDados(ctx.random, n .. "d6")
 						extra += r.total
+						efeito.furtivo = { dados = n, total = r.total, triplo = mec.primeiroGolpe == true } -- HAB8: destaque na tela
 						table.insert(notas, string.format("%s %dd6 (%d)", if mec.primeiroGolpe then "Primeiro Golpe: Dano Furtivo triplicado" else "Dano Furtivo", n, r.total))
 					end
 				end

@@ -1,3 +1,9 @@
+## Retorno de jogo e som das árvores — HAB8 (Claude + agente de QA, 17/11/2026)
+- `tools/testar.ps1`: 792 fontes, 0 erros; specs novos `DestaquesGolpe` 3/0, `FilaApresentacao` 8/0, `Maestrias` 10/0. Única falha: Catálogo, por ambiente (pasta do site `Moshoku tensei rpg` sem arquivos e com `.git` quebrado desde 09/11; não é do jogo).
+- Studio (agente de QA, `build/beleza/hab8/qa/`): Bola de Água (acerto, crítico e erro), Flecha (erro) e Impacto de Gelo: faixa "N de dano"/"errou" e número saem juntos no contato (~2,6 s), um número só. 19 SoundIds carregam (IsLoaded, TimeLength>0); Efeito_agua/gelo no acerto, no Escudo e na Névoa. `qa.py luta`: 29 ok.
+- Defeitos achados e corrigidos depois (ainda sem regravar): som de fogo no grito de toda magia (regressão desta tarefa), som dobrado das zonas, voz de dor do inimigo ~1 s antes do contato.
+- Não verificado: combo/furtivo/passivas na tela, Lâmina de Gelo, acerto da Flecha, áudio audível, celular. Notas do QA: Impacto de Gelo 5,5; Bola 5; Escudo 4,5; Flecha 4; Respingo 4; Névoa 3,5 (lava a tela inteira).
+
 ## Roda de ações pintada — RODA2 (agente implementador, 17/11/2026)
 
 Verificado no Studio: `qa.py luta` 29 ok; `roda_qa.py --video` 20 ok (base) + 15 ok: roda aberta pelo botão, custo por cunha, Golpear, Habilidades com a ficha que aprendeu a Água (Respingo, Bola de Água, Flecha de Água), lista colada à roda (≤14 px), custo com 16 px, Ações, teclas C/1/3, Andar fecha a roda e liga a mira. Capturas e vídeo (42 s) em `build/beleza/roda2/`. `testar.ps1`: só "Catálogo" falha (ambiente).

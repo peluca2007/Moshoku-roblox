@@ -10,7 +10,7 @@ local Protocol=require(game:GetService("ReplicatedStorage").Shared.MesaProtocol)
 local Feedback={}
 -- ANIM3: fila de apresentação única do cliente. A Coreografia registra `fila:reter` (PV até o marco `impacto`
 -- do atacante); BarrasLuta, BoardView e AnimacaoLuta mostram `Feedback.visto(token)` em vez do token cru. Ao vencer
--- o prazo, o número de dano sai aqui (uma vez) e `aoLiberar` avisa quem precisa redesenhar.
+-- o prazo (ou no `soltar` do contato), `aoLiberar` avisa quem redesenha; o número de dano é da BarrasLuta (HAB8).
 Feedback.fila=Fila.nova()
 local liberacoes={}
 function Feedback.aoLiberar(cb) table.insert(liberacoes,cb) end
@@ -58,8 +58,25 @@ function Feedback.start(state)
 			ativos[f]=t; t:Play()
 		end
 	end
+	-- HAB8: passiva que agiu (Roupa Leve +2 CA, Sem Recuo imune a Amedrontado): o servidor conta em avisoPassiva.n;
+	-- cada aumento vira um destaque sobre o token. O primeiro snapshot só registra (não repete avisos antigos).
+	local avisosVistos={}
+	local function avisos(s)
+		for _,t in s.tokens do
+			local a=t.avisoPassiva
+			if type(a)=="table" and type(a.n)=="number" then
+				local visto=avisosVistos[t.id]
+				avisosVistos[t.id]=a.n
+				if visto and a.n>visto and s.combat.active and not t.hidden and t.x and t.z then
+					local texto=string.upper(tostring(a.nome))..(if a.detalhe=="imune" then "  · IMUNE" elseif a.detalhe then "  "..tostring(a.detalhe) else "")
+					Efeitos.destaque(Protocol.cellCenter(t.x,t.z)+Vector3.new(0,6.5,0),texto,T.cores.sucesso,false)
+				end
+			end
+		end
+	end
 	state.onSnapshot(function(s)
 		ultimo=s
+		avisos(s)
 		emCombate=s.combat.active==true
 		local agora=os.clock()
 		for _,t in s.tokens do Feedback.fila:observar(t.id,t.pv,agora,if s.combat.active and not FX.reduzidos then Fila.CARENCIA else nil) end
@@ -70,15 +87,7 @@ function Feedback.start(state)
 	RunService.Heartbeat:Connect(function()
 		local vencidos=Feedback.fila:expirados(os.clock())
 		if #vencidos==0 then return end
-		for _,v in vencidos do
-			if v.pvReal and v.pvReal~=v.pvAntes and ultimo then
-				for _,t in ultimo.tokens do
-					if t.id==v.id and t.x and t.z and not t.hidden then
-						Efeitos.damageText(Protocol.cellCenter(t.x,t.z)+Vector3.new(0,5,0),v.pvReal-v.pvAntes)
-					end
-				end
-			end
-		end
+		-- HAB8: em luta o número sai só da BarrasLuta (salto grande no contato); aqui saía um segundo "-7" no mundo
 		if ultimo then aplicar(ultimo) end
 		for _,cb in liberacoes do task.spawn(cb,vencidos) end
 	end)

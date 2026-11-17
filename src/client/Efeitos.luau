@@ -98,6 +98,44 @@ function Efeitos.floatText(position: Vector3, text: string, color: Color3)
 	end)
 end
 
+-- HAB8: destaque de jogo sobre o alvo ("FURTIVO ×3 +11", "COMBO +4"): maior que o floatText, nasce grande e
+-- assenta (pop), sobe devagar e some. `forte` (triplo do Primeiro Golpe) fica maior e mais tempo.
+function Efeitos.destaque(position: Vector3, text: string, color: Color3, forte: boolean?)
+	if not folder then
+		return
+	end
+	local anchor = Instance.new("Part")
+	anchor.Anchored, anchor.CanCollide, anchor.CanQuery, anchor.Transparency = true, false, false, 1
+	anchor.Size = Vector3.one * 0.2
+	anchor.Position = position
+	anchor.Parent = folder
+	local gui = Instance.new("BillboardGui")
+	gui.Size = UDim2.fromOffset(if forte then 420 else 300, if forte then 72 else 54)
+	gui.AlwaysOnTop = true
+	gui.Adornee = anchor
+	gui.Parent = anchor
+	local l = label(gui, text, if forte then 50 else 36, color)
+	l.TextStrokeColor3 = Color3.fromRGB(20, 12, 8)
+	l.TextStrokeTransparency = 0
+	local escala = Instance.new("UIScale")
+	escala.Scale = 2.2
+	escala.Parent = l
+	TweenService:Create(escala, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+	local dur = if forte then 1.9 else 1.4
+	local start = os.clock()
+	local connection
+	connection = RunService.RenderStepped:Connect(function()
+		local t = math.min((os.clock() - start) / dur, 1)
+		gui.StudsOffset = Vector3.new(0, 1.5 + ease(t) * 2.5, 0)
+		local some = math.max(0, (t - 0.7) / 0.3)
+		l.TextTransparency, l.TextStrokeTransparency = some, some
+		if t >= 1 then
+			connection:Disconnect()
+			anchor:Destroy()
+		end
+	end)
+end
+
 -- Tremor de câmera (impactos). Na Visão da mesa o BoardView aplica
 -- Efeitos.tremorCFrame() à câmera; fora dela, usa o CameraOffset do avatar.
 local Curvas = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ImpactoCurvas"))

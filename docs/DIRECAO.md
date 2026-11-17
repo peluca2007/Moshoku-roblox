@@ -389,7 +389,11 @@ Pedido do Pedro: plano único juntando a direção acima e as melhorias que ele
 trouxe (área de testes, sons gratuitos, conferência de modelos do Blender).
 Estado de cada item fica em `TAREFAS.md`; aqui só a ordem e quem faz.
 
-**Modelos (Pedro, 14/11).** Alternar para não esgotar o limite de um só:
+**Modelos (Pedro, 17/11, substitui a regra de 14/11).** "Pode usar o
+melhor": trabalho visual (efeitos, câmera, animação, modelos 3D) vai para o
+modelo mais forte, e os assets são escolhidos pela maior qualidade gratuita.
+Haiku fica só com busca e documentação mecânica. Regra anterior, para
+histórico — **Modelos (Pedro, 14/11).** Alternar para não esgotar o limite de um só:
 Haiku (`economico`) em buscas, documentação e correções pequenas; Sonnet
 (`implementador`) no grosso de cada pacote delimitado; Opus em pacotes com
 várias responsabilidades, diagnóstico difícil e revisão de entrega alheia;

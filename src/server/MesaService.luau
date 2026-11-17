@@ -229,6 +229,7 @@ function MesaService.start(rng: Random?)
 			habilidades = if habilidades and (master or token.ownerUserId == player.UserId) then habilidades.habilidadesDe(token) else nil,
 			pactos = if habilidades and (master or token.ownerUserId == player.UserId) then habilidades.pactosDe(token) else nil,
 			estadosCombate = if stats and habilidades then habilidades.estadosDe(token) else nil,
+			avisoPassiva = if stats and habilidades and habilidades.avisoPassiva then habilidades.avisoPassiva(token) else nil, -- HAB8
 			criatura = if token.criatura then true else nil,
 			-- Família sonora cosmética apenas em fichas que passaram canSee.
 			vozNPC = if token.criatura then VozesNPCs.familia(token.criatura.catalogId) else nil,

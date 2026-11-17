@@ -15,6 +15,8 @@ local Efeitos = require(script.Parent:WaitForChild("Efeitos"))
 local FX = require(script.Parent:WaitForChild("MenuEfeitos"))
 local Protocol = require(Shared:WaitForChild("MesaProtocol"))
 local PlanosCamera = require(script.Parent:WaitForChild("PlanosCamera")) -- CAM1: planos de câmera por habilidade
+local Feedback = require(script.Parent:WaitForChild("FeedbackCombate")) -- HAB8: número/barra/faixa esperam o contato
+local Fila = require(Shared:WaitForChild("Animacoes"):WaitForChild("FilaApresentacao"))
 
 local MagiasAgua = {}
 
@@ -435,8 +437,21 @@ local function rota(ctx, recibo, alvo, afastar: number)
 end
 
 local function finalDoAcerto(ctx, cena, t: number, recibo, alvo, para: Vector3, de: Vector3, forca: number, molhar: boolean)
+	-- HAB8: PV, número de dano e "N de dano" da faixa ficam no valor de antes até o projétil encostar (relógio da cena,
+	-- que obedece à câmera lenta); o teto da fila cobre cena cancelada.
+	local ids = {}
+	if not FX.reduzidos then
+		for _, a in recibo.alvos or {} do
+			if type(a.id) == "string" then -- erros também: o "errou" da faixa espera a bola passar
+				table.insert(ids, a.id)
+				Feedback.fila:reter(a.id, os.clock(), t + 0.6, nil, Fila.TETO_COM_SINAL)
+			end
+		end
+	end
 	cena:em(t, function()
+		for _, id in ids do Feedback.fila:soltar(id, os.clock()) end
 		if alvo.acertou ~= false then
+			ctx.som(recibo, if molhar then "agua" else "gelo", 1.0) -- HAB8: o acerto também soa (antes só o lançamento)
 			ctx.recuo(alvo.id, de, forca)
 			if molhar then
 				auraMolhado(ctx, alvo.id, 4.2)

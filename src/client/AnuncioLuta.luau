@@ -10,6 +10,8 @@ local Execucao = require(Shared.Regras.Execucao)
 local Layout = require(Shared.Regras.LayoutLuta)
 local T = require(script.Parent.UI.Tema)
 local P = require(script.Parent.UI.PecasLuta)
+local Destaques = require(Shared.DestaquesGolpe)
+local Feedback = require(script.Parent.FeedbackCombate) -- HAB8: o resultado espera o contato, como o número de dano
 
 local Anuncio = {}
 
@@ -25,6 +27,8 @@ function Anuncio.resultado(alvos: { any }?): string
 	end
 	local texto = if dano > 0 then dano .. " de dano" elseif cura > 0 then "+" .. cura .. " PV" elseif errou then "errou" elseif resistiu then "resistiu" else ""
 	if critico and texto ~= "" then texto = "Crítico! " .. texto end
+	local extra = Destaques.prefixo(alvos) -- HAB8: "Furtivo ×3 · 18 de dano", "Combo · 9 de dano"
+	if extra ~= "" and dano > 0 then texto = extra .. " · " .. texto end
 	return texto
 end
 
@@ -79,6 +83,7 @@ function Anuncio.start(state)
 	posicionar()
 
 	local serial = 0
+	local esperando: { [string]: boolean }? = nil -- HAB8: alvos cujo contato libera o resultado
 	-- HUD3/4: a faixa "Dia N · faltam X dias / Sala" (ExpedicaoJogo.Faixa, topo central) esconde enquanto o nome do
 	-- golpe aparece e volta depois, só se estava visível antes (o dono dela, ExpedicaoView, continua mandando).
 	local faixaEscondida: GuiObject? = nil
@@ -100,6 +105,7 @@ function Anuncio.start(state)
 		end
 	end
 	local function ocultar(animado: boolean)
+		esperando = nil
 		serial += 1
 		local meu = serial
 		if not animado then
@@ -119,14 +125,36 @@ function Anuncio.start(state)
 		end)
 		task.delay(0.6, function() if gui.Parent and serial == meu then relogio(true) end end)
 	end
-	local function mostrar(nomeQuem: string, nomeHabilidade: string, detalhe: string, tom: string, duracao: number)
+	-- HAB8: "7 de dano" com pop; sai no contato do golpe (Feedback solta a retenção do alvo), não no recibo
+	local function revelarResultado()
+		if resultado.Text == "" then return end
+		resultado.Visible = true
+		escalaResultado.Scale = 1.6
+		P.animar(escalaResultado, { Scale = 1 }, TweenInfo.new(0.32, Enum.EasingStyle.Back, Enum.EasingDirection.Out), "escala")
+		P.animar(resultado, { TextTransparency = 0, TextStrokeTransparency = 0.15 }, P.SUAVE, "texto")
+		local meu = serial
+		task.delay(1.7, function()
+			if gui.Parent and serial == meu then ocultar(true) end
+		end)
+	end
+	Feedback.aoLiberar(function(vencidos)
+		if not esperando then return end
+		for _, v in vencidos do
+			if esperando[v.id] then
+				esperando = nil
+				revelarResultado()
+				return
+			end
+		end
+	end)
+	local function mostrar(nomeQuem: string, nomeHabilidade: string, detalhe: string, tom: string, duracao: number, adiado: boolean?)
 		serial += 1
 		local meu = serial
 		quem.Text, habilidade.Text, resultado.Text = string.upper(nomeQuem), nomeHabilidade, detalhe
 		resultado.TextColor3 = CORES[tom] or CORES.neutro
 		posicionar()
 		local topo0 = Layout.topo(workspace.CurrentCamera.ViewportSize.X)
-		anuncio.Visible, resultado.Visible = true, detalhe ~= ""
+		anuncio.Visible, resultado.Visible = true, detalhe ~= "" and not adiado
 		relogio(false)
 		-- entrada: o nome cresce com Back e desce 14 px; os fios abrem do centro para fora
 		for _, l in { quem, habilidade, resultado } do
@@ -148,11 +176,7 @@ function Anuncio.start(state)
 		local largura = math.clamp(topo.anuncio.w * 0.5 - #nomeHabilidade * 11 - 8, 0, 160)
 		P.animar(fioEsq, { Size = UDim2.fromOffset(largura, 2) }, entrada, "fio")
 		P.animar(fioDir, { Size = UDim2.fromOffset(largura, 2) }, entrada, "fio")
-		if detalhe ~= "" then
-			escalaResultado.Scale = 1.35
-			P.animar(escalaResultado, { Scale = 1 }, entrada, "escala")
-			P.animar(resultado, { TextTransparency = 0, TextStrokeTransparency = 0.15 }, P.SUAVE, "texto")
-		end
+		if detalhe ~= "" and not adiado then revelarResultado() end
 		task.delay(duracao, function()
 			if gui.Parent and serial == meu then ocultar(true) end
 		end)
@@ -172,7 +196,30 @@ function Anuncio.start(state)
 			or (r.habilidadeId == "criatura/ataque" and "Ataque") or "Ação"
 		local detalhe = Anuncio.resultado(r.alvos)
 		if detalhe == "" and type(r.resultado) == "string" then detalhe = r.resultado end
-		mostrar(quemUsa and quemUsa.name or "Alguém", nome, detalhe, Anuncio.tom(r.alvos), 2.8)
+		-- HAB8: com dano ou cura retidos até o contato, o resultado espera (a Coreografia registra a retenção no mesmo
+		-- quadro; task.defer garante que ela já existe). Teto: 4 s, como a fila.
+		esperando = nil
+		local alvosRetidos = {}
+		for _, a in r.alvos or {} do
+			if type(a.id) == "string" and a.id ~= r.casterId then alvosRetidos[a.id] = true end
+		end
+		local espera = next(alvosRetidos) ~= nil and Feedback.emCombate()
+		mostrar(quemUsa and quemUsa.name or "Alguém", nome, detalhe, Anuncio.tom(r.alvos), if espera then 6 else 2.8, espera)
+		if espera then
+			local meu = serial
+			task.defer(function()
+				local algum = false
+				for id in alvosRetidos do
+					if Feedback.retido(id) then algum = true end
+				end
+				if serial ~= meu then return end
+				if not algum then revelarResultado(); return end
+				esperando = alvosRetidos
+				task.delay(4, function()
+					if serial == meu and esperando == alvosRetidos then esperando = nil; revelarResultado() end
+				end)
+			end)
+		end
 	end)
 	return gui
 end

@@ -80,6 +80,10 @@ export type Efeito = {
 	doses: number?,
 	empurrar: number?,
 	notas: { string },
+	-- HAB8: destaques para a apresentação (sem efeito em regra): bônus de combo aplicado ao acerto e Dano Furtivo
+	-- (dados, total e se foi triplicado pelo Primeiro Golpe). Preenchidos por quem aplicou o bônus.
+	combo: number?,
+	furtivo: { dados: number, total: number, triplo: boolean }?,
 }
 
 -- Tipo da condição aplicada (a imunidade ao tipo impede a condição).
@@ -312,8 +316,10 @@ function Habilidades.resolver(rng: Combate.Rng, mec, conjurador: Conjurador, alv
 			bonus += alvo.bonusContraMarcado or 0
 			bonus += alvo.bonusDeAcerto or 0
 			bonus += conjurador.bonusAcertoJogo or 0
+			local combo = nil
 			if mec.bonusSeJaAcertou and conjurador.jaAcertou then
 				bonus += mec.bonusSeJaAcertou
+				combo = mec.bonusSeJaAcertou
 				table.insert(notas, string.format("Já acertou neste turno: +%d no acerto", mec.bonusSeJaAcertou))
 			end
 			local ataque = Combate.ataque(rng, bonus, ca, vantagem, desvantagem)
@@ -327,7 +333,7 @@ function Habilidades.resolver(rng: Combate.Rng, mec, conjurador: Conjurador, alv
 				ataque.acertou = true
 				table.insert(notas, "Contra alvo agarrado: qualquer resultado acerta")
 			end
-			local efeito: Efeito = { alvoId = alvo.id, ataque = ataque, notas = notas }
+			local efeito: Efeito = { alvoId = alvo.id, ataque = ataque, notas = notas, combo = combo }
 			-- Os disparos são independentes: errar o primeiro não cancela o segundo.
 			if mec.segundoDisparo then
 				efeito.danosDisparos = { 0, 0 }

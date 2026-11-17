@@ -56,9 +56,19 @@ local centroCasa = state.posicaoCasa or Protocol.cellCenter
 local tamanhoCasa = state.tamanhoCasa or Protocol.BOARD.cell
 local geracaoSonora = 0
 local geracoesDosRecibos = setmetatable({}, { __mode = "k" })
+local ultimoSomMontado: { [string]: number } = {}
 local function somDoRecibo(recibo, chave: string, duracao: number?)
 	-- Uma receita com task.delay não pode reabrir áudio depois do fim do combate.
-	if geracoesDosRecibos[recibo] == geracaoSonora then
+	-- HAB8: zonas da Água (escudo, névoa) nascem do snapshot com um recibo montado na hora, sem geração: tocam
+	-- (antes ficavam mudas); a trava de geração continua valendo para os recibos reais.
+	local geracao = geracoesDosRecibos[recibo]
+	if geracao == nil then
+		-- recibo montado (zona): o desenho pode nascer duas vezes no mesmo instante; um som só por chave a cada 0,3 s
+		local agora = os.clock()
+		if (ultimoSomMontado[chave] or -1) > agora - 0.3 then return end
+		ultimoSomMontado[chave] = agora
+		Sonorizacao.tocar(chave, duracao)
+	elseif geracao == geracaoSonora then
 		Sonorizacao.tocar(chave, duracao)
 	end
 end
@@ -266,7 +276,7 @@ local function circuloMagico(posicao: Vector3, cor: Color3, selo: string, duraca
 end
 
 -- Encantamento do livro sobre quem conjura, com a última linha gritada.
-local function encantamento(posicao: Vector3, textoCompleto: string?, cor: Color3)
+local function encantamento(posicao: Vector3, textoCompleto: string?, cor: Color3, recibo: any?)
 	if not textoCompleto then
 		return
 	end
@@ -314,7 +324,8 @@ local function encantamento(posicao: Vector3, textoCompleto: string?, cor: Color
 		end
 	end)
 	agendar(0.55, function()
-		somDoRecibo(recibo, "fogo")
+		-- HAB8: o estalo do grito era sempre "fogo"; só o fogo usa esse som (a Água já soa no lançamento e no acerto)
+		if string.find(tostring(recibo and recibo.habilidadeId), "/fogo/", 1, true) then somDoRecibo(recibo, "fogo") end
 		fala.TextTransparency = 0
 		fala.TextSize = 48
 		TweenService:Create(fala, TweenInfo.new(0.25, Enum.EasingStyle.Back), { TextSize = 32 }):Play()
@@ -432,9 +443,9 @@ end
 
 local function veredito(posicao: Vector3, alvo)
 	if alvo.critico then
-		Efeitos.floatText(posicao + Vector3.new(0, 4, 0), "CRÍTICO!", OURO)
+		Efeitos.destaque(posicao + Vector3.new(0, 4, 0), "CRÍTICO!", OURO, true) -- HAB8
 	elseif alvo.acertou == false then
-		Efeitos.floatText(posicao + Vector3.new(0, 4, 0), if alvo.natural == 1 then "FALHA" else "ERROU", Estilo.TINTA_SUAVE)
+		Efeitos.destaque(posicao + Vector3.new(0, 4, 0), if alvo.natural == 1 then "FALHA" else "ERROU", Estilo.TINTA_SUAVE, false)
 	elseif alvo.passou == true then
 		Efeitos.floatText(posicao + Vector3.new(0, 4, 0), "RESISTIU", Estilo.TINTA_SUAVE)
 	end
@@ -516,7 +527,8 @@ RECEITAS["ability/fogo/Principiante/bola-de-fogo"] = function(state, recibo)
 	TweenService:Create(esfera, TweenInfo.new(0.75, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = Vector3.one * 3.2 }):Play()
 	TweenService:Create(nucleo, TweenInfo.new(0.75, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = Vector3.one * 1.8 }):Play()
 	agendar(0.8, function()
-		somDoRecibo(recibo, "fogo")
+		-- HAB8: o estalo do grito era sempre "fogo"; só o fogo usa esse som (a Água já soa no lançamento e no acerto)
+		if string.find(tostring(recibo and recibo.habilidadeId), "/fogo/", 1, true) then somDoRecibo(recibo, "fogo") end
 		suga.Enabled = false
 		nucleo:Destroy()
 		rastro(esfera, FOGO, 3)
@@ -823,7 +835,7 @@ end
 			local posicao = posicaoDe(state, recibo.casterId, recibo.origem)
 			local alvo = recibo.alvos[1] and posicaoDe(state, recibo.alvos[1].id)
 			if RECEITAS[id] then circuloMagico(posicao, identidade.cor, if identidade.selo ~= "" then identidade.selo else Estilo.ESTRELA, 1.3) end
-			encantamento(posicao, recibo.encantamento, identidade.cor)
+			encantamento(posicao, recibo.encantamento, identidade.cor, recibo)
 			gesto(state, recibo.casterId, alvo)
 		end
 		falarDoEfeito(state, recibo)

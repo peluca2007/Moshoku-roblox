@@ -547,6 +547,7 @@ function MagiasAgua.criar(ctx)
 		local mao, destino, dir, falha, para = rota(ctx, recibo, alvo, 8)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 46, 0.3, 0.75)
+		if ctx.camera and not falha then ctx.camera(mao, destino, 0.85 + voo, { escala = 1.1, altura = 0.5 }) end -- câmera segue até o acerto
 		local tSolta = 0.85
 		local direita, cima = eixos(dir)
 		local lado = direita * 0.9

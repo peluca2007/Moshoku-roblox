@@ -699,6 +699,8 @@ local ctxAgua = {
 	end,
 	veredito = veredito,
 	som = somDoRecibo,
+	-- HAB1d: câmera de luta acompanha o projétil e fecha no acerto (ImpactoCamera)
+	camera = function(de, para, impacto, opc) require(script.Parent:WaitForChild("ImpactoCamera")).golpe(de, para, impacto, opc) end,
 }
 for id, receita in MagiasAgua.criar(ctxAgua) do
 	RECEITAS[id] = receita

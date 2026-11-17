@@ -726,6 +726,7 @@ function BoardView.start(state)
 	local blendFrom: CFrame? = nil
 	local blendStart = 0
 	local combateAnterior = false
+	local camSuave: CFrame? = nil -- IMP7: câmera de luta suavizada (sem teleportes entre enquadramentos)
 	local vezAnterior = nil
 	local saltar = true -- primeiro quadro do combate: sem transição do foco
 	local PASSO_GIRO = math.rad(45)
@@ -966,10 +967,22 @@ function BoardView.start(state)
 		-- Transição suave da câmera do avatar para a Visão da mesa.
 		local t = if blendFrom then (os.clock() - blendStart) / CAMERA_BLEND else 1
 		if blendFrom and t < 1 then
+			camSuave = target
 			camera.CFrame = blendFrom:Lerp(target, ease(t)) * Efeitos.tremorCFrame()
 		else
 			blendFrom = nil
-			camera.CFrame = target * Efeitos.tremorCFrame()
+			-- IMP7: filtro exponencial em posição e direção; absorve trocas de enquadramento (golpe, oclusão, hit-stop)
+			if snapAtual and snapAtual.combat.active and camSuave and not saltar then
+				local f = 1 - math.exp(-dt * 7)
+				-- velocidade limitada: no máximo ~110 graus/s e 30 studs/s, mesmo que o enquadramento troque de uma vez
+				local giro = math.acos(math.clamp(camSuave.LookVector:Dot(target.LookVector), -1, 1))
+				local desl = (target.Position - camSuave.Position).Magnitude
+				local teto = math.min(1, math.rad(110) * dt / math.max(giro * f, 1e-4), 30 * dt / math.max(desl * f, 1e-4))
+				camSuave = camSuave:Lerp(target, f * teto)
+			else
+				camSuave = target
+			end
+			camera.CFrame = camSuave * Efeitos.tremorCFrame()
 		end
 	end)
 

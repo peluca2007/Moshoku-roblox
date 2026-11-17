@@ -12,6 +12,7 @@ ident, nome = sys.argv[1], sys.argv[2]
 escala = sys.argv[3] if len(sys.argv) > 3 and not sys.argv[3].startswith("--") else "6"
 crit = "--crit" in sys.argv
 longe = "--longe" in sys.argv
+camera = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--camera=")), None)  # grava a série da câmera (csv) e reprova se houver salto
 video = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--video=")), None)
 q = Qa()
 q.cenario = "hab_real"
@@ -52,6 +53,24 @@ def disparar():
 r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},alvos={{id='%s',acertou=true,critico=%s,dano=6}}}) end return 'enviado'""" % (ident, hid, aid, "true" if crit else "false"))
 
 
+if camera:
+    q.lua_cliente("""local RS=game:GetService('RunService') shared.CamSerie={} local t0=os.clock()
+shared.CamCon=RS.Heartbeat:Connect(function() local c=workspace.CurrentCamera local p,l=c.CFrame.Position,c.CFrame.LookVector
+table.insert(shared.CamSerie,string.format('%.4f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f',os.clock()-t0,p.X,p.Y,p.Z,l.X,l.Y,l.Z)) end) return 'gravando'""")
+    disparar()
+    time.sleep(7 * max(float(escala), 1.0))
+    # a série vem em pedaços (limite de resposta)
+    n = int(q.lua_cliente("shared.CamCon:Disconnect() return tostring(#shared.CamSerie)"))
+    linhas = []
+    for i in range(1, n + 1, 150):
+        linhas += q.lua_cliente("local o={} for i=%d,math.min(%d,#shared.CamSerie) do table.insert(o,shared.CamSerie[i]) end return table.concat(o,';')" % (i, i + 149)).split(";")
+    with open(camera, "w", encoding="utf-8") as f:
+        f.write("t,x,y,z,lx,ly,lz" + chr(10) + chr(10).join(linhas) + chr(10))
+    from camera_saltos import ler, relatorio
+    ok = relatorio(ler(camera), rotulo=ident.split("/")[-1])
+    q.lua_cliente("workspace:SetAttribute('EscalaDeTempoDasCenas', nil) workspace:SetAttribute('QaCritico', nil) return 'ok'")
+    q.c.close()
+    sys.exit(0 if ok else 1)
 if video:
     from gravar import Gravador
     dur = 12 if escala != "1" else 6

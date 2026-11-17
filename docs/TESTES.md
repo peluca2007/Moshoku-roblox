@@ -1489,3 +1489,12 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Oclusão: `ImpactoCamera.desocluir` (raycast só contra os lutadores + caixa do corpo; gira/sobe a câmera até as duas linhas ficarem livres), aplicada à câmera do golpe e à câmera base de luta (gancho em `BoardView`). Nos vídeos o bloco marrom que tampava a tela sumiu; a câmera mostra os dois lutadores.
 - Água: Neon branco e brilho trocados por plástico liso e cores com tom de água; a flecha aparece azul (antes mancha branca com o Bloom).
 - Não feito/não provado: usar o Corte de Braço pelo caminho normal (aprender só fora de combate e o personagem de QA é Ladino; segue injetado por recibo visual), reação ReacaoGolpe do alvo nítida e som do corte/arma caindo, câmera do golpe na flecha de água (fica no atirador; o impacto no goblin não aparece na janela de 6 s do vídeo).
+
+## HAB1d — continuidade da câmera (16/11/2026, Studio por MCP)
+
+- Medição: `hab_luta_real.py <habilidade> <nome> 1 [--longe] --camera=arquivo.csv` grava a CurrentCamera por quadro; `tools/qa/camera_saltos.py arquivo.csv` lista os picos e REPROVA acima de 45 studs/s ou 260 graus/s (sobre atualizações reais da câmera). Séries em `build/beleza/hab1/camera_{antes,depois}_{corte,flecha}.csv`.
+- Achado principal: **o render do Studio na luta roda a ~15 fps** (RenderStepped medido: 14,9) mesmo parado; a câmera só atualiza a cada ~0,067 s. Esse é o principal motivo de "travada/teleportando" nas gravações; o que é lógica de câmera foi suavizado, mas o fps precisa de investigação separada (cenário do esgoto/luz/partículas).
+- Antes (Corte de Braço): maior giro por atualização 13,2 graus (196 graus/s) no início do golpe e 10,0 graus perto do contato. Depois: filtro exponencial com limite de velocidade (110 graus/s, 30 studs/s) em `BoardView` para a câmera de luta: maior giro 7,4 graus (110 graus/s), 8,8 studs/s: sem saltos acima do limite.
+- Flecha de água: antes a câmera ficava parada (0,00 studs) e não mostrava o acerto; agora `MagiasAgua` chama `ImpactoCamera.golpe` (via ctx.camera) e a câmera acompanha até o alvo (5,4 studs/s). Vídeo `flecha_de_agua.mp4` mostra a flecha, o respingo e o alvo Molhado.
+- Vídeos novos: `corte_braco.mp4`, `corte_braco_lento.mp4`, `flecha_de_agua.mp4`.
+- Não feito: reação visível do alvo e som do corte/arma caindo; os vídeos mostram o aviso "Sem Ação para mover" (a luta do QA já gastou as ações; o recibo é só visual).

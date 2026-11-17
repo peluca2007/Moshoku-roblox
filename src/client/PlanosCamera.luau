@@ -40,6 +40,12 @@ M.PLANOS = {
 		{ t = 0, f = "para", ang = -28, dist = 5.5, alt = 0.9 }, -- contato em câmera lenta (assinatura)
 		{ t = 0.9, f = "para", ang = -14, dist = 7, alt = 1.2 },
 	} },
+	["impacto-de-gelo"] = { tomadas = { -- HAB8: antes sem plano (câmera longe, alvo pequeno)
+		{ t = -1.0, f = "de", ang = 45, dist = 7.5, alt = 1.2 }, -- aponta e fecha a mão
+		{ t = -0.35, f = "proj", ang = 30, dist = 8, alt = 1.4 }, -- segue o estilhaço
+		{ t = 0, f = "para", ang = -25, dist = 6.5, alt = 0.6, mira = 0.4 }, -- baixo: os cristais crescem para cima do quadro
+		{ t = 0.6, f = "para", ang = -12, dist = 8.5, alt = 1.4 },
+	} },
 	["lamina-de-gelo"] = { tomadas = {
 		-- em si (sem alvo): o eixo é o da câmera da luta; ang negativo vai para a frente do conjurador
 		{ t = -0.7, f = "de", ang = 20, dist = 8, alt = 1.2 },
@@ -49,8 +55,8 @@ M.PLANOS = {
 	["escudo-de-agua"] = { zona = true, tomadas = {
 		-- `de` = lado dos aliados, `para` = o muro (o chamador passa os pontos): 3/4 pela face, recuando e subindo
 		{ t = 0, f = "para", ang = 62, dist = 11, alt = 1.2 },
-		{ t = 1.0, f = "para", ang = 40, dist = 14, alt = 2.8 },
-		{ t = 2.4, f = "para", ang = 22, dist = 17, alt = 4 },
+		{ t = 1.0, f = "para", ang = 30, dist = 14, alt = 3.5 },
+		{ t = 2.4, f = "para", ang = 6, dist = 16, alt = 7 }, -- HAB8: termina alto e de lado (aliados, muro e inimigos); antes ficava atrás do muro
 	} },
 	["nevoa-densa"] = { zona = true, tomadas = {
 		{ t = 0, f = "para", ang = 50, dist = 18, alt = 6 },

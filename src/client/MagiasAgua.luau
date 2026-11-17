@@ -194,6 +194,7 @@ function Cena:gotas(t0: number, centro: Vector3, n: number, vel: number, subida:
 			if y < chao then y = chao end
 			g.CFrame = CFrame.new(x, y, z) * giro * CFrame.Angles(spin.X * t, spin.Y * t, spin.Z * t)
 			g.Transparency = if u < 0.55 then 0.15 elseif u >= 1 then 1 else 0.15 + 0.85 * (u - 0.55) / 0.45
+
 			g.Size = Vector3.one * d * (if u > 0.7 then 1 - (u - 0.7) * 1.8 else 1)
 		end)
 	end
@@ -224,6 +225,20 @@ function Cena:iniciar()
 			e.TimeScale = math.max(self.taxa / math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1), 0.02)
 		end
 		-- Índices numéricos: eventos e animações novas nascem durante o laço.
+		-- HAB8: peça pequena colada na lente (gota, bolha, estilhaço) vira borrão que tapa a tela: some só para a câmera
+		-- (LocalTransparencyModifier não briga com as animações de Transparency)
+		local cam = workspace.CurrentCamera
+		if cam then
+			local olho = cam.CFrame.Position
+			for _, o in self.lixo do
+				if o:IsA("BasePart") and o.Parent then
+					local tam = o.Size
+					if math.max(tam.X, tam.Y, tam.Z) < 4 then
+						o.LocalTransparencyModifier = if (o.Position - olho).Magnitude < 3.5 then 1 else 0
+					end
+				end
+			end
+		end
 		local i = 1
 		while i <= #self.eventos do
 			local ev = self.eventos[i]
@@ -292,7 +307,8 @@ local function respingo(cena, t: number, ponto: Vector3, escala: number, critico
 			poca.Size = Vector3.new(0.1, d, d)
 			poca.Transparency = 0.6 + 0.4 * math.max((u - 0.2) / 0.8, 0)
 		end)
-		cena:gotas(t, ponto, qtd(16 * escala, critico), 7 * escala + 3, 11 * escala + 4, 0.34 * escala + 0.1, if gelo then GELO else AGUA, 0.9, gelo)
+		-- HAB8: gotas menores e de alcance curto (eram bolhas de até 1,4 stud a 13 studs/s que chegavam na câmera)
+		cena:gotas(t, ponto, qtd(12 * escala, critico), 3.5 * escala + 2, 6 * escala + 3, 0.18 * escala + 0.08, if gelo then GELO else AGUA, 0.75, gelo)
 		local suporte = cena:peca({ Size = Vector3.one * 0.2, Position = ponto, Transparency = 1 })
 		local br = cena:emissor(suporte, "brilho", if gelo then BRILHO else AGUA, {
 			Speed = NumberRange.new(6 * escala, 12 * escala), Lifetime = NumberRange.new(0.4, 0.9),
@@ -421,9 +437,24 @@ local function alvoDe(recibo)
 end
 
 -- Ponto de saída (mão), de chegada e direção para o primeiro alvo; errar passa ao lado e cai no chão.
+-- HAB8: frente do corpo real do alvo (CorposDeCriatura), como a Coreografia faz nos golpes: a casa do tabuleiro
+-- pode não coincidir com o modelo e a bola estourava no meio do caminho. nil se não há corpo.
+local function frenteDoCorpo(id: string?, de: Vector3): Vector3?
+	local corpos = workspace:FindFirstChild("CorposDeCriatura")
+	local m = id and corpos and corpos:FindFirstChild(id)
+	if not (m and m:IsA("Model")) then return nil end
+	local cf, tam = m:GetBoundingBox()
+	local centro = cf.Position + Vector3.new(0, tam.Y * 0.05, 0)
+	local plano = Vector3.new(centro.X - de.X, 0, centro.Z - de.Z)
+	if plano.Magnitude < 1e-3 then return centro end
+	return centro - plano.Unit * math.min(tam.X, tam.Z) * 0.35
+end
+
+-- HAB8: no erro, quem chama a câmera passa `para` (o alvo), não `destino` (o chão além dele): a tomada de contato
+-- descia ao rés do chão e mostrava o piso escuro.
 local function rota(ctx, recibo, alvo, afastar: number)
 	local casterPos = ctx.posicaoDe(recibo.casterId, recibo.origem)
-	local para = ctx.posicaoDe(alvo.id)
+	local para = frenteDoCorpo(alvo.id, casterPos) or ctx.posicaoDe(alvo.id)
 	local mao = ctx.aFrente(casterPos, para, 1.7) + Vector3.new(0, 0.5, 0)
 	local falha = alvo.acertou == false
 	local destino = para
@@ -502,13 +533,22 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 	local BORDA = Color3.fromRGB(206, 240, 232)
 	cena:em(t0, function()
 		local segs = {}
+		-- HAB8: cada bloco tem a largura da corda da curva entre suas bordas (+3%), sem a sobreposição de 18% que fazia
+		-- faixas escuras; `arco` = distância ao longo do muro, para a textura continuar de um bloco para o outro
+		local function naCurva(s: number): Vector3
+			return base + lateral * (s * larg / 2) + normal * (curva * (1 - s * s))
+		end
+		local arco = 0
 		for i = 1, N do
 			local s = ((i - 0.5) / N) * 2 - 1
-			local pos = base + lateral * (s * larg / 2) + normal * (curva * (1 - s * s))
+			local pos = naCurva(s)
 			local tang = (lateral * (larg / 2) + normal * (-2 * curva * s)).Unit
 			local face = tang:Cross(Vector3.yAxis)
 			if face:Dot(normal) < 0 then face = -face end
-			local w = larg / N * 1.18
+			local corda = (naCurva((i / N) * 2 - 1) - naCurva(((i - 1) / N) * 2 - 1)).Magnitude
+			local w = corda * 1.03
+			local arcoMeio = arco + corda / 2
+			arco += corda
 			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.78, Material = Enum.Material.SmoothPlastic })
 			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.25), Color = AZUL_SUP, Transparency = 0.8, Material = Enum.Material.SmoothPlastic })
 			local tex = {}
@@ -540,7 +580,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.1) }),
 				EmissionDirection = Enum.NormalId.Top,
 			})
-			segs[i] = { pos = pos, face = face, tang = tang, w = w, reflexo = reflexo, fita = fita, nucleo = nucleo, sup = sup, tex = tex, espuma = espuma, fonte = fonte, gotas = gotas, borrifo = borrifo }
+			segs[i] = { arco = arcoMeio, pos = pos, face = face, tang = tang, w = w, reflexo = reflexo, fita = fita, nucleo = nucleo, sup = sup, tex = tex, espuma = espuma, fonte = fonte, gotas = gotas, borrifo = borrifo }
 		end
 		for i = 1, N, 2 do
 			respingo(cena, cena.T + 0.02 + i * 0.03, segs[i].pos, 0.8)
@@ -560,15 +600,17 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				ki = 1 - (1 - ki) ^ 3
 				if sumindo then ki = 1 - math.clamp((cena.T - estado.tFim - i * 0.03) / 0.55, 0, 1) end
 				local h = math.max(alto * ki, 0.05)
-				local onda = math.sin(cena.T * 2.2 + i * 0.9) * 0.18
+				local onda = math.sin(cena.T * 2.2 + g.arco * 0.35) * 0.18 -- HAB8: fase pelo arco (contínua), não pelo índice
 				local cf = CFrame.lookAt(g.pos + Vector3.new(0, h / 2, 0), g.pos + Vector3.new(0, h / 2, 0) + g.face)
 				g.nucleo.Size = Vector3.new(g.nucleo.Size.X, h, espessura + onda * 0.3)
 				g.nucleo.CFrame = cf
-				g.nucleo.Transparency = 0.78 + 0.04 * math.sin(cena.T * 2.6 + i)
+				g.nucleo.Transparency = 0.78 + 0.04 * math.sin(cena.T * 2.6) -- HAB8: igual em todos (fase por bloco fazia listras)
 				g.sup.Size = Vector3.new(g.sup.Size.X, h, espessura + 0.25 + onda * 0.3)
 				g.sup.CFrame = cf
 				g.tex[1].OffsetStudsV, g.tex[2].OffsetStudsV = -cena.T * 2.6, -cena.T * 2.0 -- correnteza descendo
-				g.tex[1].OffsetStudsU, g.tex[2].OffsetStudsU = math.sin(cena.T * 0.8 + i) * 0.8, -cena.T * 0.5
+				-- HAB8: a textura continua entre blocos: o deslocamento U começa onde o bloco começa no arco do muro
+				local u0 = g.arco - g.w / 2
+				g.tex[1].OffsetStudsU, g.tex[2].OffsetStudsU = -u0 + math.sin(cena.T * 0.8) * 0.8, -u0 - cena.T * 0.5
 				local topo = g.pos + Vector3.new(0, h + 0.05 + onda * 0.5, 0)
 				g.espuma.CFrame = CFrame.lookAt(topo, topo + g.face)
 				g.espuma.Size = Vector3.new(g.espuma.Size.X, 0.3 + 0.12 * math.sin(cena.T * 4 + i * 1.7), espessura + 0.3)
@@ -620,25 +662,48 @@ local function zonaNevoa(ctx, muro, t0: number)
 	cena:em(t0, function()
 		-- HAB5: mais densa rente ao chão (até a cintura), com rolos rasteiros em movimento; acima, só um véu leve
 		-- (os lutadores aparecem da cintura para cima como silhuetas) e sem lavar o cenário inteiro.
+		-- HAB8: partículas nascem espalhadas no volume da peça (rente ao chão) e mal sobem; antes jorravam de um ponto
+		-- a 70 graus e chegavam à altura da câmera, lavando a tela de branco nas rodadas seguintes
+		local opacos = {}
 		local function emissorNevoa(pai, tam0, tam1, transp0, vida, vel)
 			local e = cena:emissor(pai, "fumaca", cinza, {
-				Rate = 0, Speed = NumberRange.new(vel * 0.4, vel), SpreadAngle = Vector2.new(70, 70),
+				Rate = 0, Speed = NumberRange.new(vel * 0.2, vel * 0.5), SpreadAngle = Vector2.new(180, 0),
+				Shape = Enum.ParticleEmitterShape.Box, ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume,
+				Acceleration = Vector3.new(0, -0.15, 0),
 				Lifetime = NumberRange.new(vida * 0.7, vida), Drag = 0.6, Rotation = NumberRange.new(0, 360), RotSpeed = NumberRange.new(-6, 6),
 				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, tam0), NumberSequenceKeypoint.new(1, tam1) }),
 				Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, transp0), NumberSequenceKeypoint.new(0.7, transp0 + 0.04), NumberSequenceKeypoint.new(1, 1) }),
 				LightEmission = 0, LightInfluence = 1,
 			})
 			e.Color = ColorSequence.new(cinza, Color3.fromRGB(185, 200, 208))
+			table.insert(opacos, { e = e, base = transp0 })
 			return e
 		end
-		local rasteira = cena:peca({ Size = Vector3.new(raio * 1.8, 0.6, raio * 1.8), Position = Vector3.new(c.X, chaoY + 0.4, c.Z), Transparency = 1 })
-		local fumo = emissorNevoa(rasteira, 5, 8, 0.55, 5, 0.8)
-		local alta = cena:peca({ Size = Vector3.new(raio * 1.6, 1, raio * 1.6), Position = Vector3.new(c.X, chaoY + 3.2, c.Z), Transparency = 1 })
-		local veu = emissorNevoa(alta, 6, 10, 0.93, 5, 0.5)
+		local rasteira = cena:peca({ Size = Vector3.new(raio * 1.8, 0.6, raio * 1.8), Position = Vector3.new(c.X, chaoY + 0.5, c.Z), Transparency = 1 })
+		local fumo = emissorNevoa(rasteira, 3.5, 5.5, 0.5, 5, 0.8)
+		local alta = cena:peca({ Size = Vector3.new(raio * 1.6, 1, raio * 1.6), Position = Vector3.new(c.X, chaoY + 2.6, c.Z), Transparency = 1 })
+		local veu = emissorNevoa(alta, 5, 7, 0.94, 5, 0.5)
+		-- HAB8: câmera dentro da névoa (a da luta costuma ficar a ~3 studs do chão, dentro da área): a opacidade de TODAS
+		-- as partículas vivas cai na hora (Transparency do emissor vale para as já emitidas); fora dela, volta.
+		local fatorAtual = 1
+		local function ajustarPelaCamera()
+			local cam = workspace.CurrentCamera
+			if not cam then return end
+			local p = cam.CFrame.Position
+			local dh = Vector2.new(p.X - c.X, p.Z - c.Z).Magnitude
+			local dentro = math.clamp((raio * 1.15 - dh) / (raio * 0.35), 0, 1) * math.clamp((chaoY + 7 - p.Y) / 3, 0, 1)
+			local fator = 1 - 0.75 * dentro
+			if math.abs(fator - fatorAtual) < 0.04 then return end
+			fatorAtual = fator
+			for _, o in opacos do
+				local tr = 1 - (1 - o.base) * fator
+				o.e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, tr), NumberSequenceKeypoint.new(0.7, math.min(1, tr + 0.04)), NumberSequenceKeypoint.new(1, 1) })
+			end
+		end
 		local rolos = {}
 		for i = 1, 3 do
 			local pr = cena:peca({ Size = Vector3.new(raio * 0.7, 0.5, raio * 0.7), Position = Vector3.new(c.X, chaoY + 0.3, c.Z), Transparency = 1 })
-			rolos[i] = { parte = pr, em = emissorNevoa(pr, 4, 7, 0.5, 3.2, 1.6) }
+			rolos[i] = { parte = pr, em = emissorNevoa(pr, 3, 5, 0.5, 3.2, 1.6) }
 		end
 		ctx.som({ habilidadeId = "ability/agua/Principiante/nevoa-densa" }, "agua", 0.8)
 		if ctx.camera then ctx.camera(Vector3.new(c.X, chaoY + 2, c.Z), Vector3.new(c.X, chaoY + 2, c.Z), 0, PlanosCamera.opc("nevoa-densa", true)) end -- CAM1: sobe e mostra a área
@@ -646,7 +711,8 @@ local function zonaNevoa(ctx, muro, t0: number)
 			local t = cena.T - t0
 			local k = math.clamp(t / 2, 0, 1)
 			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 1.4, 0, 1) end
-			fumo.Rate = (if FX.reduzidos then 14 else 50) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
+			ajustarPelaCamera()
+			fumo.Rate = (if FX.reduzidos then 14 else 60) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
 			veu.Rate = (if FX.reduzidos then 2 else 6) * k
 			for i, r in rolos do
 				local ang = cena.T * (0.35 + i * 0.1) + i * 2.1
@@ -694,7 +760,7 @@ function MagiasAgua.criar(ctx)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 40, 0.22, 0.45)
 		local t0 = 0.4
-		if ctx.camera then ctx.camera(mao, destino, t0 + voo, PlanosCamera.opc("respingo")) end -- CAM1: plano próprio (HAB6: mostra o acerto, mesmo de longe)
+		if ctx.camera then ctx.camera(mao, if falha then para else destino, t0 + voo, PlanosCamera.opc("respingo")) end -- CAM1: plano próprio (HAB6: mostra o acerto, mesmo de longe)
 		orbeNaMao(cena, 0.05, t0, mao, dir, 1.5, 5)
 		local n = if FX.reduzidos then 4 else 9
 		local direita, cima = eixos(dir)
@@ -735,7 +801,7 @@ function MagiasAgua.criar(ctx)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 28, 0.35, 0.8)
 		local t0 = 0.85
-		if ctx.camera then ctx.camera(mao, destino, t0 + voo, PlanosCamera.opc("bola-de-agua")) end -- CAM1
+		if ctx.camera then ctx.camera(mao, if falha then para else destino, t0 + voo, PlanosCamera.opc("bola-de-agua")) end -- CAM1
 		orbeNaMao(cena, 0.05, t0, mao, dir, 3.2, 5)
 		local esfera, nucleo
 		local direita, cima = eixos(dir)
@@ -788,7 +854,7 @@ function MagiasAgua.criar(ctx)
 		local mao, destino, dir, falha, para = rota(ctx, recibo, alvo, 8)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 46, 0.3, 0.75)
-		if ctx.camera then ctx.camera(mao, destino, 0.85 + voo, PlanosCamera.opc("flecha-de-agua")) end -- CAM1: segue a flecha até o acerto
+		if ctx.camera then ctx.camera(mao, if falha then para else destino, 0.85 + voo, PlanosCamera.opc("flecha-de-agua")) end -- CAM1: segue a flecha até o acerto
 		local tSolta = 0.85
 		local direita, cima = eixos(dir)
 		local lado = direita * 0.9
@@ -926,6 +992,7 @@ function MagiasAgua.criar(ctx)
 		end
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 40, 0.28, 0.6)
 		local t0 = 0.75
+		if ctx.camera then ctx.camera(mao, if falha then para else destino, t0 + voo + 0.2, PlanosCamera.opc("impacto-de-gelo")) end -- HAB8: plano próprio; o contato é o cristal crescendo
 		local direita, cima = eixos(dir)
 		orbeNaMao(cena, 0.05, t0, mao, dir, 1.6, 6, true)
 		local cacos = {}
@@ -1021,7 +1088,7 @@ function MagiasAgua.criar(ctx)
 		end)
 		respingo(cena, tHit, destino, 1.1, alvo and alvo.critico, true)
 		if alvo then
-			finalDoAcerto(ctx, cena, tHit, recibo, alvo, para, mao, 0.8, false)
+			finalDoAcerto(ctx, cena, tHit + 0.2, recibo, alvo, para, mao, 0.8, false) -- HAB8: número junto com os cristais (+0,2 s), não antes
 		end
 		cena.fimT = math.max(cena.fimT, tHit + 1.6)
 		cena:iniciar()

@@ -1424,6 +1424,12 @@ Enviados 19 módulos em malha (8 cabelos, 3 barbas, 2 orelhas, capuz, capa, cint
 - Correção de legibilidade: luz-chave SpotLight quente (brilho 6 estourava o avatar; 2 resolve) + bloom limiar 2,6/intensidade 0,3 no perfil do esgoto + teto mais claro. `qa.py esgoto_sala1` 20 ok e `qa.py luta` 29 ok; capturas `build/beleza/esgoto3/luta_geral.png` e `luta_golpe.png` (+ `build/beleza/impacto/c7_*`).
 - Não verificado: FPS/celular.
 
+## PERF1 — fps da luta no esgoto (16/11/2026, Studio por MCP)
+- Medida: `python tools/qa/fps.py <rótulo> <s>` (RenderStepped médio e p5; foca a janela antes e refaz se der <25 fps). Sem foco, o Studio limita a ~15 fps (qualquer cena, até olhando só o céu); com `studio_janela.ps1 -Foco` dá 60.
+- Luta no esgoto com foco: 60,0 fps médio, p5 55,7 (8504 partes no workspace, 91 luzes, 5 com sombra, 59 emissores). Cortando em sequência sombras, partículas, efeitos do Lighting, luzes e o cenário do esgoto: 60,2 / 60,2 / 60,0 / 60,0 / 60,0 / 60,0, ou seja, o teto de 60 fps do Studio esconde qualquer ganho; nada foi cortado.
+- Como medir certo: Play, janela do Studio em primeiro plano (sem outra janela tomando o foco e sem gravação de tela), 10 s de RenderStepped, e conferir que o fps não é ~15.
+- Não verificado: fps na RX 7600 do dono, celular, e o "travamento" da câmera (não é fps do cenário).
+
 ## ANIM3b (16/11/2026)
 
 - Mescla da ANIM3 no branch; corpo oficial Man. `qa.py esgoto_sala1` (20 ok) e `qa.py luta` (29 ok) rodados duas vezes cada, sem falhas; `anim_quadros.py` (CorteLeve, CortePesado, Estocada, DisparoArco, ReacaoGolpe, Vitoria) gerou `build/beleza/anim/prancha.jpg`.

@@ -1,3 +1,8 @@
+## Roda de ações na luta — RODA1 (agente implementador, 17/11/2026)
+
+Verificado no Studio (Play, cliques e teclas reais): `python tools/qa/qa.py esgoto_sala1 --manter-play` (20 ok) e `python tools/qa/roda_qa.py --sem-base [--video]` (12 ok): roda fechada com gatilho e Encerrar; botão Roda abre; custo em cada fatia; Golpear lista o ataque básico; Habilidades apagada ("Nenhum") para o personagem de teste, que não tem habilidades; Ações lista Andar, Desarmar, Esquivar, Defender, Ajudar; teclas C, 1 e 3; Andar pela lista fecha a roda e liga a mira (mesmo fluxo de antes); Cancelar mira volta. Capturas e vídeo (34 s) em `build/beleza/roda1/` (local, `build/` é ignorado). Specs: `LayoutLuta` (roda sem cruzar nem sair da tela de 800x600 a 1920x1080); `testar.ps1` só com "Catálogo" falhando por ambiente. `qa_cenarios.esgoto_sala1` passou a conferir "encerrar" + "roda" no lugar de "encerrarturno".
+**Não verificado:** toque real/celular, 1080p real (as capturas são de uma janela de ~1410x605, escala 0,85), lista de Habilidades com cartas (o personagem de teste não tem), Apagar o fogo e Escolher Pacto em jogo, gamepad, Levantar pela lista com personagem caído.
+
 ## Botão Habilidades vazio na luta (Claude, 15/11/2026)
 
 Studio, `qa.py esgoto_sala1 --manter-play` + clique real em `AcoesDoTurno.Menu.Habilidades`: antes, a lista abria na aba Golpes (0 cartas para o Ladino) e fechava sozinha; depois da correção em `client/AcoesDoTurno` abre na aba Apoio com 5 cartas. Mesmo teste no HUD2 (`hud2-expedition` mesclado localmente em `previa-hud2`, com a mesma correção): 5 cartas. Capturas em `build/beleza/`. `testar.ps1`: só "Catálogo" falha (ambiente, sem `tsx` no site).

@@ -94,7 +94,7 @@ def esgoto_sala1(q):
     time.sleep(3)
     q.foto("combate", "luta_hud")
     t = tela(q)
-    q.verificar("interface de combate visível", "encerrarturno" in t.replace(" ", ""), t[:90])
+    q.verificar("interface de combate visível", "encerrar" in t.replace(" ", "").lower() and "roda" in t.lower(), t[:90])
     q.verificar("avatar ancorado na luta", ancorado(q))
 
 

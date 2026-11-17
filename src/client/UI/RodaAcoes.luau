@@ -86,14 +86,14 @@ function Roda.nova(pai: Instance, opcoes: { aoEscolher: (string) -> (), aoEncerr
 		icone.AnchorPoint, icone.Position = Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 9)
 		local nome = rotulo(b, {
 			Name = "Rotulo", Position = UDim2.fromOffset(4, 41), Size = UDim2.new(1, -8, 0, 18), Text = Roda.ROTULOS[id],
-			FontFace = T.fontes.titulo, TextSize = 15, TextScaled = true, TextTruncate = Enum.TextTruncate.None,
+			FontFace = T.fontes.titulo, TextSize = 16, TextScaled = true, TextTruncate = Enum.TextTruncate.None,
 		})
-		new("UITextSizeConstraint", nome, { MaxTextSize = 16, MinTextSize = 11 })
+		new("UITextSizeConstraint", nome, { MaxTextSize = 17, MinTextSize = 12 })
 		local custo = rotulo(b, {
 			Name = "Custo", Position = UDim2.fromOffset(6, 60), Size = UDim2.new(1, -12, 0, 14), Text = "",
-			FontFace = T.fontes.numero, TextSize = 12, TextColor3 = P.cor.ouro, TextScaled = true, TextTruncate = Enum.TextTruncate.None,
+			FontFace = T.fontes.numero, TextSize = 13, TextColor3 = P.cor.ouro, TextScaled = true, TextTruncate = Enum.TextTruncate.None,
 		})
-		new("UITextSizeConstraint", custo, { MaxTextSize = 12, MinTextSize = 9 })
+		new("UITextSizeConstraint", custo, { MaxTextSize = 13, MinTextSize = 10 })
 		local tecla = P.tecla(b, TECLAS[id], 22)
 		tecla.AnchorPoint, tecla.Position = Vector2.new(0.5, 0.5), UDim2.fromOffset(13, 13)
 		local alerta = new("Frame", b, {

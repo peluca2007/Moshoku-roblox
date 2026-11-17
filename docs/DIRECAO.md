@@ -220,7 +220,7 @@ Gate 3), com categorias que abrem as opções: **Golpear** (golpes físicos, cor
 corpo ou à distância, conforme a arma equipada), **Habilidades** (magias e técnicas
 aprendidas) e **Ações** (mobilidade e manobras do livro, como andar, disparada,
 escapar, derrubar, interagir; só as que o livro tiver). Substitui o losango de
-comandos do HUD. Ainda não implementado.
+comandos do HUD. Implementado em 17/11 (RODA1, `client/UI/RodaAcoes`).
 
 ### Decisões em aberto (perguntar ao Pedro com opções e recomendação)
 

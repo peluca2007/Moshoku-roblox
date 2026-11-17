@@ -10,7 +10,7 @@ TITULO = "MoshokuRPGMesa - Roblox Studio"
 
 
 def janela():
-    subprocess.run(["powershell", "-File", os.path.join(RAIZ, "tools", "qa", "studio_janela.ps1")], capture_output=True)
+    subprocess.run(["powershell", "-File", os.path.join(RAIZ, "tools", "qa", "studio_janela.ps1"), "-Foco"], capture_output=True)
 
 
 class Gravador:

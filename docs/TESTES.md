@@ -1504,3 +1504,11 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Flecha de água: antes a câmera ficava parada (0,00 studs) e não mostrava o acerto; agora `MagiasAgua` chama `ImpactoCamera.golpe` (via ctx.camera) e a câmera acompanha até o alvo (5,4 studs/s). Vídeo `flecha_de_agua.mp4` mostra a flecha, o respingo e o alvo Molhado.
 - Vídeos novos: `corte_braco.mp4`, `corte_braco_lento.mp4`, `flecha_de_agua.mp4`.
 - Não feito: reação visível do alvo e som do corte/arma caindo; os vídeos mostram o aviso "Sem Ação para mover" (a luta do QA já gastou as ações; o recibo é só visual).
+
+## HAB1e — reação, som, vídeos com foco (16/11/2026, Studio por MCP)
+
+- Com a janela em foco (`studio_janela.ps1 -Foco`, `fps.py`: 60 fps): câmera do Corte de Braço, maior giro 108 graus/s e 34,8 studs/s; flecha de água, 49 graus/s e 25 studs/s; nenhuma atualização acima do limite (260 graus/s, 45 studs/s). Os saltos que sobravam eram o fps de 15 do Studio sem foco. Séries `camera_foco_{corte,flecha}.csv`.
+- Reação do alvo: `ReacaoMixamo` (Pro Sword and Shield "impact (2)", `anim_mixamo.py`) no lugar da ReacaoGolpe por script, tranco procedural maior. Visível de leve no bandido (ele se desloca no contato); a arma dele voa e cai.
+- Som: nenhum asset novo. O corte já toca `espada-corte`, o impacto `espada-metal` (Sons.luau/Sonorizacao, base do site); a arma caindo toca `espada-metal` ao pousar (`ImpactoFx.soltaArma`). Não audível nos vídeos (a gravação de tela não captura áudio): não conferido de ouvido.
+- Vídeos regravados com foco: `corte_braco.mp4`, `corte_braco_lento.mp4`, `flecha_de_agua.mp4`; sem o aviso "Sem Ação para mover" (a luta é nova a cada vídeo e o QA não gasta Ação à toa). `gravar.py` e `hab_luta_real.py --camera` agora focam a janela antes.
+- Não verificado: som de ouvido, reação das criaturas Quaternius (só os humanoides R15), recuo forte (o dano real do golpe vem do servidor).

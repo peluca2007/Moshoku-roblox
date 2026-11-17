@@ -22,8 +22,8 @@ local function clipeTeste(laco)
 	}
 end
 
-local GOLPES = { CorteLeve = "impacto", CortePesado = "impacto", Estocada = "impacto", Emboscada = "impacto", CorteDeBraco = "impacto", Conjurar = "impacto", DisparoArco = "soltar" }
-local ESPERADOS = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "CorteDeBraco", "DisparoArco", "Conjurar", "Canalizar",
+local GOLPES = { CorteLeve = "impacto", CortePesado = "impacto", Estocada = "impacto", Emboscada = "impacto", ReacaoMixamo = "impacto", CorteDeBraco = "impacto", Conjurar = "impacto", DisparoArco = "soltar" }
+local ESPERADOS = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "ReacaoMixamo", "CorteDeBraco", "DisparoArco", "Conjurar", "Canalizar",
 	"ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria" }
 
 return {

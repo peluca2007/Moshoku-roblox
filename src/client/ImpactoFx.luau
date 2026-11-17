@@ -8,6 +8,7 @@ local Shared = game:GetService("ReplicatedStorage").Shared
 local Curvas = require(Shared.ImpactoCurvas)
 local FX = require(script.Parent.MenuEfeitos)
 local Corpo = require(script.Parent.Corpo)
+local Sonorizacao = require(script.Parent.Sonorizacao)
 
 local M = {}
 local TEX_BRILHO = "rbxasset://textures/particles/sparkles_main.dds"
@@ -210,6 +211,7 @@ function M.soltaArma(pai: Instance, mao: Vector3, direcao: Vector3)
 	dir = if dir.Magnitude > 1e-3 then dir.Unit else Vector3.zAxis
 	local lado = dir:Cross(Vector3.yAxis)
 	local chao = mao.Y - 2.2
+	local pousou = false
 	local inicio = os.clock()
 	local con
 	con = RunService.RenderStepped:Connect(function()
@@ -219,6 +221,10 @@ function M.soltaArma(pai: Instance, mao: Vector3, direcao: Vector3)
 			con:Disconnect()
 			modelo:Destroy()
 			return
+		end
+		if t >= 0.62 and not pousou then
+			pousou = true
+			pcall(function() local parar = Sonorizacao.tocar("espada-metal", 1.0) end) -- arma batendo no chão (som existente do site)
 		end
 		local tv = math.min(t, 0.62) -- no ar até pousar
 		local pos = mao + dir * (3.2 * tv) + lado * (0.8 * tv) + Vector3.new(0, 4.2 * tv - 9 * tv * tv, 0)

@@ -29,7 +29,7 @@ if not h then con:Disconnect() return 'sem vez' end
 local alvo,dist for _,t in snap.tokens do if t.criatura and not t.derrotado and (t.pv or 0)>0 then local d=math.max(math.abs(t.x-h.x),math.abs(t.z-h.z)) if not dist or d<dist then dist,alvo=d,t end end end
 if not alvo then con:Disconnect() return 'sem alvo' end
 for _=1,4 do
- if dist<=(LONGE and 4 or 1) and (not LONGE or dist>=3) then break end
+ if dist<=(LONGE and 6 or 1) then break end -- longe: só se aproxima se estiver além de 6 (sem gastar Ação à toa: some o aviso 'Sem Ação para mover')
  local dx=alvo.x>h.x and 1 or (alvo.x<h.x and -1 or 0) local dz=alvo.z>h.z and 1 or (alvo.z<h.z and -1 or 0)
  local alvoDist=(LONGE and 3 or 1)
  local p=math.max(1,math.min(math.abs(dist-alvoDist),3)) if dist<alvoDist then p=-p end
@@ -54,6 +54,9 @@ r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},alvos={{id
 
 
 if camera:
+    import subprocess
+    subprocess.run(["powershell", "-File", os.path.join(RAIZ, "tools", "qa", "studio_janela.ps1"), "-Foco"], capture_output=True)  # sem foco o Studio cai para ~15 fps
+    time.sleep(1)
     q.lua_cliente("""local RS=game:GetService('RunService') shared.CamSerie={} local t0=os.clock()
 shared.CamCon=RS.Heartbeat:Connect(function() local c=workspace.CurrentCamera local p,l=c.CFrame.Position,c.CFrame.LookVector
 table.insert(shared.CamSerie,string.format('%.4f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f',os.clock()-t0,p.X,p.Y,p.Z,l.X,l.Y,l.Z)) end) return 'gravando'""")

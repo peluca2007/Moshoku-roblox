@@ -1512,3 +1512,14 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Som: nenhum asset novo. O corte já toca `espada-corte`, o impacto `espada-metal` (Sons.luau/Sonorizacao, base do site); a arma caindo toca `espada-metal` ao pousar (`ImpactoFx.soltaArma`). Não audível nos vídeos (a gravação de tela não captura áudio): não conferido de ouvido.
 - Vídeos regravados com foco: `corte_braco.mp4`, `corte_braco_lento.mp4`, `flecha_de_agua.mp4`; sem o aviso "Sem Ação para mover" (a luta é nova a cada vídeo e o QA não gasta Ação à toa). `gravar.py` e `hab_luta_real.py --camera` agora focam a janela antes.
 - Não verificado: som de ouvido, reação das criaturas Quaternius (só os humanoides R15), recuo forte (o dano real do golpe vem do servidor).
+
+## MOD5 humanoides armados (17/11/2026)
+
+- `powershell -File tools/testar.ps1`: só "Catálogo" falha (já falhava antes); spec ModelosCriaturas com as variantes do bandido e `tipoArma`.
+- Studio (MCP, `studio_janela -Foco`): envio dos 3 módulos pela rota do Studio (`--via-studio`), `studio_sync`, `qa.py luta` (29 ok, sala 1 sorteou rato). `python tools/qa/modelos_prancha.py` monta espada, porrete e adaga com `CriaturaAnimada` (parado, ataque, dano, morte; `build/beleza/mod5/prancha_estudio.jpg`) e imprime o contrato: `Arma` é MeshPart com `TipoArma` e `Empunhadura`; `soltarArma()` desancora as peças; rato sem arma devolve nil.
+- `python tools/qa/modelos_luta.py bandido` repete a sala 1 até sortear o bandido e fotografa a luta (`build/beleza/mod5/luta_bandido_*.png`).
+- Não verificado: o desarme em si (REA1), humanoides em patrulha no mundo aberto, celular, desempenho com vários bandidos (4 a 6 mil triângulos cada).
+
+## REA1 (17/11/2026) — reação do alvo por habilidade/tipo/resultado, SEM prova no Studio ainda
+- `shared/ReacoesAlvo` (+ spec, passa) decide a reação: Corte de Braço falhou no Vigor + modelo com peça `Arma*` + servidor confirmou (`largouArma`) → as MESMAS peças do modelo se soltam (`ImpactoFx.soltaArma`); sem arma (lobo/rato/aranha) nada cai: membro atingido (tranco com afundamento `ImpactoFx.tranco`); passou no Vigor → recuo forte; erro → esquiva. O recibo ganhou `largouArma` (`HabilidadeService.resumoDoEfeito`, só apresentação).
+- Não verificado: tudo no Studio (lock do MOD5 ocupou o Studio por mais de uma hora); que o nome das peças de arma dos modelos Quaternius seja `Arma*` no cliente; vídeos em `build/beleza/rea1/`; Investida/Golpe Contínuo/Primeiro Golpe com Mixamo e magias da Água com o Pro Magic Pack (item 4) não iniciados.

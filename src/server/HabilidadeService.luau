@@ -663,6 +663,7 @@ function HabilidadeService.start(deps)
    -- Cap. 4 §6: cai a 1,5 m; borda/parede usa a própria casa.
    if Protocol.isCell(x + 1, z) and not barreiraEm(x + 1, z) then x += 1 end
    local objeto = largarArma(alvo, x, z)
+   efeito.largouArma = objeto ~= nil -- REA1: o recibo diz se algo caiu de verdade (só apresentação)
    if mec.corteBraco and Estado.patamar(alvo) < (Regras.bonusDeRank.Santo or 4) then
     Estados.definir(estados, alvo.id, "bracoInutil", true, conjurador.id, { de = "alvo" }, combat.round)
    end
@@ -832,6 +833,7 @@ function HabilidadeService.start(deps)
 			dano = if efeito.dano then efeito.dano.total else nil,
 			cura = efeito.cura or efeito.pvTemp,
 			aplica = if efeito.aplica then efeito.aplica[1] else nil,
+			largouArma = efeito.largouArma,
 		}
 	end
 

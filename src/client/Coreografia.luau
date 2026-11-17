@@ -15,6 +15,7 @@ local Feedback = require(script.Parent.FeedbackCombate)
 local ImpactoCamera = require(script.Parent.ImpactoCamera) -- IMP1: câmera, faíscas, rastro, hit-stop
 local ImpactoFx = require(script.Parent.ImpactoFx)
 local Curvas = require(Shared.ImpactoCurvas)
+local ReacoesAlvo = require(Shared.ReacoesAlvo)
 local AnimacaoCriatura = require(Shared.Mundo.AnimacaoCriatura)
 local CatalogoCriaturas = require(Shared.Animacoes.Criaturas.Catalogo)
 
@@ -409,7 +410,20 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				Efeitos.tremer(amp, dur, golpe)
 				Efeitos.aproximar(if crit then 0.14 else 0.08, if crit then 0.55 else 0.4)
 				-- Corte de Braço: a arma do alvo voa da mão (só apresentação; o efeito real vem do servidor)
-				if cena.bracoCortado and alvo.passou ~= true then ImpactoFx.soltaArma(cena.modelo, ponto + Y * 2.2, golpe); ImpactoFx.gotas(cena.modelo, ponto + Y * 2.2, golpe) end
+				-- REA1: a reação do corpo do alvo vem de ReacoesAlvo (habilidade x tipo do alvo x resultado do recibo)
+				local tokenAlvo = state.findToken(alvo.id)
+				local corpos = workspace:FindFirstChild("CorposDeCriatura")
+				local corpoAlvo = corpos and corpos:FindFirstChild(alvo.id)
+				local armado = #ImpactoFx.pecasDaArma(corpoAlvo) > 0
+				local nomeAlvo = tokenAlvo and (tokenAlvo.criatura or tokenAlvo.modelo or tokenAlvo.name)
+				local reac = ReacoesAlvo.decidir(cena.habilidade, ReacoesAlvo.tipoDoAlvo(if type(nomeAlvo) == "string" then nomeAlvo else nil), armado, alvo)
+				if reac.solta then
+					ImpactoFx.soltaArma(cena.modelo, corpoAlvo, golpe)
+					ImpactoFx.gotas(cena.modelo, ponto + Y * 2.2, golpe)
+				end
+				if corpoAlvo and corpoAlvo:IsA("Model") and not corpoAlvo:FindFirstChildOfClass("Humanoid") then
+					ImpactoFx.tranco(corpoAlvo, golpe, reac.forca, reac.reacao == "membro-atingido")
+				end
 				if not cena.temRastro then ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit) end -- com arma, o rastro real da ponta é o corte
 				ImpactoFx.faiscas(cena.modelo, ponto, cena.cor, alvo.dano, crit, golpe)
 				if crit and Efeitos.tremorAtivo() then ImpactoFx.flash(0.2) end
@@ -506,6 +520,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 		local cor = if arv == "basico" then Color3.fromRGB(255, 232, 170) else Estilo.arvore(arv).cor
 		local cena = nova(id, perfil, cor)
 		cena.casterId = recibo.casterId
+		cena.habilidade = id
 		cena.bracoCortado = string.find(id, "corte-de-braco", 1, true) ~= nil
 		cena.emboscada = string.find(id, "primeiro-golpe", 1, true) ~= nil
 		local gelo = string.find(id, "gelo", 1, true) ~= nil

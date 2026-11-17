@@ -195,45 +195,94 @@ function M.gotas(pai: Instance, ponto: Vector3, direcao: Vector3)
 	e:Emit(8)
 end
 
--- Arma que voa da mão do alvo (Corte de Braço): uma espada de apresentação lançada em arco, gira e cai no chão.
-function M.soltaArma(pai: Instance, mao: Vector3, direcao: Vector3)
-	if FX.reduzidos then return end
-	local modelo = Instance.new("Model")
-	modelo.Name = "ArmaSolta"
-	local raiz = Instance.new("Part")
-	raiz.Name, raiz.Anchored, raiz.CanCollide, raiz.CanTouch, raiz.CanQuery, raiz.Transparency, raiz.Size = "RightHand", true, false, false, false, 1, Vector3.one * 0.3
-	raiz.CFrame = CFrame.new(mao)
-	raiz.Parent = modelo
-	modelo.Parent = pai
-	local pecas = Corpo.arma({ modelo = modelo, clipes = true }, "espada")
-	for _, p in pecas do p.Massless = true end
+-- Peças da arma REAL do modelo (rig de peças rígidas: nomes "Arma_*"). Vazio = o modelo não tem arma.
+function M.pecasDaArma(modelo: Instance?): { BasePart }
+	local lista = {}
+	if modelo then
+		for _, d in modelo:GetDescendants() do
+			if d:IsA("BasePart") and string.sub(d.Name, 1, 4) == "Arma" then table.insert(lista, d) end
+		end
+	end
+	return lista
+end
+
+-- REA1: a arma do modelo do alvo se solta: as MESMAS peças (clonadas, as originais somem só nesta tela) voam em arco,
+-- giram e caem no chão. Sem peça "Arma*" no modelo, não faz nada e devolve false (nada cai do nada).
+function M.soltaArma(pai: Instance, modelo: Instance?, direcao: Vector3): boolean
+	if FX.reduzidos then return false end
+	local originais = M.pecasDaArma(modelo)
+	if #originais == 0 or not modelo then return false end
+	local pasta = Instance.new("Model")
+	pasta.Name = "ArmaSolta"
+	pasta.Parent = pai
+	local clones, c0 = {}, Vector3.zero
+	for _, o in originais do
+		local c = o:Clone()
+		for _, f in c:GetChildren() do if not f:IsA("SpecialMesh") and not f:IsA("SurfaceAppearance") then f:Destroy() end end
+		c.Anchored, c.CanCollide, c.CanQuery, c.CanTouch, c.Massless = true, false, false, false, true
+		c.Parent = pasta
+		o.LocalTransparencyModifier = 1
+		c0 += o.Position
+		table.insert(clones, { c = c, cf = o.CFrame })
+	end
+	c0 /= #originais
+	local cfCentro = CFrame.new(c0)
 	local dir = Vector3.new(direcao.X, 0, direcao.Z)
 	dir = if dir.Magnitude > 1e-3 then dir.Unit else Vector3.zAxis
 	local lado = dir:Cross(Vector3.yAxis)
-	local chao = mao.Y - 2.2
-	local pousou = false
+	local cfm, tam = modelo:GetBoundingBox()
+	local chaoY = cfm.Position.Y - tam.Y / 2
 	local inicio = os.clock()
 	local con
 	con = RunService.RenderStepped:Connect(function()
 		local escala = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
 		local t = (os.clock() - inicio) / escala
-		if t > 1.6 or not modelo.Parent then
+		if t > 2.2 or not pasta.Parent then
 			con:Disconnect()
-			modelo:Destroy()
+			pasta:Destroy()
 			return
 		end
-		if t >= 0.62 and not pousou then
-			pousou = true
-			pcall(function() local parar = Sonorizacao.tocar("espada-metal", 1.0) end) -- arma batendo no chão (som existente do site)
+		local tv = math.min(t, 0.55)
+		local pos = c0 + dir * (3.4 * tv) + lado * (0.9 * tv) + Vector3.new(0, 4.6 * tv - 9.5 * tv * tv, 0)
+		pos = Vector3.new(pos.X, math.max(pos.Y, chaoY + 0.2), pos.Z)
+		local giro = if t < 0.55 then t * 15 else 0.55 * 15
+		local T = CFrame.new(pos) * CFrame.Angles(giro, 0, 0) * CFrame.new(-c0)
+		for _, e in clones do e.c.CFrame = T * e.cf end
+		if t > 1.7 then
+			for _, e in clones do e.c.Transparency = math.clamp((t - 1.7) / 0.5, 0, 1) end
 		end
-		local tv = math.min(t, 0.62) -- no ar até pousar
-		local pos = mao + dir * (3.2 * tv) + lado * (0.8 * tv) + Vector3.new(0, 4.2 * tv - 9 * tv * tv, 0)
-		pos = Vector3.new(pos.X, math.max(pos.Y, chao + 0.15), pos.Z)
-		local giro = if t < 0.62 then t * 14 else 0.62 * 14 + math.min(t - 0.62, 0.1) * 2
-		raiz.CFrame = CFrame.new(pos) * CFrame.Angles(0, 0.6, 0) * CFrame.Angles(giro, 0, math.pi / 2 * math.min(t / 0.62, 1))
-		if t > 1.2 then
-			for _, p in pecas do p.Transparency = math.clamp((t - 1.2) / 0.4, 0, 1) end
+		if t >= 0.55 and not pasta:GetAttribute("Pousou") then
+			pasta:SetAttribute("Pousou", true)
+			pcall(function() Sonorizacao.tocar("espada-metal", 1.0) end)
 		end
+	end)
+	return true
+end
+
+-- REA1: tranco procedural no corpo (rig de peças rígidas replicado pelo servidor): desloca/inclina o modelo no sentido do
+-- golpe e volta. `forte` aumenta; `manca` deixa o corpo afundado de um lado por mais tempo (membro atingido).
+function M.tranco(modelo: Model?, direcao: Vector3, forca: number, manca: boolean?)
+	if not modelo or FX.reduzidos then return end
+	local base = modelo:GetPivot()
+	local dir = Vector3.new(direcao.X, 0, direcao.Z)
+	dir = if dir.Magnitude > 1e-3 then dir.Unit else Vector3.zAxis
+	local lado = dir:Cross(Vector3.yAxis)
+	local dur = if manca then 1.1 else 0.55
+	local inicio = os.clock()
+	local con
+	con = RunService.RenderStepped:Connect(function()
+		local escala = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
+		local u = (os.clock() - inicio) / (dur * escala)
+		if u >= 1 or not modelo.Parent then
+			con:Disconnect()
+			if modelo.Parent then modelo:PivotTo(base) end
+			return
+		end
+		local empurra = math.sin(math.min(u * 4, 1) * math.pi / 2) * (1 - u) ^ 2 * 1.6 * forca
+		local inclina = math.sin(math.min(u * 3, 1) * math.pi / 2) * (1 - u) * 0.28 * forca
+		local afunda = if manca then math.sin(math.min(u * 2.5, 1) * math.pi / 2) * (1 - u ^ 3) * 0.9 else 0
+		local rot = CFrame.fromAxisAngle(lado, -inclina) * CFrame.fromAxisAngle(Vector3.yAxis, if manca then 0.25 * (1 - u) else 0)
+		modelo:PivotTo(CFrame.new(base.Position + dir * empurra - Vector3.new(0, afunda, 0)) * rot * base.Rotation)
 	end)
 end
 

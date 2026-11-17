@@ -28,6 +28,9 @@ end
 
 local AGUA, PROFUNDA, BRILHO, ESPUMA, GELO, GELO_ESCURO =
 	cor("agua"), cor("profunda"), cor("brilho"), cor("espuma"), cor("gelo"), cor("gelo_escuro")
+-- HAB1c: com o Bloom do esgoto, Neon branco estoura; brilho e espuma ganham tom de água e o Neon vira plástico liso.
+BRILHO = BRILHO:Lerp(AGUA, 0.55)
+ESPUMA = ESPUMA:Lerp(AGUA, 0.35)
 
 local function qtd(base: number, critico: boolean?): number
 	return Curvas.quantidade(base, critico, FX.reduzidos)
@@ -90,7 +93,7 @@ end
 function Cena:bola(tam: number, pos: Vector3, c: Color3, transp: number?, neon: boolean?): Part
 	return self:peca({
 		Shape = Enum.PartType.Ball, Size = Vector3.one * tam, Position = pos, Color = c,
-		Transparency = transp or 0.3, Material = if neon then Enum.Material.Neon else Enum.Material.Glass,
+		Transparency = transp or 0.3, Material = if neon then Enum.Material.SmoothPlastic else Enum.Material.Glass,
 	})
 end
 
@@ -98,7 +101,7 @@ end
 function Cena:elipse(larg: number, comp: number, c: Color3, transp: number?, neon: boolean?): Part
 	local p = self:peca({
 		Size = Vector3.new(larg, larg, comp), Color = c, Transparency = transp or 0.25,
-		Material = if neon then Enum.Material.Neon else Enum.Material.Glass,
+		Material = if neon then Enum.Material.SmoothPlastic else Enum.Material.Glass,
 	})
 	local m = Instance.new("SpecialMesh")
 	m.MeshType = Enum.MeshType.Sphere
@@ -114,7 +117,7 @@ function Cena:disco(centro: Vector3, diam: number, c: Color3, transp: number, di
 		else CFrame.new(centro) * CFrame.Angles(0, 0, math.rad(90))
 	local p = self:peca({
 		Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.12, diam, diam), CFrame = base, Color = c,
-		Transparency = transp, Material = if neon then Enum.Material.Neon else Enum.Material.Glass,
+		Transparency = transp, Material = if neon then Enum.Material.SmoothPlastic else Enum.Material.Glass,
 	})
 	return p
 end
@@ -123,7 +126,7 @@ function Cena:emissor(pai: Instance, tipo: string, c: Color3, op: { [string]: an
 	local e = Instance.new("ParticleEmitter")
 	e.Texture = TEX[tipo]
 	e.Color = ColorSequence.new(c, ESPUMA)
-	e.LightEmission = if tipo == "fumaca" then 0.15 else 0.6
+	e.LightEmission = if tipo == "fumaca" then 0.1 else 0.3
 	e.LightInfluence = if tipo == "fumaca" then 0.5 else 0
 	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(1, 0) })
 	e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(1, 1) })
@@ -556,8 +559,8 @@ function MagiasAgua.criar(ctx)
 			for i = 1, arcoN do
 				gotasArco[i] = cena:bola(0.1, centroArco, BRILHO, 0.1, true)
 			end
-			corda1 = cena:peca({ Size = Vector3.new(0.06, 0.06, 0.1), Color = BRILHO, Transparency = 0.15, Material = Enum.Material.Neon })
-			corda2 = cena:peca({ Size = Vector3.new(0.06, 0.06, 0.1), Color = BRILHO, Transparency = 0.15, Material = Enum.Material.Neon })
+			corda1 = cena:peca({ Size = Vector3.new(0.06, 0.06, 0.1), Color = BRILHO, Transparency = 0.15, Material = Enum.Material.SmoothPlastic })
+			corda2 = cena:peca({ Size = Vector3.new(0.06, 0.06, 0.1), Color = BRILHO, Transparency = 0.15, Material = Enum.Material.SmoothPlastic })
 			seta = cena:elipse(0.1, 0.1, BRILHO, 0.05, true)
 			local luz = Instance.new("PointLight")
 			luz.Color, luz.Range, luz.Brightness, luz.Shadows = AGUA, 12, 3, false

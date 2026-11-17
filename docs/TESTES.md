@@ -1482,3 +1482,10 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Provado: `build/beleza/hab1/corte_braco_luta_prancha.png` (10 quadros em câmera lenta ×6) e `corte_braco_luta_tempo_real.png`: base firme em guarda de espada e escudo, torção, arco alto com fita fina, arma do bandido voando (solta-arma), respingo vermelho, câmera chegando do dolly para a lateral.
 - A "ajoelhada" da prancha anterior era a postura de guarda do Mixamo (S&S), não retarget errado: pés no chão (`pe_min` ~0).
 - Não provado: reação ReacaoGolpe do bandido (o recuo dele não aparece nos quadros), som do corte/arma caindo, flecha de água (`agua_flecha_prancha.png` mostra a câmera colada no alvo adjacente: HAB2/ImpactoCamera não tratam magia à queima-roupa; precisa de uma luta com a Água a distância), o corte no quadro 0 da prancha começa com a câmera muito perto e escura.
+
+## HAB1c — vídeo, oclusão da câmera, flecha de água (16/11/2026, Studio por MCP)
+
+- `tools/qa/gravar.py` (ffmpeg gdigrab, recorte do viewport do Studio) e `hab_luta_real.py --video=... [--longe]`. Vídeos: `build/beleza/hab1/corte_braco.mp4` (tempo real), `corte_braco_lento.mp4` (câmera lenta de QA ×6), `flecha_de_agua.mp4` (alvo a 3 casas).
+- Oclusão: `ImpactoCamera.desocluir` (raycast só contra os lutadores + caixa do corpo; gira/sobe a câmera até as duas linhas ficarem livres), aplicada à câmera do golpe e à câmera base de luta (gancho em `BoardView`). Nos vídeos o bloco marrom que tampava a tela sumiu; a câmera mostra os dois lutadores.
+- Água: Neon branco e brilho trocados por plástico liso e cores com tom de água; a flecha aparece azul (antes mancha branca com o Bloom).
+- Não feito/não provado: usar o Corte de Braço pelo caminho normal (aprender só fora de combate e o personagem de QA é Ladino; segue injetado por recibo visual), reação ReacaoGolpe do alvo nítida e som do corte/arma caindo, câmera do golpe na flecha de água (fica no atirador; o impacto no goblin não aparece na janela de 6 s do vídeo).

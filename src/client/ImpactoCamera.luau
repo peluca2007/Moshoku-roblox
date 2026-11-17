@@ -105,6 +105,53 @@ local function escolher(g, cf: CFrame)
 end
 M.escolher = escolher
 
+-- Oclusão (IMP6): o corpo de um lutador não pode ficar entre a câmera e a dupla. Raycast só contra os lutadores
+-- (criaturas e personagens); tenta girar a câmera em volta do meio da dupla (e subir) até as duas linhas ficarem livres.
+local pOclusao = RaycastParams.new()
+pOclusao.FilterType = Enum.RaycastFilterType.Include
+local function lutadores(): { Instance }
+	local lista = {}
+	local c = workspace:FindFirstChild("CorposDeCriatura")
+	if c then for _, m in c:GetChildren() do table.insert(lista, m) end end
+	for _, p in Players:GetPlayers() do if p.Character then table.insert(lista, p.Character) end end
+	return lista
+end
+local function ocluido(pos: Vector3, ponto: Vector3): boolean
+	local d = ponto - pos
+	local r = workspace:Raycast(pos, d, pOclusao)
+	return r ~= nil and (r.Position - ponto).Magnitude > 2.4
+end
+local function dentroDeLutador(pos: Vector3): boolean
+	for _, m in pOclusao.FilterDescendantsInstances do
+		if m:IsA("Model") then
+			local cf, tam = m:GetBoundingBox()
+			local l = cf:PointToObjectSpace(pos)
+			if math.abs(l.X) < tam.X / 2 + 0.8 and math.abs(l.Y) < tam.Y / 2 + 0.8 and math.abs(l.Z) < tam.Z / 2 + 0.8 then return true end
+		end
+	end
+	return false
+end
+function M.desocluir(cf: CFrame, a: Vector3, b: Vector3): CFrame
+	pOclusao.FilterDescendantsInstances = lutadores()
+	local pos = cf.Position
+	local function ruim(p: Vector3): boolean
+		return dentroDeLutador(p) or ocluido(p, a) or ocluido(p, b)
+	end
+	if not ruim(pos) then return cf end
+	local meio = (a + b) / 2
+	local rel = pos - meio
+	for _, ang in { 0.4, -0.4, 0.8, -0.8, 1.2, -1.2, 1.7, -1.7 } do
+		for _, sobe in { 0, 2.5 } do
+			local c, s = math.cos(ang), math.sin(ang)
+			local p = meio + Vector3.new(rel.X * c - rel.Z * s, rel.Y + sobe, rel.X * s + rel.Z * c)
+			if not ruim(p) then
+				return CFrame.lookAt(M.semParede(meio + Vector3.new(0, 1.5, 0), p), meio + Vector3.new(0, 1.8, 0))
+			end
+		end
+	end
+	return cf
+end
+
 -- `cf`: câmera de luta já calculada. Devolve a câmera com o enquadramento do golpe misturado.
 local publicado = -1
 local function publicar(w: number)
@@ -140,6 +187,7 @@ function M.aplicar(cf: CFrame): CFrame
 	if livre ~= misto.Position then
 		misto = CFrame.lookAt(livre, o)
 	end
+	misto = M.desocluir(misto, g.de, g.para)
 	return misto
 end
 

@@ -933,12 +933,14 @@ function BoardView.start(state)
 		-- Câmera de ombro (LUTA-C): em combate, quem age no terço inferior olhando para o alvo; andar/mirar
 		-- (state.mira()) sobe para a vista tática acima, com a grade no chão.
 		local ombro = nil
+		local parOclusao = nil
 		if snapAtual and snapAtual.combat.active then
 			local pontos = Enquadramento.vivos(snapAtual.tokens, snapAtual.combat.order, board)
 			local ator
 			for _, p in pontos do if p.id == snapAtual.combat.turnId then ator = p end end
 			local alvo = ator and Enquadramento.alvoDoOmbro(pontos, ator)
 			if ator and alvo then
+				parOclusao = { board.origin + Vector3.new(ator.x, 2.5, ator.z), board.origin + Vector3.new(alvo.x, 2.5, alvo.z) }
 				ombro = Enquadramento.ombro({ ator = ator, alvo = alvo, inimigoAgindo = ator.inimigo, giro = giroOmbro, zoom = zoomUsuario * Efeitos.fatorAproximacao() })
 			end
 		end
@@ -960,6 +962,7 @@ function BoardView.start(state)
 		end
 		mostrarGrade(if snapAtual and snapAtual.combat.active then math.clamp((mistura - 0.35) / 0.65, 0, 1) else 1)
 		target = ImpactoCamera.aplicar(target) -- IMP1: enquadra atacante e alvo no golpe (com raycast contra paredes)
+		if parOclusao and not state.mira() then target = ImpactoCamera.desocluir(target, parOclusao[1], parOclusao[2]) end -- IMP6: nenhum lutador entre a câmera e a dupla
 		-- Transição suave da câmera do avatar para a Visão da mesa.
 		local t = if blendFrom then (os.clock() - blendStart) / CAMERA_BLEND else 1
 		if blendFrom and t < 1 then

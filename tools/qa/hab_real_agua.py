@@ -2,7 +2,7 @@
 Pré-requisito: Play em luta (qa.py primeira_arvore --manter-play; setar workspace.QaEncontro e QaAprender='agua' no servidor;
 qa.py esgoto_sala1 --sem-deps --manter-play). A ficha do QA aprende a árvore da Água por QaAprender (HabilidadeService, só Studio).
   python tools/qa/hab_real_agua.py <respingo|bola-de-agua|flecha-de-agua|impacto-de-gelo|lamina-de-gelo|escudo-de-agua|nevoa-densa> [--rodadas=N]
-Grava build/beleza/hab4/real_<magia>.mp4 e passa N rodadas (padrão 0) depois do uso para ver a zona sumir."""
+Grava build/beleza/hab5/real_<magia>.mp4 e passa N rodadas (padrão 0) depois do uso para ver a zona sumir."""
 import os, sys, time
 sys.path.insert(0, os.path.dirname(__file__))
 from qa_lib import Qa, RAIZ
@@ -12,7 +12,7 @@ magia = sys.argv[1]
 rodadas = next((int(a.split("=", 1)[1]) for a in sys.argv if a.startswith("--rodadas=")), 0)
 q = Qa()
 q.cenario = "hab_real_agua"
-saida = os.path.join(RAIZ, "build", "beleza", "hab4", "real_%s.mp4" % magia)
+saida = os.path.join(RAIZ, "build", "beleza", "hab5", "real_%s.mp4" % magia)
 os.makedirs(os.path.dirname(saida), exist_ok=True)
 
 ESPERA = """local remote=game.ReplicatedStorage:WaitForChild('Mesa') local snap

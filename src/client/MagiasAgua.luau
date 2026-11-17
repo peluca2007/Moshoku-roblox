@@ -479,7 +479,9 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 	local N = if FX.reduzidos then 5 else 9
 	local estado = { tFim = nil :: number? }
 	local anim
-	local AZUL_NUCLEO, AZUL_SUP, AZUL_TEX = Color3.fromRGB(52, 96, 128), Color3.fromRGB(78, 128, 158), Color3.fromRGB(150, 196, 220)
+	-- HAB5: água em pé: azul-esverdeado translúcido, borda mais clara, correnteza para BAIXO, espuma no topo e reflexo.
+	local AZUL_NUCLEO, AZUL_SUP, AZUL_TEX = Color3.fromRGB(66, 118, 128), Color3.fromRGB(112, 160, 166), Color3.fromRGB(170, 214, 212)
+	local BORDA = Color3.fromRGB(206, 240, 232)
 	cena:em(t0, function()
 		local segs = {}
 		for i = 1, N do
@@ -489,31 +491,38 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 			local face = tang:Cross(Vector3.yAxis)
 			if face:Dot(normal) < 0 then face = -face end
 			local w = larg / N * 1.18
-			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.62, Material = Enum.Material.Glass })
-			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.25), Color = AZUL_SUP, Transparency = 0.72, Material = Enum.Material.Glass })
+			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.7, Material = Enum.Material.SmoothPlastic })
+			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.25), Color = AZUL_SUP, Transparency = 0.8, Material = Enum.Material.SmoothPlastic })
 			local tex = {}
 			for _, f in { Enum.NormalId.Front, Enum.NormalId.Back } do
 				local tx = Instance.new("Texture")
-				tx.Texture, tx.Face, tx.Color3, tx.Transparency = TEX.fumaca, f, AZUL_TEX, 0.55
-				tx.StudsPerTileU, tx.StudsPerTileV = 2.6, 2.6
+				tx.Texture, tx.Face, tx.Color3, tx.Transparency = TEX.fumaca, f, AZUL_TEX, 0.86
+				tx.StudsPerTileU, tx.StudsPerTileV = 1.4, 4.2
 				tx.Parent = sup
 				table.insert(tex, tx)
 			end
 			local espuma = cena:peca({ Size = Vector3.new(w * 0.95, 0.7, espessura + 0.6), Color = ESPUMA, Transparency = 0.35, Material = Enum.Material.SmoothPlastic })
+			local reflexo = cena:peca({ Size = Vector3.new(0.16, 1, 0.05), Color = BORDA, Transparency = 0.75, Material = Enum.Material.SmoothPlastic })
+			local fita = nil
+			if i == 1 or i == N then
+				fita = cena:peca({ Size = Vector3.new(0.22, 1, espessura + 0.35), Color = BORDA, Transparency = 0.55, Material = Enum.Material.SmoothPlastic })
+			end
 			local fonte = cena:peca({ Size = Vector3.new(w * 0.8, 0.2, 0.4), Transparency = 1 })
 			local gotas = cena:emissor(fonte, "brilho", AZUL_TEX, {
-				Rate = if FX.reduzidos then 2 else 5, Speed = NumberRange.new(0.2, 0.8), SpreadAngle = Vector2.new(8, 8),
-				Lifetime = NumberRange.new(0.8, 1.3), Acceleration = Vector3.new(0, -14, 0),
-				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.38), NumberSequenceKeypoint.new(1, 0.12) }),
-				EmissionDirection = Enum.NormalId.Front, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(1, 0.8) }),
+				Rate = if FX.reduzidos then 8 else 24, Speed = NumberRange.new(0.05, 0.25), SpreadAngle = Vector2.new(4, 4),
+				Lifetime = NumberRange.new(0.9, 1.5), Acceleration = Vector3.new(0, -5, 0),
+				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0.12) }),
+				EmissionDirection = Enum.NormalId.Front, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.25), NumberSequenceKeypoint.new(1, 0.9) }),
 			})
+			gotas.Orientation = Enum.ParticleOrientation.VelocityParallel
+			gotas.Squash = NumberSequence.new(-1.5)
 			local borrifo = cena:emissor(fonte, "brilho", ESPUMA, {
 				Rate = if FX.reduzidos then 4 else 11, Speed = NumberRange.new(3, 6), SpreadAngle = Vector2.new(22, 22),
 				Lifetime = NumberRange.new(0.4, 0.8), Acceleration = Vector3.new(0, -18, 0),
 				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.1) }),
 				EmissionDirection = Enum.NormalId.Top,
 			})
-			segs[i] = { pos = pos, face = face, nucleo = nucleo, sup = sup, tex = tex, espuma = espuma, fonte = fonte, gotas = gotas, borrifo = borrifo }
+			segs[i] = { pos = pos, face = face, tang = tang, w = w, reflexo = reflexo, fita = fita, nucleo = nucleo, sup = sup, tex = tex, espuma = espuma, fonte = fonte, gotas = gotas, borrifo = borrifo }
 		end
 		for i = 1, N, 2 do
 			respingo(cena, cena.T + 0.02 + i * 0.03, segs[i].pos, 0.8)
@@ -533,17 +542,29 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				local cf = CFrame.lookAt(g.pos + Vector3.new(0, h / 2, 0), g.pos + Vector3.new(0, h / 2, 0) + g.face)
 				g.nucleo.Size = Vector3.new(g.nucleo.Size.X, h, espessura + onda * 0.3)
 				g.nucleo.CFrame = cf
-				g.nucleo.Transparency = 0.62 + 0.06 * math.sin(cena.T * 2.6 + i)
+				g.nucleo.Transparency = 0.7 + 0.05 * math.sin(cena.T * 2.6 + i)
 				g.sup.Size = Vector3.new(g.sup.Size.X, h, espessura + 0.25 + onda * 0.3)
 				g.sup.CFrame = cf
-				g.tex[1].OffsetStudsV, g.tex[2].OffsetStudsV = cena.T * 2.4, cena.T * 1.9 -- correnteza subindo
+				g.tex[1].OffsetStudsV, g.tex[2].OffsetStudsV = -cena.T * 2.6, -cena.T * 2.0 -- correnteza descendo
 				g.tex[1].OffsetStudsU, g.tex[2].OffsetStudsU = math.sin(cena.T * 0.8 + i) * 0.8, -cena.T * 0.5
 				local topo = g.pos + Vector3.new(0, h + 0.05 + onda * 0.5, 0)
 				g.espuma.CFrame = CFrame.lookAt(topo, topo + g.face)
 				g.espuma.Size = Vector3.new(g.espuma.Size.X, 0.6 + 0.25 * math.sin(cena.T * 4 + i * 1.7), espessura + 0.6)
 				local alto2 = g.pos + g.face * (espessura / 2 + 0.1) + Vector3.new(0, h - 0.2, 0)
 				g.fonte.CFrame = CFrame.lookAt(alto2, alto2 + g.face)
-				g.gotas.Rate = (if FX.reduzidos then 2 else 5) * ki
+				g.gotas.Rate = (if FX.reduzidos then 8 else 24) * ki
+				-- reflexo: faixa clara que varre a face
+				local varre = ((cena.T * 0.3 + i * 0.37) % 1 - 0.5) * g.w * 0.9
+				local pr = g.pos + g.face * (espessura / 2 + 0.16) + g.tang * varre + Vector3.new(0, h * 0.5, 0)
+				g.reflexo.Size = Vector3.new(0.16, math.max(h * 0.7, 0.05), 0.05)
+				g.reflexo.CFrame = CFrame.lookAt(pr, pr + g.face)
+				g.reflexo.Transparency = 0.6 + 0.4 * math.abs(varre) / (g.w * 0.45) + (1 - ki) * 0.5
+				if g.fita then
+					local lado = if i == 1 then -1 else 1
+					local pf = g.pos + g.tang * (lado * g.w * 0.45) + Vector3.new(0, h / 2, 0)
+					g.fita.Size = Vector3.new(0.22, math.max(h, 0.05), espessura + 0.35)
+					g.fita.CFrame = CFrame.lookAt(pf, pf + g.face)
+				end
 				g.borrifo.Rate = (if FX.reduzidos then 4 else 11) * ki
 				if ki <= 0 or t < 0 then g.espuma.Transparency = 1 else g.espuma.Transparency = 0.3 end
 			end
@@ -575,23 +596,44 @@ local function zonaNevoa(ctx, muro, t0: number)
 	local anim
 	local cinza = Color3.fromRGB(150, 168, 178)
 	cena:em(t0, function()
-		local vol = cena:peca({ Size = Vector3.new(raio * 1.8, 7, raio * 1.8), Position = Vector3.new(c.X, chaoY + 3.5, c.Z), Transparency = 1 })
-		local fumo = cena:emissor(vol, "fumaca", cinza, {
-			Rate = 0, Speed = NumberRange.new(0.2, 0.9), SpreadAngle = Vector2.new(180, 180),
-			Lifetime = NumberRange.new(5, 7), Drag = 0.5, Rotation = NumberRange.new(0, 360), RotSpeed = NumberRange.new(-8, 8),
-			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 8), NumberSequenceKeypoint.new(1, 15) }),
-			Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, 0.8), NumberSequenceKeypoint.new(0.7, 0.82), NumberSequenceKeypoint.new(1, 1) }),
-			LightEmission = 0, LightInfluence = 1,
-		})
-		fumo.Color = ColorSequence.new(cinza, Color3.fromRGB(185, 200, 208))
+		-- HAB5: mais densa rente ao chão (até a cintura), com rolos rasteiros em movimento; acima, só um véu leve
+		-- (os lutadores aparecem da cintura para cima como silhuetas) e sem lavar o cenário inteiro.
+		local function emissorNevoa(pai, tam0, tam1, transp0, vida, vel)
+			local e = cena:emissor(pai, "fumaca", cinza, {
+				Rate = 0, Speed = NumberRange.new(vel * 0.4, vel), SpreadAngle = Vector2.new(70, 70),
+				Lifetime = NumberRange.new(vida * 0.7, vida), Drag = 0.6, Rotation = NumberRange.new(0, 360), RotSpeed = NumberRange.new(-6, 6),
+				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, tam0), NumberSequenceKeypoint.new(1, tam1) }),
+				Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, transp0), NumberSequenceKeypoint.new(0.7, transp0 + 0.04), NumberSequenceKeypoint.new(1, 1) }),
+				LightEmission = 0, LightInfluence = 1,
+			})
+			e.Color = ColorSequence.new(cinza, Color3.fromRGB(185, 200, 208))
+			return e
+		end
+		local rasteira = cena:peca({ Size = Vector3.new(raio * 1.8, 0.6, raio * 1.8), Position = Vector3.new(c.X, chaoY + 0.4, c.Z), Transparency = 1 })
+		local fumo = emissorNevoa(rasteira, 5, 8, 0.55, 5, 0.8)
+		local alta = cena:peca({ Size = Vector3.new(raio * 1.6, 1, raio * 1.6), Position = Vector3.new(c.X, chaoY + 3.2, c.Z), Transparency = 1 })
+		local veu = emissorNevoa(alta, 6, 10, 0.93, 5, 0.5)
+		local rolos = {}
+		for i = 1, 3 do
+			local pr = cena:peca({ Size = Vector3.new(raio * 0.7, 0.5, raio * 0.7), Position = Vector3.new(c.X, chaoY + 0.3, c.Z), Transparency = 1 })
+			rolos[i] = { parte = pr, em = emissorNevoa(pr, 4, 7, 0.5, 3.2, 1.6) }
+		end
 		ctx.som({ habilidadeId = "ability/agua/Principiante/nevoa-densa" }, "agua", 0.8)
 		anim = cena:anim(t0, t0 + 3600, function()
 			local t = cena.T - t0
 			local k = math.clamp(t / 2, 0, 1)
 			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 1.4, 0, 1) end
-			fumo.Rate = (if FX.reduzidos then 16 else 60) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
+			fumo.Rate = (if FX.reduzidos then 14 else 50) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
+			veu.Rate = (if FX.reduzidos then 2 else 6) * k
+			for i, r in rolos do
+				local ang = cena.T * (0.35 + i * 0.1) + i * 2.1
+				r.parte.Position = Vector3.new(c.X + math.cos(ang) * raio * 0.7, chaoY + 0.35, c.Z + math.sin(ang * 1.3) * raio * 0.7)
+				r.em.Rate = (if FX.reduzidos then 4 else 14) * k
+			end
 			if estado.tFim and cena.T - estado.tFim > 1.5 then
 				fumo.Enabled = false
+				veu.Enabled = false
+				for _, r in rolos do r.em.Enabled = false end
 				if cena.T - estado.tFim > 9 then
 					for _, i in cena.lixo do if i.Parent then i:Destroy() end end
 					table.clear(cena.lixo)

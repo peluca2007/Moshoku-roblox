@@ -1617,3 +1617,13 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Specs: `ReacoesAlvo` 7 ok (+2 casos de `clipeCriatura`), novo `CriaturasMx` 4 ok. `testar.ps1`: só Catálogo falha (ambiente).
 - Vídeos pelo caminho do servidor (`tools/qa/rea4_luta.py`, atributo QaReacao só no Studio, o recibo visual é reenviado ao cliente): `bandido_golpe/critico/esquiva/morte/bloqueio.mp4`, `lobo_golpe/critico/esquiva.mp4`. Vistos em grade: bandido cambaleia no crítico e cai e fica deitado na morte; lobo recua. QaReagiu confirmou ReacaoLeve, ReacaoForte, EsquivaLado.
 - Não verificado: bloqueio (o corpo já estava morto na hora; QaReagiu=nil), goblin/esqueleto no Studio, morte de bicho em vídeo, recibo real de ataque (o QA reenvia recibo e aciona o servidor à parte), outras habilidades além do ataque básico, mãos/arma durante a esquiva, desempenho. Nota franca: ~5,5/10 (reação legível, mas o retarget por peça rígida perde cotovelo/joelho e o clipe leve é discreto).
+
+## HAB5 (17/11/2026) — Investida, escudo, névoa e anéis (`build/beleza/hab5/`)
+
+- Investida: traços de vento curtos (0,3 s) e finos ao longo do trajeto; poeira com partículas de fumaça translúcidas (arrancada, rastro contínuo nos pés, chegada). Os "blocos amarelos" atrás do corredor eram a `HumanoidRootPart` invisível clonada nas sombras (afterimages) virando Neon; agora as partes invisíveis ficam ocultas. Não reproduzi um quadro isolado de sumiço do personagem; o que se vê no vídeo é o personagem sair do ponto inicial e o fantasma entrar pela esquerda (trajeto de 4 casas, câmera parada). `investida.mp4`.
+- Escudo: núcleo azul-esverdeado dessaturado e mais translúcido, borda clara nas pontas, textura e gotas descendo, espuma no topo, reflexo varrendo a face. Gravado sem névoa: `real_escudo-de-agua.mp4`.
+- Névoa: emissor rente ao chão, 3 rolos orbitando e véu alto quase transparente; lutadores aparecem da cintura para cima. `real_nevoa-densa.mp4`.
+- Anéis de mira: eram `arco()` da Coreografia na cor da árvore (ciano da Água). Sem editar a Coreografia (REA4), `Gestos.tocar` troca `cena.cor` frias por ouro escuro. Continuam em Neon (estouram um pouco no Bloom) e a espessura é da Coreografia.
+- `qa.py luta` 29 ok; `testar.ps1` só com Catálogo falhando (ambiente).
+- Não verificado: celular, desempenho, escudo visto de outros ângulos, flecha/lâmina.
+

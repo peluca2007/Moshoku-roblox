@@ -181,6 +181,11 @@ end
 -- K = ferramentas da Coreografia (animar, evento, peca, segmento, arco, cena...).
 function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 	local state = K.state
+	-- HAB5: anéis de mira/arco em tom frio (ciano da Água) destoavam da luta: ouro e tinta, como o anel do personagem.
+	do
+		local h, sat = cena.cor:ToHSV()
+		if h > 0.42 and h < 0.64 and sat > 0.3 then cena.cor = Color3.fromRGB(176, 136, 70) end
+	end
 	-- REA3: a Investida da Espada deixa um rastro quente e fino (como a fita da lâmina), não a cor da classe (rosa forte)
 	local cor = if spec.g == "investida" and spec.estilo == "espada" then Color3.fromRGB(255, 178, 96) else cena.cor
 	cena.cor = cor
@@ -333,19 +338,44 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 			end
 		end)
 	end
+	-- HAB5: poeira rasteira e translúcida (partículas de fumaça com rastro), não bolas de desenho.
+	local POEIRA = Color3.fromRGB(176, 160, 132)
+	local function emissorPoeira(pai: BasePart, raio: number, rastro: boolean?): ParticleEmitter
+		local e = Instance.new("ParticleEmitter")
+		e.Texture = "rbxasset://textures/particles/smoke_main.dds"
+		e.Color = ColorSequence.new(POEIRA, Color3.fromRGB(150, 136, 112))
+		e.Rate = 0
+		e.Lifetime = NumberRange.new(0.45, if rastro then 0.8 else 1.0)
+		e.Speed = NumberRange.new(raio * 0.4, raio * (if rastro then 1.0 else 1.8))
+		e.SpreadAngle = Vector2.new(80, 80)
+		e.Drag = 3
+		e.Acceleration = Vector3.new(0, 0.6, 0)
+		e.Rotation = NumberRange.new(0, 360)
+		e.RotSpeed = NumberRange.new(-40, 40)
+		e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, raio * 0.25), NumberSequenceKeypoint.new(1, raio * (if rastro then 0.6 else 0.8)) })
+		e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(0.35, 0.78), NumberSequenceKeypoint.new(1, 1) })
+		e.LightInfluence = 1
+		e.Parent = pai
+		return e
+	end
 	local function poeira(ponto: Vector3, quando: number, n: number, raio: number?)
-		for i = 1, n do
-			local p = K.peca(cena, "gota", Color3.fromRGB(176, 160, 132), Enum.Material.SmoothPlastic)
-			if p then
-				local ang = i * math.pi * 2 / n
-				local v = Vector3.new(math.cos(ang), 0.5, math.sin(ang)) * (raio or 2.2)
-				K.animar(cena, quando, 0.55, function(t)
-					p.Position = K.chao(ponto) + v * suave(t) + Y * (0.4 + t * 0.9)
-					p.Size = Vector3.one * (0.45 + t * 1.1)
-					p.Transparency = 0.45 + t ^ 1.5 * 0.55
-				end)
-			end
-		end
+		local p = K.peca(cena, "gota", POEIRA, Enum.Material.SmoothPlastic)
+		if not p then return end
+		local em = emissorPoeira(p, raio or 2.2)
+		K.evento(cena, quando, function()
+			p.Position = K.chao(ponto) + Y * 0.25
+			em:Emit(n * 2)
+		end)
+	end
+	-- Rastro de poeira que segue `posDe(t)` (t de 0 a 1) entre `quando` e `quando + dur`.
+	local function poeiraSegue(quando: number, dur: number, posDe: (number) -> Vector3, taxa: number)
+		local p = K.peca(cena, "gota", POEIRA, Enum.Material.SmoothPlastic)
+		if not p then return end
+		local em = emissorPoeira(p, 1.8, true)
+		K.animar(cena, quando, dur, function(t)
+			p.Position = K.chao(posDe(t)) + Y * 0.25
+			em.Rate = if t >= 1 then 0 else taxa
+		end)
 	end
 	local function estrelas(centro: Vector3, quando: number)
 		for i = 1, 4 do
@@ -369,19 +399,26 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				return
 			end
 			local m = f.modelo:Clone()
+			local visiveis = {}
 			for _, p in m:GetDescendants() do
 				if p:IsA("BasePart") then
-					p.Anchored, p.Material, p.Color, p.CanCollide = true, Enum.Material.Neon, cor, false
-					p.Transparency = 0.8
+					p.Anchored, p.CanCollide = true, false
+					-- HAB5: partes invisíveis do corpo (HumanoidRootPart etc.) viravam caixas amarelas flutuando atrás do corredor
+					if p.Transparency >= 0.95 or p.Name == "HumanoidRootPart" then
+						p.Transparency = 1
+					else
+						p.Material, p.Color, p.Transparency = Enum.Material.Neon, cor, 0.8
+						table.insert(visiveis, p)
+					end
+				elseif p:IsA("Decal") or p:IsA("Texture") or p:IsA("ParticleEmitter") or p:IsA("Trail") or p:IsA("Beam") or p:IsA("Light") then
+					p:Destroy()
 				end
 			end
 			m.Name = "Sombra"
 			m.Parent = cena.modelo
 			K.animar(cena, quando, vida, function(t)
-				for _, p in m:GetDescendants() do
-					if p:IsA("BasePart") then
-						p.Transparency = 0.8 + 0.2 * t
-					end
+				for _, p in visiveis do
+					p.Transparency = 0.8 + 0.2 * t
 				end
 				if t >= 1 then
 					m:Destroy()
@@ -680,27 +717,27 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				end
 			end)
 		end
-		-- Rastro de vento e poeira ao longo do caminho.
-		for i = 1, 6 do
-			local u = i / 7
-			local p = A:Lerp(B, u)
-			if i % 2 == 0 then poeira(p, W + corrida * u, 5, 1.8) end
+		-- Poeira rasteira: arrancada, rastro contínuo pelos pés e nuvem na chegada.
+		local function posNoCaminho(u: number): Vector3
+			return (A - dir * 0.7):Lerp(B, math.clamp(u, 0, 1) ^ 0.8)
 		end
-		if mocap then
-			-- poeira nos pés: arrancada e uma nuvem baixa a cada passada
-			poeira(K.chao(A), W * 0.6, 8, 2)
-			for i = 1, 9 do
-				local u = i / 10
-				poeira(K.chao(A:Lerp(B, u)), W * 0.6 + (corrida + W * 0.4) * u, 3, 1.3)
-			end
-			poeira(K.chao(B), W + corrida, 6, 2.2)
-		end
-		for i = 1, 4 do
+		poeira(K.chao(A), W * 0.6, 8, 2)
+		poeiraSegue(W, corrida, posNoCaminho, if mocap then 46 else 34)
+		poeira(K.chao(B), W + corrida, 7, 2.4)
+		-- Traços de vento: curtos (0,3 s), finos, nascem e somem acompanhando o trajeto.
+		local TRACOS = 9
+		for i = 1, TRACOS do
 			local seg = K.peca(cena, "fio", cor)
-			local lado = dir:Cross(Y) * ((i - 2.5) * 1.1)
-			K.animar(cena, W, corrida + 0.1, function(t)
-				local a1 = A:Lerp(B, math.clamp(t, 0, 1)) + lado + Y * (0.4 + i * 0.5)
-				K.segmento(seg, a1 - dir * (1.8 + 3 * t), a1, 0.08, 0.3 + t * 0.6)
+			local u0 = (i - 1) / TRACOS
+			local lado = dir:Cross(Y) * (((i * 7) % 5 - 2) * 0.55)
+			local alt = 0.5 + ((i * 3) % 4) * 0.45
+			K.animar(cena, W + corrida * u0 * 0.85, 0.3, function(t)
+				if t >= 1 then
+					if seg then seg.Transparency = 1 end
+					return
+				end
+				local ponta = posNoCaminho(u0 + (0.12 + 0.2 * t)) + lado + Y * alt
+				K.segmento(seg, ponta - dir * (1.0 + 2.2 * t), ponta, 0.05, 0.35 + t * 0.65)
 			end)
 		end
 		local tImp = W + corrida + golpe * 0.6

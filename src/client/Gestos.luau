@@ -133,7 +133,7 @@ function Gestos.reacao(K, cena, alvoId: string, direcao: Vector3, forca: number,
 	if tocador then
 		-- a arma da postura não vai no clone (Archivable = false em AnimacaoLuta): põe de novo no fantasma
 		Corpo.arma(f, Corpo.armasVistas[modelo] or "espada")
-		local nome = if tipo == "esquiva" then "Esquiva" elseif tipo == "bloqueio" then "Bloqueio" else "ReacaoMixamo" -- HAB1e: mocap (sword and shield impact) no lugar da ReacaoGolpe por script
+		local nome = if tipo == "esquiva" then "EsquivaMixamo" elseif tipo == "bloqueio" then "Bloqueio" else "ReacaoMixamo" -- HAB1e: mocap (sword and shield impact) no lugar da ReacaoGolpe por script
 		local clipe = Catalogo.CLIPES[nome]
 		local marco = clipe.marcos.impacto or clipe.marcos.desvio or 0
 		local t0 = math.max(0, marco - 0.1) -- o corpo já está reagindo quando o golpe chega

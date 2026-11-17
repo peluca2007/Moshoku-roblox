@@ -18,9 +18,10 @@ local CLIPES = {
 	Vitoria = require(Shared.Animacoes.Clipes.Vitoria),
 	CorteDeBraco = require(Shared.Animacoes.Clipes.CorteDeBraco), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
 	ReacaoMixamo = require(Shared.Animacoes.Clipes.ReacaoMixamo), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
+	EsquivaMixamo = require(Shared.Animacoes.Clipes.EsquivaMixamo), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
 }
 
 return {
 	CLIPES = CLIPES,
-	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria", "CorteDeBraco", "ReacaoMixamo" },
+	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria", "CorteDeBraco", "ReacaoMixamo", "EsquivaMixamo" },
 }

@@ -369,12 +369,13 @@ local function auraMolhado(ctx, alvoId: string, duracao: number, atraso: number?
 	local cena = novaCena(ctx)
 	local inicio = (atraso or 0)
 	local centro = ctx.posicaoDe(alvoId)
+	local anim
 	cena:em(inicio, function()
 		centro = ctx.posicaoDe(alvoId)
-		local veu = cena:bola(3.6, centro, AGUA, 0.75)
+		-- HAB7: sem esfera de vidro em volta do alvo (parecia uma bolha opaca presa); só gotejar, brilho úmido e poça fina
 		local suporte = cena:peca({ Size = Vector3.one * 0.3, Position = centro, Transparency = 1 })
 		local pinga = cena:emissor(suporte, "brilho", AGUA, {
-			Rate = if FX.reduzidos then 4 else 14, Speed = NumberRange.new(0.5, 1.5), SpreadAngle = Vector2.new(60, 60),
+			Rate = if FX.reduzidos then 6 else 22, Speed = NumberRange.new(0.5, 1.5), SpreadAngle = Vector2.new(80, 80),
 			Lifetime = NumberRange.new(0.6, 1), Acceleration = Vector3.new(0, -22, 0),
 			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.6), NumberSequenceKeypoint.new(1, 0.2) }),
 			EmissionDirection = Enum.NormalId.Bottom,
@@ -384,29 +385,29 @@ local function auraMolhado(ctx, alvoId: string, duracao: number, atraso: number?
 			Lifetime = NumberRange.new(0.5, 0.9), Acceleration = Vector3.new(0, 1.5, 0),
 			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.28), NumberSequenceKeypoint.new(1, 0) }),
 		})
-		local poca = cena:disco(ctx.chao(centro) + Vector3.new(0, 0.07, 0), 3, PROFUNDA, 0.5)
-		cena:anim(inicio, inicio + duracao, function(u)
+		local poca = cena:disco(ctx.chao(centro) + Vector3.new(0, 0.07, 0), 2.4, PROFUNDA, 0.8)
+		anim = cena:anim(inicio, inicio + duracao, function(u)
 			local c = ctx.posicaoDe(alvoId)
-			veu.Position, suporte.Position = c, c
+			suporte.Position = c
 			poca.Position = ctx.chao(c) + Vector3.new(0, 0.07, 0)
 			local ondula = 1 + 0.05 * math.sin(cena.T * 6)
-			veu.Size = Vector3.one * 3.4 * ondula
 			local entrada = math.min(u * duracao / 0.35, 1)
 			local saida = math.clamp((1 - u) * duracao / 0.9, 0, 1)
 			local k = math.min(entrada, saida)
-			veu.Transparency = 1 - 0.25 * k
-			poca.Transparency = 1 - 0.5 * k
-			poca.Size = Vector3.new(0.1, 3 * ondula * (0.6 + 0.4 * k), 3 * ondula * (0.6 + 0.4 * k))
-			pinga.Rate = (if FX.reduzidos then 4 else 14) * k
-			brilho.Rate = (if FX.reduzidos then 2 else 6) * k
+			poca.Transparency = 1 - 0.2 * k
+			poca.Size = Vector3.new(0.1, 2.4 * ondula * (0.6 + 0.4 * k), 2.4 * ondula * (0.6 + 0.4 * k))
+			pinga.Rate = (if FX.reduzidos then 6 else 22) * k
+			brilho.Rate = (if FX.reduzidos then 3 else 10) * k
 		end)
 	end)
 	cena:iniciar()
 	return function()
 		cena.fimT = 0
+		if anim then anim.fim = true end
 		for _, i in cena.lixo do
 			if i.Parent then i:Destroy() end
 		end
+		table.clear(cena.lixo)
 	end
 end
 
@@ -473,11 +474,11 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 	local lateral = if ao.Magnitude > 0.1 then ao.Unit else Vector3.xAxis
 	local normal = lateral:Cross(Vector3.yAxis)
 	if frente and frente.Magnitude > 0.1 and normal:Dot(frente) < 0 then normal = -normal end
-	local larg = math.max(#pts, 2) * Protocol.BOARD.cell
+	local larg = math.max(#pts, 2) * Protocol.BOARD.cell * 1.5 -- HAB7: mais largo, para ler como muro também de lado
 	local alto = Protocol.BOARD.cell * 1.7
 	local espessura = 1.5
-	local curva = 1.6 -- o arco abaulado para os inimigos
-	local N = if FX.reduzidos then 5 else 9
+	local curva = 3.0 -- o arco abaulado para os inimigos
+	local N = if FX.reduzidos then 7 else 13
 	local estado = { tFim = nil :: number? }
 	local anim
 	-- HAB5: água em pé: azul-esverdeado translúcido, borda mais clara, correnteza para BAIXO, espuma no topo e reflexo.
@@ -530,7 +531,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 		end
 		ctx.som({ habilidadeId = "ability/agua/Principiante/escudo-de-agua" }, "agua", 1.0)
 		-- câmera curta mostrando o muro subir
-		if ctx.focoCamera then ctx.focoCamera(base + normal * curva + Vector3.new(0, alto * 0.45, 0), 1.5, nil, 15, 5, -normal) end
+		if ctx.focoCamera then ctx.focoCamera(base + normal * curva + Vector3.new(0, alto * 0.45, 0), 2.6, nil, 13, 5, -normal) end
 		anim = cena:anim(t0, t0 + 3600, function()
 			local t = cena.T - t0
 			local sumindo = estado.tFim ~= nil

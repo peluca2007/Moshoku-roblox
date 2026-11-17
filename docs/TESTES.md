@@ -1636,3 +1636,12 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - `qa.py luta` 29 ok (sozinho). `testar.ps1`: só Catálogo falha (ambiente).
 - Não verificado: celular, desempenho, escudo visto de frente sem câmera própria, reação do rato à Bola (o recuo é discreto), flecha/lâmina, o brilho amarelo sobre o corpo na largada da Investida (rastro quente) pode ainda estar forte.
 
+## HAB7 (17/11/2026) — bolha do Molhado, brilho da Investida, escudo largo, recuo na Bola (`build/beleza/hab7/`)
+
+- Bolha presa: era a aura Molhado (`MagiasAgua.molhado`): esfera de vidro de 3,4 studs em volta do alvo, mantida por `Magias` enquanto a condição `molhado` estiver no snapshot (por isso aparecia no primeiro quadro das lutas seguintes). A esfera saiu; ficam gotejar, brilho úmido e poça fina; a função de parar agora encerra a animação e limpa as peças.
+- Investida: o brilho amarelo no corpo eram as sombras (afterimages) em Neon, estouradas pelo Bloom; agora plástico liso escuro e mais translúcido. Sobraram só os fios finos do rastro.
+- Escudo: 1,5x mais largo, curva 3,0 e 13 segmentos; câmera de foco dura 2,6 s. Nos quadros de 3/4 lê como muro grosso; ao ser visto de lado pela câmera padrão, ainda parece laje alta (a câmera `dir` nem sempre fica atrás do muro).
+- Bola: `ctx.recuo` aplica `ImpactoFx.tranco` (força x1,3) em corpos de peças rígidas sem Mixamo; o rato recua e fica azulado molhado nos quadros.
+- `qa.py luta` 29 ok; `testar.ps1` só Catálogo falha (ambiente).
+- Não verificado: celular, desempenho, escudo de frente isolado, humanoides na Bola (usam clipe Mixamo no servidor).
+

@@ -694,6 +694,14 @@ local ctxAgua = {
 	aFrente = aFrente,
 	recuo = function(alvoId, de, forca)
 		recuo(state, alvoId, de, forca)
+		-- HAB7: bichos de peças rígidas (sem clipe Mixamo) levam o tranco com peso
+		local corpos = workspace:FindFirstChild("CorposDeCriatura")
+		local corpo = corpos and corpos:FindFirstChild(alvoId)
+		if corpo and corpo:IsA("Model") and not corpo:FindFirstChildOfClass("Humanoid") and not corpo:GetAttribute("ReacaoMx") then
+			local ImpactoFx = require(script.Parent:WaitForChild("ImpactoFx"))
+			local golpe = posicaoDe(state, alvoId) - de
+			ImpactoFx.tranco(corpo, golpe, math.clamp(forca * 1.3, 1.2, 2), false)
+		end
 		-- HAB1: o corpo do alvo também reage (ReacaoGolpe), não só a miniatura recua
 		if coreografiaRef then coreografiaRef.reacao(alvoId, posicaoDe(state, alvoId) - de, forca) end
 	end,

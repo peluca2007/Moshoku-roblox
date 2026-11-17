@@ -407,7 +407,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 					if p.Transparency >= 0.95 or p.Name == "HumanoidRootPart" then
 						p.Transparency = 1
 					else
-						p.Material, p.Color, p.Transparency = Enum.Material.Neon, cor, 0.8
+						p.Material, p.Color, p.Transparency = Enum.Material.SmoothPlastic, cor:Lerp(Color3.fromRGB(60, 40, 30), 0.55), 0.88 -- HAB7: Neon + Bloom cobria o corpo de amarelo na arrancada
 						table.insert(visiveis, p)
 					end
 				elseif p:IsA("Decal") or p:IsA("Texture") or p:IsA("ParticleEmitter") or p:IsA("Trail") or p:IsA("Beam") or p:IsA("Light") then
@@ -418,7 +418,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 			m.Parent = cena.modelo
 			K.animar(cena, quando, vida, function(t)
 				for _, p in visiveis do
-					p.Transparency = 0.8 + 0.2 * t
+					p.Transparency = 0.88 + 0.12 * t
 				end
 				if t >= 1 then
 					m:Destroy()

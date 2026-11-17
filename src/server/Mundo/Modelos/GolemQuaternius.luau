@@ -1,9 +1,9 @@
--- GERADO por tools/exportar_modelo.py; não editar. Fonte: criatura-externa semente 1 (asset 124076981066731, Quaternius (CC0)), Creator Store grátis; scripts/uniões removidos.
+-- GERADO por tools/exportar_modelo.py; não editar. Fonte: criatura-externa semente 1 (asset 82416902424707, Quaternius (CC0)), Creator Store grátis; scripts/uniões removidos.
 -- Modelo GolemQuaternius (GolemQuaternius): 16 peças; caixa original 6.35 x 8 x 3.47 studs (alinhada ao pivô).
 -- Formato das linhas de P e das tabelas S/R: ver Mundo/MontarModelo.luau.
 return {
 	versao = 1,
-	fonte = { nome = "criatura-externa semente 1", asset = 124076981066731, autor = "Quaternius (CC0)" },
+	fonte = { nome = "criatura-externa semente 1", asset = 82416902424707, autor = "Quaternius (CC0)" },
 	caixa = { 6.348, 8, 3.473 },
 	centro = { 0, 4, 0 },
 	S = {"MeshPart","BracoD_Musgo","","Plastic","rbxassetid://132923226369461","BracoD_Pedra","rbxassetid://71367240666879","BracoD_PedraXX","rbxassetid://97611953462447","BracoE_Musgo","rbxassetid://134193405303305","BracoE_Pedra","rbxassetid://116183594992830","BracoE_PedraXX","rbxassetid://107502945389272","Cabeca_Brilho","rbxassetid://91257714629263","Cabeca_PedraClara","rbxassetid://84010340964015","Corpo_PedraEscuraXX","rbxassetid://74690282266573","Corpo_PedraX","rbxassetid://133696205782610","PernaD_PedraEscura","rbxassetid://99879214397821","PernaD_PedraEscuraX","rbxassetid://114203951574572","PernaD_PedraXXX","rbxassetid://97326259907498","PernaE_PedraEscura","rbxassetid://98540432220514","PernaE_PedraEscuraX","rbxassetid://107098423173965","PernaE_PedraXXX","rbxassetid://138111487351700"},

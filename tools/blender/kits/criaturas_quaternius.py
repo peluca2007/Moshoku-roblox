@@ -41,7 +41,7 @@ PERSONAGENS = glob.glob(os.path.join(EXTERNOS, "personagens-ultimate", "*", "FBX
 PERSONAGENS = PERSONAGENS[0] if PERSONAGENS else ""
 URSO = os.path.join(EXTERNOS, "urso-branco", "x")  # Bear de Phelippeau Rudy (CC0, OpenGameArt, sem esqueleto), MOD6
 GOLEM = os.path.join(EXTERNOS, "golem-knight", "x")  # Golem Knight (CC0, OpenGameArt), MOD6
-TREANT = os.path.join(EXTERNOS, "treant-floresta", "x")  # Forest Monster de Cestmir Dammer (CC0, OpenGameArt), MOD6
+TREANT = os.path.join(EXTERNOS, "ent1")  # Evil Tree Creature de Benji Smith (CC BY 3.0, OpenGameArt), MOD7 (o Forest Monster da MOD6 foi trocado)
 PASTAS = {"monstros": MONSTROS, "easy": INIMIGOS, "animais": ANIMAIS, "personagens": PERSONAGENS, "golem": GOLEM, "treant": TREANT, "urso": URSO}
 
 
@@ -147,9 +147,9 @@ def regra_golem_objeto(nome, x):
 
 
 def regra_treant(nome, x, _):
-    if re.search(r"Head|Neck|Mouth", nome): return "Cabeca"
-    if re.search(r"Shoulder|Arm|Hand|Finger|Toe[0-9]", nome): return "Braco" + _lado(nome, x)
-    if re.search(r"Thigh|Leg|Foot|Footfinger", nome, re.I): return "Perna" + _lado(nome, x)
+    if re.search(r"^Head", nome): return "Cabeca"
+    if re.search(r"arm|hand|finger|fnger|elbow", nome, re.I): return "Braco" + _lado(nome, x)
+    if re.search(r"leg|foot|knee|Bone\.00[45]", nome, re.I): return "Perna" + _lado(nome, x)
     return "Corpo"
 
 
@@ -159,12 +159,14 @@ def regra_urso(nome, x, _):
 
 def parte_urso(c):
     """Urso sem esqueleto (Bear.blend): partes pela posição do centro do polígono, em coordenadas do .blend (olha para +Y,
-    cabeça em y > 1,5, pernas da frente em y 0,3..1,3 e de trás em y -1,6..-0,6, abaixo de z 1)."""
+    cabeça em y > 1,5, pernas da frente em y 0,3..1,3 e de trás em y -1,6..-0,6, abaixo de z 1). MOD7: cada perna em 2
+    segmentos (coxa acima de z 0,5, canela `...Baixo` abaixo) para o joelho dobrar."""
     if c.y > 1.5: return "Cabeca"
     if c.z < 1.05 and abs(c.x) > 0.2:
         lado = "D" if c.x < 0 else "E"  # depois do giro de 180 graus a direita do urso fica em -X
-        if c.y > 0.25: return "Braco" + lado
-        if c.y < -0.55: return "Perna" + lado
+        base = "Braco" if c.y > 0.25 else ("Perna" if c.y < -0.55 else None)
+        if base:
+            return base + lado + ("Baixo" if c.z < 0.5 else "")
     return "Corpo"
 
 
@@ -175,7 +177,8 @@ def cor_urso(c):
 # Módulo -> função(centro do polígono no mundo do Blender, antes do giro) -> parte (malha sem esqueleto), e seus pivôs (mundo do Blender).
 PARTE_POLIGONO = {"UrsoQuaternius": parte_urso}
 PIVOS_FIXOS = {"UrsoQuaternius": {"BracoD": (-0.5, 0.8, 1.55), "BracoE": (0.5, 0.8, 1.55), "PernaD": (-0.5, -1.0, 1.55), "PernaE": (0.5, -1.0, 1.55),
-                                  "Cabeca": (0.0, 1.5, 1.35), "Corpo": (0.0, 0.0, 1.1)}}
+                                  "Cabeca": (0.0, 1.5, 1.35), "Corpo": (0.0, 0.0, 1.1),
+                                  "BracoDBaixo": (-0.5, 0.8, 0.5), "BracoEBaixo": (0.5, 0.8, 0.5), "PernaDBaixo": (-0.5, -1.0, 0.5), "PernaEBaixo": (0.5, -1.0, 0.5)}}
 # Cor por polígono (módulo -> função(centro) -> nome do grupo) e as cores dos grupos.
 COR_POLIGONO = {"UrsoQuaternius": (cor_urso, {"Pelo": (112, 80, 54), "Pata": (58, 42, 32), "Focinho": (176, 140, 112)})}
 # Modulo -> função(nome do objeto, x) que decide a parte pelo objeto (quando os pesos não separam as peças).
@@ -189,9 +192,9 @@ COR_POR_MATERIAL = {"GolemQuaternius": {
     "Material_6": ((124, 126, 130), "Pedra"), "Material_7": ((108, 110, 114), "Pedra"), "Material_8": ((98, 122, 84), "Musgo"),
     "Material_9": ((120, 122, 126), "Pedra")}}
 # Módulos coloridos por textura: cor amostrada no UV de cada polígono e reduzida a K cores (k-means) para limitar as peças.
-TEXTURA_K = {"TreantQuaternius": 7}
+TEXTURA_K = {"TreantQuaternius": 6}
 # O .blend do treant perdeu os nós de textura na conversão: material -> imagem de cor (módulo -> {material: imagem}).
-TEXTURA_IMG = {"TreantQuaternius": {"Monster": "monster-skin", "Tree": "skin_dieing.png"}}
+TEXTURA_IMG = {"TreantQuaternius": {"Material": "Diff_Map", "Material.001": "Diff_Map"}}
 
 # Modulo -> (arquivo, regra, medida alvo em studs, "h" maior dimensão horizontal | "a" altura, tipo de animação, yaw extra graus,
 # arquivo de origem do osso que aponta a frente)
@@ -211,12 +214,12 @@ CRIATURAS = {
     # MOD6: golem (Golem Knight, gltf, CC0) e treant (Forest Monster, blend, CC0); o urso é feito por geometria (ver ursos.py)
     "UrsoQuaternius": ("urso", "Bear.blend", regra_urso, 7.4, "h", "quadrupede", None),
     "GolemQuaternius": ("golem", "golem.gltf", regra_golem_osso, 8.0, "a", "pesado", None),
-    "TreantQuaternius": ("treant", "forest-monster-final.blend", regra_treant, 14.0, "a", "pesado", None),
+    "TreantQuaternius": ("treant", "Tree_Creature.blend", regra_treant, 13.0, "a", "pesado", None),
     "BandidoEspadaQuaternius": ("personagens", "Cowboy_Male.fbx", regra_goblin, 5.4, "a", "humanoide", None),
     "BandidoPorreteQuaternius": ("personagens", "Casual3_Male.fbx", regra_goblin, 5.4, "a", "humanoide", None),
 }
 # yaw em graus (rotação em Z do Blender) que põe a frente em -Y; descoberto olhando a pose de repouso.
-YAW = {"UrsoQuaternius": 180.0}
+YAW = {"UrsoQuaternius": 180.0, "TreantQuaternius": 90.0}
 # Onde a pose de repouso não mostra para onde a criatura olha: (ossos da frente, osso de referência) -> direção no plano XY.
 FRENTE = {"LoboQuaternius": (["Bone.003"], "Bone"), "VespaQuaternius": (["Head"], "Abdomen"), "SlimeQuaternius": (["RightEye", "LeftEye"], "Body")}
 

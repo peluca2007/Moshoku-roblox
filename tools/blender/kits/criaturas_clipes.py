@@ -42,15 +42,17 @@ CLIPES = {
                          "LevarGolpe": ("RecieveHit", False)},
     # MOD6: golem (Golem Knight: walk, attack_light, heavy_hit; sem idle nem morte) e treant (Forest Monster: Idle, Walk, Attack, Dying)
     "UrsoQuaternius": {},  # sem esqueleto: Respirar, Andar, Atacar, LevarGolpe e Morrer sintetizados
-    "GolemQuaternius": {"Andar": ("walk", LAÇO), "Atacar": ("light", False), "Atacar2": ("hit", False)},
-    "TreantQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Attack", False), "Morrer": ("Dying", False)},
+    "GolemQuaternius": {"Atacar": ("light", False), "Atacar2": ("hit", False)},
+    "TreantQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Attack1", False), "Atacar2": ("Attack2", False)},
 }
 # Clipes que terminam no último quadro (não voltam ao repouso).
 SEGURAR = {"Morrer"}
+# MOD7: instante do impacto (s) quando o detector de pico falha (treant: movimento por mãos/galhos): (módulo, clipe) -> tempo.
+IMPACTO_FIXO = {("TreantQuaternius", "Atacar"): 0.9, ("TreantQuaternius", "Atacar2"): 1.0}
 # MOD6: clipes do pacote curtos demais para a luta (golem: 6 quadros) são esticados no tempo: (módulo, clipe) -> fator.
-LENTO = {("GolemQuaternius", "Andar"): 3.0, ("GolemQuaternius", "Atacar"): 2.6, ("GolemQuaternius", "Atacar2"): 1.6}
+LENTO = {("GolemQuaternius", "Atacar"): 2.6, ("GolemQuaternius", "Atacar2"): 1.6}
 # MOD6: humanoides com morte em 3 fases (joelhos, tombo girando, assentamento) em vez do tombo rígido.
-ANDAR_SINTETICO = {"UrsoQuaternius"}
+ANDAR_SINTETICO = {"UrsoQuaternius", "GolemQuaternius"}
 MORTE_HUMANOIDE = {"GoblinQuaternius", "BandidoEspadaQuaternius", "BandidoPorreteQuaternius"}
 # Tolerâncias da redução de quadros: rotação (rad) e deslocamento (fração da altura do modelo).
 TOL_ROT, TOL_POS = 0.006, 0.004
@@ -249,21 +251,79 @@ def respirar(pivos_r, altura):
     return tempos, sintetizar(pivos_r, tempos, fn, extra), dur
 
 
+def _chave_hierarquia(pivos_r, tempos, fn_mundo, fn_local, pais):
+    """Animação de peças encadeadas (coxa -> canela): `fn_local(parte, t)` devolve a rotação local da peça em volta do próprio
+    pivô; a peça com pai herda a transformação do pai: p' = Rpai (Rs (p - k) + k - h) + h. `fn_mundo(t)` = (R, tv) do corpo todo."""
+    dados = {p: ([], []) for p in pivos_r}
+    for t in tempos:
+        Rw, tw = fn_mundo(t)
+        for parte, pv in pivos_r.items():
+            Rs = fn_local(parte, t)
+            pai = pais.get(parte)
+            if pai:
+                h = pivos_r[pai]
+                Ru = fn_local(pai, t)
+                Rl = Ru @ Rs
+                bl = Ru @ (pv - Rs @ pv - h) + h
+            else:
+                Rl = Rs
+                bl = pv - Rs @ pv
+            Rt = Rw @ Rl
+            b = Rw @ bl + tw
+            dados[parte][0].append(quat_de(Rt))
+            dados[parte][1].append(Rt @ pv + b - pv)
+    return {p: (alinhar(q), np.array(d)) for p, (q, d) in dados.items()}
+
+
 def andar_quadrupede(pivos_r, altura):
-    """Andar sintetizado de quadrúpede sem esqueleto: patas em diagonal balançam em rot x (laço de 0,9 s), corpo balança de leve."""
-    dur, fps = 0.9, 24
+    """Passo de quadrúpede (urso): pernas em 2 segmentos (coxa `BracoD`/`PernaE`..., canela `...Baixo`), diagonais em oposição
+    (BracoE+PernaD / BracoD+PernaE), joelho dobra na fase de balanço, peso no ombro (corpo mergulha no apoio das patas da
+    frente e a cabeça acompanha). Laço de 1,2 s."""
+    dur, fps = 1.2, 24
+    tempos = [i / fps for i in range(int(round(dur * fps)) + 1)]
+    pais = {p: p[:-5] for p in pivos_r if p.endswith("Baixo") and p[:-5] in pivos_r}
+
+    def fase(parte):
+        base = parte[:-5] if parte.endswith("Baixo") else parte
+        return {"BracoE": 0.0, "PernaD": 0.0, "BracoD": math.pi, "PernaE": math.pi}.get(base)
+
+    def mundo(t):
+        w = 2 * math.pi * t / dur
+        return rot("x", -0.035 * math.cos(2 * w)) @ rot("z", 0.03 * math.sin(w)), np.array([0.0, -0.03 * altura * abs(math.sin(w)) + 0.012 * altura, 0.0])
+
+    def local(parte, t):
+        w = 2 * math.pi * t / dur
+        f = fase(parte)
+        if f is None:
+            return rot("x", 0.06 * math.sin(2 * w - 0.8)) if parte == "Cabeca" else np.eye(3)
+        if parte.endswith("Baixo"):
+            return rot("x", -0.85 * max(0.0, math.cos(w + f + 0.3)))  # dobra o joelho ao levar a pata para a frente
+        return rot("x", 0.5 * math.sin(w + f))
+
+    return tempos, _chave_hierarquia(pivos_r, tempos, mundo, local, pais), dur
+
+
+def andar_pesado(pivos_r, altura):
+    """Passo pesado do golem (bípede de pedra): ciclo lento de 1,5 s, tronco balançando para o lado do apoio, braços em oposição
+    às pernas e impacto no chão (o corpo afunda no instante em que o pé pousa e a cabeça solavanca)."""
+    dur, fps = 1.5, 24
     tempos = [i / fps for i in range(int(round(dur * fps)) + 1)]
 
-    def fn(t):
+    def mundo(t):
         w = 2 * math.pi * t / dur
-        return rot("z", 0.02 * math.sin(w)), np.array([0.0, 0.015 * altura * abs(math.sin(w)), 0.0])
+        impacto = abs(math.sin(w)) ** 0.5  # 0 quando um pé pousa, 1 no meio do passo
+        return rot("z", 0.06 * math.sin(w)) @ rot("x", 0.02 * math.cos(2 * w)), np.array([0.0, 0.04 * altura * (impacto - 1), 0.0])
 
-    def extra(parte, t):
+    def local(parte, t):
         w = 2 * math.pi * t / dur
-        fase = {"BracoE": 0.0, "PernaD": 0.0, "BracoD": math.pi, "PernaE": math.pi}.get(parte)
-        return rot("x", 0.45 * math.sin(w + fase)) if fase is not None else (rot("x", -0.05 * math.sin(2 * w)) if parte == "Cabeca" else np.eye(3))
+        if parte == "PernaD": return rot("x", 0.36 * math.sin(w))
+        if parte == "PernaE": return rot("x", -0.36 * math.sin(w))
+        if parte == "BracoD": return rot("x", -0.2 * math.sin(w)) @ rot("z", -0.04)
+        if parte == "BracoE": return rot("x", 0.2 * math.sin(w)) @ rot("z", 0.04)
+        if parte == "Cabeca": return rot("x", -0.07 * math.cos(2 * w)) @ rot("y", -0.05 * math.sin(w))
+        return np.eye(3)
 
-    return tempos, sintetizar(pivos_r, tempos, fn, extra), dur
+    return tempos, _chave_hierarquia(pivos_r, tempos, mundo, local, {}), dur
 
 
 def mordida(pivos_r, altura):
@@ -291,18 +351,18 @@ def mordida(pivos_r, altura):
 
 
 def morte_humanoide(pivos_r, pts_partes):
-    """MOD6: morte com peso em 3 fases (o Defeat do pacote volta de pé). 1) os joelhos cedem (corpo desce, pernas dobram para
+    """MOD6/MOD7: morte com peso em 3 fases, 1,75 s (o Defeat do pacote volta de pé). 1) os joelhos cedem (corpo desce, pernas dobram para
     a frente, cabeça cai), 2) o tronco tomba para trás girando em torno do eixo, com o braço da arma jogado para fora,
     3) assenta no chão com um quique amortecido. Cada peça gira em volta do próprio pivô; o chão é respeitado por peça."""
-    dur, fps = 1.3, 24
+    dur, fps = 1.75, 24
     tempos = [i / fps for i in range(int(round(dur * fps)) + 1)]
     todos = np.concatenate(list(pts_partes.values()))
     altura = float(todos[:, 1].max() - todos[:, 1].min())
 
     def fases(t):
-        cede = suave(t / 0.32)                                   # 0..1: joelhos
-        tomba = suave((t - 0.22) / 0.62) ** 1.6 if t > 0.22 else 0.0   # 0..1: queda (acelera)
-        q = max(t - 0.84, 0.0)
+        cede = suave(t / 0.42)                                   # 0..1: joelhos
+        tomba = suave((t - 0.30) / 0.82) ** 1.6 if t > 0.30 else 0.0   # 0..1: queda (acelera)
+        q = max(t - 1.10, 0.0)
         quique = 0.07 * math.exp(-q * 7) * math.sin(q * 20) if q > 0 else 0.0
         return cede, tomba, quique
 
@@ -434,7 +494,7 @@ def gerar(bpy, modulo, malhas, partes_verts, pts_repouso, T, pivos_aut, desloc):
             tempos, fps = [t * fator for t in tempos], fps / fator
         marco = {}
         if nome.startswith("Atacar"):
-            marco["impacto"] = impacto({p: (None, d) for p, (q, d) in dados.items()}, tempos)
+            marco["impacto"] = IMPACTO_FIXO.get((modulo, nome)) or impacto({p: (None, d) for p, (q, d) in dados.items()}, tempos)
         if laco:
             tempos, dados, dur = fechar_laco(tempos, dados, altura, fps)
         else:
@@ -444,7 +504,7 @@ def gerar(bpy, modulo, malhas, partes_verts, pts_repouso, T, pivos_aut, desloc):
         tempos, dados, dur = respirar(pivos_r, altura)
         saida["Respirar"] = montar("Respirar", "sintetizado", tempos, dados, dur, 24, True, {}, altura)
     if "Andar" not in saida and modulo in ANDAR_SINTETICO:
-        tempos, dados, dur = andar_quadrupede(pivos_r, altura)
+        tempos, dados, dur = (andar_pesado if modulo == "GolemQuaternius" else andar_quadrupede)(pivos_r, altura)
         saida["Andar"] = montar("Andar", "sintetizado", tempos, dados, dur, 24, True, {}, altura)
     if "Atacar" not in saida:
         tempos, dados, dur, t_imp = mordida(pivos_r, altura)

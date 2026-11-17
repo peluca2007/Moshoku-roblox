@@ -498,10 +498,10 @@
   "sha256": "7217953cf15549d3b51b5c2f5439f31bb1b6a27b6c5d79018a46e8554e5551dd"
  },
  "GolemQuaternius": {
-  "asset": "124076981066731",
+  "asset": "82416902424707",
   "modelo": "criatura-externa",
   "semente": "1",
-  "sha256": "17a8ee7da9f23ee7fbbc897742f685c8ced828682fbe6bb1810e0a89c084626e"
+  "sha256": "801ea0378c598093ae1502a2a7f3fd22ed316b1820aae1598e1575d9d3983e1a"
  },
  "Jardineira": {
   "asset": "108925798351800",
@@ -858,10 +858,10 @@
   "sha256": "152babd95beb7bc37009cdce047fc99a91cf8b92fcd5b99cb2c8d527b81890a1"
  },
  "TreantQuaternius": {
-  "asset": "111832533348588",
+  "asset": "120513435855788",
   "modelo": "criatura-externa",
   "semente": "1",
-  "sha256": "9b527735089e5b3e2bc7f6d4a5de3ad039f68a0b6657dd0803f7ec1d72cc3be0"
+  "sha256": "f2b20d43f5be355c95c5219f2659a20e08cd1aa83704c8b287bef1b947e696b4"
  },
  "Tripe1": {
   "asset": "106778895361908",
@@ -888,10 +888,10 @@
   "sha256": "e7046695346b2d85a35ecdc7cd716306310086d2aea4a8ab09a88a4d4dcf934e"
  },
  "UrsoQuaternius": {
-  "asset": "134501935916625",
+  "asset": "99436584894096",
   "modelo": "criatura-externa",
   "semente": "1",
-  "sha256": "bcfdbd753f37c8529f5a5380c921f9989077bcbd8cec4733866a9dcc69528bcb"
+  "sha256": "f7f4b25b060c94ba08af983bf2420d15a140a7c804fd7188859a72e2c1ff6ec6"
  },
  "Varal": {
   "asset": "94398145531634",

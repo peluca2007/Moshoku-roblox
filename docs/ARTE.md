@@ -100,11 +100,12 @@ respeitado por peça. Regenerar: `python tools/blender_rodar.py tools/blender/ki
 
 **Novos modelos** (procedência em `FONTES.md`, todos CC0 do OpenGameArt): `GolemQuaternius` (Golem Knight; pedra em cores fixas,
 olhos `Brilho`, ~1000 triângulos; walk/attack do pacote esticados no tempo, Respirar/LevarGolpe/Morrer sintetizados),
-`TreantQuaternius` (Forest Monster com árvore nas costas; cor amostrada da textura e reduzida a 7 cores por k-means,
-cartões de folha transparentes descartados; Idle/Walk/Attack/Dying do pacote; ~6400 triângulos e 37 peças, o mais pesado) e
+`TreantQuaternius` (na MOD6 era o Forest Monster; trocado na MOD7, abaixo) e
 `UrsoQuaternius` (Bear sem esqueleto, repartido por geometria em cabeça, 2 patas da frente, 2 de trás e corpo; todos os clipes
 sintetizados). Notas francas: golem ~6,5 (a melhor silhueta), urso ~6,5, treant ~5 (macaco com árvore na cabeça, malha ruidosa).
 Limitações: o urso anda com patas rígidas balançando; o golem tem walk de 6 quadros esticado (ritmo de boneco).
+
+**MOD7.** Treant: Evil Tree Creature de Benji Smith (CC BY 3.0, crédito obrigatório; `FONTES.md`), rig de 30 ossos limpo, 784 triângulos, 33 peças, tronco com galhos-braços e raízes-pés; Idle/Walk/Attack1/Attack2 do pacote (impacto fixo em `IMPACTO_FIXO`), Morrer = tombo rígido de árvore. Urso: pernas em 2 segmentos (`BracoD` + `BracoDBaixo` etc., encadeados por `_chave_hierarquia`) com passo de quadrúpede em diagonais, joelho dobrando no balanço e peso no ombro. Golem: `andar_pesado` sintetizado (1,5 s, tronco balançando, afundando no apoio). Morte humanoide: 1,75 s.
 
 ## Animações da luta: Universal Animation Library (APRES1)
 Quaternius, **CC0 1.0** (`License.txt` do pacote), `Universal Animation Library[Standard].zip` (UAL1, glb Unreal-Godot, 24 fps), baixada em 15/11/2026 e extraída em `build/externos/ual/` (fora do git). Redirecionada para o R15 por `tools/blender/anim_ual.py` com o mapa `tools/animacao/ual_clipes.json` (ver `tools/animacao/README.md`). Clipes da UAL: PosturaCombate (Sword_Idle), CorteLeve/CortePesado (Sword_Attack, 1,1x e 0,7x), Estocada (Punch_Jab), Conjurar (Spell_Simple Enter+Shoot+Exit), Canalizar, ReacaoGolpe (Hit_Chest), Esquiva (Roll), Queda (Death01). Continuam por script (`origem = "script"`): DisparoArco (a UAL1 só tem pistola), Bloqueio, Vitoria.

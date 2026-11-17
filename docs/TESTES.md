@@ -1535,3 +1535,9 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Arma única no mundo: o objeto lógico "arma no chão" ganhou `fisica=true` quando a peça real cai; `ArmasNoChaoView` esconde a espada de mentira e mantém só a etiqueta (peça física dura 3 min). Não conferido em jogo.
 - Vídeos: `bandido_larga_arma.mp4` (goblin batedor: a arma cai, pequena no chão, a câmera NÃO enquadra a mão do alvo), `passou_no_teste.mp4` (mostra "RESISTIU" no bandido: só recuo), `erro.mp4` (mostra "ERROU"; sem esquiva visível). SEM `lobo_sem_arma.mp4`: 8 lutas sorteadas e nenhuma com lobo (aranha/rato); forçar o encontro não foi implementado.
 - (REA1, 17/11) Código adiantado SEM prova no Studio (lock do MOD7): gancho de QA `workspace.QaEncontro="creature/lobo-cinzento"` (RunServico, só Studio) para forçar o elenco da luta; câmera segura ~0,6 s na mão do alvo quando a arma cai; esquiva de criaturas de peças rígidas com tranco lateral. Pendentes: vídeo do lobo, esquiva com clipe Mixamo "standing dodge" (humanoides), Investida com corrida real e Golpe Contínuo com Mixamo.
+
+## MOD7 treant novo, urso em 2 segmentos, golem pesado, morte 1,75 s (17/11/2026)
+
+- Studio (MCP, com foco, lock MOD7): envio de Treant/Urso/Golem pela rota do Studio, `studio_sync`, `qa.py luta` (29 ok), `testar.ps1` (só Catálogo falha), vídeos em `build/beleza/mod7/` (bandido, goblin, urso, treant, golem).
+- Visto: treant agora é um homem-árvore alto e magro (marrom escuro, sem pedaços soltos nas folhas de contato); golem anda com tronco balançando; urso com joelhos dobrando (difícil de ver na câmera do palco).
+- Não verificado: criaturas em luta real (esgoto sorteia), desempenho, orientação do treant em luta, passo do urso de perto.

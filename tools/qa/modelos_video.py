@@ -1,7 +1,7 @@
-"""MOD6: vídeo (com foco, ffmpeg) de cada criatura modelada no Studio: parado, andando, ataque, dano e morte.
+"""MOD7: vídeo (com foco, ffmpeg) de cada criatura modelada no Studio: parado, andando, ataque, dano e morte.
 Uso: python tools/qa/modelos_video.py [rotulo ...]   Rótulos: bandido_espada bandido_porrete goblin urso treant golem
-Palco do `anim_criaturas` (CriaturaAnimada, a mesma classe da luta). Pede o lock build/qa/STUDIO_EM_USO.txt (crie com MOD6).
-Saída: build/beleza/mod6/<rotulo>.mp4"""
+Palco do `anim_criaturas` (CriaturaAnimada, a mesma classe da luta). Pede o lock build/qa/STUDIO_EM_USO.txt (crie com MOD7).
+Saída: build/beleza/mod7/<rotulo>.mp4"""
 import os
 import sys
 import time
@@ -11,7 +11,7 @@ import anim_criaturas as A  # noqa: E402
 from gravar import Gravador  # noqa: E402
 from qa_lib import Qa, RAIZ  # noqa: E402
 
-SAIDA = os.path.join(RAIZ, "build", "beleza", "mod6")
+SAIDA = os.path.join(RAIZ, "build", "beleza", "mod7")
 ITENS = {"bandido_espada": ("creature/bandido-de-estrada", 1), "bandido_porrete": ("creature/bandido-de-estrada", 0),
          "goblin": ("creature/goblin-batedor", 0), "urso": ("creature/urso-de-presas-vermelhas", 0),
          "treant": ("creature/treant-anciao", 0), "golem": ("creature/golem-de-pedra-menor", 0)}

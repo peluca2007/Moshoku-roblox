@@ -67,3 +67,7 @@ Todos baixados do OpenGameArt com `curl` (arquivos em `build/externos/`, fora do
 | White Bear Low Poly (blend, sem rig), Phelippeau Rudy | https://opengameart.org/content/white-bear-low-poly (CC0; `License.txt.txt` do pacote) | `sites/default/files/Bear.7z` | `urso-branco` -> UrsoQuaternius |
 
 Os nomes `*Quaternius` dos módulos são só convenção do pipeline (`tools/criaturas_quaternius.py`); esses três não são do Quaternius.
+
+## Treant trocado (MOD7, 17/11/2026)
+
+O Forest Monster (MOD6) parecia um macaco com árvore na cabeça; o treant agora é o **Evil Tree Creature** de **Benji Smith** (OpenGameArt, https://opengameart.org/content/evil-tree-creature), **CC BY 3.0** (exige crédito: "Benji Smith"; entra nos créditos do jogo junto com os ícones CC BY de `docs/ARTE.md`). Arquivo `Tree_Creature.blend` em `build/externos/ent1/` (fora do git); rig de 30 ossos, 784 triângulos, animações Idle/Walk/Run/Attack1/Attack2, textura `Diff_Map` amostrada por k-means em 6 cores. Os demais do MOD6 (golem e urso) seguem CC0.

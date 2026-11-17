@@ -1552,3 +1552,9 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - `investida.mp4` (`hab_luta_real.py --trajeto=4`): corrida Mixamo ("sword and shield run") com poeira, golpe Mixamo (slash 1) no fim. A câmera da luta mostra só o trecho final da corrida.
 - `golpe_continuo.mp4`: 3 cortes Mixamo (slash 1, 2 e 4), terceiro com peso 0,6 e tremor maior. O terceiro clipe termina agachado (visível) e o 2º gira o corpo: sem recorte fino.
 - Não verificado: celular, desempenho com vários inimigos, esquiva Mixamo em inimigo, o Vigor real passando pelo servidor, `testar.ps1` só com "Catálogo" falhando (antigo); `qa.py luta` 29 ok.
+
+## CEN4 esgoto em malha (17/11/2026)
+
+- Antes: `qa.py esgoto_sala1` 20 ok, fps 60,0 (p5 55,9), 8521 partes; capturas `build/beleza/cen4/antes_*.png`.
+- Depois (primeira versão, pedra bege): `qa.py esgoto_sala1` 19 ok (1 falha não analisada), capturas `build/beleza/cen4/depois_*.png`: tijolos em 3 fileiras, pilares do chão ao teto, arco com canal de borda de pedra, lajes hexagonais no piso fora do tabuleiro. Ficou quente demais (laranja) em relação à CEN3; ajustei a cor no código (`TOM_ESGOTO`, tinta cinza-esverdeada) mas as capturas finais NÃO foram refeitas.
+- Não verificado: fps depois (a medida deu erro de Client), `qa.py luta`, cor final, vídeo da câmera da luta. As últimas rodadas do qa falharam porque outro agente (REA3) passou a usar o Studio ao mesmo tempo.

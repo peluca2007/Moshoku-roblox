@@ -11,6 +11,10 @@ FONTES = {
         "id": "kenney/mini-dungeon-2.0", "licenca": "CC0 1.0",
         "pasta": "mini-dungeon/x/Models/OBJ format",
     },
+    "kaykit-dungeon": {
+        "id": "kaykit/dungeon-remastered-1.0", "licenca": "CC0 1.0",
+        "pasta": "kaykit-dungeon/x/KayKit-Dungeon-Remastered-1.0-main/addons/kaykit_dungeon_remastered/Assets/obj",
+    },
     "fantasy-town": {
         "id": "kenney/fantasy-town-kit-2.0", "licenca": "CC0 1.0",
         "pasta": "fantasy-town-kit/x/Models/OBJ format",
@@ -57,6 +61,14 @@ ITENS = [
     _d("mini-dungeon", "coin", "Moeda", "esgoto", "moeda", escala=5, sat=0.7, valor=0.8),
     _d("mini-dungeon", "key", "Chave", "esgoto", "chave", escala=5, sat=0.7, valor=0.8),
     _d("mini-dungeon", "potion", "Pocao", "esgoto", "poção", escala=5, sat=0.7, valor=0.8),
+    # ---------- ESGOTO (KayKit Dungeon Remastered, CC0, CEN4; módulo de parede ~12 studs de largura) ----------
+    _d("kaykit-dungeon", "wall", "EsgotoKKParede", "esgoto", "parede de pedra com tijolos (CEN4)", orcamento="cenario", alvo=("x", 12), maximo_cores=5, **PEDRA),
+    _d("kaykit-dungeon", "wall_cracked", "EsgotoKKParedeRachada", "esgoto", "parede rachada (CEN4)", orcamento="cenario", alvo=("x", 12), maximo_cores=5, **PEDRA),
+    _d("kaykit-dungeon", "wall_broken", "EsgotoKKParedeQuebrada", "esgoto", "parede quebrada (CEN4)", orcamento="cenario", alvo=("x", 12), maximo_cores=5, **PEDRA),
+    _d("kaykit-dungeon", "pillar", "EsgotoKKPilar", "esgoto", "pilar (CEN4)", orcamento="cenario", alvo=("z", 30), maximo_cores=5, **PEDRA),
+    _d("kaykit-dungeon", "floor_tile_large", "EsgotoKKPiso", "esgoto", "piso grande de lajes (CEN4)", orcamento="cenario", alvo=("x", 16), maximo_cores=5, **PEDRA),
+    _d("kaykit-dungeon", "floor_tile_large_rocks", "EsgotoKKPisoPedras", "esgoto", "piso com pedras (CEN4)", orcamento="cenario", alvo=("x", 16), maximo_cores=5, **PEDRA),
+    _d("kaykit-dungeon", "rubble_large", "EsgotoKKEntulho", "esgoto", "entulho (CEN4)", orcamento="cenario", alvo=("x", 8), maximo_cores=4, **PEDRA),
     # ---------- TAVERNA ----------
     _d("mini-dungeon", "table", "TavernaMesa", "taverna", "mesa", escala=5, **MADEIRA),
     _d("mini-dungeon", "chair", "TavernaCadeira", "taverna", "cadeira", escala=5, **MADEIRA),

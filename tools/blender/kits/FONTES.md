@@ -71,3 +71,7 @@ Os nomes `*Quaternius` dos módulos são só convenção do pipeline (`tools/cri
 ## Treant trocado (MOD7, 17/11/2026)
 
 O Forest Monster (MOD6) parecia um macaco com árvore na cabeça; o treant agora é o **Evil Tree Creature** de **Benji Smith** (OpenGameArt, https://opengameart.org/content/evil-tree-creature), **CC BY 3.0** (exige crédito: "Benji Smith"; entra nos créditos do jogo junto com os ícones CC BY de `docs/ARTE.md`). Arquivo `Tree_Creature.blend` em `build/externos/ent1/` (fora do git); rig de 30 ossos, 784 triângulos, animações Idle/Walk/Run/Attack1/Attack2, textura `Diff_Map` amostrada por k-means em 6 cores. Os demais do MOD6 (golem e urso) seguem CC0.
+
+## Esgoto em malha (CEN4, 17/11/2026)
+
+KayKit Dungeon Remastered 1.0, de Kay Lousberg, **CC0** (`LICENSE.txt` do pacote), https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 (zip do ramo main, extraído em `build/externos/kaykit-dungeon/x/`, fora do git). Usados: wall, wall_broken, pillar, floor_tile_large, floor_tile_large_rocks e rubble_large (módulos `EsgotoKK*`, `catalogo.py`); wall_cracked foi convertida mas não usada (2010 triângulos). Sem crédito obrigatório; crédito a Kay Lousberg como cortesia.

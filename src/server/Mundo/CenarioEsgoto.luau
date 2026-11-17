@@ -7,6 +7,7 @@ local EsgotoArcos = require(script.Parent.EsgotoArcos)
 local EsgotoAgua = require(script.Parent.EsgotoAgua)
 local EsgotoTochas = require(script.Parent.EsgotoTochas)
 local EsgotoSujeira = require(script.Parent.EsgotoSujeira)
+local EsgotoMalhas = require(script.Parent.EsgotoMalhas)
 
 local CenarioEsgoto = {}
 
@@ -26,7 +27,7 @@ local PAREDES = {
 	{ girar = -90, arcos = { -30, 30 }, tochas = { 0 }, grade = 0 },
 }
 
-local function parede(pasta, base, cfg, tem)
+local function parede(pasta, base, cfg, tem, malhas)
 	local function L(x, y, z) return base * CFrame.new(x, y, z) end
 	local variante = tem and "EsgotoPedra" or nil
 	local fatias = {}
@@ -43,8 +44,8 @@ local function parede(pasta, base, cfg, tem)
 		local larg = f[2] - f[1]
 		peca(pasta, "Parede", Vector3.new(larg, ALTURA_TETO, 4), L((f[1] + f[2]) / 2, ALTURA_TETO / 2, -MEIA),
 			(i % 2 == 0) and PEDRA or PEDRA_ESCURA, Enum.Material.Plastic, { variante = variante })
-		-- Pilastra a cada ~28 studs, saliente, de tom diferente: quebra o paredão liso.
-		local passo = math.max(1, math.floor(larg / 28))
+		-- Pilastra a cada ~28 studs, saliente, de tom diferente: quebra o paredão liso (com malhas, pilares e tijolos do EsgotoMalhas).
+		local passo = if malhas then 0 else math.max(1, math.floor(larg / 28))
 		for k = 1, passo do
 			local px = f[1] + larg * (k - 0.5) / passo
 			peca(pasta, "Pilastra", Vector3.new(4.5, ALTURA_TETO - 3, 2.4), L(px, (ALTURA_TETO - 3) / 2, -MEIA + 3),
@@ -53,8 +54,9 @@ local function parede(pasta, base, cfg, tem)
 		end
 		-- Limo escorrendo do alto.
 		local lx = f[1] + larg * 0.3
-		peca(pasta, "Limo", Vector3.new(3.4, 9 + (i * 5) % 7, 0.2), L(lx, ALTURA_TETO - 5, -MEIA + 2.15), MUSGO, Enum.Material.Grass, { Transparency = 0.15 })
+		if not malhas then peca(pasta, "Limo", Vector3.new(3.4, 9 + (i * 5) % 7, 0.2), L(lx, ALTURA_TETO - 5, -MEIA + 2.15), MUSGO, Enum.Material.Grass, { Transparency = 0.15 }) end
 	end
+	if malhas then EsgotoMalhas.parede(pasta, L, MEIA, fatias, 300 + (cfg.girar + 360) % 360) end
 	for _, ax in arcos do
 		EsgotoArcos.vao(pasta, L, ax, MEIA, ALTURA_TETO)
 		-- Túnel: chão, laterais, teto e fundo escuros, com um fio de água e luz verde ao longe.
@@ -69,6 +71,10 @@ local function parede(pasta, base, cfg, tem)
 			Color3.fromRGB(70, 120, 100), 0.5, 22)
 		-- Água que sai do túnel e vira canaleta no chão do salão (fora do tabuleiro: z < -50).
 		EsgotoAgua.canal(pasta, "Canaleta", Vector3.new(7, 0.14, MEIA - 50 + 2), L(ax, 0.09, -MEIA + (MEIA - 50) / 2 + 1))
+		-- Borda de pedra dos dois lados do canal (meio-fio), CEN4.
+		for lado = -1, 1, 2 do
+			peca(pasta, "BordaCanal", Vector3.new(1.3, 0.5, MEIA - 50 + 2), L(ax + lado * 4.1, 0.25, -MEIA + (MEIA - 50) / 2 + 1), EsgotoPecas.PEDRA_CLARA, Enum.Material.Slate)
+		end
 		peca(pasta, "MargemCanaleta", Vector3.new(9.4, 0.1, MEIA - 50 + 2), L(ax, 0.05, -MEIA + (MEIA - 50) / 2 + 1), MUSGO, Enum.Material.Grass)
 	end
 	-- Canos horizontais com suportes e manchas de ferrugem.
@@ -202,10 +208,12 @@ end
 function CenarioEsgoto.montar(raiz, origem, temVariante)
 	local pasta = Instance.new("Folder")
 	pasta.Name = "Cenario"
+	local malhas = EsgotoMalhas.disponivel()
 	for _, cfg in PAREDES do
-		parede(pasta, CFrame.new(origem.X, 0, origem.Z) * CFrame.Angles(0, math.rad(cfg.girar), 0), cfg, temVariante)
+		parede(pasta, CFrame.new(origem.X, 0, origem.Z) * CFrame.Angles(0, math.rad(cfg.girar), 0), cfg, temVariante, malhas)
 	end
 	chao(pasta, origem)
+	if malhas then EsgotoMalhas.piso(pasta, origem, MEIA) end
 	teto(pasta, origem)
 	feixes(pasta, origem)
 	nevoa(pasta, origem)

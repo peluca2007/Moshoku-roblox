@@ -413,6 +413,42 @@
   "semente": "1",
   "sha256": "3537502b46db42df968184b76b25995879e515d8df613e7dc4d49ca873c2bb95"
  },
+ "EsgotoKKEntulho": {
+  "asset": "109026152891664",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "0a6b38e862c368640650a879c074cc3f57b9699b6e45161a6795da89bb520ac5"
+ },
+ "EsgotoKKParede": {
+  "asset": "77792071891579",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "8b7e9582f5223fe738d5fa629be4e65221556c6b700a6c67f97f12d2ac5c178b"
+ },
+ "EsgotoKKParedeQuebrada": {
+  "asset": "108329528598797",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "ecf2e697a493f333470e1ac23afffae4d44c90b1718ad9a56f6090564833b160"
+ },
+ "EsgotoKKPilar": {
+  "asset": "78640777922809",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "b8bba09016d76287b2fc93306a60073cc46df9c0381899b0f8409d931c075695"
+ },
+ "EsgotoKKPiso": {
+  "asset": "94701720588005",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "d162e1976ee61d3879c05e51b72fed3d96ac94da391b64fa7e17fdf7d163cf4a"
+ },
+ "EsgotoKKPisoPedras": {
+  "asset": "112489779516259",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "0e68e27e36f5ceaf34892d0076242d892117735d1a3fd8bb20b742195d6ab0ac"
+ },
  "EspelhoVila": {
   "asset": "98981712442900",
   "modelo": "espelhovila",

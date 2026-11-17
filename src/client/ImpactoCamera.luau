@@ -35,13 +35,13 @@ function M.golpe(de: Vector3, para: Vector3, impacto: number, opc: { escala: num
 	workspace:SetAttribute("ImpactoGolpeChamado", os.clock()) -- QA: prova que a Coreografia chamou
 	if FX.reduzidos then return end
 	atual = { de = de, para = para, inicio = os.clock(), impacto = math.max(impacto, 0.1), opc = opc,
-		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) } -- esc: câmera lenta forçada (só QA) dilata tudo
+		dir = opc and opc.dir, esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) } -- esc: câmera lenta forçada (só QA) dilata tudo
 end
 
 -- REA2: câmera presa num ponto móvel (ex.: a arma caindo): `posicao()` devolve o ponto no mundo (nil = mantém o último).
 -- Aproxima em ~0,15 s, segura até `dur` e solta em ~0,3 s; mistura com a câmera da luta (que continua calculando).
-local foco: { inicio: number, dur: number, posicao: () -> Vector3?, ultimo: Vector3, esc: number, dist: number, altura: number }? = nil
-function M.foco(inicial: Vector3, dur: number, posicao: () -> Vector3?, opc: { dist: number?, altura: number? }?)
+local foco: { inicio: number, dur: number, posicao: () -> Vector3?, ultimo: Vector3, esc: number, dist: number, altura: number, dir: Vector3?, pos: Vector3?, rel: Vector3? }? = nil
+function M.foco(inicial: Vector3, dur: number, posicao: () -> Vector3?, opc: { dist: number?, altura: number?, dir: Vector3? }?)
 	if FX.reduzidos then return end
 	foco = { inicio = os.clock(), dur = dur, posicao = posicao, ultimo = inicial, dist = (opc and opc.dist) or 3.6, altura = (opc and opc.altura) or 5,
 		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) }
@@ -177,9 +177,10 @@ local function aplicarFoco(cf: CFrame): CFrame?
 		pOclusao.FilterDescendantsInstances = lutadores()
 		local fora = Vector3.new(cf.Position.X - alvo.X, 0, cf.Position.Z - alvo.Z)
 		fora = if fora.Magnitude > 0.1 then fora.Unit else Vector3.zAxis
+		if f.dir and f.dir.Magnitude > 0.1 then fora = Vector3.new(f.dir.X, 0, f.dir.Z).Unit end -- HAB6: lado preferido (ex.: de frente para o muro de água)
 		local escolhida
 		for _, sobe in { 0, 3, 6 } do
-			for _, ang in { 65, -65, 110, -110, 150, -150, 20, -20, 0 } do
+			for _, ang in if f.dir then { 35, -35, 0, 60, -60, 90, -90 } else { 65, -65, 110, -110, 150, -150, 20, -20, 0 } do
 				local d = CFrame.Angles(0, math.rad(ang), 0):VectorToWorldSpace(fora)
 				local pos = M.semParede(mira, alvo + d * f.dist + Vector3.new(0, f.altura + sobe, 0))
 				if not dentroDeLutador(pos) and not ocluido(pos, mira) then escolhida = pos break end

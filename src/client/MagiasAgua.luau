@@ -271,6 +271,7 @@ local function respingo(cena, t: number, ponto: Vector3, escala: number, critico
 	local ctx = cena.ctx
 	local chao = ctx.chao(ponto)
 	cena:em(t, function()
+		workspace:SetAttribute("QaRespingoEm", string.format("%.1f,%.1f,%.1f", ponto.X, ponto.Y, ponto.Z)) -- QA
 		local nucleo = cena:bola(escala * 1.4, ponto, if gelo then GELO else ESPUMA, 0.2, true)
 		cena:anim(t, t + 0.28, function(u)
 			nucleo.Size = Vector3.one * escala * (1.4 + 3.4 * u)
@@ -282,11 +283,11 @@ local function respingo(cena, t: number, ponto: Vector3, escala: number, critico
 			anel.Size = Vector3.new(0.12, d, d)
 			anel.Transparency = 0.2 + 0.8 * u
 		end)
-		local poca = cena:disco(chao + Vector3.new(0, 0.08, 0), escala * 2, if gelo then GELO else PROFUNDA, 0.45)
-		cena:anim(t, t + 2.2, function(u)
-			local d = escala * (2 + 2.6 * math.min(u * 4, 1))
+		local poca = cena:disco(chao + Vector3.new(0, 0.08, 0), escala * 1.2, if gelo then GELO else PROFUNDA, 0.6)
+		cena:anim(t, t + 1.3, function(u)
+			local d = escala * (1.2 + 1.4 * math.min(u * 4, 1)) -- HAB6: poça menor e curta (era um disco liso de 7 studs parado por 2 s)
 			poca.Size = Vector3.new(0.1, d, d)
-			poca.Transparency = 0.45 + 0.55 * math.max((u - 0.35) / 0.65, 0)
+			poca.Transparency = 0.6 + 0.4 * math.max((u - 0.2) / 0.8, 0)
 		end)
 		cena:gotas(t, ponto, qtd(16 * escala, critico), 7 * escala + 3, 11 * escala + 4, 0.34 * escala + 0.1, if gelo then GELO else AGUA, 0.9, gelo)
 		local suporte = cena:peca({ Size = Vector3.one * 0.2, Position = ponto, Transparency = 1 })
@@ -491,21 +492,21 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 			local face = tang:Cross(Vector3.yAxis)
 			if face:Dot(normal) < 0 then face = -face end
 			local w = larg / N * 1.18
-			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.7, Material = Enum.Material.SmoothPlastic })
+			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.78, Material = Enum.Material.SmoothPlastic })
 			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.25), Color = AZUL_SUP, Transparency = 0.8, Material = Enum.Material.SmoothPlastic })
 			local tex = {}
 			for _, f in { Enum.NormalId.Front, Enum.NormalId.Back } do
 				local tx = Instance.new("Texture")
-				tx.Texture, tx.Face, tx.Color3, tx.Transparency = TEX.fumaca, f, AZUL_TEX, 0.86
+				tx.Texture, tx.Face, tx.Color3, tx.Transparency = TEX.fumaca, f, AZUL_TEX:Lerp(AZUL_NUCLEO, 0.4), 0.9
 				tx.StudsPerTileU, tx.StudsPerTileV = 1.4, 4.2
 				tx.Parent = sup
 				table.insert(tex, tx)
 			end
-			local espuma = cena:peca({ Size = Vector3.new(w * 0.95, 0.7, espessura + 0.6), Color = ESPUMA, Transparency = 0.35, Material = Enum.Material.SmoothPlastic })
+			local espuma = cena:peca({ Size = Vector3.new(w * 0.95, 0.4, espessura + 0.3), Color = ESPUMA:Lerp(AZUL_SUP, 0.5), Transparency = 0.6, Material = Enum.Material.SmoothPlastic })
 			local reflexo = cena:peca({ Size = Vector3.new(0.16, 1, 0.05), Color = BORDA, Transparency = 0.75, Material = Enum.Material.SmoothPlastic })
 			local fita = nil
 			if i == 1 or i == N then
-				fita = cena:peca({ Size = Vector3.new(0.22, 1, espessura + 0.35), Color = BORDA, Transparency = 0.55, Material = Enum.Material.SmoothPlastic })
+				fita = cena:peca({ Size = Vector3.new(0.22, 1, espessura + 0.35), Color = AZUL_TEX, Transparency = 0.72, Material = Enum.Material.SmoothPlastic })
 			end
 			local fonte = cena:peca({ Size = Vector3.new(w * 0.8, 0.2, 0.4), Transparency = 1 })
 			local gotas = cena:emissor(fonte, "brilho", AZUL_TEX, {
@@ -529,7 +530,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 		end
 		ctx.som({ habilidadeId = "ability/agua/Principiante/escudo-de-agua" }, "agua", 1.0)
 		-- câmera curta mostrando o muro subir
-		if ctx.focoCamera then ctx.focoCamera(base + normal * curva + Vector3.new(0, alto * 0.45, 0), 1.5, nil, 15, 5) end
+		if ctx.focoCamera then ctx.focoCamera(base + normal * curva + Vector3.new(0, alto * 0.45, 0), 1.5, nil, 15, 5, -normal) end
 		anim = cena:anim(t0, t0 + 3600, function()
 			local t = cena.T - t0
 			local sumindo = estado.tFim ~= nil
@@ -542,14 +543,14 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				local cf = CFrame.lookAt(g.pos + Vector3.new(0, h / 2, 0), g.pos + Vector3.new(0, h / 2, 0) + g.face)
 				g.nucleo.Size = Vector3.new(g.nucleo.Size.X, h, espessura + onda * 0.3)
 				g.nucleo.CFrame = cf
-				g.nucleo.Transparency = 0.7 + 0.05 * math.sin(cena.T * 2.6 + i)
+				g.nucleo.Transparency = 0.78 + 0.04 * math.sin(cena.T * 2.6 + i)
 				g.sup.Size = Vector3.new(g.sup.Size.X, h, espessura + 0.25 + onda * 0.3)
 				g.sup.CFrame = cf
 				g.tex[1].OffsetStudsV, g.tex[2].OffsetStudsV = -cena.T * 2.6, -cena.T * 2.0 -- correnteza descendo
 				g.tex[1].OffsetStudsU, g.tex[2].OffsetStudsU = math.sin(cena.T * 0.8 + i) * 0.8, -cena.T * 0.5
 				local topo = g.pos + Vector3.new(0, h + 0.05 + onda * 0.5, 0)
 				g.espuma.CFrame = CFrame.lookAt(topo, topo + g.face)
-				g.espuma.Size = Vector3.new(g.espuma.Size.X, 0.6 + 0.25 * math.sin(cena.T * 4 + i * 1.7), espessura + 0.6)
+				g.espuma.Size = Vector3.new(g.espuma.Size.X, 0.3 + 0.12 * math.sin(cena.T * 4 + i * 1.7), espessura + 0.3)
 				local alto2 = g.pos + g.face * (espessura / 2 + 0.1) + Vector3.new(0, h - 0.2, 0)
 				g.fonte.CFrame = CFrame.lookAt(alto2, alto2 + g.face)
 				g.gotas.Rate = (if FX.reduzidos then 8 else 24) * ki
@@ -566,7 +567,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 					g.fita.CFrame = CFrame.lookAt(pf, pf + g.face)
 				end
 				g.borrifo.Rate = (if FX.reduzidos then 4 else 11) * ki
-				if ki <= 0 or t < 0 then g.espuma.Transparency = 1 else g.espuma.Transparency = 0.3 end
+				if ki < 0.95 or t < 0 then g.espuma.Transparency = 1 else g.espuma.Transparency = 0.6 end -- a espuma só aparece com o muro de pé (de lado, as espumas escalonadas viravam uma coluna branca)
 			end
 			if sumindo and cena.T - estado.tFim > 1.1 then
 				for _, i in cena.lixo do if i.Parent then i:Destroy() end end
@@ -671,6 +672,7 @@ function MagiasAgua.criar(ctx)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 40, 0.22, 0.45)
 		local t0 = 0.4
+		if ctx.camera and not falha then ctx.camera(mao, destino, t0 + voo, { escala = 1.0, altura = 0.4 }) end -- HAB6: a câmera mostra o acerto, mesmo de longe
 		orbeNaMao(cena, 0.05, t0, mao, dir, 1.5, 5)
 		local n = if FX.reduzidos then 4 else 9
 		local direita, cima = eixos(dir)
@@ -711,6 +713,7 @@ function MagiasAgua.criar(ctx)
 		local cena = novaCena(ctx)
 		local voo = Curvas.duracaoDoVoo((destino - mao).Magnitude, 28, 0.35, 0.8)
 		local t0 = 0.85
+		if ctx.camera and not falha then ctx.camera(mao, destino, t0 + voo, { escala = 1.2, altura = 0.5 }) end -- HAB6
 		orbeNaMao(cena, 0.05, t0, mao, dir, 3.2, 5)
 		local esfera, nucleo
 		local direita, cima = eixos(dir)

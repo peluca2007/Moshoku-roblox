@@ -189,7 +189,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 	-- REA3: a Investida da Espada deixa um rastro quente e fino (como a fita da lâmina), não a cor da classe (rosa forte)
 	local cor = if spec.g == "investida" and spec.estilo == "espada" then Color3.fromRGB(255, 178, 96) else cena.cor
 	cena.cor = cor
-	if spec.g == "investida" and spec.estilo == "espada" then cena.semCorte = true end -- HAB3: sem o talho/clarão grande do ImpactoFx; o corte fino é do próprio gesto
+	if spec.g == "investida" and spec.estilo == "espada" then cena.semCorte = true; cena.paradaMin = 0.1 end -- HAB6: pausa de ~6 quadros no contato (peso) -- HAB3: sem o talho/clarão grande do ImpactoFx; o corte fino é do próprio gesto
 	local casterId = recibo.casterId
 	if not casterId then
 		return nil
@@ -658,7 +658,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		local pesada = est == "devastadora"
 		local W = if pesada then 0.34 else 0.14
 		local mocapCorrida = ok and est == "espada" and Corpo.tocador(f) ~= nil -- REA2: com a corrida de mocap, ritmo de passada legível (>= 0,6 s)
-		local corrida = if mocapCorrida then math.clamp(dist / 26, 0.6, 1.0) else math.clamp(dist / (if pesada then 34 else 56), 0.22, 0.75)
+		local corrida = if mocapCorrida then math.clamp(dist / 20, 0.8, 1.2) else math.clamp(dist / (if pesada then 34 else 56), 0.22, 0.75)
 		-- REA2: Investida da Espada com mocap: corrida real (sword and shield run) e golpe (slash 1) no fim, poeira nos pés
 		local mocap = ok and est == "espada" and Corpo.tocador(f) ~= nil
 		local golpe = if mocap then 0.34 else 0.1
@@ -725,7 +725,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		poeiraSegue(W, corrida, posNoCaminho, if mocap then 46 else 34)
 		poeira(K.chao(B), W + corrida, 7, 2.4)
 		-- Traços de vento: curtos (0,3 s), finos, nascem e somem acompanhando o trajeto.
-		local TRACOS = 9
+		local TRACOS = 12
 		for i = 1, TRACOS do
 			local seg = K.peca(cena, "fio", cor)
 			local u0 = (i - 1) / TRACOS
@@ -744,7 +744,9 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		if est == "espada" then
 			-- REA3: um corte fino e quente (antes dois cortes grossos e um clarão grande, "rosa forte demais")
 			-- (HAB4: sem talho neon: o corte é o rastro real da lâmina Mixamo; o talho deixava um bloco amarelo parado)
-			faiscas(alvoFinal - olhar * 1.1, olhar, tImp + 0.05, 10)
+			faiscas(alvoFinal - olhar * 1.1, olhar, tImp + 0.05, 16)
+			poeira(K.chao(alvoFinal - olhar * 0.6), tImp + 0.03, 9, 2.6) -- nuvem curta no contato
+			K.evento(cena, tImp, function() K.Efeitos.tremer(0.5, 0.28, olhar) end)
 		elseif est == "quadrupede" then
 			for i = 1, 3 do
 				talho(alvoFinal - olhar * 0.5 + dir:Cross(Y) * ((i - 2) * 0.9), olhar, 62 + i * 3, 3.2, tImp + i * 0.03, 0.2)

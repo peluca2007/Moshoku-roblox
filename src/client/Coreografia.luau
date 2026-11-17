@@ -437,7 +437,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				workspace:SetAttribute(if crit then "ImpactoCriticoEm" else "ImpactoAcertoEm", os.clock()) -- QA: prova do efeito
 				if not cena.pausada and not FX.reduzidos and Efeitos.tremorAtivo() then
 					cena.pausada = true
-					local parada = Curvas.hitStop(alvo.dano, crit)
+					local parada = math.max(Curvas.hitStop(alvo.dano, crit), cena.paradaMin or 0)
 					local lentoDur, taxa = Curvas.lento(crit, golpeFinal(alvo.id), cena.assinatura)
 					pausar(parada, lentoDur, taxa)
 					local corpos = workspace:FindFirstChild("CorposDeCriatura")

@@ -1627,3 +1627,12 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - `qa.py luta` 29 ok; `testar.ps1` só com Catálogo falhando (ambiente).
 - Não verificado: celular, desempenho, escudo visto de outros ângulos, flecha/lâmina.
 
+## HAB6 (17/11/2026) — escudo sem coluna branca, Respingo/Bola, Investida com peso (`build/beleza/hab6/`)
+
+- Escudo: a coluna branca vista de longe eram as espumas do topo (uma por segmento, Transparency 0,3) subindo escalonadas e vistas de lado. Agora a espuma é mais fina, azulada e só aparece com o muro de pé; núcleo, textura e fitas das pontas mais translúcidos e menos claros. `ImpactoCamera.foco` ganhou `opc.dir` (lado preferido); o escudo pede câmera por trás do muro (ainda lê como pilar translúcido quando visto de lado pela câmera padrão). `real_escudo-de-agua.mp4`.
+- Anéis de mira (Coreografia `arco()` já fosco desde f6b04e8): nos quadros do impacto aparecem finos e dourados; vistos só de relance.
+- Respingo e Bola: gesto, círculo rúnico, projétil e respingo conferidos nos quadros. Corrigidos: poça de 7 studs parada por 2 s (disco liso cinza/azul) virou poça pequena e curta; `ctx.camera` agora acompanha o projétil até o acerto (antes só a flecha). Vídeos `real_respingo.mp4`, `real_bola-de-agua.mp4`.
+- Investida: corrida mais longa, pausa mínima de 0,1 s no contato (`cena.paradaMin`, usada pela Coreografia), nuvem de poeira e tremor direcional no contato, 12 traços finos de vento. `investida.mp4`.
+- `qa.py luta` 29 ok (sozinho). `testar.ps1`: só Catálogo falha (ambiente).
+- Não verificado: celular, desempenho, escudo visto de frente sem câmera própria, reação do rato à Bola (o recuo é discreto), flecha/lâmina, o brilho amarelo sobre o corpo na largada da Investida (rastro quente) pode ainda estar forte.
+

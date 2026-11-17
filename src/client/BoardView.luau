@@ -493,7 +493,9 @@ function BoardView.start(state)
 		renderMuros(snapshot.jogo and snapshot.jogo.muros, snapshot)
   armas.render(snapshot.jogo and snapshot.jogo.objetos)
 		local seen = {}
-		for _, token in snapshot.tokens do
+		for _, token0 in snapshot.tokens do
+			-- HAB8: PV e derrota como o jogador deve ver (retidos até o golpe encostar); "DERROTADO" saía ~1 s antes
+			local token = Feedback.visto(token0)
 			seen[token.id] = true
 			local view = views[token.id]
 			local fresh = false
@@ -724,6 +726,10 @@ function BoardView.start(state)
 	end
 
 	state.onSnapshot(render)
+	Feedback.aoLiberar(function() -- HAB8: o contato solta a retenção: redesenha com o PV/derrota reais
+		local s = state.snapshot()
+		if s then render(s) end
+	end)
 	state.onSnapshot(renderMap)
 	state.onRoll(Efeitos.dice)
 	state.onSelection(function(_, x, z)

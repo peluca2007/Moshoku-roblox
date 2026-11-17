@@ -98,40 +98,50 @@ function Efeitos.floatText(position: Vector3, text: string, color: Color3)
 	end)
 end
 
--- HAB8: destaque de jogo sobre o alvo ("FURTIVO ×3 +11", "COMBO +4"): maior que o floatText, nasce grande e
--- assenta (pop), sobe devagar e some. `forte` (triplo do Primeiro Golpe) fica maior e mais tempo.
+-- HAB8: destaque de jogo sobre o alvo ("FURTIVO ×3 +11", "COMBO!", "CRÍTICO!", "ROUPA LEVE +2 CA"). Em TELA, não no
+-- mundo: segue o ponto projetado do alvo, mas preso numa faixa segura (20% a 65% da altura, 10% a 90% da largura),
+-- porque com a câmera fechada da luta um Billboard alto caía acima do quadro. Nasce grande e assenta (pop), sobe um
+-- pouco e some. `forte` (triplo do Primeiro Golpe, crítico) fica maior e mais tempo. Vários seguidos empilham.
+local destaquesVivos = 0
 function Efeitos.destaque(position: Vector3, text: string, color: Color3, forte: boolean?)
-	if not folder then
+	if not overlay then
 		return
 	end
-	local anchor = Instance.new("Part")
-	anchor.Anchored, anchor.CanCollide, anchor.CanQuery, anchor.Transparency = true, false, false, 1
-	anchor.Size = Vector3.one * 0.2
-	anchor.Position = position
-	anchor.Parent = folder
-	local gui = Instance.new("BillboardGui")
-	gui.Size = UDim2.fromOffset(if forte then 420 else 300, if forte then 72 else 54)
-	gui.AlwaysOnTop = true
-	gui.Adornee = anchor
-	gui.Parent = anchor
-	local l = label(gui, text, if forte then 50 else 36, color)
+	local tam = if forte then 54 else 40
+	local l = label(overlay, text, tam, color)
+	l.Name = "Destaque"
+	l.AnchorPoint = Vector2.new(0.5, 0.5)
+	l.Size = UDim2.fromOffset(if forte then 520 else 380, tam + 12)
 	l.TextStrokeColor3 = Color3.fromRGB(20, 12, 8)
 	l.TextStrokeTransparency = 0
+	l.ZIndex = 20
 	local escala = Instance.new("UIScale")
 	escala.Scale = 2.2
 	escala.Parent = l
 	TweenService:Create(escala, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+	destaquesVivos += 1
+	local pilha = (destaquesVivos - 1) % 3
 	local dur = if forte then 1.9 else 1.4
 	local start = os.clock()
 	local connection
 	connection = RunService.RenderStepped:Connect(function()
 		local t = math.min((os.clock() - start) / dur, 1)
-		gui.StudsOffset = Vector3.new(0, 1.5 + ease(t) * 2.5, 0)
+		local cam = workspace.CurrentCamera
+		local vp = cam and cam.ViewportSize or Vector2.new(1280, 720)
+		local x, y = vp.X * 0.5, vp.Y * 0.35
+		if cam then
+			local p, naFrente = cam:WorldToViewportPoint(position)
+			if naFrente then x, y = p.X, p.Y end
+		end
+		x = math.clamp(x, vp.X * 0.1, vp.X * 0.9)
+		y = math.clamp(y - 30 - pilha * (tam + 6), vp.Y * 0.2, vp.Y * 0.65) - ease(t) * 40
+		l.Position = UDim2.fromOffset(x, y)
 		local some = math.max(0, (t - 0.7) / 0.3)
 		l.TextTransparency, l.TextStrokeTransparency = some, some
 		if t >= 1 then
 			connection:Disconnect()
-			anchor:Destroy()
+			destaquesVivos -= 1
+			l:Destroy()
 		end
 	end)
 end

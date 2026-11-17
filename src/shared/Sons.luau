@@ -25,6 +25,8 @@ function Sons.lancamento(id: string, arvore: string?, gesto): string?
 	if g == "grito" then return nil end
 	if g == "conjuro" then
 		if arvore == "cura" then return nil end -- toca uma vez no resultado da cura
+		-- HAB8: Escudo de Água e Névoa Densa tocam no desenho da zona (MagiasAgua); aqui dobrava o som
+		if id == "ability/agua/Principiante/escudo-de-agua" or id == "ability/agua/Principiante/nevoa-densa" then return nil end
 		if string.find(id, "gelo", 1, true) then return "gelo" end
 		return ELEMENTOS[arvore]
 	end

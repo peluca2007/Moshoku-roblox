@@ -2,6 +2,7 @@
 -- HAB8: destaques de jogo de um golpe (puro, só apresentação): o que o jogador deve sentir como "fiz algo especial".
 -- Lê o resumo do alvo no recibo (HabilidadeService.resumoDoEfeito): `furtivo = { dados, total, triplo }` (Dano Furtivo,
 -- triplo no Primeiro Golpe) e `combo` (bônus do Golpe Contínuo por já ter acertado no turno). Não decide regra.
+-- O combo é bônus de ACERTO: o texto não mostra "+4" para não parecer dano extra.
 local M = {}
 
 export type Destaque = { chave: string, texto: string, curto: string, forte: boolean }
@@ -20,7 +21,7 @@ function M.listar(alvo: any): { Destaque }
 		end
 	end
 	if type(alvo.combo) == "number" and alvo.combo > 0 then
-		table.insert(saida, { chave = "combo", texto = "COMBO  +" .. alvo.combo, curto = "Combo", forte = false })
+		table.insert(saida, { chave = "combo", texto = "COMBO!", curto = "Combo", forte = false })
 	end
 	return saida
 end

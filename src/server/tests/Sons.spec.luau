@@ -1,5 +1,10 @@
 local Sons = require(game:GetService("ReplicatedStorage").Shared.Sons)
 return {
+	["HAB8: zonas da Água não tocam no lançamento (o desenho da zona toca)"] = function(t)
+		t.eq(Sons.lancamento("ability/agua/Principiante/escudo-de-agua", "agua", { g = "conjuro" }), nil)
+		t.eq(Sons.lancamento("ability/agua/Principiante/nevoa-densa", "agua", { g = "conjuro" }), nil)
+		t.eq(Sons.lancamento("ability/agua/Principiante/bola-de-agua", "agua", { g = "conjuro" }), "agua")
+	end,
 	["nenhuma vocalizacao entra no catalogo"] = function(t)
 		t.eq(Sons.ARQUIVOS.buff, nil)
 		t.eq(Sons.ARQUIVOS.assobio, nil)

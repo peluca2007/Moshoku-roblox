@@ -17,6 +17,7 @@ return {
 	["combo e furtivo comum juntos; erro não destaca"] = function(t)
 		local l = D.listar({ acertou = true, combo = 4, furtivo = { dados = 1, total = 4, triplo = false } })
 		t.eq(#l, 2)
+		t.eq(l[2].texto, "COMBO!", "bônus de acerto não aparece como número")
 		t.eq(D.prefixo({ { acertou = true, combo = 4 }, { acertou = true, combo = 4 } }), "Combo", "não repete")
 		t.eq(#D.listar({ acertou = false, combo = 4 }), 0)
 	end,

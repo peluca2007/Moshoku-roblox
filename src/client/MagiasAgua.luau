@@ -17,6 +17,7 @@ local Protocol = require(Shared:WaitForChild("MesaProtocol"))
 local PlanosCamera = require(script.Parent:WaitForChild("PlanosCamera")) -- CAM1: planos de câmera por habilidade
 local Feedback = require(script.Parent:WaitForChild("FeedbackCombate")) -- HAB8: número/barra/faixa esperam o contato
 local Fila = require(Shared:WaitForChild("Animacoes"):WaitForChild("FilaApresentacao"))
+local Destaques = require(Shared:WaitForChild("DestaquesGolpe"))
 
 local MagiasAgua = {}
 
@@ -483,6 +484,9 @@ local function finalDoAcerto(ctx, cena, t: number, recibo, alvo, para: Vector3, 
 		for _, id in ids do Feedback.fila:soltar(id, os.clock()) end
 		if alvo.acertou ~= false then
 			ctx.som(recibo, if molhar then "agua" else "gelo", 1.0) -- HAB8: o acerto também soa (antes só o lançamento)
+			for k, d in Destaques.listar(alvo) do -- HAB8: furtivo/combo também nas magias (a faixa já dizia)
+				Efeitos.destaque(para + Vector3.new(0, 2 + k, 0), d.texto, if d.forte then Color3.fromRGB(200, 60, 60) else Color3.fromRGB(240, 196, 92), d.forte)
+			end
 			ctx.recuo(alvo.id, de, forca)
 			if molhar then
 				auraMolhado(ctx, alvo.id, 4.2)

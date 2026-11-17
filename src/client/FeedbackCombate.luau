@@ -63,11 +63,13 @@ function Feedback.start(state)
 	local avisosVistos={}
 	local function avisos(s)
 		for _,t in s.tokens do
+			-- token já visto sem aviso conta como 0: o primeiro aviso (n=1) também aparece; token novo só registra
 			local a=t.avisoPassiva
-			if type(a)=="table" and type(a.n)=="number" then
-				local visto=avisosVistos[t.id]
-				avisosVistos[t.id]=a.n
-				if visto and a.n>visto and s.combat.active and not t.hidden and t.x and t.z then
+			local n=if type(a)=="table" and type(a.n)=="number" then a.n else 0
+			local visto=avisosVistos[t.id]
+			avisosVistos[t.id]=n
+			if type(a)=="table" then
+				if visto and n>visto and s.combat.active and not t.hidden and t.x and t.z then
 					local texto=string.upper(tostring(a.nome))..(if a.detalhe=="imune" then "  · IMUNE" elseif a.detalhe then "  "..tostring(a.detalhe) else "")
 					Efeitos.destaque(Protocol.cellCenter(t.x,t.z)+Vector3.new(0,6.5,0),texto,T.cores.sucesso,false)
 				end

@@ -62,6 +62,18 @@ function HabilidadeService.start(deps)
 	local turnoAtual = { tokenId = nil :: string?, turno = -1, usadas = 0, usos = {} :: { [string]: boolean }, acertou = false, acertados = {} }
 	local zonas: { any } = {}
 	local proximaZona = 0
+	local aplicarCondicaoRef -- HAB8: o gancho QaCondicao abaixo usa aplicarCondicao, definida depois
+	-- QA (só no Studio, HAB8): workspace.QaCondicao = "amedrontado" aplica a condição às fichas de jogador pelo caminho
+	-- normal (aplicarCondicao, com imunidade e aviso de passiva); o conditionAdd da mesa não passa por ele.
+	if game:GetService("RunService"):IsStudio() then
+		workspace:GetAttributeChangedSignal("QaCondicao"):Connect(function()
+			local id = workspace:GetAttribute("QaCondicao")
+			if type(id) ~= "string" or id == "" then return end
+			for _, t in tokens do
+				if t.ownerUserId and aplicarCondicaoRef then aplicarCondicaoRef(t, id) end
+			end
+		end)
+	end
 	-- QA (só no Studio, HAB3): workspace.QaAprender = "agua" faz as fichas de jogador aprenderem as habilidades Principiante dessa
 	-- árvore (compradas na ficha, como fora da luta) e enche a mana; o uso passa pelo caminho normal (usarHabilidade).
 	if game:GetService("RunService"):IsStudio() then
@@ -179,6 +191,7 @@ function HabilidadeService.start(deps)
 			aplicadas[token.id][id] = true
 		end
 	end
+	aplicarCondicaoRef = aplicarCondicao
 
 	local function removerCondicao(token, id: string)
 		if not temCondicao(token, id) then

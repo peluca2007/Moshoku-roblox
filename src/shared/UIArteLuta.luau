@@ -119,7 +119,11 @@ local POR_ID_MESA = {
 	["mesa/levantar"] = "levantar", ["mesa/marcar"] = "marcar", ["mesa/andar"] = "andar",
 	["mesa/sob-minha-guarda"] = "guarda", ["mesa/desenhar-formula"] = "runa", ["mesa/moldar"] = "espiral",
 	["mesa/brisa"] = "vento", ["mesa/molhar"] = "agua",
+	["mesa/apagar-fogo"] = "chamas", ["mesa/pacto"] = "runa", -- RODA1: linhas da lista de Ações que não são cartas do livro
 }
+
+-- RODA1: ícone de cada fatia da roda de ações (nomes do atlas acima).
+UIArteLuta.ICONES_RODA = table.freeze({ golpear = "golpe", habilidades = "magia", acoes = "andar", encerrar = "encerrar" })
 
 -- Nome do ícone de uma habilidade pelo id (e árvore, se souber); sempre devolve um ícone existente.
 function UIArteLuta.iconeDe(habilidadeId: string, arvore: string?): string

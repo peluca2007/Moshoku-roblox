@@ -1,14 +1,17 @@
--- Menu de comandos da luta (HUD2): losango no canto inferior direito, um comando em cada vértice
--- (Habilidades no topo, Atacar à esquerda, Andar à direita, Encerrar na base) com a tecla visível.
--- Atacar e Habilidades abrem uma lista vertical à esquerda do losango (nome grande, custo em Ações/PM à
--- direita, uma linha de efeito; a habilidade em foco fica destacada; "?" abre o DetalheAcao). Comandos
--- extras (Confirmar, Cancelar mira, Levantar, Apagar o fogo, Pacto) empilham acima do losango.
--- Teclas: R Habilidades, F Atacar, G Andar, V Encerrar turno (Q/E giram a câmera, WASD movem, M alterna
--- a mesa); com a lista aberta, seta para cima/baixo move o foco e Enter usa.
+-- Comandos da luta (RODA1): roda de ações no canto inferior direito, no lugar do antigo losango.
+-- Três fatias: Golpear (ataques da arma equipada), Habilidades (cartas do livro) e Ações (Andar, Apagar o
+-- fogo, Escolher Pacto e as manobras que o servidor oferece: Levantar, Desarmar, Escapar...). O botão
+-- central é Encerrar turno; o gatilho "Roda" embaixo abre/fecha. A fatia abre uma lista vertical à esquerda
+-- (nome grande, custo em Ações/PM à direita, uma linha de efeito; "?" abre o DetalheAcao). Cada fatia mostra
+-- o custo (ou o motivo) e fica apagada se nada nela pode ser pago. Comandos extras (Confirmar, Cancelar mira)
+-- empilham acima da roda. Corpo visual em client/UI/RodaAcoes; geometria em shared/Regras/LayoutLuta.
+-- Teclas: C abre/fecha a roda, 1/2/3 ou setas escolhem a fatia (Enter confirma), F Golpear, R Habilidades,
+-- G Andar, V Encerrar turno (Q/E giram a câmera, WASD movem, M alterna a mesa); com a lista aberta, seta para
+-- cima/baixo move o foco e Enter usa.
 -- Só intenção: escolher a habilidade liga a MIRA (MesaState); o clique no tabuleiro manda o pedido;
--- o servidor valida e resolve. Geometria em shared/Regras/LayoutLuta (pura, com spec).
--- Instances: AcoesDoTurno > Menu (Atacar, Habilidades, Andar, EncerrarTurno, ConfirmarAcao, CancelarMira,
--- Levantar, ApagarFogo, EscolherPacto) | Lista > Grupos | Cartas > Carta_<id> | Dica | TooltipAcao | DetalheAcao.
+-- o servidor valida e resolve.
+-- Instances: AcoesDoTurno > Menu (Roda, Gatilho, ConfirmarAcao, CancelarMira) | Lista > Grupos | Cartas >
+-- Carta_<id> | Dica | TooltipAcao | DetalheAcao.
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
@@ -25,6 +28,7 @@ local Previa = require(script.Parent.PreviaFurtiva)
 local T = require(script.Parent.UI.Tema)
 local C = require(script.Parent.UI.Componentes)
 local P = require(script.Parent.UI.PecasLuta)
+local RodaAcoes = require(script.Parent.UI.RodaAcoes)
 local Arte = require(Shared:WaitForChild("UIArteLuta"))
 
 local AcoesDoTurno = {}
@@ -88,8 +92,20 @@ local function custoPm(mec, indisponivel): string
 	return if #partes == 0 then (if (mec.acoes or 0) == 0 then "Livre" else "") else table.concat(partes, "·")
 end
 
-local TECLAS = { habilidades = Enum.KeyCode.R, atacar = Enum.KeyCode.F, andar = Enum.KeyCode.G, encerrar = Enum.KeyCode.V }
-local EXTRAS_MAX = 5
+local EXTRAS_MAX = 2
+-- Fatia da roda -> modo da lista de cartas.
+local MODO_DA_FATIA = { golpear = "atacar", habilidades = "habilidades", acoes = "acoes" }
+local FATIA_DO_MODO = { atacar = "golpear", habilidades = "habilidades", acoes = "acoes" }
+local TECLA_DA_FATIA = { [Enum.KeyCode.One] = "golpear", [Enum.KeyCode.Two] = "habilidades", [Enum.KeyCode.Three] = "acoes" }
+
+-- Custo de uma fatia a partir das suas linhas: "1 Ação", "1–3 Ações" ou o motivo de nada poder ser pago.
+local function custoDaFatia(minimo: number?, maximo: number?, motivo: string?): string
+	if not minimo then return motivo or "—" end
+	local m = maximo or minimo
+	if minimo == 0 and m == 0 then return "Livre" end
+	local plural = if m == 1 then " Ação" else " Ações"
+	return if minimo == m then minimo .. plural else minimo .. "–" .. m .. plural
+end
 
 function AcoesDoTurno.start(state)
 	local player = Players.LocalPlayer
@@ -118,27 +134,21 @@ function AcoesDoTurno.start(state)
 	-- Posição absoluta dos blocos (a partir do canto, com âncora: o UIScale encolhe em direção ao canto).
 	local function geometria()
 		local vp = workspace.CurrentCamera.ViewportSize
-		local lo = Layout.losango(vp.X, vp.Y)
+		local lo = Layout.roda(vp.X, vp.Y)
 		local extras = Layout.extras(vp.X, vp.Y, EXTRAS_MAX)
 		local topo = extras[EXTRAS_MAX]
 		return vp, lo, extras, { x = lo.x, y = topo.y, w = lo.w, h = lo.y + lo.h - topo.y }
 	end
 	local _, _, _, menuRect0 = geometria()
 
-	-- Menu: contém o losango e a pilha de extras; some fora da vez deste jogador.
+	-- Menu: contém a roda, o gatilho e a pilha de extras; some fora da vez deste jogador.
 	local menu = new("Frame", gui, {
 		Name = "Menu", AnchorPoint = Vector2.new(1, 1), Size = UDim2.fromOffset(menuRect0.w, menuRect0.h),
 		BackgroundTransparency = 1, Visible = false,
 	})
-	-- Enfeite: losango fino no centro do losango de comandos.
-	local centro = new("Frame", menu, {
-		Name = "Centro", AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(34, 34), Rotation = 45,
-		BackgroundTransparency = 1, BorderSizePixel = 0,
-	})
-	new("UIStroke", centro, { Color = P.cor.ouro, Thickness = 1, Transparency = 0.45 })
-	new("Frame", centro, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(10, 10), BackgroundColor3 = P.cor.ouro, BorderSizePixel = 0 })
+	local roda -- api da RodaAcoes, criada depois das funções que ela chama
 
-	-- Lista de habilidades (à esquerda do losango): abas Golpes-Apoio-Tudo (só em Habilidades) e as linhas.
+	-- Lista de habilidades (à esquerda da roda): abas Golpes-Apoio-Tudo (só em Habilidades) e as linhas.
 	local lista = new("Frame", gui, { Name = "Lista", AnchorPoint = Vector2.new(1, 1), Size = UDim2.fromOffset(Layout.LISTA_LARGURA, Layout.LISTA_LINHA), BackgroundTransparency = 1, Visible = false })
 	local escalaLista = new("UIScale", lista, { Name = "Entrada", Scale = 1 })
 	new("UIListLayout", lista, { Padding = UDim.new(0, Layout.ESPACO), SortOrder = Enum.SortOrder.LayoutOrder })
@@ -205,7 +215,7 @@ function AcoesDoTurno.start(state)
 		return b
 	end
 
-	-- Estado da lista: nil, "atacar" ou "habilidades"; grupo vale só em "habilidades".
+	-- Estado da lista: nil, "atacar" (Golpear), "habilidades" ou "acoes"; grupo vale só em "habilidades".
 	local modoLista: string? = nil
 	local grupo, atualizar = "Golpes", nil
 	local cartas: { [string]: any } = {}
@@ -228,19 +238,32 @@ function AcoesDoTurno.start(state)
 		botoesGrupo[nome] = b
 	end
 
+	-- Abre a roda (se preciso) e alterna a lista da fatia; escolher a mesma fatia de novo fecha a lista.
 	local function alternarLista(modo: string)
 		detalhe.fechar(); tooltip.fechar()
+		roda.abrir()
 		modoLista = if modoLista == modo then nil else modo
 		focoRegistro = nil
 		state.setMira(nil)
 		cartasFrame.CanvasPosition = Vector2.zero
 		if atualizar then atualizar() end
 	end
-	local function tamanhoVertice() return UDim2.fromOffset(Layout.VERTICE_W, Layout.VERTICE_H) end
-	local atacar = botao(menu, "Atacar", "Atacar", tamanhoVertice(), { tecla = "F" }, function() alternarLista("atacar") end)
-	local habilidades = botao(menu, "Habilidades", "Habilidades", tamanhoVertice(), { tecla = "R" }, function() alternarLista("habilidades") end)
+	local function escolherFatia(id: string)
+		alternarLista(MODO_DA_FATIA[id])
+	end
+	local function fecharRoda()
+		if not roda.aberta() then return end
+		roda.fechar()
+		modoLista = nil
+		detalhe.fechar(); tooltip.fechar()
+	end
+	-- Gatilho "Roda": botão na tela (e tecla C) que abre/fecha a roda.
+	local gatilho = botao(menu, "Gatilho", "Roda", UDim2.fromOffset(Layout.GATILHO_W, Layout.GATILHO_H), { tecla = "C", tamanhoTexto = 16 }, function()
+		if roda.aberta() then fecharRoda() else roda.abrir() end
+		if atualizar then atualizar() end
+	end)
 	-- Andar (Cap. 4: 1 Ação, até o Deslocamento): acende as casas e um clique move.
-	local andar = botao(menu, "Andar", "Andar", tamanhoVertice(), { tecla = "G" }, function()
+	local function andarAgora()
 		if not atual.tokenId or (atual.restantes or 0) < 1 and (atual.passosLivres or 0) < 1 then
 			return
 		end
@@ -254,17 +277,17 @@ function AcoesDoTurno.start(state)
 			tokenId = atual.tokenId, habilidadeId = "mesa/andar", tipo = "mover", modo = "casa",
 			alcanceCasas = if (atual.passosLivres or 0) > 0 then atual.passosLivres else atual.deslocamentoCasas or 6, cor = Estilo.CAPITULOS[3],
 		})
-	end)
-	local encerrar = botao(menu, "EncerrarTurno", "Encerrar turno", tamanhoVertice(), { tecla = "V", principal = true }, function()
+	end
+	local function encerrarTurno()
 		local snapshot = state.snapshot()
 		if snapshot and atual.tokenId then
 			modoLista = nil
 			state.setMira(nil)
 			state.send("nextTurn", { expectedId = atual.tokenId, expectedTurn = snapshot.combat.turn })
 		end
-	end)
-	local vertices = { habilidades = habilidades, atacar = atacar, andar = andar, encerrar = encerrar }
-	-- Comandos extras: empilham acima do losango, na ordem abaixo, só os visíveis.
+	end
+	roda = RodaAcoes.nova(menu, { aoEscolher = escolherFatia, aoEncerrar = encerrarTurno })
+	-- Comandos extras: empilham acima da roda, na ordem abaixo, só os visíveis.
 	local tamanhoExtra = UDim2.fromOffset(Layout.EXTRA_W, Layout.EXTRA_H)
 	local confirmar = botao(menu, "ConfirmarAcao", "Confirmar ação", tamanhoExtra, { principal = true }, function()
 		local mira = state.mira()
@@ -276,20 +299,7 @@ function AcoesDoTurno.start(state)
 	local cancelar = botao(menu, "CancelarMira", "Cancelar mira", tamanhoExtra, nil, function()
 		state.setMira(nil)
 	end)
-	local levantar = botao(menu, "Levantar", "Levantar (1 Ação)", tamanhoExtra, { tamanhoTexto = 15 }, function()
-		tooltip.fechar()
-		if atual.tokenId then state.setMira(nil); state.send("usarHabilidade", {tokenId = atual.tokenId, habilidadeId = "mesa/levantar"}) end
-	end)
-	local apagar = botao(menu, "ApagarFogo", "Apagar o fogo (1 Ação)", tamanhoExtra, { perigo = true, tamanhoTexto = 15 }, function()
-		if atual.tokenId then
-			state.send("apagarFogo", { tokenId = atual.tokenId })
-		end
-	end)
-	local pacto = botao(menu, "EscolherPacto", "Escolher Pacto", tamanhoExtra, nil, function()
-		atual.pacto += 1
-		state.setMira(nil)
-	end)
-	local extras = { confirmar, cancelar, levantar, apagar, pacto }
+	local extras = { confirmar, cancelar }
 	for _, b in extras do b.Visible = false end
 	C.aplicarEscala(menu)
 	C.aplicarEscala(lista)
@@ -300,17 +310,16 @@ function AcoesDoTurno.start(state)
 	end
 
 	local ultimoTurno = nil
+	local ultimaChaveMira = nil
 	local linhasLista, comAbasLista = 1, false
 
 	-- Posição dos blocos (só muda com a tela ou com o conteúdo, não por quadro).
 	local function posicionar()
 		local vp, lo, rectsExtras, mr = geometria()
 		menu.Position, menu.Size = UDim2.fromOffset(vp.X - Layout.MARGEM, vp.Y - Layout.MARGEM), UDim2.fromOffset(mr.w, mr.h)
-		for nome, b in vertices do
-			local v = lo.vertices[nome]
-			b.Position, b.Size = UDim2.fromOffset(lo.x - mr.x + v.x, lo.y - mr.y + v.y), UDim2.fromOffset(v.w, v.h)
-		end
-		centro.Position = UDim2.fromOffset(lo.x - mr.x + lo.w / 2, lo.y - mr.y + lo.h / 2)
+		roda.raiz.Position = UDim2.fromOffset(lo.x - mr.x, lo.y - mr.y)
+		gatilho.Position = UDim2.fromOffset(lo.x - mr.x + lo.gatilho.x, lo.y - mr.y + lo.gatilho.y)
+		gatilho.Size = UDim2.fromOffset(lo.gatilho.w, lo.gatilho.h)
 		-- extras visíveis, do mais perto do losango para cima
 		local k = 0
 		for _, b in extras do
@@ -329,12 +338,14 @@ function AcoesDoTurno.start(state)
 	end
 	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(posicionar)
 
-	local function criarCarta(habilidadeId: string, ordem: number)
-		local indisponivel = Execucao.INDISPONIVEIS[habilidadeId]
-		local mec = Execucao.MECANICAS[habilidadeId] or { acoes = 0, pm = 0, pt = 0, tipo = "manual" }
+	-- `extra` (opcional) descreve uma linha que não é carta do livro (Andar, Apagar o fogo, Escolher Pacto):
+	-- { mec, dados, cor, linha, detalhe = function, acionar = function }.
+	local function criarCarta(habilidadeId: string, ordem: number, extra: any?)
+		local indisponivel = if extra then nil else Execucao.INDISPONIVEIS[habilidadeId]
+		local mec = if extra then extra.mec else Execucao.MECANICAS[habilidadeId] or { acoes = 0, pm = 0, pt = 0, tipo = "manual" }
 		local entrada = Catalogo.POR_ID[habilidadeId]
-		local dados = entrada and entrada.data or {}
-		local cor = Estilo.arvore(mec.arvore or arvoreDe(habilidadeId)).cor
+		local dados = if extra then extra.dados else entrada and entrada.data or {}
+		local cor = if extra then extra.cor else Estilo.arvore(mec.arvore or arvoreDe(habilidadeId)).cor
 		-- Carta pintada (ARTE2): faixa de tinta (normal/foco/bloqueada), ícone da habilidade tingido pela
 		-- árvore, nome grande em fonte de título, custo em Ações num losango e PM/PT logo abaixo.
 		local carta = new("TextButton", cartasFrame, {
@@ -366,10 +377,17 @@ function AcoesDoTurno.start(state)
 		if mec.descricao and not indisponivel then resumo = mec.descricao end
 		local custo = if indisponivel then "CONSULTA • VEJA OS DETALHES" else linhaDeCusto(mec)
 		local registro = { carta = carta, mec = mec, cor = cor, indisponivel = indisponivel, efeito = efeito, nome = nome, custoLabel = custoLabel,
-			custo = custo, resumo = resumo, linhaResumo = ResumoCarta.curto(mec, dados, indisponivel, habilidadeId), grupo = Apresentacao.grupo(mec, indisponivel),
+			custo = custo, resumo = resumo, linhaResumo = if extra then extra.linha else ResumoCarta.curto(mec, dados, indisponivel, habilidadeId), grupo = Apresentacao.grupo(mec, indisponivel),
 			armada = false, hover = false, foco = false, escala = escala, estado = "",
-			ataque = string.sub(habilidadeId, 1, 5) == "mesa/" and Apresentacao.grupo(mec, indisponivel) == "Golpes" }
+			ataque = string.sub(habilidadeId, 1, 5) == "mesa/" and Apresentacao.grupo(mec, indisponivel) == "Golpes", existe = true }
+		-- Fatia da roda: golpes da arma, manobras e movimento (Ações) ou habilidades do livro.
+		registro.cat = if registro.ataque then "golpear" elseif string.sub(habilidadeId, 1, 5) == "mesa/" then "acoes" else "habilidades"
 		local function dadosDetalhe()
+			if extra and extra.detalhe then
+				local d = extra.detalhe()
+				d.motivo = carta:GetAttribute("Motivo")
+				return d
+			end
 			local ficha = atual.tokenId and state.fichaDetalhe and state.fichaDetalhe(atual.tokenId)
 			local contexto = ficha and Descricao.contexto(mec, ficha, Catalogo, habilidadeId, atual.ficha)
 			local completo = if indisponivel then resumo else Descricao.texto(mec, atual.ficha, contexto)
@@ -422,6 +440,10 @@ function AcoesDoTurno.start(state)
 				consultar()
 				return
 			end
+			if extra and extra.acionar then
+				extra.acionar()
+				return
+			end
 			if mec.tipo == "formula" then
 				-- Teórica: a fórmula é desenhada no quadro (FormulaView), não mirada.
 				state.setMira(nil)
@@ -469,6 +491,45 @@ function AcoesDoTurno.start(state)
 		return registro
 	end
 
+	-- Linhas da lista de Ações que não são cartas do livro: Andar, Apagar o fogo e Escolher Pacto (as manobras
+	-- do servidor, como Levantar e Desarmar, já chegam como cartas "mesa/..."). Só intenção: cada uma cai no
+	-- mesmo pedido de antes (mira de Andar, remoto apagarFogo, troca local de pacto).
+	local function linhasDaRoda()
+		return {
+			{ "mesa/andar", {
+				mec = { tipo = "mover", nome = "Andar", acoes = 1, pm = 0, pt = 0 }, dados = { name = "Andar" }, cor = Estilo.CAPITULOS[3],
+				linha = "Até o seu Deslocamento",
+				detalhe = function()
+					return { nome = "Andar", custo = "1 AÇÃO", texto = string.format("Gasta 1 Ação e move até o seu Deslocamento (%d casas). Escolha a casa no tabuleiro.", atual.deslocamentoCasas or 6) }
+				end,
+				acionar = andarAgora,
+			} },
+			{ "mesa/apagar-fogo", {
+				mec = { tipo = "utilidade", nome = "Apagar o fogo", acoes = 1, pm = 0, pt = 0 }, dados = { name = "Apagar o fogo" }, cor = P.cor.inimigo,
+				linha = "Remove Em chamas",
+				detalhe = function()
+					return { nome = "Apagar o fogo", custo = "1 AÇÃO", texto = "Gasta 1 Ação para apagar as chamas que queimam você." }
+				end,
+				acionar = function()
+					modoLista = nil
+					if atual.tokenId then state.send("apagarFogo", { tokenId = atual.tokenId }) end
+				end,
+			} },
+			{ "mesa/pacto", {
+				mec = { tipo = "utilidade", nome = "Escolher Pacto", acoes = 0, pm = 0, pt = 0 }, dados = { name = "Escolher Pacto" }, cor = Estilo.CAPITULOS[3],
+				linha = "Toque para trocar",
+				detalhe = function()
+					return { nome = "Escolher Pacto", custo = "LIVRE", texto = "Troca qual pacto as próximas habilidades usam. Não gasta Ação." }
+				end,
+				acionar = function()
+					atual.pacto += 1
+					state.setMira(nil)
+					if atualizar then atualizar() end
+				end,
+			} },
+		}
+	end
+
 	-- Foco do teclado na lista: seta para cima/baixo e Enter.
 	local function linhasVisiveis()
 		local v = {}
@@ -503,16 +564,12 @@ function AcoesDoTurno.start(state)
 		local token = if vez then state.findToken(vez) else nil
 		local mostrar = token ~= nil and token.habilidades ~= nil and state.canControl(token)
 		if mostrar and not menu.Visible then
-			-- entrada: os quatro vértices crescem em sequência (Back)
-			local i = 0
-			for _, b in vertices do
-				i += 1
+			-- entrada: o botão central e o gatilho crescem (Back)
+			for _, b in { roda.hub, gatilho } do
 				local foco = b:FindFirstChild("Foco")
 				if foco then
 					foco.Scale = 0.7
-					task.delay((i - 1) * 0.04, function()
-						if b.Parent then P.animar(foco, { Scale = 1 }, P.ENTRADA, "foco") end
-					end)
+					P.animar(foco, { Scale = 1 }, P.ENTRADA, "foco")
 				end
 			end
 		end
@@ -520,6 +577,7 @@ function AcoesDoTurno.start(state)
 		if not mostrar then
 			lista.Visible, dica.Visible = false, false
 			modoLista = nil
+			roda.fechar()
 			detalhe.fechar()
 			tooltip.fechar()
 			if state.mira() then
@@ -541,6 +599,10 @@ function AcoesDoTurno.start(state)
 			focoRegistro = nil
 			-- Os golpes de todo mundo (ataque básico, disparo, Lâmina de Gelo) vêm primeiro.
 			local ordem = 0
+			for _, par in linhasDaRoda() do
+				ordem += 1
+				cartas[par[1]] = criarCarta(par[1], ordem, par[2])
+			end
 			for _, passe in { true, false } do
 				for _, id in token.habilidades do
 					if (string.sub(id, 1, 5) == "mesa/") == passe and (Execucao.MECANICAS[id] or Execucao.INDISPONIVEIS[id]) then
@@ -565,6 +627,7 @@ function AcoesDoTurno.start(state)
 			tooltip.fechar()
 			ultimoTurno = chaveTurno
 			modoLista = nil
+			roda.fechar()
 			if state.mira() then state.setMira(nil) end
 			cartasFrame.CanvasPosition = Vector2.zero
 		end
@@ -575,22 +638,20 @@ function AcoesDoTurno.start(state)
 				queimando = true
 			end
 		end
-		levantar.Visible = caido and (token.pv or 0) > 0
-		apagar.Visible = queimando
-		pacto.Visible = token.pactos ~= nil and #token.pactos > 1
+		local mira = state.mira()
+		-- Pacto (só quem tem mais de um): a linha de Ações troca o pacto escolhido.
+		atual.pactos = token.pactos
 		if token.pactos and #token.pactos > 0 then
 			atual.pacto = (atual.pacto - 1) % #token.pactos + 1
-			local entradaPacto = Catalogo.POR_ID[token.pactos[atual.pacto]]
-			rotuloDe(pacto, entradaPacto and entradaPacto.data.name or "Pacto")
 		end
-		local mira = state.mira()
 		cancelar.Visible = mira ~= nil
-		rotuloDe(andar, if atual.passosLivres > 0 then "Andar · " .. atual.passosLivres .. " casas" else "Andar")
-		andar:SetAttribute("Bloqueada", restantes < 1 and atual.passosLivres < 1)
-		andar:SetAttribute("Desabilitado", restantes < 1 and atual.passosLivres < 1)
-		rotuloDe(encerrar, if restantes == 0 then "Pronto · Encerrar" else "Encerrar turno")
+		roda.definirHub({ rotulo = if restantes == 0 then "Pronto" else "Encerrar", pronto = restantes == 0 })
 		local contagens = { Golpes = 0, Apoio = 0, Tudo = 0 }
-		local temAtaque, temHabilidade, visiveis = false, false, 0
+		local visiveis = 0
+		local fatias = { golpear = { n = 0 }, habilidades = { n = 0 }, acoes = { n = 0 } }
+		cartas["mesa/apagar-fogo"].existe = queimando
+		cartas["mesa/pacto"].existe = token.pactos ~= nil and #token.pactos > 1
+		cartas["mesa/andar"].linhaResumo = string.format("Até %d casas", if atual.passosLivres > 0 then atual.passosLivres else atual.deslocamentoCasas)
 		for id, registro in cartas do
 			local mec = registro.mec
 			local motivo = Apresentacao.motivo(mec, registro.indisponivel, token, jogo, id)
@@ -599,13 +660,24 @@ function AcoesDoTurno.start(state)
 			if ativa then motivo = "ATIVA • manter não gasta Ação" end
 			if apoio and mec.especial == "pararCancao" and not apoio.cancao then motivo = "Nenhuma canção ativa" end
 			if apoio and mec.especial == "inspirar" and apoio.inspiracoesUsadas >= apoio.inspiracoesMax then motivo = "Sem usos de Inspiração neste descanso" end
-			if registro.ataque then temAtaque = true else
-				temHabilidade = true
-				contagens.Tudo += 1
-				if contagens[registro.grupo] then contagens[registro.grupo] += 1 end
+			if id == "mesa/andar" and atual.passosLivres > 0 and motivo == "Sem Ações" then motivo = nil end -- passos livres (Levantar)
+			if registro.existe then
+				local f = fatias[registro.cat]
+				f.n += 1
+				if motivo == nil or ativa then
+					local acoes = registro.mec.acoes or 0
+					f.minimo, f.maximo = math.min(f.minimo or acoes, acoes), math.max(f.maximo or acoes, acoes)
+				elseif not f.motivo then
+					f.motivo = motivo
+				end
+				if registro.cat == "habilidades" then
+					contagens.Tudo += 1
+					if contagens[registro.grupo] then contagens[registro.grupo] += 1 end
+				end
 			end
-			local naLista = if modoLista == "atacar" then registro.ataque
-				elseif modoLista == "habilidades" then not registro.ataque and (grupo == "Tudo" or grupo == registro.grupo) else false
+			local naLista = registro.existe and (if modoLista == "atacar" then registro.cat == "golpear"
+				elseif modoLista == "acoes" then registro.cat == "acoes"
+				elseif modoLista == "habilidades" then registro.cat == "habilidades" and (grupo == "Tudo" or grupo == registro.grupo) else false)
 			registro.carta.Visible = naLista
 			if naLista then visiveis += 1 end
 			registro.carta:SetAttribute("Bloqueada", motivo ~= nil)
@@ -614,6 +686,10 @@ function AcoesDoTurno.start(state)
 			detalhe.atualizar(id, registro.dadosDetalhe())
 			tooltip.atualizar(id, registro.dadosDetalhe())
 			registro.efeito.Text = motivo or registro.linhaResumo
+			if id == "mesa/pacto" then
+				local entradaPacto = atual.pactos and Catalogo.POR_ID[atual.pactos[atual.pacto]]
+				registro.nome.Text = "Pacto: " .. (entradaPacto and entradaPacto.data.name or "—")
+			end
 			registro.efeito.TextColor3 = if motivo then P.cor.inimigo else P.cor.secundario
 			registro.nome.TextTransparency = if motivo then 0.45 else 0
 			registro.custoLabel.TextTransparency = if motivo then 0.45 else 0
@@ -621,14 +697,19 @@ function AcoesDoTurno.start(state)
 			registro.foco = registro.foco and naLista
 			registro.pintar()
 		end
-		atacar.Visible, habilidades.Visible = temAtaque, temHabilidade
+		for id, f in fatias do
+			roda.definirFatia(id, {
+				custo = if f.n == 0 then "Nenhum" else custoDaFatia(f.minimo, f.maximo, f.motivo),
+				bloqueada = f.minimo == nil,
+				alerta = id == "acoes" and (caido or queimando) and (token.pv or 0) > 0,
+			})
+		end
 		-- Aba vazia (ex.: só habilidades de Apoio e a aba é Golpes): passa à primeira aba com cartas em vez de
 		-- fechar a lista, que antes sumia no clique em Habilidades sem mostrar nada.
 		if modoLista == "habilidades" and visiveis == 0 and contagens.Tudo > 0 then
 			grupo = if contagens.Golpes > 0 then "Golpes" elseif contagens.Apoio > 0 then "Apoio" else "Tudo"
 			return atualizar()
 		end
-		atacar.Marca.Visible, habilidades.Marca.Visible = modoLista == "atacar", modoLista == "habilidades"
 		local registroMira = mira and cartas[mira.habilidadeId]
 		confirmar.Visible = registroMira ~= nil and (mira.modo == "confirmar" or mira.modo == "lista" or mira.ponto ~= nil)
 		if confirmar.Visible then
@@ -650,6 +731,18 @@ function AcoesDoTurno.start(state)
 		cartasFrame.Size = UDim2.new(1, 0, 0, Layout.alturaLista(k))
 		linhasLista, comAbasLista = k, comAbas
 		if modoLista ~= nil and visiveis == 0 then modoLista = nil end
+		-- Mira nova (escolheu algo na lista): a roda fecha para o tabuleiro ficar livre.
+		local chaveMira = mira and mira.habilidadeId
+		if chaveMira ~= ultimaChaveMira then
+			ultimaChaveMira = chaveMira
+			if mira then
+				modoLista = nil
+				roda.fechar()
+				visiveis = 0
+			end
+		end
+		roda.ativar(if modoLista then FATIA_DO_MODO[modoLista] else nil)
+		gatilho.Rotulo.Text = if roda.aberta() then "Fechar" else "Roda"
 		local abrir = modoLista ~= nil and visiveis > 0
 		if abrir and not lista.Visible then
 			escalaLista.Scale = 0.92
@@ -672,25 +765,42 @@ function AcoesDoTurno.start(state)
 	end
 
 	cartasFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(function() tooltip.fechar() end)
-	-- Teclas dos vértices e foco da lista.
+	-- Teclas: atalhos diretos (F/R/G/V), roda (C, 1/2/3, setas, Enter) e foco da lista.
 	local teclas = UserInputService.InputBegan:Connect(function(input, processado)
 		if processado or not menu.Visible or UserInputService:GetFocusedTextBox() then return end
 		local dialogo = gui:FindFirstChild("DetalheAcao")
 		if dialogo and dialogo.Visible then return end
-		for nome, tecla in TECLAS do
-			if input.KeyCode == tecla then
-				local b = vertices[nome]
-				if b.Visible then cliques[b]() end
-				return
-			end
+		local k = input.KeyCode
+		if k == Enum.KeyCode.C then
+			if roda.aberta() then fecharRoda() else roda.abrir() end
+			return atualizar()
+		elseif k == Enum.KeyCode.F then return escolherFatia("golpear")
+		elseif k == Enum.KeyCode.R then return escolherFatia("habilidades")
+		elseif k == Enum.KeyCode.G then return andarAgora()
+		elseif k == Enum.KeyCode.V then return encerrarTurno()
 		end
-		if not lista.Visible then return end
-		if input.KeyCode == Enum.KeyCode.Down then
-			moverFoco(1)
-		elseif input.KeyCode == Enum.KeyCode.Up then
-			moverFoco(-1)
-		elseif input.KeyCode == Enum.KeyCode.Return and focoRegistro and focoRegistro.carta.Visible then
-			focoRegistro.acionar()
+		if not roda.aberta() then return end
+		if TECLA_DA_FATIA[k] then
+			return escolherFatia(TECLA_DA_FATIA[k])
+		elseif k == Enum.KeyCode.Left then
+			return roda.mover(-1)
+		elseif k == Enum.KeyCode.Right then
+			return roda.mover(1)
+		end
+		if lista.Visible then
+			if k == Enum.KeyCode.Down then
+				moverFoco(1)
+			elseif k == Enum.KeyCode.Up then
+				moverFoco(-1)
+			elseif k == Enum.KeyCode.Return and focoRegistro and focoRegistro.carta.Visible then
+				focoRegistro.acionar()
+			end
+		elseif k == Enum.KeyCode.Down then
+			roda.mover(1)
+		elseif k == Enum.KeyCode.Up then
+			roda.mover(-1)
+		elseif k == Enum.KeyCode.Return and roda.foco() then
+			escolherFatia(roda.foco())
 		end
 	end)
 	gui.Destroying:Connect(function()

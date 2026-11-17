@@ -1,4 +1,4 @@
--- HUD2: layout puro do HUD da luta (losango de comandos, lista, cartões, coluna da ordem e topo).
+-- HUD2: layout puro do HUD da luta (roda de ações, lista, cartões, coluna da ordem e topo).
 local L = require(game:GetService("ReplicatedStorage").Shared.Regras.LayoutLuta)
 local LARGURAS = { 800, 1024, 1280, 1920 }
 local ALTURAS = { 600, 720, 1080 }
@@ -17,10 +17,10 @@ end
 
 -- Todas as peças visíveis ao mesmo tempo (pior caso): nome => retângulo absoluto.
 local function pecas(vx, vy, cartoes, turnos, extras)
-	local lo = L.losango(vx, vy)
+	local lo = L.roda(vx, vy)
 	local topo = L.topo(vx)
 	local lista = {
-		losango = lo, lista = L.lista(vx, vy, L.LISTA_MAX_LINHAS, true), chefe = L.chefe(vx), dia = L.diaFaixa(vx),
+		roda = lo, lista = L.lista(vx, vy, L.LISTA_MAX_LINHAS, true), chefe = L.chefe(vx), dia = L.diaFaixa(vx),
 		anuncio = topo.anuncio, resultado = topo.resultado, rodada = topo.rodada,
 	}
 	for i, r in L.extras(vx, vy, extras) do lista["extra" .. i] = r end
@@ -32,7 +32,7 @@ end
 return {
 	["nenhuma peça sai da tela nem cruza outra, de 800x600 a 1920x1080"] = function(t)
 		cada_tela(function(vx, vy)
-			local lista = pecas(vx, vy, 4, 12, 5)
+			local lista = pecas(vx, vy, 4, 12, 2)
 			local nomes = {}
 			for nome, r in lista do
 				table.insert(nomes, nome)
@@ -51,35 +51,42 @@ return {
 			local topo = L.topo(vx)
 			t.ok(topo.rodada.y + topo.rodada.h < L.ABAIXO_DO_TOPO, "topo passa do limite")
 			t.ok(L.lista(vx, vy, L.LISTA_MAX_LINHAS, true).y >= L.ABAIXO_DO_TOPO, "lista sobe demais " .. vx .. "x" .. vy)
-			local extras = L.extras(vx, vy, 5)
-			t.ok(extras[5].y >= L.ABAIXO_DO_TOPO, "extras sobem demais " .. vx .. "x" .. vy)
+			local extras = L.extras(vx, vy, 2)
+			t.ok(extras[2].y >= L.ABAIXO_DO_TOPO, "extras sobem demais " .. vx .. "x" .. vy)
 		end)
 	end,
-	["losango: quatro vértices dentro do quadrado, sem tocar, com alvo de toque >= 44"] = function(t)
+	["roda: fatias, hub e gatilho dentro do quadrado, sem tocar, com alvo de toque >= 44"] = function(t)
 		cada_tela(function(vx, vy)
-			local lo = L.losango(vx, vy)
+			local lo = L.roda(vx, vy)
 			t.eq(lo.x + lo.w, vx - L.MARGEM)
 			t.eq(lo.y + lo.h, vy - L.MARGEM)
-			local nomes = { "habilidades", "atacar", "andar", "encerrar" }
-			for i, nome in nomes do
-				local v = lo.vertices[nome]
-				t.ok(v.x >= 0 and v.y >= 0 and v.x + v.w <= lo.w and v.y + v.h <= lo.h, nome .. " fora do quadrado")
-				t.ok(v.w >= 44 and v.h >= 44, nome .. " pequeno para toque")
-				for j = i + 1, #nomes do
-					t.ok(not L.intersecta(v, lo.vertices[nomes[j]]), nome .. " cruza " .. nomes[j])
+			local partes = { lo.fatias.golpear, lo.fatias.habilidades, lo.fatias.acoes, lo.hub, lo.gatilho }
+			local nomes = { "golpear", "habilidades", "acoes", "hub", "gatilho" }
+			for i, v in partes do
+				t.ok(v.x >= 0 and v.y >= 0 and v.x + v.w <= lo.w and v.y + v.h <= lo.h, nomes[i] .. " fora do quadrado")
+				t.ok(v.w >= 44 and v.h >= 38, nomes[i] .. " pequeno para toque")
+				for j = i + 1, #partes do
+					local w = partes[j]
+					if i <= 4 and j <= 4 then
+						-- fatias e hub são círculos: a distância dos centros tem de passar a soma dos raios
+						local d = math.sqrt((v.x + v.w / 2 - w.x - w.w / 2) ^ 2 + (v.y + v.h / 2 - w.y - w.h / 2) ^ 2)
+						t.ok(d >= (v.w + w.w) / 2, nomes[i] .. " cruza " .. nomes[j])
+					else
+						t.ok(not L.intersecta(v, w), nomes[i] .. " cruza " .. nomes[j])
+					end
 				end
 			end
-			-- o losango é simétrico: topo/base no meio, esquerda/direita na altura do meio
-			t.eq(lo.vertices.habilidades.x, lo.vertices.encerrar.x)
-			t.eq(lo.vertices.atacar.y, lo.vertices.andar.y)
+			-- simétrica: as duas fatias de baixo espelham-se e a de cima está no meio
+			t.eq(lo.fatias.habilidades.x + lo.fatias.habilidades.w / 2, lo.w / 2)
+			t.ok(math.abs(lo.fatias.golpear.y - lo.fatias.acoes.y) < 0.001, "fatias de baixo desalinhadas")
 		end)
 	end,
-	["lista: fica à esquerda do losango, com a base alinhada, e cresce com as linhas"] = function(t)
+	["lista: fica à esquerda da roda, com a base alinhada, e cresce com as linhas"] = function(t)
 		cada_tela(function(vx, vy)
-			local lo = L.losango(vx, vy)
+			local lo = L.roda(vx, vy)
 			local pequena = L.lista(vx, vy, 1, false)
 			local cheia = L.lista(vx, vy, 99, true)
-			t.ok(pequena.x + pequena.w <= lo.x, "lista cruza o losango")
+			t.ok(pequena.x + pequena.w <= lo.x, "lista cruza a roda")
 			t.eq(pequena.y + pequena.h, vy - L.MARGEM)
 			t.eq(cheia.y + cheia.h, vy - L.MARGEM)
 			t.ok(cheia.h > pequena.h and cheia.w <= L.LISTA_LARGURA)
@@ -87,13 +94,13 @@ return {
 			t.ok(cheia.x >= L.CARTAO_X + L.CARTAO_LARGURA, "lista invade os cartões")
 		end)
 	end,
-	["extras: pilha acima do losango, o 1 mais perto, sem cruzar"] = function(t)
+	["extras: pilha acima da roda, o 1 mais perto, sem cruzar"] = function(t)
 		cada_tela(function(vx, vy)
-			local lo = L.losango(vx, vy)
-			local e = L.extras(vx, vy, 5)
-			t.ok(e[1].y + e[1].h <= lo.y, "extra 1 cruza o losango")
+			local lo = L.roda(vx, vy)
+			local e = L.extras(vx, vy, 3)
+			t.ok(e[1].y + e[1].h <= lo.y, "extra 1 cruza a roda")
 			t.ok(e[1].y > e[2].y and e[2].y > e[3].y)
-			for i = 2, 5 do t.ok(not L.intersecta(e[i], e[i - 1])) end
+			for i = 2, 3 do t.ok(not L.intersecta(e[i], e[i - 1])) end
 			t.eq(#L.extras(vx, vy, 0), 0)
 		end)
 	end,

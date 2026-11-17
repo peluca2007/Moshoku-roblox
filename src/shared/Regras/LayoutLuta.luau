@@ -2,9 +2,9 @@
 -- Só números em pixels de tela (o UIScale de `aplicarEscala` age por cima, ancorado nos cantos);
 -- nenhuma Instance. Mapa da tela:
 --   topo central: nome da habilidade (anúncio), resultado e a linha da rodada/prazo; chefe logo abaixo;
---   canto inferior direito: menu de comandos em losango (um comando em cada vértice) e, acima dele,
---     a pilha de comandos extras (Confirmar, Cancelar, Levantar, ...);
---   à esquerda do losango: lista vertical de habilidades (com as abas Golpes/Apoio/Tudo no topo);
+--   canto inferior direito: RODA de ações (RODA1: três fatias Golpear/Habilidades/Ações em volta do botão
+--     Encerrar turno, mais o gatilho "Roda" embaixo) e, acima dela, a pilha de comandos extras (Confirmar, Cancelar);
+--   à esquerda da roda: lista vertical de habilidades (com as abas Golpes/Apoio/Tudo no topo);
 --   canto inferior esquerdo: cartões do grupo, à direita da coluna da ordem dos turnos;
 --   coluna esquerda: ordem dos turnos (retratos; quem age no topo e maior);
 --   canto superior direito: faixa do dia/sala (reserva `diaFaixa`).
@@ -14,11 +14,15 @@ L.MARGEM = 12
 L.GAP = 8
 L.ESPACO = 4
 L.LINHA = 44 -- toque mínimo
--- Losango de comandos: quatro botões (topo, esquerda, direita, base) num quadrado LOSANGO x LOSANGO.
-L.LOSANGO = 240
-L.VERTICE_W, L.VERTICE_H = 116, 60
+-- Roda de ações: quadrado RODA x RODA no canto. Três fatias redondas (topo, baixo-esquerda, baixo-direita)
+-- à distância RODA_RAIO do centro, o botão Encerrar turno no centro e o gatilho (abre/fecha) na base.
+L.RODA = 264
+L.FATIA = 88
+L.RODA_RAIO = 90
+L.HUB = 76
+L.GATILHO_W, L.GATILHO_H = 132, 38
 L.EXTRA_W, L.EXTRA_H = 176, 38
--- Lista de habilidades (à esquerda do losango).
+-- Lista de habilidades (à esquerda da roda).
 L.LISTA_LARGURA = 330
 L.LISTA_LINHA = 54
 L.LISTA_MAX_LINHAS = 5
@@ -78,24 +82,26 @@ function L.alturaLista(linhas: number): number
 	return linhas * L.LISTA_LINHA + (linhas - 1) * L.ESPACO
 end
 
--- Losango de comandos no canto inferior direito. `vertices` está em coordenadas relativas ao quadrado.
-function L.losango(vx: number, vy: number): Retangulo & { vertices: { habilidades: Retangulo, atacar: Retangulo, andar: Retangulo, encerrar: Retangulo } }
-	local s, w, h = L.LOSANGO, L.VERTICE_W, L.VERTICE_H
+-- Roda de ações no canto inferior direito. Retângulos de fatias, hub e gatilho em coordenadas relativas ao quadrado.
+function L.roda(vx: number, vy: number): Retangulo & { fatias: { golpear: Retangulo, habilidades: Retangulo, acoes: Retangulo }, hub: Retangulo, gatilho: Retangulo }
+	local s, d, r, h = L.RODA, L.FATIA, L.RODA_RAIO, L.HUB
+	local cx, cy = s / 2, r + d / 2 -- a fatia de cima encosta no topo do quadrado
+	local function fatia(graus: number): Retangulo
+		local rad = math.rad(graus)
+		return { x = cx + r * math.cos(rad) - d / 2, y = cy + r * math.sin(rad) - d / 2, w = d, h = d }
+	end
 	return {
 		x = vx - L.MARGEM - s, y = vy - L.MARGEM - s, w = s, h = s,
-		vertices = {
-			habilidades = { x = (s - w) / 2, y = 0, w = w, h = h },
-			atacar = { x = 0, y = (s - h) / 2, w = w, h = h },
-			andar = { x = s - w, y = (s - h) / 2, w = w, h = h },
-			encerrar = { x = (s - w) / 2, y = s - h, w = w, h = h },
-		},
+		fatias = { golpear = fatia(150), habilidades = fatia(-90), acoes = fatia(30) },
+		hub = { x = cx - h / 2, y = cy - h / 2, w = h, h = h },
+		gatilho = { x = (s - L.GATILHO_W) / 2, y = s - L.GATILHO_H, w = L.GATILHO_W, h = L.GATILHO_H },
 	}
 end
 
--- Comandos extras (Confirmar, Cancelar, Levantar, ...): pilha acima do losango, alinhada à direita;
--- o item 1 fica mais perto do losango.
+-- Comandos extras (Confirmar, Cancelar mira): pilha acima da roda, alinhada à direita;
+-- o item 1 fica mais perto da roda.
 function L.extras(vx: number, vy: number, n: number): { Retangulo }
-	local lo = L.losango(vx, vy)
+	local lo = L.roda(vx, vy)
 	local lista = {}
 	for i = 1, n do
 		lista[i] = { x = lo.x + lo.w - L.EXTRA_W, y = lo.y - L.GAP - i * L.EXTRA_H - (i - 1) * L.ESPACO, w = L.EXTRA_W, h = L.EXTRA_H }
@@ -103,10 +109,10 @@ function L.extras(vx: number, vy: number, n: number): { Retangulo }
 	return lista
 end
 
--- Lista de habilidades à esquerda do losango, com a base alinhada à dele. Estreita-se para não tocar
+-- Lista de habilidades à esquerda da roda, com a base alinhada à dela. Estreita-se para não tocar
 -- os cartões do grupo em telas pequenas.
 function L.lista(vx: number, vy: number, linhas: number, comAbas: boolean): Retangulo
-	local lo = L.losango(vx, vy)
+	local lo = L.roda(vx, vy)
 	local direita = lo.x - L.GAP
 	local esquerda = L.CARTAO_X + L.CARTAO_LARGURA + L.GAP
 	local w = math.max(120, math.min(L.LISTA_LARGURA, direita - esquerda))

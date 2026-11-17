@@ -123,3 +123,9 @@ Só peças do Roblox (Part, cilindros, Fire, ParticleEmitter, PointLight/SpotLig
 ### CEN2 (16/11/2026)
 
 Acabamento do esgoto, ainda sem ativo externo: arcos em aduelas (segmentos de círculo) e nervuras curvas; água com duas camadas de `Texture` (partícula nativa `rbxasset://textures/particles/smoke_main.dds`, tingida) rolando no cliente; tochas com `ParticleEmitter` nativos (`fire_main`, `sparkles_main`, `smoke_main`) e luz oscilando; remendos de Brick/Concrete/Cobblestone/Slate/Pebble, musgo, lama e entulho (Rock). Props da arena genérica (muros, colunas, rochas, lenha) removidos do layout do esgoto. Código: `src/server/Mundo/Esgoto*.luau`, `src/client/EsgotoAnimacao.luau`.
+
+## Animações Mixamo (HAB1, 16/11/2026)
+
+- Origem: Mixamo (Adobe), conta do dono, pacote "Pro Sword and Shield", rig X Bot, 30 fps. Uso das animações em jogos é permitido pela licença do Mixamo; os FBX crus NÃO são redistribuídos (ficam em `build/ferramentas/mixamo/`, ignorado pelo git). No repositório entram só os clipes convertidos (dados por junta do R15).
+- Conversão: `python tools/blender_rodar.py tools/blender/anim_mixamo.py --fbx <arquivo> --nome <Clipe> [--inicio --fim --velocidade --impacto]` (reaproveita `anim_ual.py`: mapeia mixamorig:* para o R15, desfaz a T-pose, escala a pelve; marco `impacto` = maior velocidade da mão direita). Genérico para os outros pacotes (Magic, Longbow).
+- Em uso: `CorteDeBraco` (de "sword and shield slash (3)"), origem "mixamo".

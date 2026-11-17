@@ -61,7 +61,7 @@ local ESPEC = {
 	["apontar"] = { g = "comando" },
 	["ataque-basico"] = { g = "golpe", cortes = { { 0, 38 } }, peso = 0.3 },
 	["ataque-a-distancia"] = { g = "disparo", peso = 0.25 },
-	["corte-de-braco"] = { g = "golpe", cortes = { { 0, 62 } }, peso = 0.4, preparo = 0.26, preciso = true, assinatura = true },
+	["corte-de-braco"] = { g = "golpe", cortes = { { 0, 62 } }, peso = 0.4, preparo = 0.26, preciso = true, assinatura = true, clipe = "CorteDeBraco" },
 	["golpe-continuo"] = { g = "golpe", cortes = { { 0, 28 }, { 0.12, -34 }, { 0.24, 80 } }, peso = 0.35, preparo = 0.16 },
 	["golpe-baixo"] = { g = "golpe", cortes = { { 0, 88 } }, peso = 0.3, baixo = true, preparo = 0.24 },
 	["golpe-circular"] = { g = "giro", peso = 0.55 },

@@ -1474,3 +1474,4 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Não funciona bem: a pose do corpo no Corte de Braço (base CorteLeve) fica dobrada/"dino" e a espada penetra o alvo nos quadros finais; refinos aditivos sobre CorteLeve/CortePesado pioraram e foram removidos do catálogo. Sem câmera própria do alvo (boneco sem Humanoid: nenhuma reação ReacaoGolpe provada).
 - Câmera: `ImpactoCamera` ignora a caixa da sala quando a dupla está fora do tabuleiro (palcos de QA).
 - Não verificado: ganchos da Água em luta real (flecha de água, Molhado), Investida, passivas, som.
+- (HAB1, Mixamo) `CorteDeBraco` = "sword and shield slash (3)" retargetado: prancha `build/beleza/hab1/corte_braco_prancha.png` mostra antecipação com agachamento e torção de corpo inteiro, arco alto, fita fina curva da lâmina e follow-through; tempo real em `corte_braco_tempo_real.png`. Não verificado: reação do alvo com corpo R15, som, luta real.

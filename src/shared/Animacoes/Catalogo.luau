@@ -16,9 +16,10 @@ local CLIPES = {
 	Bloqueio = require(Shared.Animacoes.Clipes.Bloqueio),
 	Queda = require(Shared.Animacoes.Clipes.Queda),
 	Vitoria = require(Shared.Animacoes.Clipes.Vitoria),
+	CorteDeBraco = require(Shared.Animacoes.Clipes.CorteDeBraco), -- HAB1: Mixamo (tools/blender/anim_mixamo.py)
 }
 
 return {
 	CLIPES = CLIPES,
-	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria" },
+	NOMES = { "PosturaCombate", "CorteLeve", "CortePesado", "Estocada", "Emboscada", "DisparoArco", "Conjurar", "Canalizar", "ReacaoGolpe", "Esquiva", "Bloqueio", "Queda", "Vitoria", "CorteDeBraco" },
 }

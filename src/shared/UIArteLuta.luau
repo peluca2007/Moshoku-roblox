@@ -28,6 +28,10 @@ UIArteLuta.PECAS = table.freeze({
 	mancha_retrato = peca("104789560244950", 256, 256, nil),
 	mancha_cartao = peca("98440627878709", 512, 192, CARTAO),
 	anel_ativo = peca("77389798167274", 512, 512, nil),
+	-- RODA2: cunhas da roda de ações (tools/arte/roda.py; setor de anel de 116 graus apontando para cima)
+	cunha_normal = peca("131324010837843", 600, 600, nil),
+	cunha_foco = peca("103701037756075", 600, 600, nil),
+	cunha_bloqueada = peca("84146614831909", 600, 600, nil),
 })
 
 function UIArteLuta.peca(nome: string)

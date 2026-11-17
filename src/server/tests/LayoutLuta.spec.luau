@@ -55,30 +55,32 @@ return {
 			t.ok(extras[2].y >= L.ABAIXO_DO_TOPO, "extras sobem demais " .. vx .. "x" .. vy)
 		end)
 	end,
-	["roda: fatias, hub e gatilho dentro do quadrado, sem tocar, com alvo de toque >= 44"] = function(t)
+	["roda: cunhas, hub e gatilho dentro da área, sem cruzar, com alvo de toque >= 44"] = function(t)
 		cada_tela(function(vx, vy)
 			local lo = L.roda(vx, vy)
 			t.eq(lo.x + lo.w, vx - L.MARGEM)
 			t.eq(lo.y + lo.h, vy - L.MARGEM)
+			local cunhas = { lo.fatias.golpear, lo.fatias.habilidades, lo.fatias.acoes }
 			local partes = { lo.fatias.golpear, lo.fatias.habilidades, lo.fatias.acoes, lo.hub, lo.gatilho }
 			local nomes = { "golpear", "habilidades", "acoes", "hub", "gatilho" }
 			for i, v in partes do
-				t.ok(v.x >= 0 and v.y >= 0 and v.x + v.w <= lo.w and v.y + v.h <= lo.h, nomes[i] .. " fora do quadrado")
+				t.ok(v.x >= 0 and v.y >= 0 and v.x + v.w <= lo.w and v.y + v.h <= lo.h, nomes[i] .. " fora da área")
 				t.ok(v.w >= 44 and v.h >= 38, nomes[i] .. " pequeno para toque")
-				for j = i + 1, #partes do
-					local w = partes[j]
-					if i <= 4 and j <= 4 then
-						-- fatias e hub são círculos: a distância dos centros tem de passar a soma dos raios
-						local d = math.sqrt((v.x + v.w / 2 - w.x - w.w / 2) ^ 2 + (v.y + v.h / 2 - w.y - w.h / 2) ^ 2)
-						t.ok(d >= (v.w + w.w) / 2, nomes[i] .. " cruza " .. nomes[j])
-					else
-						t.ok(not L.intersecta(v, w), nomes[i] .. " cruza " .. nomes[j])
-					end
-				end
 			end
-			-- simétrica: as duas fatias de baixo espelham-se e a de cima está no meio
+			for i = 1, 3 do
+				for j = i + 1, 3 do t.ok(not L.intersecta(cunhas[i], cunhas[j]), nomes[i] .. " cruza " .. nomes[j]) end
+				t.ok(not L.intersecta(cunhas[i], lo.gatilho), nomes[i] .. " cruza o gatilho")
+			end
+			t.ok(not L.intersecta(lo.hub, lo.gatilho), "hub cruza o gatilho")
+			-- o centro de cada cunha fica no anel: fora do hub e dentro do disco
+			for i, c in cunhas do
+				local d = math.sqrt((c.x + c.w / 2 - L.RODA / 2) ^ 2 + (c.y + c.h / 2 - L.RODA / 2) ^ 2)
+				t.ok(d > L.RODA_RAIO_INT and d < L.RODA / 2, nomes[i] .. " fora do anel")
+			end
+			t.ok(L.HUB / 2 < L.RODA_RAIO_INT, "hub invade o anel")
+			-- simétrica: a de cima está no meio e as de baixo se espelham
 			t.eq(lo.fatias.habilidades.x + lo.fatias.habilidades.w / 2, lo.w / 2)
-			t.ok(math.abs(lo.fatias.golpear.y - lo.fatias.acoes.y) < 0.001, "fatias de baixo desalinhadas")
+			t.ok(math.abs(lo.fatias.golpear.y - lo.fatias.acoes.y) < 0.001, "cunhas de baixo desalinhadas")
 		end)
 	end,
 	["lista: fica à esquerda da roda, com a base alinhada, e cresce com as linhas"] = function(t)
@@ -87,8 +89,9 @@ return {
 			local pequena = L.lista(vx, vy, 1, false)
 			local cheia = L.lista(vx, vy, 99, true)
 			t.ok(pequena.x + pequena.w <= lo.x, "lista cruza a roda")
-			t.eq(pequena.y + pequena.h, vy - L.MARGEM)
-			t.eq(cheia.y + cheia.h, vy - L.MARGEM)
+			t.eq(pequena.y + pequena.h, lo.y + L.RODA) -- base na base do disco, colada à roda
+			t.eq(cheia.y + cheia.h, lo.y + L.RODA)
+			t.eq(pequena.x + pequena.w, lo.x - L.RODA_GAP)
 			t.ok(cheia.h > pequena.h and cheia.w <= L.LISTA_LARGURA)
 			t.eq(cheia.h, L.alturaLista(L.LISTA_MAX_LINHAS) + L.LINHA + L.ESPACO)
 			t.ok(cheia.x >= L.CARTAO_X + L.CARTAO_LARGURA, "lista invade os cartões")

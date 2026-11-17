@@ -14,18 +14,22 @@ L.MARGEM = 12
 L.GAP = 8
 L.ESPACO = 4
 L.LINHA = 44 -- toque mínimo
--- Roda de ações: quadrado RODA x RODA no canto. Três fatias redondas (topo, baixo-esquerda, baixo-direita)
--- à distância RODA_RAIO do centro, o botão Encerrar turno no centro e o gatilho (abre/fecha) na base.
-L.RODA = 264
-L.FATIA = 88
-L.RODA_RAIO = 90
-L.HUB = 76
+-- Roda de ações (RODA2): disco de RODA x RODA px com três cunhas de anel (topo, baixo-direita, baixo-esquerda;
+-- imagens de tools/arte/roda.py, anel de RODA_RAIO_INT a RODA/2), o botão Encerrar turno (HUB) no centro e o
+-- gatilho (abre/fecha) logo abaixo do disco. FATIA_* é a área de toque/conteúdo de cada cunha, centrada no
+-- meio do anel (a RODA_RAIO do centro).
+L.RODA = 300
+L.RODA_RAIO_INT = 62
+L.RODA_RAIO = 104
+L.FATIA_W, L.FATIA_H = 110, 88
+L.HUB = 104
 L.GATILHO_W, L.GATILHO_H = 132, 38
+L.RODA_GAP = 4
 L.EXTRA_W, L.EXTRA_H = 176, 38
 -- Lista de habilidades (à esquerda da roda).
 L.LISTA_LARGURA = 330
 L.LISTA_LINHA = 54
-L.LISTA_MAX_LINHAS = 5
+L.LISTA_MAX_LINHAS = 4 -- a lista sobe da base do disco da roda; 4 linhas + abas não alcançam o chefe a 800x600
 -- Coluna da ordem dos turnos (retratos).
 L.ORDEM_ATIVO, L.ORDEM_ITEM, L.ORDEM_GAP = 68, 48, 6
 L.ORDEM_Y = 52 -- abaixo dos ícones do topo do Roblox
@@ -84,17 +88,18 @@ end
 
 -- Roda de ações no canto inferior direito. Retângulos de fatias, hub e gatilho em coordenadas relativas ao quadrado.
 function L.roda(vx: number, vy: number): Retangulo & { fatias: { golpear: Retangulo, habilidades: Retangulo, acoes: Retangulo }, hub: Retangulo, gatilho: Retangulo }
-	local s, d, r, h = L.RODA, L.FATIA, L.RODA_RAIO, L.HUB
-	local cx, cy = s / 2, r + d / 2 -- a fatia de cima encosta no topo do quadrado
+	local s, r = L.RODA, L.RODA_RAIO
+	local cx, cy = s / 2, s / 2
+	local altura = s + L.RODA_GAP + L.GATILHO_H
 	local function fatia(graus: number): Retangulo
 		local rad = math.rad(graus)
-		return { x = cx + r * math.cos(rad) - d / 2, y = cy + r * math.sin(rad) - d / 2, w = d, h = d }
+		return { x = cx + r * math.cos(rad) - L.FATIA_W / 2, y = cy + r * math.sin(rad) - L.FATIA_H / 2, w = L.FATIA_W, h = L.FATIA_H }
 	end
 	return {
-		x = vx - L.MARGEM - s, y = vy - L.MARGEM - s, w = s, h = s,
+		x = vx - L.MARGEM - s, y = vy - L.MARGEM - altura, w = s, h = altura,
 		fatias = { golpear = fatia(150), habilidades = fatia(-90), acoes = fatia(30) },
-		hub = { x = cx - h / 2, y = cy - h / 2, w = h, h = h },
-		gatilho = { x = (s - L.GATILHO_W) / 2, y = s - L.GATILHO_H, w = L.GATILHO_W, h = L.GATILHO_H },
+		hub = { x = cx - L.HUB / 2, y = cy - L.HUB / 2, w = L.HUB, h = L.HUB },
+		gatilho = { x = (s - L.GATILHO_W) / 2, y = s + L.RODA_GAP, w = L.GATILHO_W, h = L.GATILHO_H },
 	}
 end
 
@@ -113,12 +118,13 @@ end
 -- os cartões do grupo em telas pequenas.
 function L.lista(vx: number, vy: number, linhas: number, comAbas: boolean): Retangulo
 	local lo = L.roda(vx, vy)
-	local direita = lo.x - L.GAP
+	local direita = lo.x - L.RODA_GAP
 	local esquerda = L.CARTAO_X + L.CARTAO_LARGURA + L.GAP
 	local w = math.max(120, math.min(L.LISTA_LARGURA, direita - esquerda))
 	local n = math.max(1, math.min(linhas, L.LISTA_MAX_LINHAS))
 	local h = L.alturaLista(n) + (if comAbas then L.LINHA + L.ESPACO else 0)
-	return { x = direita - w, y = vy - L.MARGEM - h, w = w, h = h }
+	-- colada à roda: borda direita a 4 px do disco e base na base do disco (acima do gatilho)
+	return { x = direita - w, y = lo.y + L.RODA - h, w = w, h = h }
 end
 
 -- Coluna da ordem dos turnos, à esquerda. O primeiro (quem age) é maior. Se não couberem todos, o

@@ -333,7 +333,10 @@ function AcoesDoTurno.start(state)
 		dica.Position = UDim2.fromOffset(vp.X - Layout.MARGEM, topoPilha - 4)
 		if lista.Visible then
 			local l = Layout.lista(vp.X, vp.Y, linhasLista, comAbasLista)
-			lista.Position, lista.Size = UDim2.fromOffset(l.x + l.w, l.y + l.h), UDim2.fromOffset(l.w, l.h)
+			-- O UIScale do menu e o da lista encolhem em direção ao canto: a lista cola na roda já escalada.
+			local e = T.escala(vp.Y)
+			local direita, base = vp.X - Layout.MARGEM - e * (Layout.RODA + Layout.RODA_GAP), vp.Y - Layout.MARGEM - e * (Layout.GATILHO_H + Layout.RODA_GAP)
+			lista.Position, lista.Size = UDim2.fromOffset(direita, base), UDim2.fromOffset(l.w, l.h)
 		end
 	end
 	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(posicionar)

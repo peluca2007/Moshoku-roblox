@@ -1,10 +1,10 @@
-"""RODA1: QA da roda de ações da luta, com cliques e teclas reais no Studio (Play).
+"""RODA1/RODA2: QA da roda de ações da luta, com cliques e teclas reais no Studio (Play).
 
   python tools/qa/roda_qa.py [--video] [--sem-base]      (precisa do lock build/qa/STUDIO_EM_USO.txt criado por quem roda)
 
 Leva o jogo até a luta da sala 1 do esgoto (qa.py esgoto_sala1 --manter-play), abre a roda pelo botão, escolhe
 Golpear, Habilidades e Ações com o mouse, usa Andar (a roda fecha e a mira liga), testa as teclas C/1/2/3 e
-confere os custos/apagados. Capturas em build/qa/<data>/roda_*.png; com --video grava build/beleza/roda1/roda.mp4.
+confere os custos/apagados. Capturas em build/qa/<data>/roda_*.png; com --video grava build/beleza/roda2/roda.mp4.
 """
 import os
 import subprocess
@@ -23,7 +23,7 @@ def lua(q, corpo):
 
 
 def corpo_visivel(q):
-    return lua(q, "return tostring(m.Roda.Corpo.Visible and m.Roda.Corpo.GroupTransparency<0.5)")
+    return lua(q, "return tostring(m.Roda.Corpo.Visible and m.Roda.Corpo.Cunha_golpear.GroupTransparency<0.5)")
 
 
 def lista_visivel(q):
@@ -35,7 +35,16 @@ def linhas_da_lista(q):
 
 
 def custos(q):
-    return lua(q, "local o={} for _,id in {'golpear','habilidades','acoes'} do local f=m.Roda.Corpo['Fatia_'..id] o[#o+1]=id..'='..f.Custo.Text..(f:GetAttribute('Bloqueada') and '(apagada)' or '') end return table.concat(o,' ')")
+    return lua(q, "local o={} for _,id in {'golpear','habilidades','acoes'} do local f=m.Roda.Corpo['Cunha_'..id]['Fatia_'..id] o[#o+1]=id..'='..f.Custo.Text..(f:GetAttribute('Bloqueada') and '(apagada)' or '') end return table.concat(o,' ')")
+
+
+def aprender_agua(q):
+    """Gancho QaAprender (só no Studio): a ficha aprende a Água; as cartas só chegam num snapshot novo, então
+    encerra o turno pelo botão central e espera a vez voltar com as cartas da árvore."""
+    q.lua_servidor("workspace:SetAttribute('QaAprender','agua') return 'ok'")
+    q.esperar_lua("workspace:GetAttribute('QaAprenderFeito')", 8, "Server")
+    q.clique(GUI + "Menu.Roda.Hub", 1000)
+    return q.esperar(lambda: lua(q, "local n=0 for _,c in g.Lista.Cartas:GetChildren() do if c.Name:find('respingo') then n+=1 end end return tostring(n>0 and m.Visible)") == "true", 60, 3)
 
 
 def passos(q):
@@ -47,18 +56,20 @@ def passos(q):
     q.verificar("botão Roda abre a roda", corpo_visivel(q) == "true", corpo_visivel(q), foto=True)
     q.foto("aberta", "roda_aberta")
     c = custos(q)
-    q.verificar("cada fatia mostra custo (Ações)", "golpear=1 Ação" in c and "Ações" in c.split("acoes=")[1] or "acoes=1 Ação" in c, c)
-    q.clique(GUI + "Menu.Roda.Corpo.Fatia_golpear", 900)
+    q.verificar("cada fatia mostra custo (Ações)", "golpear=1 Ação" in c and "Ação" in c.split("acoes=")[1], c)
+    q.clique(GUI + "Menu.Roda.Corpo.Cunha_golpear.Fatia_golpear", 900)
     q.verificar("Golpear abre a lista de golpes", lista_visivel(q) == "true" and "ataque-basico" in linhas_da_lista(q), linhas_da_lista(q), foto=True)
     q.foto("golpear", "roda_golpear")
-    q.clique(GUI + "Menu.Roda.Corpo.Fatia_habilidades", 900)
+    # RODA2: personagem COM habilidades (gancho QaAprender, ver aprender_agua): a árvore da Água
+    q.clique(GUI + "Menu.Roda.Corpo.Cunha_habilidades.Fatia_habilidades", 1200)
     lh = linhas_da_lista(q)
-    if "apagada" in custos(q).split("habilidades=")[1].split(" acoes")[0]:
-        q.verificar("Habilidades apagada quando não há nada a pagar/aprender", lista_visivel(q) in ("true", "false"), custos(q))
-    else:
-        q.verificar("Habilidades abre a lista de habilidades do livro", lista_visivel(q) == "true" and "ataque-basico" not in lh, lh, foto=True)
+    q.verificar("Habilidades abre a lista com cartas do livro (Água)", lista_visivel(q) == "true" and "respingo" in lh, lh[:140] + " | " + custos(q), foto=True)
+    colada = lua(q, "local l=g.Lista local w=m.Roda return tostring(math.abs((l.AbsolutePosition.X+l.AbsoluteSize.X)-w.AbsolutePosition.X)<=14*g.Menu.Roda.AbsoluteSize.X/300)")
+    q.verificar("lista colada à roda (≤ 14 px)", colada == "true", colada)
+    tam = lua(q, "return tostring(m.Roda.Corpo.Cunha_golpear.Fatia_golpear.Custo.TextSize)")
+    q.verificar("texto de custo com 16 px ou mais", float(tam or 0) >= 16, tam)
     q.foto("habilidades", "roda_habilidades")
-    q.clique(GUI + "Menu.Roda.Corpo.Fatia_acoes", 900)
+    q.clique(GUI + "Menu.Roda.Corpo.Cunha_acoes.Fatia_acoes", 900)
     la = linhas_da_lista(q)
     q.verificar("Ações lista Andar", lista_visivel(q) == "true" and "mesa/andar" in la, la, foto=True)
     q.foto("acoes", "roda_acoes")
@@ -90,11 +101,13 @@ def main():
     q = Qa()
     try:
         time.sleep(2)
+        q.cenario = "roda"
+        q.verificar("a ficha aprendeu a Água (cartas na vez seguinte)", bool(aprender_agua(q)))  # fora do vídeo: espera a vez voltar
         if video:
             sys.path.insert(0, os.path.dirname(__file__))
             from gravar import Gravador
-            saida = os.path.join(RAIZ, "build", "beleza", "roda1", "roda.mp4")
-            with Gravador(saida, segundos=34):
+            saida = os.path.join(RAIZ, "build", "beleza", os.environ.get('RODA_PASTA', 'roda2'), "roda.mp4")
+            with Gravador(saida, segundos=int(os.environ.get('RODA_VIDEO_S', '42'))):
                 passos(q)
         else:
             passos(q)

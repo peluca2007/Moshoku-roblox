@@ -415,7 +415,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				local corpos = workspace:FindFirstChild("CorposDeCriatura")
 				local corpoAlvo = corpos and corpos:FindFirstChild(alvo.id)
 				local armado = #ImpactoFx.pecasDaArma(corpoAlvo) > 0
-				local nomeAlvo = tokenAlvo and (tokenAlvo.criatura or tokenAlvo.modelo or tokenAlvo.name)
+				local nomeAlvo = tokenAlvo and ((if type(tokenAlvo.criatura) == "string" then tokenAlvo.criatura else nil) or tokenAlvo.modelo or tokenAlvo.name) -- REA4: `criatura` costuma ser `true` no snapshot; o nome ("Lobo Cinzento") dá o tipo
 				local reac = ReacoesAlvo.decidir(cena.habilidade, ReacoesAlvo.tipoDoAlvo(if type(nomeAlvo) == "string" then nomeAlvo else nil), armado, alvo)
 				if reac.solta then
 					-- a arma cai de verdade pelo servidor (CorposDeCriatura.soltarArma); o cliente só põe o respingo
@@ -427,7 +427,8 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 					end)
 					ImpactoFx.gotas(cena.modelo, ponto + Y * 2.2, golpe)
 				end
-				if corpoAlvo and corpoAlvo:IsA("Model") and not corpoAlvo:FindFirstChildOfClass("Humanoid") then
+				-- REA4: corpo com reação Mixamo no servidor (atributo ReacaoMx) já recua pelo clipe; o tranco procedural é dos bichos
+				if corpoAlvo and corpoAlvo:IsA("Model") and not corpoAlvo:FindFirstChildOfClass("Humanoid") and not corpoAlvo:GetAttribute("ReacaoMx") then
 					ImpactoFx.tranco(corpoAlvo, golpe, reac.forca, reac.reacao == "membro-atingido")
 				end
 				if not cena.temRastro and not cena.semCorte then ImpactoFx.corte(cena.modelo, ponto, golpe, cena.cor, crit) end -- com arma, o rastro real da ponta é o corte
@@ -450,9 +451,9 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				-- esquiva perceptível: criaturas de peças rígidas dão um passo lateral (tranco para o lado)
 				local cAlvo = workspace:FindFirstChild("CorposDeCriatura")
 				cAlvo = cAlvo and cAlvo:FindFirstChild(alvo.id)
-				if cAlvo and cAlvo:IsA("Model") and not cAlvo:FindFirstChildOfClass("Humanoid") then
+				if cAlvo and cAlvo:IsA("Model") and not cAlvo:FindFirstChildOfClass("Humanoid") and not cAlvo:GetAttribute("ReacaoMx") then
 					local tk = state.findToken(alvo.id)
-					local nm = tk and (tk.criatura or tk.modelo or tk.name)
+					local nm = tk and ((if type(tk.criatura) == "string" then tk.criatura else nil) or tk.modelo or tk.name)
 					ImpactoFx.tranco(cAlvo, ponto - de, 1.0, false, true, ReacoesAlvo.tipoDoAlvo(if type(nm) == "string" then nm else nil) == "humanoide")
 				end
 			elseif alvo.dano == 0 and not alvo.passou then

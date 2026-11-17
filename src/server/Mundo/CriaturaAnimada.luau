@@ -9,6 +9,7 @@ local Anim = require(Shared.Mundo.AnimacaoCriatura)
 local Modelos = require(Shared.Mundo.ModelosCriaturas)
 local Amostra = require(Shared.Animacoes.Amostra)
 local PASTA_CLIPES = Shared.Animacoes:FindFirstChild("Criaturas")
+local PASTA_MX = Shared.Animacoes:FindFirstChild("CriaturasMx") -- REA4: clipes Mixamo por peça rígida (humanoides)
 local FADE = 0.18 -- troca de clipe base (parado/andando) e entrada/saída das ações (s)
 
 -- Dados de clipes do módulo (ANIM2); nil se não houver ou estiverem malformados (cai nas poses por código).
@@ -21,6 +22,19 @@ local function clipesDe(modulo)
 		if m and m:IsA("ModuleScript") then
 			local ok, dados = pcall(require, m)
 			if ok and Anim.validar(dados) then c = dados end
+		end
+		-- REA4: mescla os clipes Mixamo do módulo (reação leve/forte, esquiva, bloqueio, morte). Eles substituem
+		-- LevarGolpe e Morrer do Quaternius (guardados como ...Quaternius) para quem não pede o clipe pelo nome.
+		local mx = c and PASTA_MX and PASTA_MX:FindFirstChild(modulo)
+		if mx and mx:IsA("ModuleScript") then
+			local ok, extra = pcall(require, mx)
+			if ok and Anim.validar(extra) then
+				local clipes = table.clone(c.clipes)
+				for nome, clipe in extra.clipes do clipes[nome] = clipe end
+				if extra.clipes.ReacaoLeve then clipes.LevarGolpeQuaternius, clipes.LevarGolpe = clipes.LevarGolpe, extra.clipes.ReacaoLeve end
+				if extra.clipes.MorrerMx then clipes.MorrerQuaternius, clipes.Morrer = clipes.Morrer, extra.clipes.MorrerMx end
+				c = { modulo = c.modulo, clipes = clipes, mixamo = true }
+			end
 		end
 		cacheClipes[modulo] = c
 	end
@@ -102,6 +116,16 @@ function CriaturaAnimada:levarGolpe(agora)
 		self.acao = { clipe = clipe, desde = agora or os.clock(), ultimo = -1e-6 }
 	end
 end
+-- REA4: toca o clipe Mixamo `nome` (ReacaoLeve/ReacaoForte/Esquiva/EsquivaLado/EsquivaLadoD/Bloqueio) por cima da base,
+-- mesmo no meio de um ataque (a reação vence). Devolve false se a criatura caiu ou não tem o clipe (usa o procedural).
+function CriaturaAnimada:reagir(nome, agora)
+	if self.quedaDesde or not self.clipes then return false end
+	local clipe = self.clipes.clipes[nome]
+	if not clipe then return false end
+	self.acao = { clipe = clipe, desde = agora or os.clock(), ultimo = -1e-6 }
+	return true
+end
+function CriaturaAnimada:temClipe(nome) return self.clipes ~= nil and self.clipes.clipes[nome] ~= nil end
 -- MOD5: a peça `Arma` (e `Arma_<Cor>`) acompanha o braço pela animação (peças ancoradas, sem Weld). `soltarArma`
 -- tira essas peças da animação, as solta com física e devolve {principal, demais}; nil se não há arma (ou já foi solta).
 function CriaturaAnimada:soltarArma()

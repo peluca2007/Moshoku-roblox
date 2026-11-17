@@ -269,7 +269,7 @@ function M.tranco(modelo: Model?, direcao: Vector3, forca: number, manca: boolea
 	local dir = Vector3.new(direcao.X, 0, direcao.Z)
 	dir = if dir.Magnitude > 1e-3 then dir.Unit else Vector3.zAxis
 	local lado = dir:Cross(Vector3.yAxis)
-	local dur = if manca then 2.0 elseif lateral then 0.9 else 0.55
+	local dur = if manca then 2.0 elseif lateral then 0.9 else 0.95
 	local inicio = os.clock()
 	-- As peças são replicadas pelo servidor em instantes diferentes: um PivotTo único deixa peças "soltas" (pata duplicada).
 	-- Então cada peça recebe a transformação sobre o último CFrame cru (replicado ou animado) dela, quadro a quadro.
@@ -317,11 +317,12 @@ function M.tranco(modelo: Model?, direcao: Vector3, forca: number, manca: boolea
 			guina = 0.35 * balanco * f
 		elseif lateral then
 			-- passo lateral rápido: sai da linha do golpe e volta com a inclinação do corpo
-			local ida = math.sin(math.min(u * 2.2, 1) * math.pi / 2)
+			local ida0 = math.min(u * 2.4, 1)
+			local ida = ida0 * ida0 * (3 - 2 * ida0) -- smoothstep: sai da linha sem arranque
 			local volta = (1 - u) ^ 1.6
 			desloca = lado * 2.6 * ida * volta * f + dir * -0.6 * ida * volta
 			rola = -0.5 * ida * volta
-			afunda = 0.15 * ida * volta + math.abs(math.sin(u * math.pi * 2)) * 0.25 * (1 - u)
+			afunda = 0.15 * ida * volta + (1 - math.cos(u * math.pi * 4)) * 0.5 * 0.2 * (1 - u) -- quique suave (antes |sin|, com bico)
 			if humanoide then
 				-- humanoide: agacha e joga o tronco para trás ao tirar o corpo da linha (esquiva de duelista)
 				afunda = 0.6 * ida * volta
@@ -330,10 +331,24 @@ function M.tranco(modelo: Model?, direcao: Vector3, forca: number, manca: boolea
 				guina = 0.35 * ida * volta
 			end
 		else
-			local empurra = math.sin(math.min(u * 4, 1) * math.pi / 2) * (1 - u) ^ 2 * 1.6 * f
-			desloca = dir * empurra
-			inclina = math.sin(math.min(u * 3, 1) * math.pi / 2) * (1 - u) * 0.28 * f
+			-- REA4: recuo com peso. (1) contato: sobe em ~0,1 s por smoothstep (sem estalo), o corpo afunda e o tronco joga
+			-- para trás; (2) assenta com um repique pequeno (mola amortecida: o peso devolve para frente, passa um pouco do
+			-- ponto e volta); (3) o envelope final zera tudo sem degrau. Mais forca = maior amplitude, mesmo tempo.
+			local f2 = math.clamp(forca, 0.6, 2)
+			local sobe = math.min(seg / 0.1, 1)
+			local ramp = sobe * sobe * (3 - 2 * sobe)
+			local pos = math.max(seg - 0.1, 0)
+			local assenta = math.exp(-pos * 4.5) * (1 + 0.3 * math.sin(pos * 11))
+			local mola = ramp * assenta
+			desloca = dir * mola * 1.5 * f2
+			afunda = mola * 0.16 * f2
+			inclina = mola * 0.3 * f2
+			rola = math.sin(seg * 8) * math.exp(-seg * 4) * 0.06 * f2
 		end
+		-- envelope: nos últimos 15% tudo some suave (o fim do tranco não estala o corpo de volta)
+		local fim = 1 - math.clamp((u - 0.85) / 0.15, 0, 1)
+		fim = fim * fim * (3 - 2 * fim)
+		desloca, afunda, inclina, rola, guina = desloca * fim, afunda * fim, inclina * fim, rola * fim, guina * fim
 		local rot = CFrame.fromAxisAngle(lado, -inclina) * CFrame.fromAxisAngle(dir, rola) * CFrame.fromAxisAngle(Vector3.yAxis, guina)
 		local alvo = CFrame.new(base.Position + desloca - Vector3.new(0, afunda, 0)) * rot * base.Rotation
 		aplicarEm(alvo * base:Inverse())

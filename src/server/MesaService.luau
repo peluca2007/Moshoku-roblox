@@ -1688,6 +1688,7 @@ function MesaService.start(rng: Random?)
 			treino.reviver(token)
 		end,
 		soltarArma = function(token) return corpos.soltarArma(token) end, -- REA1
+		reagirAlvo = function(token, id, r) return corpos.reagir(token, id, r) end, -- REA4
 		virarPara = function(token, x, z)
 			require(ReplicatedStorage.Shared.VisaoFurtiva).virar(token, x, z)
 			corpos.olhar(token, x, z)

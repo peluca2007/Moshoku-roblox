@@ -38,4 +38,23 @@ return {
 		t.ok(not n.solta)
 		t.eq(R.decidir("mesa/ataque-basico", "humanoide", true, { acertou = true, dano = 0 }).reacao, "bloqueio")
 	end,
+	["REA4: cada reação decidida mapeia para um clipe Mixamo ou para nenhum"] = function(t)
+		t.eq(R.clipeCriatura("recuo", 0.9, 0), "ReacaoLeve")
+		t.eq(R.clipeCriatura("recuo", 1.2, 0), "ReacaoLeve")
+		t.eq(R.clipeCriatura("cambaleio", 1.8, 0), "ReacaoForte", "crítico")
+		t.eq(R.clipeCriatura("recuo-forte", 1.6, 0), "ReacaoForte")
+		t.eq(R.clipeCriatura("larga-arma", 1.4, 0), "ReacaoForte")
+		t.eq(R.clipeCriatura("membro-atingido", 1.2, 0), "ReacaoLeve")
+		t.eq(R.clipeCriatura("bloqueio", 0.3, 0), "Bloqueio")
+		t.eq(R.clipeCriatura("nenhuma", 0, 0), nil)
+	end,
+	["REA4: esquiva alterna trás, esquerda e direita; humano só em humanoide e morto-vivo"] = function(t)
+		t.eq(R.clipeCriatura("esquiva", 0.3, 0), "Esquiva")
+		t.eq(R.clipeCriatura("esquiva", 0.3, 1), "EsquivaLado")
+		t.eq(R.clipeCriatura("esquiva", 0.3, 2), "EsquivaLadoD")
+		t.eq(R.clipeCriatura("esquiva", 0.3, 3), "Esquiva")
+		t.eq(R.clipeCriatura("esquiva", 0.3, nil), "Esquiva")
+		t.ok(R.temClipeHumano("humanoide") and R.temClipeHumano("morto-vivo"))
+		t.ok(not R.temClipeHumano("quadrupede") and not R.temClipeHumano("aracnideo") and not R.temClipeHumano("amorfo"))
+	end,
 }

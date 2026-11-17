@@ -486,6 +486,13 @@ function HabilidadeService.start(deps)
 	-- Quem recebe o recibo: quem vê o conjurador ou algum alvo; ids que o
 	-- observador não pode ver saem (D-19: efeito não revela ficha oculta).
 	local function enviarRecibo(recibo)
+		-- REA4: o corpo humanoide da criatura atingida toca a reação Mixamo no contato (CorposDeCriatura.reagir)
+		if deps.reagirAlvo then
+			for _, alvo in recibo.alvos do
+				local token = tokens[alvo.id]
+				if token and token.criatura then deps.reagirAlvo(token, recibo.habilidadeId or "", alvo) end
+			end
+		end
 		for _, player in game:GetService("Players"):GetPlayers() do
 			local conjurador = recibo.casterId and tokens[recibo.casterId]
 			local veConjurador = conjurador ~= nil and deps.canSee(player, conjurador)

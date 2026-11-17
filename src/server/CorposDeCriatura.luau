@@ -17,6 +17,9 @@ local Visual = require(script.Parent.VisualCriaturas)
 local ModelosCriaturas = require(game.ReplicatedStorage.Shared.Mundo.ModelosCriaturas)
 local CriaturaAnimada = require(script.Parent.Mundo.CriaturaAnimada)
 local MontarModelo = require(script.Parent.Mundo.MontarModelo)
+local ReacoesAlvo = require(game.ReplicatedStorage.Shared.ReacoesAlvo)
+-- REA4: a reação Mixamo cai no contato do golpe na tela; o recibo sai ~0,8 s antes (mesmo atraso da queda da arma).
+local ATRASO_CONTATO = 0.8
 
 local Corpos = {}
 -- O jogo tem uma só mesa. Reutiliza o filtro de névoa já injetado por MesaService
@@ -358,7 +361,19 @@ function Corpos.start(deps)
 			c.parado:Stop(0.2)
 		end
 		if c.animado then
-			c.animado:cair()
+			-- REA4: se uma reação está a caminho (o golpe ainda não encostou na tela), a queda espera o contato
+			-- (o recibo e o estado chegam em ordem indefinida: espera 0,05 s para o recibo marcar `contatoEm`)
+			task.delay(0.05, function()
+				if not (c.tombado and c.animado and c.modelo.Parent) then return end
+				local espera = (c.contatoEm or 0) - os.clock()
+				if espera > 0.02 then
+					task.delay(espera, function()
+						if c.tombado and c.animado and c.modelo.Parent then c.animado:cair() end
+					end)
+				else
+					c.animado:cair()
+				end
+			end)
 			return
 		end
 		local cf0 = if c.tipo == "besta" then CFrame.new(c.modelo.PrimaryPart.Position) * c.rumo else c.modelo.PrimaryPart.CFrame
@@ -420,7 +435,9 @@ function Corpos.start(deps)
 			return nil
 		end
 		modelo.Name = token.id
-		local c = { modelo = modelo, tipo = tipo, rumo = CFrame.identity, animado = animado }
+		local c = { modelo = modelo, tipo = tipo, rumo = CFrame.identity, animado = animado, esquivas = 0,
+			nomeTipo = string.lower(tostring(catalogId or "") .. " " .. tostring(info and info.modulo or "")) }
+		if animado and animado:temClipe("ReacaoLeve") then modelo:SetAttribute("ReacaoMx", true) end -- o cliente não soma o tranco procedural
 		modelo.PrimaryPart.Anchored = true
 		modelo.Parent = pasta
 		local humanoide = modelo:FindFirstChildOfClass("Humanoid")
@@ -465,6 +482,28 @@ function Corpos.start(deps)
 		end)
 	end
 
+	-- QA (só no Studio): workspace.QaReacao = "id|habilidade|acertou|critico|dano" roda o mesmo caminho do recibo real
+	-- (decidir -> clipe no contato); workspace.QaMorrer = id derruba o corpo (toca a morte). tools/qa/rea4_luta.py.
+	if game:GetService("RunService"):IsStudio() then
+		workspace:GetAttributeChangedSignal("QaReacao"):Connect(function()
+			local v = workspace:GetAttribute("QaReacao")
+			if type(v) ~= "string" or v == "" then return end
+			workspace:SetAttribute("QaReacao", nil)
+			local id, hab, acertou, crit, dano = table.unpack(string.split(v, "|"))
+			if id and corpos[id] then
+				workspace:SetAttribute("QaReagiu", tostring(api.reagir({ id = id }, hab or "", {
+					acertou = acertou == "true", critico = crit == "true", dano = tonumber(dano) or 4 })))
+			end
+		end)
+		workspace:GetAttributeChangedSignal("QaMorrer"):Connect(function()
+			local id = workspace:GetAttribute("QaMorrer")
+			if type(id) == "string" and id ~= "" and corpos[id] then
+				workspace:SetAttribute("QaMorrer", nil)
+				tombar(corpos[id])
+			end
+		end)
+	end
+
 	function api.sincronizar()
 		local vistos = {}
 		for _, token in deps.fichas() do
@@ -474,7 +513,10 @@ function Corpos.start(deps)
 				if c then
 					-- Levou dano (PV caiu e segue de pé): clipe LevarGolpe. O dano já foi resolvido pelo servidor.
 					if c.animado and c.pvAnt and token.pv < c.pvAnt and token.pv > 0 and not c.tombado then
-						c.animado:levarGolpe()
+						-- REA4: se o recibo mandou uma reação própria, ela já toca no contato; senão (veneno, queimadura) toca agora
+						task.delay(0.05, function()
+							if c.animado and not c.tombado and os.clock() - (c.reagiuEm or -1e9) > 1.5 then c.animado:levarGolpe() end
+						end)
 					end
 					c.pvAnt = token.pv
 					local caido = token.derrotado or token.pv <= 0
@@ -540,6 +582,36 @@ function Corpos.start(deps)
 		local espera = if atraso == nil then 0.8 else atraso
 		if espera > 0 then task.delay(espera, soltar) else soltar() end
 		return true
+	end
+
+	-- REA4: reação do corpo humanoide ao recibo (hook de HabilidadeService.enviarRecibo). ReacoesAlvo.decidir escolhe
+	-- a reação; o clipe Mixamo toca no contato do golpe. Sem clipe (bichos), nada acontece aqui: o cliente faz o tranco
+	-- procedural. Devolve o nome do clipe agendado ou nil.
+	function api.reagir(token, idHabilidade: string, r)
+		local c = corpos[token.id]
+		if not c or not c.animado or c.animado:caiu() then return nil end
+		local tipo = ReacoesAlvo.tipoDoAlvo(c.nomeTipo)
+		local temArma = false
+		for _, g in c.animado.grupos do if g.grupo == "Arma" then temArma = true break end end
+		local dec = ReacoesAlvo.decidir(idHabilidade, tipo, temArma, r)
+		c.esquivas += if dec.reacao == "esquiva" then 1 else 0
+		local nome = ReacoesAlvo.clipeCriatura(dec.reacao, dec.forca, c.esquivas)
+		if dec.reacao == "nenhuma" then return nil end
+		c.reagiuEm = os.clock()
+		c.contatoEm = c.reagiuEm + ATRASO_CONTATO
+		if nome and c.animado:temClipe(nome) then
+			task.delay(ATRASO_CONTATO, function()
+				if c.animado and c.modelo.Parent and not c.tombado then c.animado:reagir(nome) end -- morreu nesse golpe: a queda toca no lugar
+			end)
+			return nome
+		end
+		-- sem clipe Mixamo (bichos): o clipe LevarGolpe do Quaternius também espera o contato (antes tocava no recibo, cedo)
+		if dec.reacao ~= "esquiva" and dec.reacao ~= "bloqueio" then
+			task.delay(ATRASO_CONTATO, function()
+				if c.animado and c.modelo.Parent and not c.tombado then c.animado:levarGolpe() end
+			end)
+		end
+		return nil
 	end
 
 	-- Vira o corpo para um ponto (ex.: o alvo do golpe).

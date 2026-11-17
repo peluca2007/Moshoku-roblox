@@ -10,6 +10,8 @@ O que faz (reaproveita anim_ual.py, que já desfaz a T-pose e normaliza escala/e
   2. acha os ossos pelo nome (mixamorig:Hips, Spine2, LeftArm, LeftForeArm, LeftUpLeg...), refaz a pose de referência
      (braços/pernas para baixo), amostra a ação a 30 fps no recorte [inicio, fim] (quadros do FBX) e escala o
      deslocamento da pelve pela razão das alturas do quadril;
+  2b. --criatura A,B grava também o clipe por peça rígida das criaturas A e B (anim_criatura_mx.py, REA4) em
+     src/shared/Animacoes/CriaturasMx; --sem-r15 não grava o clipe R15 nem mexe no Catálogo.
   3. sem --impacto, o marco `impacto` vai no instante de maior velocidade da mão direita (o contato do golpe);
   4. ergue a raiz até a sola do primeiro quadro tocar o chão, confere pé/penetração e gera a folha de prévia
      (build/anim/previa);
@@ -38,14 +40,14 @@ import anim_ual  # noqa: E402
 
 def args():
     o = {"fbx": None, "nome": None, "inicio": None, "fim": None, "velocidade": 1.0, "impacto": None, "laco": False,
-         "segurar": False, "registro": True, "previa": True}
+         "segurar": False, "registro": True, "previa": True, "criatura": "", "sem_r15": False, "volta": 0.0}
     a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     i = 0
     while i < len(a):
         k = a[i]
-        if k in ("--fbx", "--nome"):
+        if k in ("--fbx", "--nome", "--criatura"):
             o[k[2:]] = a[i + 1]; i += 2
-        elif k in ("--inicio", "--fim", "--velocidade", "--impacto"):
+        elif k in ("--inicio", "--fim", "--velocidade", "--impacto", "--volta"):
             o[k[2:]] = float(a[i + 1]); i += 2
         elif k == "--laco":
             o["laco"] = True; i += 1
@@ -53,6 +55,8 @@ def args():
             o["segurar"] = True; i += 1
         elif k == "--sem-registro":
             o["registro"] = False; i += 1
+        elif k == "--sem-r15":
+            o["sem_r15"] = True; i += 1
         elif k == "--sem-previa":
             o["previa"] = False; i += 1
         else:
@@ -118,6 +122,13 @@ def principal():
     m = anim_previa.posar(dados, 0.0)
     m0 = min((m[l + "Foot"] @ c).y for l in ("Right", "Left") for c in anim_previa._cantos(R.PECAS[l + "Foot"][1]))
     dados["raiz"] = [[t, x, y - m0, z] for t, x, y, z in dados["raiz"]]
+    # REA4: também grava o clipe nas criaturas humanoides de peças rígidas (--criatura Modulo1,Modulo2)
+    for modulo in [m for m in o["criatura"].split(",") if m]:
+        import anim_criatura_mx as CM
+        CM.gravar(modulo, o["nome"], CM.converter(dados, CM.escala_do_modelo(modulo), True, o["volta"]), "mixamo:" + os.path.basename(caminho))
+        print("criatura:", modulo, o["nome"])
+    if o["sem_r15"]:
+        return
     nota = ("Origem: Mixamo (Adobe), pacote Pro Sword and Shield; redirecionada para o R15 por tools/blender/anim_mixamo.py. "
             "Arquivo FBX cru não redistribuído (docs/ARTE.md).")
     E.escrever_luau(dados, os.path.join(E.PASTA_CLIPES, o["nome"] + ".luau"), nota)

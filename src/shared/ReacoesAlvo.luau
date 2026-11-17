@@ -57,4 +57,26 @@ function M.decidir(idHabilidade: string, tipo: string, temArma: boolean, r: { [s
 	return { reacao = "recuo", forca = if dano >= 8 then 1.2 else 0.9, solta = false }
 end
 
+-- REA4: clipe Mixamo (Shared/Animacoes/CriaturasMx) que o corpo humanoide toca para a reação decidida, ou nil (sem clipe).
+-- `variante` (inteiro, ex.: contador de esquivas da criatura) alterna esquiva para trás / para a esquerda / para a direita.
+-- Só humanoides e mortos-vivos têm esses clipes; bichos seguem a reação procedural do cliente (ImpactoFx.tranco).
+function M.clipeCriatura(reacao: string, forca: number?, variante: number?): string?
+	if reacao == "esquiva" then
+		local v = (variante or 0) % 3
+		return if v == 0 then "Esquiva" elseif v == 1 then "EsquivaLado" else "EsquivaLadoD"
+	elseif reacao == "bloqueio" then
+		return "Bloqueio"
+	elseif reacao == "cambaleio" or reacao == "recuo-forte" or reacao == "larga-arma" then
+		return "ReacaoForte"
+	elseif reacao == "recuo" or reacao == "membro-atingido" then
+		return if (forca or 0) >= 1.5 then "ReacaoForte" else "ReacaoLeve"
+	end
+	return nil
+end
+
+-- Tipos cujo corpo aceita os clipes humanos acima.
+function M.temClipeHumano(tipo: string): boolean
+	return tipo == "humanoide" or tipo == "morto-vivo"
+end
+
 return M

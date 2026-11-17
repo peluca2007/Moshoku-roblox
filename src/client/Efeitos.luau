@@ -100,7 +100,7 @@ end
 
 -- HAB8: destaque de jogo sobre o alvo ("FURTIVO ×3 +11", "COMBO!", "CRÍTICO!", "ROUPA LEVE +2 CA"). Em TELA, não no
 -- mundo: segue o ponto projetado do alvo, mas preso numa faixa segura (20% a 65% da altura, 10% a 90% da largura),
--- porque com a câmera fechada da luta um Billboard alto caía acima do quadro. Nasce grande e assenta (pop), sobe um
+-- porque com a câmera fechada da luta um Billboard alto caía acima do quadro. (Faixa real: 30% a 68%.) Nasce grande e assenta (pop), sobe um
 -- pouco e some. `forte` (triplo do Primeiro Golpe, crítico) fica maior e mais tempo. Vários seguidos empilham.
 local destaquesVivos = 0
 function Efeitos.destaque(position: Vector3, text: string, color: Color3, forte: boolean?)
@@ -134,7 +134,8 @@ function Efeitos.destaque(position: Vector3, text: string, color: Color3, forte:
 			if naFrente then x, y = p.X, p.Y end
 		end
 		x = math.clamp(x, vp.X * 0.1, vp.X * 0.9)
-		y = math.clamp(y - 30 - pilha * (tam + 6), vp.Y * 0.2, vp.Y * 0.65) - ease(t) * 40
+		-- faixa do topo e "Dia N" ocupam até ~22%: o destaque fica de 30% para baixo (sobe só 20 px ao sumir)
+		y = math.clamp(y - 30 + pilha * (tam + 6), vp.Y * 0.3, vp.Y * 0.68) - ease(t) * 20
 		l.Position = UDim2.fromOffset(x, y)
 		local some = math.max(0, (t - 0.7) / 0.3)
 		l.TextTransparency, l.TextStrokeTransparency = some, some

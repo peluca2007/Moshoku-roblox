@@ -401,7 +401,7 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 			if semTextos then
 			elseif alvo.critico then Efeitos.destaque(ponto + Y * 4, "CRÍTICO!", Estilo.ALERTA, true) -- HAB8: grande, com pop
 			elseif not acertou then Efeitos.destaque(ponto + Y * 4, "ERROU", Color3.fromRGB(226, 220, 206), false) -- HAB8: claro (o cinza sumia no esgoto)
-			elseif alvo.passou then Efeitos.floatText(ponto + Y * 4, "RESISTIU", Estilo.TINTA_SUAVE) end
+			elseif alvo.passou then Efeitos.destaque(ponto + Y * 4, "RESISTIU", Color3.fromRGB(196, 214, 230), false) end
 			if not semTextos then
 				for k, d in Destaques.listar(alvo) do
 					-- o triplo é o momento da assinatura: vinho forte; combo e furtivo comum em ouro

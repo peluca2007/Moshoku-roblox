@@ -578,7 +578,7 @@ function BoardView.start(state)
 				for _, nome in MINI do
 					TweenService:Create(view.parts[nome], TweenInfo.new(1.8, Enum.EasingStyle.Quad), { Transparency = 1, Color = Estilo.MESA }):Play()
 				end
-				Efeitos.floatText(target.Position + Vector3.new(0, 6, 0), "DERROTADO", Estilo.PERIGO)
+				Efeitos.destaque(target.Position + Vector3.new(0, 3, 0), "DERROTADO", Color3.fromRGB(230, 96, 84), false) -- HAB8: em tela
 			elseif not token.derrotado and view.derrotado then
 				-- Boneco de treino levantando: volta inteiro.
 				view.derrotado = false

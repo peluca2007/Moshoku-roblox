@@ -236,6 +236,11 @@ function Cena:iniciar()
 					local tam = o.Size
 					if math.max(tam.X, tam.Y, tam.Z) < 4 then
 						o.LocalTransparencyModifier = if (o.Position - olho).Magnitude < 3.5 then 1 else 0
+					else
+						-- peça grande (placa do Escudo) com a câmera dentro ou rente: quase some, em vez de a lente atravessá-la
+						local rel = o.CFrame:PointToObjectSpace(olho)
+						local dentro = math.abs(rel.X) < tam.X / 2 + 1 and math.abs(rel.Y) < tam.Y / 2 + 1 and math.abs(rel.Z) < tam.Z / 2 + 1
+						o.LocalTransparencyModifier = if dentro then 0.85 else 0
 					end
 				end
 			end
@@ -291,9 +296,9 @@ local function respingo(cena, t: number, ponto: Vector3, escala: number, critico
 	local chao = ctx.chao(ponto)
 	cena:em(t, function()
 		workspace:SetAttribute("QaRespingoEm", string.format("%.1f,%.1f,%.1f", ponto.X, ponto.Y, ponto.Z)) -- QA
-		local nucleo = cena:bola(escala * 1.4, ponto, if gelo then GELO else ESPUMA, 0.2, true)
+		local nucleo = cena:bola(escala * 1.2, ponto, if gelo then GELO else ESPUMA, 0.2, true)
 		cena:anim(t, t + 0.28, function(u)
-			nucleo.Size = Vector3.one * escala * (1.4 + 3.4 * u)
+			nucleo.Size = Vector3.one * escala * (1.2 + 1.8 * u) -- HAB8: bolha de estouro menor (ia a ~7 studs e engolia o espaço entre os dois)
 			nucleo.Transparency = 0.2 + 0.8 * u
 		end)
 		local anel = cena:disco(chao + Vector3.new(0, 0.25, 0), escala * 0.8, if gelo then BRILHO else AGUA, 0.2, nil, true)
@@ -444,11 +449,14 @@ local function frenteDoCorpo(id: string?, de: Vector3): Vector3?
 	local corpos = workspace:FindFirstChild("CorposDeCriatura")
 	local m = id and corpos and corpos:FindFirstChild(id)
 	if not (m and m:IsA("Model")) then return nil end
+	-- XZ do pivô (raiz do corpo): a caixa envolvente inclui arma e peças de colisão e puxava o ponto para o atacante;
+	-- altura do meio da caixa; recuo até a frente do corpo limitado a 0,6 stud
 	local cf, tam = m:GetBoundingBox()
-	local centro = cf.Position + Vector3.new(0, tam.Y * 0.05, 0)
+	local piv = m:GetPivot().Position
+	local centro = Vector3.new(piv.X, cf.Position.Y + tam.Y * 0.05, piv.Z)
 	local plano = Vector3.new(centro.X - de.X, 0, centro.Z - de.Z)
 	if plano.Magnitude < 1e-3 then return centro end
-	return centro - plano.Unit * math.min(tam.X, tam.Z) * 0.35
+	return centro - plano.Unit * math.min(math.min(tam.X, tam.Z) * 0.3, 0.6)
 end
 
 -- HAB8: no erro, quem chama a câmera passa `para` (o alvo), não `destino` (o chão além dele): a tomada de contato
@@ -513,7 +521,7 @@ local function geometriaDaZona(ctx, muro)
 	return soma / #pts, pts
 end
 
--- Escudo de Água (HAB3b): muro de água CURVO e GROSSO (arco de ~2 casas, 1,5 stud de espessura) virado para os inimigos.
+-- Escudo de Água (HAB3b): muro de água CURVO (arco de ~2 casas; placas finas desde a HAB8) virado para os inimigos.
 -- Camadas por segmento: núcleo azul translúcido, superfície com textura rolando PARA CIMA, espuma ondulando no topo;
 -- por cima, gotas escorrendo pela face e respingo contínuo na base. Sobe em onda, respinga ao subir e ao se desfazer.
 local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
@@ -527,7 +535,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 	if frente and frente.Magnitude > 0.1 and normal:Dot(frente) < 0 then normal = -normal end
 	local larg = math.max(#pts, 2) * Protocol.BOARD.cell * 1.5 -- HAB7: mais largo, para ler como muro também de lado
 	local alto = Protocol.BOARD.cell * 1.7
-	local espessura = 1.5
+	local espessura = 0.3 -- HAB8: placas finas: as faces laterais de blocos grossos translúcidos eram as emendas verticais
 	local curva = 3.0 -- o arco abaulado para os inimigos
 	local N = if FX.reduzidos then 7 else 13
 	local estado = { tFim = nil :: number? }
@@ -554,7 +562,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 			local arcoMeio = arco + corda / 2
 			arco += corda
 			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.78, Material = Enum.Material.SmoothPlastic })
-			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.25), Color = AZUL_SUP, Transparency = 0.8, Material = Enum.Material.SmoothPlastic })
+			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.06), Color = AZUL_SUP, Transparency = 0.8, Material = Enum.Material.SmoothPlastic })
 			local tex = {}
 			for _, f in { Enum.NormalId.Front, Enum.NormalId.Back } do
 				local tx = Instance.new("Texture")
@@ -606,10 +614,10 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				local h = math.max(alto * ki, 0.05)
 				local onda = math.sin(cena.T * 2.2 + g.arco * 0.35) * 0.18 -- HAB8: fase pelo arco (contínua), não pelo índice
 				local cf = CFrame.lookAt(g.pos + Vector3.new(0, h / 2, 0), g.pos + Vector3.new(0, h / 2, 0) + g.face)
-				g.nucleo.Size = Vector3.new(g.nucleo.Size.X, h, espessura + onda * 0.3)
+				g.nucleo.Size = Vector3.new(g.nucleo.Size.X, h, espessura)
 				g.nucleo.CFrame = cf
 				g.nucleo.Transparency = 0.78 + 0.04 * math.sin(cena.T * 2.6) -- HAB8: igual em todos (fase por bloco fazia listras)
-				g.sup.Size = Vector3.new(g.sup.Size.X, h, espessura + 0.25 + onda * 0.3)
+				g.sup.Size = Vector3.new(g.sup.Size.X, h, espessura + 0.06 + math.abs(onda) * 0.1)
 				g.sup.CFrame = cf
 				g.tex[1].OffsetStudsV, g.tex[2].OffsetStudsV = -cena.T * 2.6, -cena.T * 2.0 -- correnteza descendo
 				-- HAB8: a textura continua entre blocos: o deslocamento U começa onde o bloco começa no arco do muro
@@ -684,8 +692,8 @@ local function zonaNevoa(ctx, muro, t0: number)
 			return e
 		end
 		local rasteira = cena:peca({ Size = Vector3.new(raio * 1.8, 0.6, raio * 1.8), Position = Vector3.new(c.X, chaoY + 0.5, c.Z), Transparency = 1 })
-		local fumo = emissorNevoa(rasteira, 3.5, 5.5, 0.5, 5, 0.8)
-		local alta = cena:peca({ Size = Vector3.new(raio * 1.6, 1, raio * 1.6), Position = Vector3.new(c.X, chaoY + 2.6, c.Z), Transparency = 1 })
+		local fumo = emissorNevoa(rasteira, 4, 6.5, 0.38, 5, 0.8) -- HAB8: mais densa rente ao chão (no lançamento quase não aparecia)
+		local alta = cena:peca({ Size = Vector3.new(raio * 1.6, 1, raio * 1.6), Position = Vector3.new(c.X, chaoY + 2.2, c.Z), Transparency = 1 })
 		local veu = emissorNevoa(alta, 5, 7, 0.94, 5, 0.5)
 		-- HAB8: câmera dentro da névoa (a da luta costuma ficar a ~3 studs do chão, dentro da área): a opacidade de TODAS
 		-- as partículas vivas cai na hora (Transparency do emissor vale para as já emitidas); fora dela, volta.

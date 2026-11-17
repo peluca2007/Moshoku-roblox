@@ -71,7 +71,7 @@ function Feedback.start(state)
 			if type(a)=="table" then
 				if visto and n>visto and s.combat.active and not t.hidden and t.x and t.z then
 					local texto=string.upper(tostring(a.nome))..(if a.detalhe=="imune" then "  · IMUNE" elseif a.detalhe then "  "..tostring(a.detalhe) else "")
-					Efeitos.destaque(Protocol.cellCenter(t.x,t.z)+Vector3.new(0,6.5,0),texto,T.cores.sucesso,false)
+					Efeitos.destaque(Protocol.cellCenter(t.x,t.z)+Vector3.new(0,6.5,0),texto,T.barras.cheia,false) -- HAB8: verde claro do tema (o escuro sumia no painel)
 				end
 			end
 		end

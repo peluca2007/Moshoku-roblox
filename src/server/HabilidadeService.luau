@@ -70,7 +70,11 @@ function HabilidadeService.start(deps)
 			local id = workspace:GetAttribute("QaCondicao")
 			if type(id) ~= "string" or id == "" then return end
 			for _, t in tokens do
-				if t.ownerUserId and aplicarCondicaoRef then aplicarCondicaoRef(t, id) end
+				-- só fichas de jogador (no modo mestre de teste as criaturas também têm dono); o log publica o snapshot
+				if t.ownerUserId and not t.criatura and t.ficha2 and aplicarCondicaoRef then
+					aplicarCondicaoRef(t, id)
+					deps.logAboutToken(t, "QA: " .. id .. " aplicada pelo caminho normal")
+				end
 			end
 		end)
 	end

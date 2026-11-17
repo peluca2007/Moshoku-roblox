@@ -447,7 +447,7 @@ local function veredito(posicao: Vector3, alvo)
 	elseif alvo.acertou == false then
 		Efeitos.destaque(posicao + Vector3.new(0, 4, 0), if alvo.natural == 1 then "FALHA" else "ERROU", Color3.fromRGB(226, 220, 206), false) -- HAB8: claro (o cinza sumia no esgoto)
 	elseif alvo.passou == true then
-		Efeitos.floatText(posicao + Vector3.new(0, 4, 0), "RESISTIU", Estilo.TINTA_SUAVE)
+		Efeitos.destaque(posicao + Vector3.new(0, 4, 0), "RESISTIU", Color3.fromRGB(196, 214, 230), false) -- HAB8
 	end
 end
 

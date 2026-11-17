@@ -91,6 +91,21 @@ Idle/Walk/Punch/RecieveHit do pacote, Morrer sintetizado). `ARMAS` em `kits/cria
 resultado é limpo mas simplificado, longe de Clair Obscur; nota franca ~5,5/10. Pendências: Urso, Treant, Golem, Guerreiro e
 demais ainda são de blocos (ou sem modelo); o goblin arqueiro usa adaga; a arma segue o braço rígido (a mão não gira à parte); a Morte tomba o corpo rígido como tábua (aceitável por ora); armas inclinadas para fora da mão (`euler` Y) para não atravessar o corpo; olhos do pacote (brancos com "lágrima") trocados por escuros; metal do Roblox reflete o céu e fica azulado.
 
+## Morte dos humanoides e Urso/Treant/Golem (MOD6, 17/11/2026)
+
+**Morte com peso** (goblin e bandidos): o Defeat do pacote volta de pé, então `Morrer` é sintetizado em 3 fases em
+`criaturas_clipes.py::morte_humanoide` (1,3 s): joelhos cedem (corpo desce, pernas dobram, cabeça cai), tronco tomba para trás
+girando (acelera, braço da arma jogado para fora, a arma acompanha o braço) e assentamento com quique amortecido; o chão é
+respeitado por peça. Regenerar: `python tools/blender_rodar.py tools/blender/kits/criaturas_quaternius.py --clipes 1 --so <Nome>`.
+
+**Novos modelos** (procedência em `FONTES.md`, todos CC0 do OpenGameArt): `GolemQuaternius` (Golem Knight; pedra em cores fixas,
+olhos `Brilho`, ~1000 triângulos; walk/attack do pacote esticados no tempo, Respirar/LevarGolpe/Morrer sintetizados),
+`TreantQuaternius` (Forest Monster com árvore nas costas; cor amostrada da textura e reduzida a 7 cores por k-means,
+cartões de folha transparentes descartados; Idle/Walk/Attack/Dying do pacote; ~6400 triângulos e 37 peças, o mais pesado) e
+`UrsoQuaternius` (Bear sem esqueleto, repartido por geometria em cabeça, 2 patas da frente, 2 de trás e corpo; todos os clipes
+sintetizados). Notas francas: golem ~6,5 (a melhor silhueta), urso ~6,5, treant ~5 (macaco com árvore na cabeça, malha ruidosa).
+Limitações: o urso anda com patas rígidas balançando; o golem tem walk de 6 quadros esticado (ritmo de boneco).
+
 ## Animações da luta: Universal Animation Library (APRES1)
 Quaternius, **CC0 1.0** (`License.txt` do pacote), `Universal Animation Library[Standard].zip` (UAL1, glb Unreal-Godot, 24 fps), baixada em 15/11/2026 e extraída em `build/externos/ual/` (fora do git). Redirecionada para o R15 por `tools/blender/anim_ual.py` com o mapa `tools/animacao/ual_clipes.json` (ver `tools/animacao/README.md`). Clipes da UAL: PosturaCombate (Sword_Idle), CorteLeve/CortePesado (Sword_Attack, 1,1x e 0,7x), Estocada (Punch_Jab), Conjurar (Spell_Simple Enter+Shoot+Exit), Canalizar, ReacaoGolpe (Hit_Chest), Esquiva (Roll), Queda (Death01). Continuam por script (`origem = "script"`): DisparoArco (a UAL1 só tem pistola), Bloqueio, Vitoria.
 

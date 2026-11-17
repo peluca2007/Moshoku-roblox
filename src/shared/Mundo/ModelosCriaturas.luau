@@ -11,12 +11,12 @@ local ModelosCriaturas = {}
 ModelosCriaturas.POR_CRIATURA = table.freeze({
 	["creature/goblin-batedor"] = { modulos = { "GoblinFaca", "GoblinArco" }, preferido = "GoblinQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
 	["creature/lobo-cinzento"] = { modulos = { "LoboCinzento" }, preferido = "LoboQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },
-	["creature/urso-de-presas-vermelhas"] = { modulos = { "UrsoPresasVermelhas" }, escalaMundo = 1, escalaCombate = 0.8, tipo = "quadrupede" },
+	["creature/urso-de-presas-vermelhas"] = { modulos = { "UrsoPresasVermelhas" }, preferido = "UrsoQuaternius", escalaMundo = 1, escalaCombate = 0.8, tipo = "quadrupede" },
 	["creature/bandido-de-estrada"] = { modulos = { "BandidoPorrete", "BandidoEspada" }, preferidos = { "BandidoPorreteQuaternius", "BandidoEspadaQuaternius" }, escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
 	["creature/rato-gigante"] = { modulos = { "RatoGigante" }, preferido = "RatoQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },
 	["creature/aranha-da-floresta"] = { modulos = { "AranhaFloresta" }, preferido = "AranhaQuaternius", escalaMundo = 1, escalaCombate = 0.8, tipo = "aranha" },
-	["creature/treant-anciao"] = { modulos = { "TreantAnciao" }, escalaMundo = 1, escalaCombate = 0.4, tipo = "pesado" },
-	["creature/golem-de-pedra-menor"] = { modulos = { "GolemPedraMenor" }, escalaMundo = 1, escalaCombate = 0.6, tipo = "pesado" },
+	["creature/treant-anciao"] = { modulos = { "TreantAnciao" }, preferido = "TreantQuaternius", escalaMundo = 1, escalaCombate = 0.4, tipo = "pesado" },
+	["creature/golem-de-pedra-menor"] = { modulos = { "GolemPedraMenor" }, preferido = "GolemQuaternius", escalaMundo = 1, escalaCombate = 0.6, tipo = "pesado" },
 	-- Só Quaternius (sem modelo de blocos): sem o módulo enviado, a criatura cai na aparência padrão do combate.
 	["creature/esqueleto-andarilho"] = { modulos = { "EsqueletoQuaternius" }, escalaMundo = 1, escalaCombate = 0.9, tipo = "humanoide" },
 	["creature/serpente-de-fogo"] = { modulos = { "SerpenteQuaternius" }, escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },

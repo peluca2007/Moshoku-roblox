@@ -497,6 +497,12 @@
   "semente": "1",
   "sha256": "7217953cf15549d3b51b5c2f5439f31bb1b6a27b6c5d79018a46e8554e5551dd"
  },
+ "GolemQuaternius": {
+  "asset": "124076981066731",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "17a8ee7da9f23ee7fbbc897742f685c8ced828682fbe6bb1810e0a89c084626e"
+ },
  "Jardineira": {
   "asset": "108925798351800",
   "modelo": "jardineira",
@@ -851,6 +857,12 @@
   "semente": "1",
   "sha256": "152babd95beb7bc37009cdce047fc99a91cf8b92fcd5b99cb2c8d527b81890a1"
  },
+ "TreantQuaternius": {
+  "asset": "111832533348588",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "9b527735089e5b3e2bc7f6d4a5de3ad039f68a0b6657dd0803f7ec1d72cc3be0"
+ },
  "Tripe1": {
   "asset": "106778895361908",
   "modelo": "tripe",
@@ -874,6 +886,12 @@
   "modelo": "urso",
   "semente": "1",
   "sha256": "e7046695346b2d85a35ecdc7cd716306310086d2aea4a8ab09a88a4d4dcf934e"
+ },
+ "UrsoQuaternius": {
+  "asset": "134501935916625",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "bcfdbd753f37c8529f5a5380c921f9989077bcbd8cec4733866a9dcc69528bcb"
  },
  "Varal": {
   "asset": "94398145531634",

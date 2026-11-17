@@ -1525,3 +1525,9 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Não verificado: tudo no Studio (lock do MOD5 ocupou o Studio por mais de uma hora); que o nome das peças de arma dos modelos Quaternius seja `Arma*` no cliente; vídeos em `build/beleza/rea1/`; Investida/Golpe Contínuo/Primeiro Golpe com Mixamo e magias da Água com o Pro Magic Pack (item 4) não iniciados.
 - (REA1, 17/11) Contrato MOD5: a arma cai pelo SERVIDOR: `HabilidadeService` chama `deps.soltarArma` quando `largouArma` (-> `CorposDeCriatura.soltarArma` -> `CriaturaAnimada:soltarArma`, física replicada, some em 25 s); o cliente só põe o respingo. Gancho de QA (só Studio): `workspace.QaSoltarArma = id`. `hab_luta_real.py` ganhou `--nome= --solta --res=falha|passa|erro`.
 - Vídeos em `build/beleza/rea1/`: `bandido_larga_arma.mp4`, `passou_no_teste.mp4`, `erro.mp4`. SEM `lobo_sem_arma.mp4`: 4 lutas sorteadas só trouxeram aranha (forçar o encontro não foi feito). No vídeo do bandido a queda da arma não ficou nítida (só um brilho laranja junto à mão): não comprovada.
+
+## MOD6 morte dos humanoides + Golem, Treant e Urso (17/11/2026)
+
+- Studio (MCP, com foco, lock MOD6): envio dos 3 módulos pela rota do Studio, `studio_sync`, `qa.py luta`, `python tools/qa/modelos_video.py` (um mp4 por criatura em `build/beleza/mod6/`: parado, andando, ataque, dano, morte; `morte_bandido.jpg` mostra a morte nova do bandido: joelhos cedem, tomba girando, assenta).
+- Visto nos vídeos: o treant mostra pedaços soltos no ataque (peças rígidas de uma malha orgânica); o golem anda em ritmo de boneco; o urso anda com patas rígidas balançando.
+- Não verificado: criaturas dentro de luta real (sala sorteada; `qa.py luta` pega só o que o esgoto sortear), desempenho do treant (6,4 mil triângulos, 37 peças), celular.

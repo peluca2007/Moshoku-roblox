@@ -55,3 +55,15 @@ Mesmo pacote de personagens do goblin (Cowboy_Male -> BandidoEspadaQuaternius, C
 preta de vitrine do pacote é trocada por tom de pele no script) e as armas do **Medieval Weapons Pack (set/2018)**, Quaternius, CC0
 (https://opengameart.org/content/lowpoly-medieval-weapons; linha acima desta tabela, extraído em `build/externos/quaternius-weapons-2018/`):
 Sword_2 (espada), Hammer_Small (porrete) e Dagger_2 (adaga do goblin), importadas como peça separada `Arma`.
+
+## Golem, treant e urso (MOD6, 17/11/2026)
+
+Todos baixados do OpenGameArt com `curl` (arquivos em `build/externos/`, fora do git), licença CC0 lida na página de cada um:
+
+| Modelo | Autor / página | Download | Usado em |
+| --- | --- | --- | --- |
+| Golem Knight (gltf, 4 animações) | https://opengameart.org/content/golem-knight (CC0) | `sites/default/files/golem.zip` | `golem-knight` -> GolemQuaternius |
+| Forest Monster (blend, rig 76 ossos, Idle/Walk/Attack/Dying), Cestmir Dammer (CDmir), projeto Kelgar | https://opengameart.org/content/forest-monster (CC0; `Licenses.txt` do pacote confirma) | `sites/default/files/forest-monster_0.7z` (extrair com `tar -xf`) | `treant-floresta` -> TreantQuaternius |
+| White Bear Low Poly (blend, sem rig), Phelippeau Rudy | https://opengameart.org/content/white-bear-low-poly (CC0; `License.txt.txt` do pacote) | `sites/default/files/Bear.7z` | `urso-branco` -> UrsoQuaternius |
+
+Os nomes `*Quaternius` dos módulos são só convenção do pipeline (`tools/criaturas_quaternius.py`); esses três não são do Quaternius.

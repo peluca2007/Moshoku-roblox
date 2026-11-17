@@ -38,6 +38,33 @@ function M.golpe(de: Vector3, para: Vector3, impacto: number, opc: { escala: num
 		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) } -- esc: câmera lenta forçada (só QA) dilata tudo
 end
 
+-- REA2: câmera presa num ponto móvel (ex.: a arma caindo): `posicao()` devolve o ponto no mundo (nil = mantém o último).
+-- Aproxima em ~0,15 s, segura até `dur` e solta em ~0,3 s; mistura com a câmera da luta (que continua calculando).
+local foco: { inicio: number, dur: number, posicao: () -> Vector3?, ultimo: Vector3, esc: number }? = nil
+function M.foco(inicial: Vector3, dur: number, posicao: () -> Vector3?)
+	if FX.reduzidos then return end
+	foco = { inicio = os.clock(), dur = dur, posicao = posicao, ultimo = inicial,
+		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) }
+	workspace:SetAttribute("ImpactoFocoEm", os.clock()) -- QA
+end
+local function aplicarFoco(cf: CFrame): CFrame?
+	local f = foco
+	if not f then return nil end
+	local t = (os.clock() - f.inicio) / f.esc
+	if t >= f.dur then foco = nil return nil end
+	local p = f.posicao()
+	if p then f.ultimo = p end
+	local alvo = f.ultimo
+	local w = Curvas.suave(math.min(t / 0.15, 1)) * Curvas.suave(math.min((f.dur - t) / 0.3, 1))
+	local fora = Vector3.new(cf.Position.X - alvo.X, 0, cf.Position.Z - alvo.Z)
+	fora = if fora.Magnitude > 0.1 then fora.Unit else Vector3.zAxis
+	fora = CFrame.Angles(0, math.rad(65), 0):VectorToWorldSpace(fora) -- de lado: a câmera da luta fica atrás do atacante, que taparia a arma
+	local pos = alvo + fora * 3.6 + Vector3.new(0, 5, 0) -- de cima e perto: nenhum corpo fica entre a câmera e a arma
+	local mira = alvo - Vector3.new(0, 0.3, 0)
+	pos = M.semParede(mira, pos)
+	return cf:Lerp(CFrame.lookAt(pos, mira), w)
+end
+
 -- Só para a QA: o golpe atual (com a escolha de enquadramento e a folga do raycast).
 function M.estado()
 	return atual
@@ -164,6 +191,8 @@ local function publicar(w: number)
 end
 
 function M.aplicar(cf: CFrame): CFrame
+	local preso = aplicarFoco(cf)
+	if preso then return preso end
 	local g = atual
 	if not g then publicar(0) return cf end
 	local w = M.peso() * Curvas.FORCA

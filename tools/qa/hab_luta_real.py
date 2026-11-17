@@ -17,6 +17,7 @@ nome_exige = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--nome=
 solta = "--solta" in sys.argv  # pede ao servidor (só Studio) que a arma do corpo caia de verdade
 resultado = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--res=")), "falha")  # falha | passa | erro (Vigor/erro do recibo visual)
 video = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--video=")), None)
+trajeto = next((int(a.split("=", 1)[1]) for a in sys.argv if a.startswith("--trajeto=")), 0)  # Investida: casas de corrida para trás do conjurador (REA2)
 q = Qa()
 q.cenario = "hab_real"
 dest = os.path.join(RAIZ, "build", "beleza", "hab1")
@@ -41,12 +42,16 @@ for _=1,4 do
  h=eu() for _,t in snap.tokens do if t.id==alvo.id then alvo=t end end
  dist=math.max(math.abs(alvo.x-h.x),math.abs(alvo.z-h.z))
 end
-con:Disconnect() return h.id..'|'..alvo.id..'|'..alvo.name..'|dist='..dist"""
+con:Disconnect() return h.id..'|'..alvo.id..'|'..alvo.name..'|dist='..dist..'|'..h.x..','..h.z..','..alvo.x..','..alvo.z"""
 info = q.lua_cliente(LUA % ("true" if longe else "false"))
 print(info)
 if "|" not in info:
     sys.exit(1)
 hid, aid = info.split("|")[:2]
+hx, hz, ax, az = [int(float(v)) for v in info.split("|")[4].split(",")]
+sgn = lambda v: (v > 0) - (v < 0)
+traj_lua = "trajeto={{%d,%d},{%d,%d}}," % (hx - sgn(ax - hx) * trajeto, hz - sgn(az - hz) * trajeto, hx, hz) if trajeto else ""
+
 if nome_exige and not any(n.strip().lower() in info.split("|")[2].lower() for n in nome_exige.split(",")):
     print("alvo errado:", info); sys.exit(2)
 q.lua_cliente("workspace:SetAttribute('EscalaDeTempoDasCenas', %s) workspace:SetAttribute('QaCritico', %s) return 'ok'" % (escala, "true" if crit else "nil"))
@@ -55,7 +60,7 @@ time.sleep(0.5)
 
 def disparar():
     q.lua_servidor("""local r=game.ReplicatedStorage.Mesa for _,p in game.Players:GetPlayers() do
-r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},alvos={{id='%s',acertou=%s,critico=%s,dano=6,passou=%s,largouArma=%s}}}) end return 'enviado'""" % (ident, hid, aid, "false" if resultado == "erro" else "true", "true" if crit else "false", "true" if resultado == "passa" else "false", "true" if (solta and resultado == "falha") else "false"))
+r:FireClient(p,'efeito',{habilidadeId='%s',casterId='%s',origem={1,1},%s alvos={{id='%s',acertou=%s,critico=%s,dano=6,passou=%s,largouArma=%s}}}) end return 'enviado'""" % (ident, hid, traj_lua, aid, "false" if resultado == "erro" else "true", "true" if crit else "false", "true" if resultado == "passa" else "false", "true" if (solta and resultado == "falha") else "false"))
     if solta and resultado == "falha":
         time.sleep(0.85 * float(escala))  # o contato cai ~0,8 s depois do recibo
         q.lua_servidor("workspace:SetAttribute('QaSoltarArma', '%s') return 'ok'" % aid)

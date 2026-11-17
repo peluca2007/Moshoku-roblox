@@ -460,7 +460,7 @@ function Corpos.start(deps)
 			local qa = workspace:GetAttribute("QaSoltarArma")
 			if type(qa) == "string" and qa ~= "" and corpos[qa] then
 				workspace:SetAttribute("QaSoltarArma", nil)
-				workspace:SetAttribute("QaSoltouArma", api.soltarArma({ id = qa }))
+				workspace:SetAttribute("QaSoltouArma", api.soltarArma({ id = qa }, 0))
 			end
 		end)
 	end
@@ -518,19 +518,27 @@ function Corpos.start(deps)
 
 	-- REA1: Corte de Braço que fez o alvo largar a arma: a peça `Arma` do corpo sai da animação e cai com física
 	-- (replicada a todos); some depois de 3 min. Sem arma no modelo devolve false (nada cai do nada).
-	function api.soltarArma(token): boolean
+	-- REA2: `atraso` (padrão 0,8 s) segura a queda até o contato do golpe na tela (o recibo chega ~0,8 s antes do corte
+	-- acertar); a QA passa 0. O retorno (há arma?) é imediato.
+	function api.soltarArma(token, atraso: number?): boolean
 		local c = corpos[token.id]
 		if not c or not c.animado or not c.animado.soltarArma then return false end
-		local r = c.animado:soltarArma()
-		if not r then return false end
-		workspace:SetAttribute("QaArmaSolta", r.principal and (r.principal.Name .. "|" .. tostring(#r.demais)) or "?")
-		local dono = c.modelo
-		for _, p in r.demais do
-			p.Parent = workspace
-			p.AssemblyLinearVelocity = Vector3.new(math.random(-6, 6), 14, math.random(-6, 6))
-			p.AssemblyAngularVelocity = Vector3.new(math.random(-8, 8), math.random(-8, 8), math.random(-8, 8))
-			game:GetService("Debris"):AddItem(p, 180)
+		local tem = false
+		for _, g in c.animado.grupos do if g.grupo == "Arma" then tem = true break end end
+		if not tem then return false end
+		local function soltar()
+			local r = c.animado:soltarArma()
+			if not r then return end
+			workspace:SetAttribute("QaArmaSolta", r.principal and (r.principal.Name .. "|" .. tostring(#r.demais)) or "?")
+			for _, p in r.demais do
+				p.Parent = workspace
+				p.AssemblyLinearVelocity = Vector3.new(math.random(-6, 6), 14, math.random(-6, 6))
+				p.AssemblyAngularVelocity = Vector3.new(math.random(-8, 8), math.random(-8, 8), math.random(-8, 8))
+				game:GetService("Debris"):AddItem(p, 180)
+			end
 		end
+		local espera = if atraso == nil then 0.8 else atraso
+		if espera > 0 then task.delay(espera, soltar) else soltar() end
 		return true
 	end
 

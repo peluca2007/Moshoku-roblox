@@ -1543,3 +1543,12 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Não verificado: criaturas em luta real (esgoto sorteia), desempenho, orientação do treant em luta, passo do urso de perto.
 - (REA1, 17/11, Studio com foco) `QaEncontro="creature/lobo-cinzento"` funciona (lobo forçado na sala 1; `primeira_arvore` -> atributo no servidor -> `esgoto_sala1 --sem-deps`). `lobo_sem_arma.mp4`: nada cai da mão (sem peça Arma), mas a manca/tranco do lobo é pouco perceptível nos quadros (a reação existe em código, fraca). `erro.mp4` regravado (esquiva lateral do código anterior, sem Mixamo: o clipe `EsquivaMixamo` foi convertido de "standing dodge backward" do Pro Longbow Pack e ligado em `Gestos.reacao` depois, sem regravar).
 - Não feito: câmera na arma caindo não regravada com bandido; Investida com corrida real e Golpe Contínuo com Mixamo.
+
+## REA2 (17/11/2026) — reações e habilidades da Espada, Studio com foco, vídeos em `build/beleza/rea2/`
+
+- `lobo_sem_arma.mp4` (QaEncontro lobo, Corte de Braço falhando no Vigor): a pata cede, o corpo afunda ~0,6 m e tomba até ~45 graus, balança e recupera mancando em ~1,2 s. Bug achado: `PivotTo` do modelo inteiro deixava peças replicadas "soltas" (pata duplicada); `ImpactoFx.tranco` agora transforma cada peça sobre o último CFrame cru.
+- `erro_lobo.mp4`, `erro_bandido.mp4`: passo lateral com inclinação; humanoide agacha e joga o tronco para trás. É PROCEDURAL: o clipe `EsquivaMixamo` só toca em personagens R15; os inimigos são peças rígidas animadas pelo servidor (sem retarget Mixamo).
+- `bandido_larga_arma.mp4`: a câmera sai da dupla e segura ~0,7 s de cima na peça `Arma` caindo (`ImpactoCamera.foco`; na 1ª versão entrava nas pernas do atacante). `CorposDeCriatura.soltarArma` agora atrasa 0,8 s (contato do golpe na tela); antes a arma caía no recibo, antes do corte. Fora do vídeo: a prova do atraso pela rota real (HabilidadeService) não foi rodada, a QA passa atraso 0.
+- `investida.mp4` (`hab_luta_real.py --trajeto=4`): corrida Mixamo ("sword and shield run") com poeira, golpe Mixamo (slash 1) no fim. A câmera da luta mostra só o trecho final da corrida.
+- `golpe_continuo.mp4`: 3 cortes Mixamo (slash 1, 2 e 4), terceiro com peso 0,6 e tremor maior. O terceiro clipe termina agachado (visível) e o 2º gira o corpo: sem recorte fino.
+- Não verificado: celular, desempenho com vários inimigos, esquiva Mixamo em inimigo, o Vigor real passando pelo servidor, `testar.ps1` só com "Catálogo" falhando (antigo); `qa.py luta` 29 ok.

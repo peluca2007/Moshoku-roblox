@@ -259,30 +259,84 @@ function M.soltaArma(pai: Instance, modelo: Instance?, direcao: Vector3): boolea
 	return true
 end
 
--- REA1: tranco procedural no corpo (rig de peças rígidas replicado pelo servidor): desloca/inclina o modelo no sentido do
--- golpe e volta. `forte` aumenta; `manca` deixa o corpo afundado de um lado por mais tempo (membro atingido).
-function M.tranco(modelo: Model?, direcao: Vector3, forca: number, manca: boolean?)
+-- REA1/REA2: tranco procedural no corpo (rig de peças rígidas replicado pelo servidor): desloca/inclina o modelo no sentido do
+-- golpe e volta. `manca` (membro atingido, sem arma para largar) = 3 tempos legíveis: (1) o golpe empurra e a pata cede
+-- (corpo afunda e tomba para o lado ferido), (2) cambaleia ~0,6 s (balanço amortecido), (3) recupera mancando
+-- (mergulho a cada passo, cada vez menor). `lateral` = esquiva: passo para o lado com inclinação, sem afundar.
+function M.tranco(modelo: Model?, direcao: Vector3, forca: number, manca: boolean?, lateral: boolean?, humanoide: boolean?)
 	if not modelo or FX.reduzidos then return end
 	local base = modelo:GetPivot()
 	local dir = Vector3.new(direcao.X, 0, direcao.Z)
 	dir = if dir.Magnitude > 1e-3 then dir.Unit else Vector3.zAxis
 	local lado = dir:Cross(Vector3.yAxis)
-	local dur = if manca then 1.1 else 0.55
+	local dur = if manca then 2.0 elseif lateral then 0.9 else 0.55
 	local inicio = os.clock()
+	-- As peças são replicadas pelo servidor em instantes diferentes: um PivotTo único deixa peças "soltas" (pata duplicada).
+	-- Então cada peça recebe a transformação sobre o último CFrame cru (replicado ou animado) dela, quadro a quadro.
+	local cru: { [BasePart]: CFrame } = {}
+	local escrito: { [BasePart]: CFrame } = {}
+	local function aplicarEm(T: CFrame)
+		for _, p in modelo:GetDescendants() do
+			if p:IsA("BasePart") then
+				local atual = p.CFrame
+				local r = if escrito[p] ~= nil and atual == escrito[p] then cru[p] else atual
+				cru[p] = r
+				local novo = T * r
+				escrito[p] = novo
+				p.CFrame = novo
+			end
+		end
+	end
 	local con
 	con = RunService.RenderStepped:Connect(function()
 		local escala = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1)
-		local u = (os.clock() - inicio) / (dur * escala)
+		local seg = (os.clock() - inicio) / escala -- segundos de jogo
+		local u = seg / dur
 		if u >= 1 or not modelo.Parent then
 			con:Disconnect()
-			if modelo.Parent then modelo:PivotTo(base) end
+			if modelo.Parent then aplicarEm(CFrame.identity) end
 			return
 		end
-		local empurra = math.sin(math.min(u * 4, 1) * math.pi / 2) * (1 - u) ^ 2 * 1.6 * forca
-		local inclina = math.sin(math.min(u * 3, 1) * math.pi / 2) * (1 - u) * 0.28 * forca
-		local afunda = if manca then math.sin(math.min(u * 2.5, 1) * math.pi / 2) * (1 - u ^ 3) * 0.9 else 0
-		local rot = CFrame.fromAxisAngle(lado, -inclina) * CFrame.fromAxisAngle(Vector3.yAxis, if manca then 0.25 * (1 - u) else 0)
-		modelo:PivotTo(CFrame.new(base.Position + dir * empurra - Vector3.new(0, afunda, 0)) * rot * base.Rotation)
+		local f = math.clamp(forca, 0.6, 2)
+		local desloca, afunda, inclina, rola, guina = Vector3.zero, 0, 0, 0, 0
+		if manca then
+			local golpe = math.min(seg / 0.14, 1)
+			local empurra = math.sin(golpe * math.pi / 2) * math.exp(-seg * 3.2) * 1.2 * f
+			-- (1)+(2) a pata cede: afunda em 0,25 s e SEGURA o corpo baixo e torto ~0,7 s enquanto cambaleia de um lado a outro
+			local cede = math.sin(math.min(seg / 0.25, 1) * math.pi / 2)
+			local plato = 1 - math.clamp((seg - 0.7) / 0.5, 0, 1) -- 1 até 0,7 s, some até 1,2 s
+			local cambaleio = cede * plato
+			-- (3) manca: mergulho a cada passo (2,4 Hz) de 0,9 s a 2 s, cada vez menor
+			local mancando = math.clamp((seg - 0.9) / 0.2, 0, 1) * (1 - math.clamp((seg - 1.2) / 0.8, 0, 1))
+			local passo = (math.sin(seg * 15) * 0.5 + 0.5) * mancando
+			local balanco = math.sin(seg * 9) * cambaleio
+			desloca = dir * empurra + lado * balanco * 0.9 * f
+			afunda = cambaleio * 0.55 * f + passo * 0.3
+			inclina = cambaleio * 0.45 * f + passo * 0.12 -- cabeça para baixo
+			rola = cambaleio * 0.5 * f + balanco * 0.28 + passo * 0.22 -- tomba para o lado ferido e balança
+			guina = 0.35 * balanco * f
+		elseif lateral then
+			-- passo lateral rápido: sai da linha do golpe e volta com a inclinação do corpo
+			local ida = math.sin(math.min(u * 2.2, 1) * math.pi / 2)
+			local volta = (1 - u) ^ 1.6
+			desloca = lado * 2.6 * ida * volta * f + dir * -0.6 * ida * volta
+			rola = -0.5 * ida * volta
+			afunda = 0.15 * ida * volta + math.abs(math.sin(u * math.pi * 2)) * 0.25 * (1 - u)
+			if humanoide then
+				-- humanoide: agacha e joga o tronco para trás ao tirar o corpo da linha (esquiva de duelista)
+				afunda = 0.6 * ida * volta
+				inclina = -0.32 * ida * volta
+				rola = -0.2 * ida * volta
+				guina = 0.35 * ida * volta
+			end
+		else
+			local empurra = math.sin(math.min(u * 4, 1) * math.pi / 2) * (1 - u) ^ 2 * 1.6 * f
+			desloca = dir * empurra
+			inclina = math.sin(math.min(u * 3, 1) * math.pi / 2) * (1 - u) * 0.28 * f
+		end
+		local rot = CFrame.fromAxisAngle(lado, -inclina) * CFrame.fromAxisAngle(dir, rola) * CFrame.fromAxisAngle(Vector3.yAxis, guina)
+		local alvo = CFrame.new(base.Position + desloca - Vector3.new(0, afunda, 0)) * rot * base.Rotation
+		aplicarEm(alvo * base:Inverse())
 	end)
 end
 

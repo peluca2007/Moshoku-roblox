@@ -62,7 +62,9 @@ local ESPEC = {
 	["ataque-basico"] = { g = "golpe", cortes = { { 0, 38 } }, peso = 0.3 },
 	["ataque-a-distancia"] = { g = "disparo", peso = 0.25 },
 	["corte-de-braco"] = { g = "golpe", cortes = { { 0, 62 } }, peso = 0.4, preparo = 0.26, preciso = true, assinatura = true, clipe = "CorteDeBraco" },
-	["golpe-continuo"] = { g = "golpe", cortes = { { 0, 28 }, { 0.12, -34 }, { 0.24, 80 } }, peso = 0.35, preparo = 0.16 },
+	-- REA2: 3 cortes Mixamo encadeados (slash 1, 2 e 4 do Pro Sword and Shield), o terceiro mais pesado (peso e tremor)
+	["golpe-continuo"] = { g = "golpe", cortes = { { 0, 28 }, { 0.42, -34 }, { 0.86, 80 } }, peso = 0.6, preparo = 0.34,
+		clipes = { "SlashMx1", "SlashMx2", "SlashMx3" }, velClipes = { 1.15, 1.25, 1.0 } },
 	["golpe-baixo"] = { g = "golpe", cortes = { { 0, 88 } }, peso = 0.3, baixo = true, preparo = 0.24 },
 	["golpe-circular"] = { g = "giro", peso = 0.55 },
 	["cabecada"] = { g = "cabecada", peso = 0.5 },
@@ -445,21 +447,29 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 				elseif tipoArma == "pesada" or (spec.peso or 0) >= 0.5 then "CortePesado" else "CorteLeve")
 			vel = if spec.clipe then 1 elseif #cortes > 1 then 1.7 elseif nomeClipe == "CortePesado" then 1.3 else 1.2
 			W = Catalogo.CLIPES[nomeClipe].marcos.impacto / vel
+			if spec.clipes then
+				nomeClipe, vel, W = spec.clipes[1], spec.velClipes[1], spec.preparo
+			end
 		end
 		local ultimo = cortes[#cortes][1]
 		local golpeFim = W + ultimo
 		local total = golpeFim + 0.1 + 0.28 + 0.2
 		if nomeClipe then
 			local clipe = Catalogo.CLIPES[nomeClipe]
-			total = math.max(total, golpeFim + (clipe.duracao - clipe.marcos.impacto) / vel)
+			total = if spec.clipes then golpeFim + 0.38 else math.max(total, golpeFim + (clipe.duracao - clipe.marcos.impacto) / vel)
 			clipeNaCena(K, cena, f, "PosturaCombate", 0, total, 1, 0, { camada = "base", fade = 0 })
 			for i, c in cortes do
 				-- cada corte é uma camada; a seguinte começa logo depois do impacto da anterior,
 				-- já no meio do preparo, para o impacto cair em W + c[1]
 				local comeca = if i == 1 then 0 else W + cortes[i - 1][1]
-				local t0 = clipe.marcos.impacto - (W + c[1] - comeca) * vel
-				local fim = if i == #cortes then total else W + cortes[i + 1][1] + 0.05
-				clipeNaCena(K, cena, f, nomeClipe, comeca, fim - comeca, vel, math.max(0, t0), { fade = if i == 1 then 0.06 else 0.05 })
+				local nomeI = if spec.clipes then spec.clipes[i] else nomeClipe
+				local velI = if spec.velClipes then spec.velClipes[i] else vel
+				local clipeI = Catalogo.CLIPES[nomeI]
+				-- com clipes distintos, cada corte entra ~0,32 s antes do próprio impacto (sem a espera longa do mocap)
+				local comecaI = if spec.clipes and i > 1 then W + c[1] - 0.32 else comeca
+				local t0 = clipeI.marcos.impacto - (W + c[1] - comecaI) * velI
+				local fim = if i == #cortes then total else W + cortes[i + 1][1] - 0.1
+				clipeNaCena(K, cena, f, nomeI, comecaI, fim - comecaI, velI, math.max(0, t0), { fade = if i == 1 then 0.06 else 0.1 })
 			end
 		end
 		local ponto = alvoPos - dir * 1.1
@@ -601,8 +611,11 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		local est = spec.estilo
 		local pesada = est == "devastadora"
 		local W = if pesada then 0.34 else 0.14
-		local corrida = math.clamp(dist / (if pesada then 34 else 56), 0.22, 0.75)
-		local golpe = 0.1
+		local mocapCorrida = ok and est == "espada" and Corpo.tocador(f) ~= nil -- REA2: com a corrida de mocap, ritmo de passada legível (>= 0,6 s)
+		local corrida = if mocapCorrida then math.clamp(dist / 26, 0.6, 1.0) else math.clamp(dist / (if pesada then 34 else 56), 0.22, 0.75)
+		-- REA2: Investida da Espada com mocap: corrida real (sword and shield run) e golpe (slash 1) no fim, poeira nos pés
+		local mocap = ok and est == "espada" and Corpo.tocador(f) ~= nil
+		local golpe = if mocap then 0.34 else 0.1
 		local total = W + corrida + golpe + 0.3 + 0.2
 		local alvoFinal = if alvoPos then alvoPos else B + dir * 2
 		local olhar = if alvoPos then unit(alvoPos - B) else dir
@@ -610,9 +623,16 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 			arma(if est == "quadrupede" then "espada" else (spec.prop or tipoDaArma()))
 			for i = 1, 3 do sombra(W + corrida * i / 4, 0.28) end
 			anim(0, "toolnone", { repete = true, prioridade = Enum.AnimationPriority.Action })
-			anim(W * 0.5, "run", { repete = true, velocidade = 1.8, prioridade = Enum.AnimationPriority.Movement })
-			pararAnim(W + corrida, "run")
-			anim(W + corrida - 0.04, if est == "quadrupede" then "toollunge" else "toolslash", { velocidade = 1.5, prioridade = GOLPE })
+			if mocap then
+				local slash = Catalogo.CLIPES.SlashMx1
+				clipeNaCena(K, cena, f, "PosturaCombate", 0, total, 1, 0, { camada = "base", fade = 0 })
+				clipeNaCena(K, cena, f, "CorridaMx", W * 0.5, corrida + W * 0.5 + 0.12, 1.5, 0, { fade = 0.08 })
+				clipeNaCena(K, cena, f, "SlashMx1", W + corrida - 0.15, total - (W + corrida - 0.15), 1.1, slash.marcos.impacto - 0.2 * 1.1 - 0.0, { fade = 0.1 })
+			else
+				anim(W * 0.5, "run", { repete = true, velocidade = 1.8, prioridade = Enum.AnimationPriority.Movement })
+				pararAnim(W + corrida, "run")
+				anim(W + corrida - 0.04, if est == "quadrupede" then "toollunge" else "toolslash", { velocidade = 1.5, prioridade = GOLPE })
+			end
 			rodar(total, function(s)
 				local pos, pitch, d, e, trn = A, 0, -0.9, -0.5, 0
 				local look = dir
@@ -656,6 +676,15 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 			local u = i / 7
 			local p = A:Lerp(B, u)
 			if i % 2 == 0 then poeira(p, W + corrida * u, 5, 1.8) end
+		end
+		if mocap then
+			-- poeira nos pés: arrancada e uma nuvem baixa a cada passada
+			poeira(K.chao(A), W * 0.6, 8, 2)
+			for i = 1, 9 do
+				local u = i / 10
+				poeira(K.chao(A:Lerp(B, u)), W * 0.6 + (corrida + W * 0.4) * u, 3, 1.3)
+			end
+			poeira(K.chao(B), W + corrida, 6, 2.2)
 		end
 		for i = 1, 4 do
 			local seg = K.peca(cena, "fio", cor)

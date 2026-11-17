@@ -200,6 +200,10 @@ function Servico.start(deps)
 	local function iniciarLutaPendente(solicitante)
 		local luta = sessao and sessao:lutaPendente()
 		if not luta or lutaAtiva then return end
+		-- QA (só no Studio): workspace.QaEncontro = "creature/<id>" força o elenco desta luta (ex.: lobo para o vídeo sem arma)
+		if game:GetService("RunService"):IsStudio() and type(workspace:GetAttribute("QaEncontro")) == "string" and workspace:GetAttribute("QaEncontro") ~= "" then
+			luta = table.clone(luta); luta.criaturas = { workspace:GetAttribute("QaEncontro") }
+		end
 		if solicitante and not sessao.run.jogadores[solicitante.UserId] then recusa(solicitante, "Você não está nesta run."); return end
 		local function falhar(motivo)
 			sessao:definirErroDaLuta(motivo)

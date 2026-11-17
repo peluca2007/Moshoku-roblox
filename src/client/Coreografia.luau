@@ -419,6 +419,8 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				local reac = ReacoesAlvo.decidir(cena.habilidade, ReacoesAlvo.tipoDoAlvo(if type(nomeAlvo) == "string" then nomeAlvo else nil), armado, alvo)
 				if reac.solta then
 					-- a arma cai de verdade pelo servidor (CorposDeCriatura.soltarArma); o cliente só põe o respingo
+					-- câmera: segura ~0,6 s na mão do alvo até a arma tocar o chão
+					ImpactoCamera.golpe(ponto + Y * 2.4, ponto + Y * 0.4, 0.2, { escala = 0.55, altura = 0 })
 					ImpactoFx.gotas(cena.modelo, ponto + Y * 2.2, golpe)
 				end
 				if corpoAlvo and corpoAlvo:IsA("Model") and not corpoAlvo:FindFirstChildOfClass("Humanoid") then
@@ -441,6 +443,12 @@ function Coreografia.start(state, pasta, posicaoDe, chaoDe, centroCasa)
 				end
 			elseif not acertou then
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, 0.3, "esquiva")
+				-- esquiva perceptível: criaturas de peças rígidas dão um passo lateral (tranco para o lado)
+				local cAlvo = workspace:FindFirstChild("CorposDeCriatura")
+				cAlvo = cAlvo and cAlvo:FindFirstChild(alvo.id)
+				if cAlvo and cAlvo:IsA("Model") and not cAlvo:FindFirstChildOfClass("Humanoid") then
+					ImpactoFx.tranco(cAlvo, (ponto - de):Cross(Y), 1.0, false)
+				end
 			elseif alvo.dano == 0 and not alvo.passou then
 				Gestos.reacao(kit, cena, alvo.id, ponto - de, 0.3, "bloqueio") -- acertou sem dano: aparou
 			end

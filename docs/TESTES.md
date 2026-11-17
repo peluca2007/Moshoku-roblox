@@ -1475,3 +1475,10 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Câmera: `ImpactoCamera` ignora a caixa da sala quando a dupla está fora do tabuleiro (palcos de QA).
 - Não verificado: ganchos da Água em luta real (flecha de água, Molhado), Investida, passivas, som.
 - (HAB1, Mixamo) `CorteDeBraco` = "sword and shield slash (3)" retargetado: prancha `build/beleza/hab1/corte_braco_prancha.png` mostra antecipação com agachamento e torção de corpo inteiro, arco alto, fita fina curva da lâmina e follow-through; tempo real em `corte_braco_tempo_real.png`. Não verificado: reação do alvo com corpo R15, som, luta real.
+
+## HAB1b — Corte de Braço na luta real (16/11/2026, Studio por MCP)
+
+- `tools/qa/hab_luta_real.py <habilidade-id> <nome> [escala]`: na luta real do esgoto (personagem Man do QA, Bandido de Estrada adjacente, câmera da luta + assinatura) o servidor reenvia ao cliente um recibo "efeito" só visual (Mesa:FireClient); o personagem do QA é Ladino e não tem a árvore da Espada, e aprender só é permitido fora de combate, por isso a apresentação é injetada.
+- Provado: `build/beleza/hab1/corte_braco_luta_prancha.png` (10 quadros em câmera lenta ×6) e `corte_braco_luta_tempo_real.png`: base firme em guarda de espada e escudo, torção, arco alto com fita fina, arma do bandido voando (solta-arma), respingo vermelho, câmera chegando do dolly para a lateral.
+- A "ajoelhada" da prancha anterior era a postura de guarda do Mixamo (S&S), não retarget errado: pés no chão (`pe_min` ~0).
+- Não provado: reação ReacaoGolpe do bandido (o recuo dele não aparece nos quadros), som do corte/arma caindo, flecha de água (`agua_flecha_prancha.png` mostra a câmera colada no alvo adjacente: HAB2/ImpactoCamera não tratam magia à queima-roupa; precisa de uma luta com a Água a distância), o corte no quadro 0 da prancha começa com a câmera muito perto e escura.

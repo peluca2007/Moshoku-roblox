@@ -113,11 +113,23 @@
   "semente": "1",
   "sha256": "333d6f68c72b4ed30fc6dd7e4c061d5521fdf3842cbead1a5fa6b3fd9d5fe355"
  },
+ "BandidoEspadaQuaternius": {
+  "asset": "137516155260431",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "1b4135e2607906608c5174da431bbc8a31c0681bc25b6c2fe86ba5ef199d7708"
+ },
  "BandidoPorrete": {
   "asset": "121609113162863",
   "modelo": "bandido",
   "semente": "1",
   "sha256": "0491d66aaa9cb20c6e6c1b230e2f8cc9882f78201af214c53177a091227be6ba"
+ },
+ "BandidoPorreteQuaternius": {
+  "asset": "140629943270341",
+  "modelo": "criatura-externa",
+  "semente": "1",
+  "sha256": "fab2de301ff2b5cc3e92f3b4d84bf9e73a5270786aedfd5a0c197e4f30f224be"
  },
  "Barba1": {
   "asset": "129677285232439",
@@ -474,10 +486,10 @@
   "sha256": "049abc8510c043277ab51b0402163b0513bc7c3daad32002ba7778de5b7034ac"
  },
  "GoblinQuaternius": {
-  "asset": "85527745949003",
+  "asset": "120973098778452",
   "modelo": "criatura-externa",
   "semente": "1",
-  "sha256": "301f7a5cf1691bcd9259035569169115455a03002014173174b4ab554665d4a4"
+  "sha256": "b43a82de73fe70dbde5f3f7682608dd7459dae4ee55c9b7b5afe00bae2d69a42"
  },
  "GolemPedraMenor": {
   "asset": "135974045085542",

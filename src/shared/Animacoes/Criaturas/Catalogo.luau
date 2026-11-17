@@ -3,6 +3,8 @@ local Shared = game:GetService("ReplicatedStorage").Shared
 
 return {
 	AranhaQuaternius = require(Shared.Animacoes.Criaturas.AranhaQuaternius),
+	BandidoEspadaQuaternius = require(Shared.Animacoes.Criaturas.BandidoEspadaQuaternius),
+	BandidoPorreteQuaternius = require(Shared.Animacoes.Criaturas.BandidoPorreteQuaternius),
 	DragaoQuaternius = require(Shared.Animacoes.Criaturas.DragaoQuaternius),
 	EsqueletoQuaternius = require(Shared.Animacoes.Criaturas.EsqueletoQuaternius),
 	GoblinQuaternius = require(Shared.Animacoes.Criaturas.GoblinQuaternius),

@@ -12,7 +12,7 @@ ModelosCriaturas.POR_CRIATURA = table.freeze({
 	["creature/goblin-batedor"] = { modulos = { "GoblinFaca", "GoblinArco" }, preferido = "GoblinQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
 	["creature/lobo-cinzento"] = { modulos = { "LoboCinzento" }, preferido = "LoboQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },
 	["creature/urso-de-presas-vermelhas"] = { modulos = { "UrsoPresasVermelhas" }, escalaMundo = 1, escalaCombate = 0.8, tipo = "quadrupede" },
-	["creature/bandido-de-estrada"] = { modulos = { "BandidoPorrete", "BandidoEspada" }, escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
+	["creature/bandido-de-estrada"] = { modulos = { "BandidoPorrete", "BandidoEspada" }, preferidos = { "BandidoPorreteQuaternius", "BandidoEspadaQuaternius" }, escalaMundo = 1, escalaCombate = 1, tipo = "humanoide" },
 	["creature/rato-gigante"] = { modulos = { "RatoGigante" }, preferido = "RatoQuaternius", escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },
 	["creature/aranha-da-floresta"] = { modulos = { "AranhaFloresta" }, preferido = "AranhaQuaternius", escalaMundo = 1, escalaCombate = 0.8, tipo = "aranha" },
 	["creature/treant-anciao"] = { modulos = { "TreantAnciao" }, escalaMundo = 1, escalaCombate = 0.4, tipo = "pesado" },
@@ -22,6 +22,16 @@ ModelosCriaturas.POR_CRIATURA = table.freeze({
 	["creature/serpente-de-fogo"] = { modulos = { "SerpenteQuaternius" }, escalaMundo = 1, escalaCombate = 1, tipo = "quadrupede" },
 	["creature/dragao-azul"] = { modulos = { "DragaoQuaternius" }, escalaMundo = 1, escalaCombate = 0.5, tipo = "voador" },
 })
+
+-- MOD5: TipoArma da peça `Arma` de cada módulo armado (espada/porrete/arco/adaga/machado/cajado). Sem entrada = sem arma.
+ModelosCriaturas.TIPO_ARMA = table.freeze({
+	BandidoEspadaQuaternius = "espada", BandidoPorreteQuaternius = "porrete", GoblinQuaternius = "adaga",
+	BandidoEspada = "espada", BandidoPorrete = "porrete", GoblinFaca = "adaga", GoblinArco = "arco",
+})
+
+function ModelosCriaturas.tipoArma(modulo)
+	return if type(modulo) == "string" then ModelosCriaturas.TIPO_ARMA[modulo] else nil
+end
 
 -- Prefixo legado de `EncontrosPorZona.patrulhas()[i].modelo` -> criatura.
 ModelosCriaturas.POR_PREFIXO = table.freeze({
@@ -45,6 +55,14 @@ function ModelosCriaturas.escolher(criaturaId, variante, existe)
 	if type(variante) == "number" then indice = (math.floor(variante) % #entrada.modulos) + 1 end
 	local modulo = entrada.modulos[indice]
 	if entrada.preferido and type(existe) == "function" and existe(entrada.preferido) then modulo = entrada.preferido end
+	-- MOD5: várias variantes Quaternius; a variante escolhe entre as que existem (índice 1 = porrete, 2 = espada).
+	if entrada.preferidos and type(existe) == "function" then
+		local vivos = {}
+		for _, m in ipairs(entrada.preferidos) do
+			if existe(m) then table.insert(vivos, m) end
+		end
+		if #vivos > 0 then modulo = vivos[(math.floor(type(variante) == "number" and variante or 0) % #vivos) + 1] end
+	end
 	return {
 		modulo = modulo,
 		escalaMundo = entrada.escalaMundo,

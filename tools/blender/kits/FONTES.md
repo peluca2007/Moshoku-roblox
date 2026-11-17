@@ -48,3 +48,10 @@ pastas próprias em `build/externos/` (fora do git):
 
 Lobo: Respirar/Andar do pacote; Atacar (bote com marco `impacto`), LevarGolpe e Morrer sintetizados. Goblin: Idle, Walk, Punch
 (Atacar), RecieveHit, Defeat do pacote. Registro em `shared/Animacoes/Criaturas/*.luau` (`origem`).
+
+## Bandidos e armas (MOD5, 17/11/2026)
+
+Mesmo pacote de personagens do goblin (Cowboy_Male -> BandidoEspadaQuaternius, Casual3_Male -> BandidoPorreteQuaternius; a pele
+preta de vitrine do pacote é trocada por tom de pele no script) e as armas do **Medieval Weapons Pack (set/2018)**, Quaternius, CC0
+(https://opengameart.org/content/lowpoly-medieval-weapons; linha acima desta tabela, extraído em `build/externos/quaternius-weapons-2018/`):
+Sword_2 (espada), Hammer_Small (porrete) e Dagger_2 (adaga do goblin), importadas como peça separada `Arma`.

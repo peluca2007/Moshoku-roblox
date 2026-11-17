@@ -142,6 +142,9 @@ CRIATURAS = {
     "DragaoQuaternius": ("monstros", "Dragon.fbx", regra_morcego, 9.0, "h", "voador", None),
     "LoboQuaternius": ("animais", "Wolf.fbx", regra_lobo, 6.4, "h", "quadrupede", None),
     "GoblinQuaternius": ("personagens", "Goblin_Male.fbx", regra_goblin, 4.4, "a", "humanoide", None),
+    # MOD5: bandidos humanoides (Ultimate Animated Character Pack) com arma do Medieval Weapons Pack como peça `Arma`
+    "BandidoEspadaQuaternius": ("personagens", "Cowboy_Male.fbx", regra_goblin, 5.4, "a", "humanoide", None),
+    "BandidoPorreteQuaternius": ("personagens", "Casual3_Male.fbx", regra_goblin, 5.4, "a", "humanoide", None),
 }
 # yaw em graus (rotação em Z do Blender) que põe a frente em -Y; descoberto olhando a pose de repouso.
 YAW = {}
@@ -152,6 +155,21 @@ FRENTE = {"LoboQuaternius": (["Bone.003"], "Bone"), "VespaQuaternius": (["Head"]
 SATURACAO, VALOR = 0.78, 0.92
 # Cor do material clara demais sob a luz do jogo (lobo ficava azul-claro): cinza de lobo escurecido.
 COR_FIXA = {"LoboQuaternius": (124, 116, 106)}
+# O pacote de personagens traz pele preta (bonecos de vitrine); os humanos recebem tom de pele por módulo (material "Skin").
+PELE = {"BandidoEspadaQuaternius": (204, 152, 118), "BandidoPorreteQuaternius": (178, 124, 92)}
+
+# MOD5, arma como peça separada `Arma` (grupo "Arma_<Cor>"), na mão direita (osso Fist.R). Medidas do Medieval Weapons Pack
+# (CC0, Quaternius): comprimento ao longo de +Z (ponta em +Z); `agarre` = ponto do cabo (z local) que fica na mão;
+# `tipo` = atributo TipoArma (espada/porrete/arco/adaga/machado/cajado); `comp` = comprimento total em studs;
+# `euler` = (inclinação em X, inclinação em Y, giro em Z) em graus (gira em Z primeiro): +Z = ponta para cima; X positivo leva a ponta para -Y (frente); Y negativo leva a ponta para -X (para fora da mão direita).
+ARMAS = {
+    "BandidoEspadaQuaternius": dict(arquivo="Sword_2.fbx", tipo="espada", comp=3.6, agarre=-0.25, euler=(12, -28, 0)),
+    "BandidoPorreteQuaternius": dict(arquivo="Hammer_Small.fbx", tipo="porrete", comp=3.4, agarre=0.0, euler=(12, -28, 0)),
+    "GoblinQuaternius": dict(arquivo="Dagger_2.fbx", tipo="adaga", comp=1.9, agarre=-0.2, euler=(12, -28, 0)),
+}
+ARMAS_DIR = glob.glob(os.path.join(EXTERNOS, "quaternius-weapons-2018", "*", "*", "FBX"))
+ARMAS_DIR = ARMAS_DIR[0] if ARMAS_DIR else ""
+METAIS = ("Steel", "LightSteel", "DarkSteel", "Gold")
 
 
 def _lin_srgb(c):
@@ -228,6 +246,40 @@ def renderizar(objetos, caminho):
     bpy.ops.render.render(write_still=True)
 
 
+def adicionar_arma(modelo, modulo, T, chave_cor, paleta):
+    """MOD5: importa a arma do Medieval Weapons Pack e põe na mão direita (osso Fist.R) como grupo `Arma_<Cor>`.
+    Devolve a posição da mão (espaço final autoral). Roda com o esqueleto do personagem ainda na cena."""
+    from mathutils import Euler
+    cfg = ARMAS[modulo]
+    antes = set(bpy.data.objects)
+    bpy.ops.import_scene.fbx(filepath=os.path.join(ARMAS_DIR, cfg["arquivo"]))
+    novos = [o for o in bpy.data.objects if o not in antes and o.type == "MESH"]
+    mao = None
+    for a in [o for o in antes if o.type == "ARMATURE"]:
+        if "Fist.R" in a.pose.bones:
+            pb = a.pose.bones["Fist.R"]
+            mao = T(a.matrix_world @ ((pb.head + pb.tail) / 2))
+    assert mao is not None, "osso Fist.R não encontrado"
+    zs = [(o.matrix_world @ v.co).z for o in novos for v in o.data.vertices]
+    esc = cfg["comp"] / (max(zs) - min(zs))
+    gira = Euler(tuple(math.radians(g) for g in cfg["euler"]), "ZYX").to_matrix()
+    grip = Vector((0, 0, cfg["agarre"]))
+    for o in novos:
+        for p in o.data.polygons:
+            mat = o.material_slots[p.material_index].material if o.material_slots and p.material_index < len(o.material_slots) else None
+            cor = chave_cor(mat)
+            if mat and mat.name in METAIS:
+                paleta[cor] = (paleta[cor][0], "Metal")
+            bm = modelo.g("Arma", cor)
+            vs = [bm.verts.new(mao + gira @ (((o.matrix_world @ o.data.vertices[i].co) - grip) * esc)) for i in p.vertices]
+            try:
+                bm.faces.new(vs)
+            except ValueError:
+                pass
+    modelo.tipo_arma = cfg["tipo"]
+    return mao
+
+
 def converter(modulo, cfg):
     pasta, arquivo, regra, alvo, medida, tipo, _ = cfg
     caminho = os.path.join(PASTAS[pasta], arquivo)
@@ -278,7 +330,7 @@ def converter(modulo, cfg):
     modelo = _Criatura(modulo, paleta)
 
     def chave_cor(mat):
-        rgb = COR_FIXA.get(modulo) or cor_do_material(mat)
+        rgb = COR_FIXA.get(modulo) or (PELE[modulo] if mat and mat.name.startswith("Skin") and modulo in PELE else None) or ((40, 32, 30) if mat and mat.name.startswith("Face") and modulo in PELE else None) or cor_do_material(mat)
         base = re.sub(r"[^A-Za-z]", "", mat.name if mat else "Cor") or "Cor"
         nome = base
         i = 0
@@ -320,6 +372,10 @@ def converter(modulo, cfg):
             except ValueError:
                 pass
 
+    mao_arma = None
+    if modulo in ARMAS:
+        mao_arma = adicionar_arma(modelo, modulo, T, chave_cor, paleta)
+
     if opcoes_clipes:
         import numpy as np
         import criaturas_clipes as clipes
@@ -346,6 +402,8 @@ def converter(modulo, cfg):
         if any(g.startswith(parte + "_") for g in modelo.grupos):
             c = sum(lista, Vector()) / len(lista)
             modelo.pivo(parte, c.x, c.y, c.z)
+    if mao_arma is not None:  # o pivô de `Arma` só indica de que braço ela é (AnimacaoCriatura.bracoDaArma)
+        modelo.pivo("Arma", mao_arma.x, mao_arma.y, mao_arma.z)
     for parte in ("Corpo",):
         if parte not in modelo.pivos_autorais:
             modelo.pivo(parte, 0, 0, alvo * 0.3)

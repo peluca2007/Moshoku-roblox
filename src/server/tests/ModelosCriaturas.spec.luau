@@ -68,6 +68,15 @@ return {
 	["modelo Quaternius só vale se o módulo existir (fallback de blocos)"] = function(t)
 		t.eq(Modelos.escolher("creature/rato-gigante", 0).modulo, "RatoGigante")
 		t.eq(Modelos.escolher("creature/rato-gigante", 0, function() return false end).modulo, "RatoGigante")
+		-- MOD5: bandido tem duas variantes Quaternius, escolhidas pela variante entre as existentes; arma declarada por módulo
+		local todos = function() return true end
+		t.eq(Modelos.escolher("creature/bandido-de-estrada", 0, todos).modulo, "BandidoPorreteQuaternius")
+		t.eq(Modelos.escolher("creature/bandido-de-estrada", 1, todos).modulo, "BandidoEspadaQuaternius")
+		t.eq(Modelos.escolher("creature/bandido-de-estrada", 1, function(m) return m == "BandidoPorreteQuaternius" end).modulo, "BandidoPorreteQuaternius")
+		t.eq(Modelos.escolher("creature/bandido-de-estrada", 1, function() return false end).modulo, "BandidoEspada")
+		t.eq(Modelos.tipoArma("BandidoEspadaQuaternius"), "espada")
+		t.eq(Modelos.tipoArma("RatoQuaternius"), nil)
+		t.eq(Anim.bracoDaArma(Pivos.BandidoEspadaQuaternius) ~= nil, true)
 		t.eq(Modelos.escolher("creature/rato-gigante", 0, function(m) return m == "RatoQuaternius" end).modulo, "RatoQuaternius")
 		t.eq(Modelos.escolher("creature/aranha-da-floresta", 3, function() return true end).modulo, "AranhaQuaternius")
 		t.eq(Modelos.escolher("creature/lobo-cinzento", 0, function() return false end).modulo, "LoboCinzento")

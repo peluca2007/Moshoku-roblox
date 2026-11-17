@@ -80,6 +80,17 @@ em `~/.moshoku/roblox_api_key.txt` respondeu "Invalid API Key" (15/11) e o Studi
 Slime 7; Morcego 7,5; Vespa 8; Dragão 6,5 (mais morcego grande que dragão). Triângulos: rato 4000, sapo 4900, aranha 2700
 (acima do orçamento de 2500; decimar se pesar). Cor sRGB vem do material e passa por `SATURACAO`/`VALOR` do script.
 
+## Humanoides armados Quaternius (MOD5, 17/11/2026)
+
+Bandido de Estrada deixou de ser boneco de blocos: `BandidoEspadaQuaternius` (Cowboy_Male + espada) e `BandidoPorreteQuaternius`
+(Casual3_Male + martelo pequeno como porrete), CC0 (procedência em `tools/blender/kits/FONTES.md`). O Goblin ganhou adaga
+(`GoblinQuaternius` regenerado). Mesmo pipeline do goblin (`tools/criaturas_quaternius.py --so X --studio --via-studio`; clipes
+Idle/Walk/Punch/RecieveHit do pacote, Morrer sintetizado). `ARMAS` em `kits/criaturas_quaternius.py` coloca a arma na mão direita
+(osso Fist.R) como grupo `Arma_<Cor>` (metais com material Metal). `ModelosCriaturas.preferidos` escolhe a variante do bandido
+(0 = porrete, 1 = espada) entre as existentes. Decisão visual: o pacote é de bonecos chibi de rosto liso (olhos brancos), então o
+resultado é limpo mas simplificado, longe de Clair Obscur; nota franca ~5,5/10. Pendências: Urso, Treant, Golem, Guerreiro e
+demais ainda são de blocos (ou sem modelo); o goblin arqueiro usa adaga; a arma segue o braço rígido (a mão não gira à parte); a Morte tomba o corpo rígido como tábua (aceitável por ora); armas inclinadas para fora da mão (`euler` Y) para não atravessar o corpo; olhos do pacote (brancos com "lágrima") trocados por escuros; metal do Roblox reflete o céu e fica azulado.
+
 ## Animações da luta: Universal Animation Library (APRES1)
 Quaternius, **CC0 1.0** (`License.txt` do pacote), `Universal Animation Library[Standard].zip` (UAL1, glb Unreal-Godot, 24 fps), baixada em 15/11/2026 e extraída em `build/externos/ual/` (fora do git). Redirecionada para o R15 por `tools/blender/anim_ual.py` com o mapa `tools/animacao/ual_clipes.json` (ver `tools/animacao/README.md`). Clipes da UAL: PosturaCombate (Sword_Idle), CorteLeve/CortePesado (Sword_Attack, 1,1x e 0,7x), Estocada (Punch_Jab), Conjurar (Spell_Simple Enter+Shoot+Exit), Canalizar, ReacaoGolpe (Hit_Chest), Esquiva (Roll), Queda (Death01). Continuam por script (`origem = "script"`): DisparoArco (a UAL1 só tem pistola), Bloqueio, Vitoria.
 

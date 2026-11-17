@@ -35,6 +35,11 @@ CLIPES = {
     "LoboQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walking", LAÇO)},
     "GoblinQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Punch", False),
                          "LevarGolpe": ("RecieveHit", False)},
+    # MOD5: bandidos humanoides (mesmo esqueleto do goblin; Morrer sintetizado)
+    "BandidoEspadaQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Punch", False),
+                         "LevarGolpe": ("RecieveHit", False)},
+    "BandidoPorreteQuaternius": {"Respirar": ("Idle", LAÇO), "Andar": ("Walk", LAÇO), "Atacar": ("Punch", False),
+                         "LevarGolpe": ("RecieveHit", False)},
 }
 # Clipes que terminam no último quadro (não voltam ao repouso).
 SEGURAR = {"Morrer"}

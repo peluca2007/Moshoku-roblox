@@ -41,6 +41,18 @@ function CriaturaAnimada.montar(info, pai, cf, escala)
 	local base = cf
 	local partes, grupos, locais = {}, {}, {}
 	local bracoArma = Anim.bracoDaArma(pivos)
+	local tipoArma = Modelos.tipoArma(info.modulo)
+	local principal, maior = nil, -1
+	for _, p in ipairs(modelo:GetDescendants()) do
+		if p:IsA("BasePart") and Anim.grupo(p.Name) == "Arma" then
+			-- Contrato MOD5: a maior peça do grupo vira `Arma` (as demais, cores do mesmo objeto, ficam `Arma_<Cor>`).
+			p:SetAttribute("TipoArma", tipoArma)
+			p:SetAttribute("Empunhadura", bracoArma)
+			local v = p.Size.X * p.Size.Y * p.Size.Z
+			if v > maior then principal, maior = p, v end
+		end
+	end
+	if principal then principal.Name = "Arma" end
 	for _, p in ipairs(modelo:GetDescendants()) do
 		if p:IsA("BasePart") then
 			p.Material = Enum.Material[Modelos.material(p.Name, p.Material.Name)]
@@ -89,6 +101,24 @@ function CriaturaAnimada:levarGolpe(agora)
 	if clipe and not (self.acao and self.acao.ataque) then
 		self.acao = { clipe = clipe, desde = agora or os.clock(), ultimo = -1e-6 }
 	end
+end
+-- MOD5: a peça `Arma` (e `Arma_<Cor>`) acompanha o braço pela animação (peças ancoradas, sem Weld). `soltarArma`
+-- tira essas peças da animação, as solta com física e devolve {principal, demais}; nil se não há arma (ou já foi solta).
+function CriaturaAnimada:soltarArma()
+	local soltas = {}
+	for i = #self.partes, 1, -1 do
+		if self.grupos[i].grupo == "Arma" then
+			table.insert(soltas, self.partes[i])
+			table.remove(self.partes, i); table.remove(self.grupos, i); table.remove(self.locais, i); table.remove(self.cfs, i)
+		end
+	end
+	if #soltas == 0 then return nil end
+	local principal
+	for _, p in ipairs(soltas) do
+		p.Anchored, p.CanCollide, p.Massless = false, true, false
+		if p.Name == "Arma" then principal = p end
+	end
+	return { principal = principal or soltas[1], demais = soltas }
 end
 function CriaturaAnimada:cair(agora) self.quedaDesde = agora or os.clock() end
 function CriaturaAnimada:caiu() return self.quedaDesde ~= nil end

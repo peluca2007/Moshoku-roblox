@@ -59,8 +59,8 @@ M.PLANOS = {
 		{ t = 2.4, f = "para", ang = 6, dist = 16, alt = 7 }, -- HAB8: termina alto e de lado (aliados, muro e inimigos); antes ficava atrás do muro
 	} },
 	["nevoa-densa"] = { zona = true, tomadas = {
-		{ t = 0, f = "para", ang = 50, dist = 18, alt = 6 },
-		{ t = 1.4, f = "para", ang = 25, dist = 24, alt = 10 }, -- sobe e mostra a área
+		{ t = 0, f = "para", ang = 40, dist = 14, alt = 10 }, -- HAB8: do alto, por cima de muros (o Escudo de pé tapava)
+		{ t = 1.4, f = "para", ang = 20, dist = 16, alt = 15 }, -- sobe e mostra a área rente ao chão
 	} },
 	-- Deus da Espada ----------------------------------------------------------------------------------------
 	["corte-de-braco"] = { tomadas = {

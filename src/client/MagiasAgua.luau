@@ -634,7 +634,8 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				local pr = g.pos + g.face * (espessura / 2 + 0.16) + g.tang * varre + Vector3.new(0, h * 0.5, 0)
 				g.reflexo.Size = Vector3.new(0.16, math.max(h * 0.7, 0.05), 0.05)
 				g.reflexo.CFrame = CFrame.lookAt(pr, pr + g.face)
-				g.reflexo.Transparency = 0.6 + 0.4 * math.abs(varre) / (g.w * 0.45) + (1 - ki) * 0.5
+				-- HAB8: um reflexo a cada 4 placas, mais suave (13 faixas claras verticais liam como emendas)
+				g.reflexo.Transparency = if i % 4 ~= 2 then 1 else 0.78 + 0.22 * math.abs(varre) / (g.w * 0.45) + (1 - ki) * 0.5
 				if g.fita then
 					local lado = if i == 1 then -1 else 1
 					local pf = g.pos + g.tang * (lado * g.w * 0.45) + Vector3.new(0, h / 2, 0)
@@ -685,7 +686,7 @@ local function zonaNevoa(ctx, muro, t0: number)
 				Lifetime = NumberRange.new(vida * 0.7, vida), Drag = 0.6, Rotation = NumberRange.new(0, 360), RotSpeed = NumberRange.new(-6, 6),
 				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, tam0), NumberSequenceKeypoint.new(1, tam1) }),
 				Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, transp0), NumberSequenceKeypoint.new(0.7, transp0 + 0.04), NumberSequenceKeypoint.new(1, 1) }),
-				LightEmission = 0, LightInfluence = 1,
+				LightEmission = 0, LightInfluence = 0.25, -- HAB8: a luz da Bola de Água acendia a névoa numa faixa azul brilhante
 			})
 			e.Color = ColorSequence.new(cinza, Color3.fromRGB(185, 200, 208))
 			table.insert(opacos, { e = e, base = transp0 })
@@ -825,7 +826,7 @@ function MagiasAgua.criar(ctx)
 			local luz = Instance.new("PointLight")
 			luz.Color, luz.Range, luz.Brightness, luz.Shadows = AGUA, 14, 4, false
 			luz.Parent = esfera
-			cena:rastro(esfera, AGUA, 2.2, 0.4, PROFUNDA)
+			cena:rastro(esfera, AGUA, 0.8, 0.22, PROFUNDA) -- HAB8: fino e curto (2,2 x 0,4 s virava um cone que cobria a tela com a câmera atrás da bola)
 			cena:emissor(esfera, "brilho", BRILHO, { Rate = qtd(34), Speed = NumberRange.new(0.5, 3), Lifetime = NumberRange.new(0.3, 0.6), Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0) }) })
 			cena:emissor(esfera, "fumaca", ESPUMA, { Rate = qtd(14), Speed = NumberRange.new(0.5, 1.5), Lifetime = NumberRange.new(0.4, 0.7),
 				Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.6), NumberSequenceKeypoint.new(1, 0.4) }), Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(1, 1) }) })

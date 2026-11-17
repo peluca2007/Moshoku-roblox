@@ -706,7 +706,7 @@ function Gestos.tocar(K, cena, recibo, spec, de: Vector3?, mec)
 		local tImp = W + corrida + golpe * 0.6
 		if est == "espada" then
 			-- REA3: um corte fino e quente (antes dois cortes grossos e um clarão grande, "rosa forte demais")
-			talho(alvoFinal - olhar * 0.5, olhar, 78, 3.2, tImp, 0.18)
+			-- (HAB4: sem talho neon: o corte é o rastro real da lâmina Mixamo; o talho deixava um bloco amarelo parado)
 			faiscas(alvoFinal - olhar * 1.1, olhar, tImp + 0.05, 10)
 		elseif est == "quadrupede" then
 			for i = 1, 3 do

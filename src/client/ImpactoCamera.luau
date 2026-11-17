@@ -47,24 +47,6 @@ function M.foco(inicial: Vector3, dur: number, posicao: () -> Vector3?, opc: { d
 		esc = math.max(tonumber(workspace:GetAttribute("EscalaDeTempoDasCenas")) or 1, 1) }
 	workspace:SetAttribute("ImpactoFocoEm", os.clock()) -- QA
 end
-local function aplicarFoco(cf: CFrame): CFrame?
-	local f = foco
-	if not f then return nil end
-	local t = (os.clock() - f.inicio) / f.esc
-	if t >= f.dur then foco = nil return nil end
-	local p = f.posicao()
-	if p then f.ultimo = p end
-	local alvo = f.ultimo
-	local w = Curvas.suave(math.min(t / 0.15, 1)) * Curvas.suave(math.min((f.dur - t) / 0.3, 1))
-	local fora = Vector3.new(cf.Position.X - alvo.X, 0, cf.Position.Z - alvo.Z)
-	fora = if fora.Magnitude > 0.1 then fora.Unit else Vector3.zAxis
-	fora = CFrame.Angles(0, math.rad(65), 0):VectorToWorldSpace(fora) -- de lado: a câmera da luta fica atrás do atacante, que taparia a arma
-	local pos = alvo + fora * f.dist + Vector3.new(0, f.altura, 0) -- de cima e perto: nenhum corpo fica entre a câmera e a arma
-	local mira = alvo - Vector3.new(0, 0.3, 0)
-	pos = M.semParede(mira, pos)
-	return cf:Lerp(CFrame.lookAt(pos, mira), w)
-end
-
 -- Só para a QA: o golpe atual (com a escolha de enquadramento e a folga do raycast).
 function M.estado()
 	return atual
@@ -177,6 +159,38 @@ function M.desocluir(cf: CFrame, a: Vector3, b: Vector3): CFrame
 		end
 	end
 	return cf
+end
+
+local function aplicarFoco(cf: CFrame): CFrame?
+	local f = foco
+	if not f then return nil end
+	local t = (os.clock() - f.inicio) / f.esc
+	if t >= f.dur then foco = nil return nil end
+	local p = f.posicao()
+	if p then f.ultimo = p end
+	local alvo = f.ultimo
+	local w = Curvas.suave(math.min(t / 0.15, 1)) * Curvas.suave(math.min((f.dur - t) / 0.3, 1))
+	local mira = alvo - Vector3.new(0, 0.3, 0)
+	if not f.pos then
+		-- escolhe UMA vez o lado: a câmera da luta fica atrás do atacante, que taparia o alvo; testa vários ângulos e
+		-- alturas e fica com o primeiro que não cai dentro de um lutador nem tem um corpo entre ela e o alvo
+		pOclusao.FilterDescendantsInstances = lutadores()
+		local fora = Vector3.new(cf.Position.X - alvo.X, 0, cf.Position.Z - alvo.Z)
+		fora = if fora.Magnitude > 0.1 then fora.Unit else Vector3.zAxis
+		local escolhida
+		for _, sobe in { 0, 3, 6 } do
+			for _, ang in { 65, -65, 110, -110, 150, -150, 20, -20, 0 } do
+				local d = CFrame.Angles(0, math.rad(ang), 0):VectorToWorldSpace(fora)
+				local pos = M.semParede(mira, alvo + d * f.dist + Vector3.new(0, f.altura + sobe, 0))
+				if not dentroDeLutador(pos) and not ocluido(pos, mira) then escolhida = pos break end
+			end
+			if escolhida then break end
+		end
+		f.pos = escolhida or M.semParede(mira, alvo + fora * f.dist + Vector3.new(0, f.altura + 8, 0))
+		f.rel = f.pos - alvo
+	end
+	local pos = alvo + f.rel
+	return cf:Lerp(CFrame.lookAt(pos, mira), w)
 end
 
 -- `cf`: câmera de luta já calculada. Devolve a câmera com o enquadramento do golpe misturado.

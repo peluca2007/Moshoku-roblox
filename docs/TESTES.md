@@ -1600,3 +1600,11 @@ Não verificado: luta real com personagem da Água; o corpo do alvo só recua (`
 - Névoa Densa: 18 bolhas translúcidas à deriva + emissor largo + véu; `real_nevoa-densa.mp4` mostra os lutadores sob bruma cinza-azulada (arestas das bolhas ainda visíveis).
 - Provados pelo caminho real, com QA forte (120 PV) contra rato gigante: flecha de água (`real_flecha-de-agua.mp4`: arco d'água, flecha, impacto) e lâmina de gelo (`real_lamina-de-gelo.mp4`: lâmina de gelo na mão).
 - NÃO feito: vídeo da Investida depois do ajuste e `qa.py luta`: depois dessas provas o Studio passou a falhar em `primeira_arvore` (tela de criação não aparece, 7 falhas em duas tentativas seguidas, não relacionadas a esta mudança), então o pipeline de QA ficou inutilizável nesta sessão. Pendente: refazer `hab_luta_real.py ... investida-espada --trajeto=4` e `qa.py luta` quando o Studio estiver íntegro.
+
+## HAB4 (17/11/2026) — Investida, escudo e névoa refinados (`build/beleza/hab4/`)
+
+- Investida: o bloco amarelo parado do impacto era o `talho` neon; removido (sobram faíscas, traços de vento e o rastro da lâmina). `investida.mp4`.
+- Escudo: núcleo em vidro cinza-azulado (a lateral deixou de ser azul viva; lê mais como vidro grosso que como água); `ImpactoCamera.foco` escolhe uma vez um ponto sem lutador dentro nem corpo na frente do alvo. O plano de cabeça grande que aparece no vídeo é o enquadramento do ataque do inimigo, não deste foco. `real_escudo-de-agua.mp4` (gravado dentro da névoa da cast anterior).
+- Névoa: sem bolhas nem disco; só emissor largo (60/s, 8 a 15 studs) ⇒ bruma contínua sem borda. `real_nevoa-densa.mp4`.
+- `qa.py luta` 29 ok (rodado sozinho). `testar.ps1` só com Catálogo falhando (uma rodada isolada acusou 2 problemas durante edições de outro agente). Lição do RODA2: nunca QA em paralelo nem junto de testar.ps1.
+- Não verificado: celular, desempenho, escudo sozinho (sem névoa), flecha/lâmina regravadas.

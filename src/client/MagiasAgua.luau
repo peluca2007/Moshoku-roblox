@@ -479,7 +479,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 	local N = if FX.reduzidos then 5 else 9
 	local estado = { tFim = nil :: number? }
 	local anim
-	local AZUL_NUCLEO, AZUL_SUP, AZUL_TEX = Color3.fromRGB(34, 104, 176), Color3.fromRGB(70, 150, 205), Color3.fromRGB(160, 214, 238)
+	local AZUL_NUCLEO, AZUL_SUP, AZUL_TEX = Color3.fromRGB(52, 96, 128), Color3.fromRGB(78, 128, 158), Color3.fromRGB(150, 196, 220)
 	cena:em(t0, function()
 		local segs = {}
 		for i = 1, N do
@@ -489,7 +489,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 			local face = tang:Cross(Vector3.yAxis)
 			if face:Dot(normal) < 0 then face = -face end
 			local w = larg / N * 1.18
-			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.5, Material = Enum.Material.SmoothPlastic })
+			local nucleo = cena:peca({ Size = Vector3.new(w, 0.1, espessura), Color = AZUL_NUCLEO, Transparency = 0.62, Material = Enum.Material.Glass })
 			local sup = cena:peca({ Size = Vector3.new(w, 0.1, espessura + 0.25), Color = AZUL_SUP, Transparency = 0.72, Material = Enum.Material.Glass })
 			local tex = {}
 			for _, f in { Enum.NormalId.Front, Enum.NormalId.Back } do
@@ -499,7 +499,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				tx.Parent = sup
 				table.insert(tex, tx)
 			end
-			local espuma = cena:peca({ Size = Vector3.new(w * 0.95, 0.7, espessura + 0.6), Color = ESPUMA, Transparency = 0.3, Material = Enum.Material.SmoothPlastic })
+			local espuma = cena:peca({ Size = Vector3.new(w * 0.95, 0.7, espessura + 0.6), Color = ESPUMA, Transparency = 0.35, Material = Enum.Material.SmoothPlastic })
 			local fonte = cena:peca({ Size = Vector3.new(w * 0.8, 0.2, 0.4), Transparency = 1 })
 			local gotas = cena:emissor(fonte, "brilho", AZUL_TEX, {
 				Rate = if FX.reduzidos then 2 else 5, Speed = NumberRange.new(0.2, 0.8), SpreadAngle = Vector2.new(8, 8),
@@ -533,7 +533,7 @@ local function zonaEscudo(ctx, muro, t0: number, frente: Vector3?)
 				local cf = CFrame.lookAt(g.pos + Vector3.new(0, h / 2, 0), g.pos + Vector3.new(0, h / 2, 0) + g.face)
 				g.nucleo.Size = Vector3.new(g.nucleo.Size.X, h, espessura + onda * 0.3)
 				g.nucleo.CFrame = cf
-				g.nucleo.Transparency = 0.5 + 0.07 * math.sin(cena.T * 2.6 + i)
+				g.nucleo.Transparency = 0.62 + 0.06 * math.sin(cena.T * 2.6 + i)
 				g.sup.Size = Vector3.new(g.sup.Size.X, h, espessura + 0.25 + onda * 0.3)
 				g.sup.CFrame = cf
 				g.tex[1].OffsetStudsV, g.tex[2].OffsetStudsV = cena.T * 2.4, cena.T * 1.9 -- correnteza subindo
@@ -576,23 +576,11 @@ local function zonaNevoa(ctx, muro, t0: number)
 	local cinza = Color3.fromRGB(150, 168, 178)
 	cena:em(t0, function()
 		local vol = cena:peca({ Size = Vector3.new(raio * 1.8, 7, raio * 1.8), Position = Vector3.new(c.X, chaoY + 3.5, c.Z), Transparency = 1 })
-		local veu = cena:disco(Vector3.new(c.X, chaoY + 0.2, c.Z), raio * 2.1, cinza, 0.8)
-		local nuvens = {}
-		local semente = (muro.id and #muro.id or 3) * 7.13
-		for i = 1, if FX.reduzidos then 8 else 18 do
-			local ang = i * 2.399 + semente
-			local dist = raio * 0.8 * math.sqrt((i % 9) / 9 + 0.08)
-			local tam = 9 + (i % 4) * 2.5
-			local p = cena:bola(tam, Vector3.new(c.X + math.cos(ang) * dist, chaoY + 1.5 + (i % 3) * 1.6, c.Z + math.sin(ang) * dist), cinza, 0.86)
-			p.Material = Enum.Material.SmoothPlastic
-			p.CastShadow = false
-			nuvens[i] = { p = p, ang = ang, dist = dist, base = p.Position, fase = i * 0.7, tam = tam }
-		end
 		local fumo = cena:emissor(vol, "fumaca", cinza, {
 			Rate = 0, Speed = NumberRange.new(0.2, 0.9), SpreadAngle = Vector2.new(180, 180),
 			Lifetime = NumberRange.new(5, 7), Drag = 0.5, Rotation = NumberRange.new(0, 360), RotSpeed = NumberRange.new(-8, 8),
-			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 6), NumberSequenceKeypoint.new(1, 12) }),
-			Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.25, 0.86), NumberSequenceKeypoint.new(0.75, 0.88), NumberSequenceKeypoint.new(1, 1) }),
+			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 8), NumberSequenceKeypoint.new(1, 15) }),
+			Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, 0.8), NumberSequenceKeypoint.new(0.7, 0.82), NumberSequenceKeypoint.new(1, 1) }),
 			LightEmission = 0, LightInfluence = 1,
 		})
 		fumo.Color = ColorSequence.new(cinza, Color3.fromRGB(185, 200, 208))
@@ -601,14 +589,7 @@ local function zonaNevoa(ctx, muro, t0: number)
 			local t = cena.T - t0
 			local k = math.clamp(t / 2, 0, 1)
 			if estado.tFim then k = 1 - math.clamp((cena.T - estado.tFim) / 1.4, 0, 1) end
-			fumo.Rate = (if FX.reduzidos then 8 else 22) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
-			veu.Transparency = 1 - 0.22 * k
-			for _, n in nuvens do
-				local a = n.ang + cena.T * 0.05
-				n.p.Position = n.base + Vector3.new(math.cos(a) * 1.2, math.sin(cena.T * 0.4 + n.fase) * 0.5, math.sin(a) * 1.2)
-				n.p.Size = Vector3.one * n.tam * (0.4 + 0.6 * k)
-				n.p.Transparency = 1 - 0.14 * k
-			end
+			fumo.Rate = (if FX.reduzidos then 16 else 60) * k * (1 + 0.1 * math.sin(cena.T * 0.7))
 			if estado.tFim and cena.T - estado.tFim > 1.5 then
 				fumo.Enabled = false
 				if cena.T - estado.tFim > 9 then
